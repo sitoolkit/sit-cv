@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+</head>
+
+<body>
+
+    <div id="list"></div>
+    <div id="designdoc"></div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script>
+
+        function renderDesingDocList(designDocIds) {
+            var html = '';
+            $.each(designDocIds, function(idx, designDocId) {
+                html += '<a href="#">' + designDocId + '</a></li>';
+            });
+            $('#list').html(html);
+        }
+
+        function renderDiagrams(diagrams) {
+            var html = '';
+            $.each(diagrams, function(id, data) {
+                html += '<img src="' + data + '"/>';
+            });
+            $('#designdoc').html(html);
+        }
+        
+        var stompClient = null;
+        
+        function subscribe(designDocId) {
+            stompClient.subscribe('/topic/designdoc/detail/' + designDocId, function (response) {
+                    renderDiagrams(JSON.parse(response.body).diagrams);
+                });
+        }
+
+        function unsubscribe(designDocId) {
+            stompClient.unsubscribe('/topic/designdoc/detail/' + designDocId);
+        }
+
+        function connect() {
+            var socket = new SockJS('/gs-guide-websocket');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+
+                stompClient.subscribe('/topic/designdoc/list', function (response) {
+                    renderDesingDocList(JSON.parse(response.body).designDocIds);
+                });
+
+                stompClient.send("/app/designdoc/list");
+            });
+        }
+
+        connect();
+    
+        $(function () {
+
+            var currentDesignDocId = '';
+
+            $(document).on('click', '#list a', function() {
+                if (currentDesignDocId) {
+                    unsubscribe(currentDesignDocId);
+                }
+                currentDesignDocId = $(this).html();
+                subscribe(currentDesignDocId);
+                stompClient.send("/app/designdoc/detail", {}, currentDesignDocId);
+            });
+
+
+        });
+
+    </script>
+</body>
+
+</html>
