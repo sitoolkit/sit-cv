@@ -65,7 +65,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     @Override
     public void readDir(Path srcDir) {
 
-        // init(srcDir);
+        init(srcDir);
 
         try {
             Pattern p = Pattern.compile(config.getJavaFilePattern());
