@@ -1,6 +1,5 @@
 package org.sitoolkit.cv.core.domain.uml.plantuml;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,10 +12,6 @@ import org.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import org.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import org.sitoolkit.cv.core.domain.uml.MessageDef;
 import org.sitoolkit.cv.core.domain.uml.SequenceDiagram;
-
-import net.sourceforge.plantuml.FileFormat;
-import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.SourceStringReader;
 
 public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram> {
 
@@ -33,22 +28,8 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
     }
 
     @Override
-    public Diagram write(SequenceDiagram sequence) {
-        Diagram diagram = new Diagram();
-        diagram.setId(sequence.getId());
-        diagram.setTags(sequence.getAllTags());
-
-        SourceStringReader reader = new SourceStringReader(serialize(sequence));
-
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            reader.outputImage(baos, new FileFormatOption(FileFormat.PNG));
-            diagram.setData(baos.toByteArray());
-
-            return diagram;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public Diagram write(SequenceDiagram diagram) {
+        return PlantUmlUtil.createDiagram(diagram, this::serialize);
     }
 
     public String serialize(SequenceDiagram diagram) {
