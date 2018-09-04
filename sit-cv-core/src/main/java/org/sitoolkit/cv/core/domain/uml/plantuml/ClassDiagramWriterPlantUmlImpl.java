@@ -24,7 +24,9 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
 
         String fieldsStr = clazz.getFields().stream().map(this::field2str).collect(Collectors.joining("\n"));
         String methodsStr = clazz.getMethods().stream()
-                .sorted(Comparator.comparing(MethodDef::isPublic).reversed())
+                .sorted(Comparator.comparing(MethodDef::isPublic)
+                        .reversed()
+                        .thenComparing(Comparator.comparing(MethodDef::getName)))
                 .map(this::method2str)
                 .collect(Collectors.joining("\n"));
 
