@@ -17,12 +17,29 @@ import org.sitoolkit.cv.core.domain.classdef.RelationDef;
 public class ClassDiagramProcessor {
 
     public ClassDiagram process(MethodDef entryPoint) {
-        Set<ClassDef> classes = pickClasses(entryPoint);
-        return process(classes, relation -> classes.contains(relation.getOther()));
+
+        Set<ClassDef> pickedClasses = pickClasses(entryPoint);
+        return process(
+                entryPoint.getQualifiedSignature() + "(classDiagram)",
+                pickedClasses,
+                relation -> pickedClasses.contains(relation.getOther()));
+    }
+
+    public ClassDiagram process(String id, Set<ClassDef> classes, Predicate<RelationDef> relationFilter) {
+
+        Set<RelationDef> relations = classes.stream()
+                .flatMap(this::getRelations)
+                .filter(relationFilter)
+                .collect(Collectors.toSet());
+
+        return ClassDiagram.builder()
+                .id(id)
+                .classes(classes)
+                .relations(relations)
+                .build();
     }
 
     private Stream<RelationDef> getRelations(ClassDef clazz) {
-
         Stream<RelationDef> instanceRels = clazz.getFields().stream()
                 .map(field -> getInstanceRelation(clazz, field))
                 .filter(Optional::isPresent)
@@ -31,15 +48,6 @@ public class ClassDiagramProcessor {
         Stream<RelationDef> classRels = getClassRelation(clazz).stream();
         Stream<RelationDef> dependencies = clazz.getMethods().stream().flatMap(this::getDependencies);
         return Stream.of(instanceRels, classRels, dependencies).flatMap(Function.identity()).distinct();
-    }
-
-    public ClassDiagram process(Set<ClassDef> classes, Predicate<RelationDef> relationFilter) {
-        Set<RelationDef> relations = classes.stream()
-                .flatMap(this::getRelations)
-                .filter(relationFilter)
-                .collect(Collectors.toSet());
-
-        return ClassDiagram.builder().classes(classes).relations(relations).build();
     }
 
     private Set<ClassDef> pickClasses(MethodDef entryPoint) {

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SequenceDiagram {
+public class SequenceDiagram implements DiagramModel{
     private LifeLineDef entryLifeLine;
 
     public String getId() {

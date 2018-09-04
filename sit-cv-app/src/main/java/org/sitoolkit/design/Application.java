@@ -5,8 +5,12 @@ import org.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import org.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import org.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
 import org.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
+import org.sitoolkit.cv.core.domain.uml.ClassDiagram;
+import org.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
 import org.sitoolkit.cv.core.domain.uml.DiagramWriter;
+import org.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import org.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
+import org.sitoolkit.cv.core.domain.uml.plantuml.ClassDiagramWriterPlantUmlImpl;
 import org.sitoolkit.cv.core.domain.uml.plantuml.SequenceDiagramWriterPlantUmlImpl;
 import org.sitoolkit.cv.core.infra.config.Config;
 import org.sitoolkit.cv.core.infra.watcher.FileInputSourceWatcher;
@@ -28,13 +32,23 @@ public class Application {
     }
 
     @Bean
+    public ClassDiagramProcessor classDiagramProcessor() {
+        return new ClassDiagramProcessor();
+    }
+
+    @Bean
     public DesignDocService designService() {
         return new DesignDocService();
     }
 
     @Bean
-    public DiagramWriter sequenceDiagramWriter() {
+    public DiagramWriter<SequenceDiagram> sequenceDiagramWriter() {
         return new SequenceDiagramWriterPlantUmlImpl();
+    }
+
+    @Bean
+    public DiagramWriter<ClassDiagram> classDiagramWriter() {
+        return new ClassDiagramWriterPlantUmlImpl();
     }
 
     @Bean

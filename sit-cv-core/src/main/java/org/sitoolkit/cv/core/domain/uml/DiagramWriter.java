@@ -2,7 +2,7 @@ package org.sitoolkit.cv.core.domain.uml;
 
 import org.sitoolkit.cv.core.domain.designdoc.Diagram;
 
-public interface DiagramWriter {
+public interface DiagramWriter<T extends DiagramModel> {
 
-    Diagram write(SequenceDiagram diagram);
+    Diagram write(T diagram);
 }

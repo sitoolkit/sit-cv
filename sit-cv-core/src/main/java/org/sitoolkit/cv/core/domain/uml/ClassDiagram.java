@@ -1,20 +1,26 @@
 package org.sitoolkit.cv.core.domain.uml;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.sitoolkit.cv.core.domain.classdef.ClassDef;
 import org.sitoolkit.cv.core.domain.classdef.RelationDef;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 @Builder
-public class ClassDiagram {
+public class ClassDiagram implements DiagramModel {
     private Set<ClassDef> classes;
     private Set<RelationDef> relations;
+    private String id;
+
+    @Override
+    public Set<String> getAllTags() {
+        return classes.stream()
+                .map(ClassDef::getSourceId)
+                .distinct()
+                .collect(Collectors.toSet());
+    }
 }

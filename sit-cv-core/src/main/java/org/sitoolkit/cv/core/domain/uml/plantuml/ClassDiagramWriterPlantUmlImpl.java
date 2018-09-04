@@ -9,14 +9,16 @@ import org.sitoolkit.cv.core.domain.classdef.ClassDef;
 import org.sitoolkit.cv.core.domain.classdef.FieldDef;
 import org.sitoolkit.cv.core.domain.classdef.MethodDef;
 import org.sitoolkit.cv.core.domain.classdef.RelationDef;
+import org.sitoolkit.cv.core.domain.designdoc.Diagram;
 import org.sitoolkit.cv.core.domain.uml.ClassDiagram;
+import org.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import org.sitoolkit.cv.core.domain.uml.RelationType;
 
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.plantuml.StringUtils;
 
 @Slf4j
-public class ClassDiagramWriterPlantUmlImpl {
+public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagram>{
 
     private String class2str(ClassDef clazz) {
 
@@ -89,6 +91,11 @@ public class ClassDiagramWriterPlantUmlImpl {
         log.debug("serializedDiagram -> {}", umlString);
 
         return umlString;
+    }
+
+    @Override
+    public Diagram write(ClassDiagram diagram) {
+        return PlantUmlUtil.createDiagram(diagram, this::serialize);
     }
 
 }

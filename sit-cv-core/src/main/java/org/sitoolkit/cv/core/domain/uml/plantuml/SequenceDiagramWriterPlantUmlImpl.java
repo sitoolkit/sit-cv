@@ -9,16 +9,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.sitoolkit.cv.core.domain.designdoc.Diagram;
+import org.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import org.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import org.sitoolkit.cv.core.domain.uml.MessageDef;
 import org.sitoolkit.cv.core.domain.uml.SequenceDiagram;
-import org.sitoolkit.cv.core.domain.uml.DiagramWriter;
 
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 
-public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter {
+public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram> {
 
     public List<String> write(List<SequenceDiagram> diagrams) {
         List<String> lines = new ArrayList<>();
