@@ -16,6 +16,8 @@ import org.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import org.sitoolkit.cv.core.domain.classdef.MethodDef;
 import org.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import org.sitoolkit.cv.core.domain.designdoc.Diagram;
+import org.sitoolkit.cv.core.domain.uml.ClassDiagram;
+import org.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
 import org.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import org.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import org.sitoolkit.cv.core.domain.uml.SequenceDiagram;
@@ -31,10 +33,16 @@ public class DesignDocService {
     ClassDefReader classDefReader;
 
     @Resource
-    SequenceDiagramProcessor processor;
+    SequenceDiagramProcessor sequenceProcessor;
 
     @Resource
-    DiagramWriter sequenceWriter;
+    ClassDiagramProcessor classProcessor;
+
+    @Resource
+    DiagramWriter<SequenceDiagram> sequenceWriter;
+
+    @Resource
+    DiagramWriter<ClassDiagram> classWriter;
 
     @Resource
     ClassDefRepository classDefRepository;
@@ -84,7 +92,7 @@ public class DesignDocService {
 
         MethodDef entryPoint = classDefRepository.findMethodByQualifiedSignature(designDocId);
         log.info("Build diagram for {}", entryPoint);
-        LifeLineDef lifeLine = processor.process(entryPoint.getClassDef(), entryPoint);
+        LifeLineDef lifeLine = sequenceProcessor.process(entryPoint.getClassDef(), entryPoint);
 
         lifeLine.getAllSourceIds().stream().forEach(sourceId -> {
             Set<String> entryPoints = entryPointMap.computeIfAbsent(sourceId,
@@ -92,11 +100,14 @@ public class DesignDocService {
             entryPoints.add(entryPoint.getQualifiedSignature());
         });
 
-        Diagram diagram = sequenceWriter
+        Diagram sequenceDiagram = sequenceWriter
                 .write(SequenceDiagram.builder().entryLifeLine(lifeLine).build());
 
+        Diagram classDiagram = classWriter.write(classProcessor.process(entryPoint));
+
         DesignDoc doc = new DesignDoc();
-        doc.add(diagram);
+        doc.add(sequenceDiagram);
+        doc.add(classDiagram);
 
         return doc;
     }

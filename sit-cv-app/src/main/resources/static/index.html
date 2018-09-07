@@ -31,10 +31,11 @@
                 html += '<img src="' + data + '"/>';
             });
             $('#designdoc').html(html);
+            $('#designdoc img').css('display','block');
         }
-        
+
         var stompClient = null;
-        
+
         function subscribe(designDocId) {
             stompClient.subscribe('/topic/designdoc/detail/' + designDocId, function (response) {
                     renderDiagrams(JSON.parse(response.body).diagrams);
@@ -59,7 +60,7 @@
         }
 
         connect();
-    
+
         $(function () {
 
             var currentDesignDocId = '';
