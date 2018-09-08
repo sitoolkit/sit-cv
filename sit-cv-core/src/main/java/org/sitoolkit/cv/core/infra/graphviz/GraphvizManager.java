@@ -25,18 +25,15 @@ public class GraphvizManager {
     };
 
     public Path getBinaryPath() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return getGraphvizPath().resolve("release/bin/dot.exe");
-        } else {
-            //TODO Linux/Mac 向け実装
-            throw new IllegalStateException("this OS is not supported. Supported is Windows only.");
-        }
-    };
+        return getGraphvizPath().resolve("release/bin/dot.exe");
+    }
 
     @PostConstruct
     public void init() {
-        loadProperties();
-        checkBinary();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            loadProperties();
+            checkBinary();
+        }
     }
 
     private void loadProperties() {
@@ -58,12 +55,7 @@ public class GraphvizManager {
 
     private void installGraphviz() {
         prepareDirectory();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            installGraphvizWindows();
-        } else {
-            //TODO Linux/Mac向け実装
-            log.info("install skipped. Graphviz auto install is supported for Windows only. ");
-        }
+        installGraphvizWindows();
     }
 
     private void installGraphvizWindows() {
@@ -89,7 +81,7 @@ public class GraphvizManager {
         if (Files.exists(zipFile)) {
             log.info("zipFile exists :{}", zipFile.toString());
         } else {
-            //TODO proxy対応
+            // TODO proxy対応
             try {
                 URL url = new URL(winGraphvizDownloadUrl);
                 log.info("downloading zipFile from '{}' ... ", url);
@@ -106,7 +98,8 @@ public class GraphvizManager {
         ZipUtil.unpack(zipFile.toFile(), getGraphvizPath().toFile());
         if (!Files.exists(getBinaryPath())) {
             log.error("graphviz executable not found at '{}' ", getBinaryPath().toAbsolutePath());
-            throw new IllegalStateException("graphviz executable not found at " + getBinaryPath().toAbsolutePath());
+            throw new IllegalStateException(
+                    "graphviz executable not found at " + getBinaryPath().toAbsolutePath());
         }
     }
 
