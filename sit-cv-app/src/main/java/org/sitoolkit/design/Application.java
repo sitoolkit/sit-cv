@@ -11,8 +11,10 @@ import org.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import org.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import org.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
 import org.sitoolkit.cv.core.domain.uml.plantuml.ClassDiagramWriterPlantUmlImpl;
+import org.sitoolkit.cv.core.domain.uml.plantuml.PlantUmlWriter;
 import org.sitoolkit.cv.core.domain.uml.plantuml.SequenceDiagramWriterPlantUmlImpl;
 import org.sitoolkit.cv.core.infra.config.Config;
+import org.sitoolkit.cv.core.infra.graphviz.GraphvizManager;
 import org.sitoolkit.cv.core.infra.watcher.FileInputSourceWatcher;
 import org.sitoolkit.cv.core.infra.watcher.InputSourceWatcher;
 import org.springframework.boot.SpringApplication;
@@ -69,6 +71,16 @@ public class Application {
     @Bean
     public InputSourceWatcher inputSourceWatcher() {
         return new FileInputSourceWatcher();
+    }
+
+    @Bean
+    public PlantUmlWriter plantumlWriter() {
+        return new PlantUmlWriter();
+    }
+
+    @Bean
+    public GraphvizManager graphvizManager() {
+        return new GraphvizManager();
     }
 
     @Bean

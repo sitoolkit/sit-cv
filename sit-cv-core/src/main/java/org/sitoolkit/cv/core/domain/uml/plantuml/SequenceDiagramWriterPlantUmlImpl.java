@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.sitoolkit.cv.core.domain.designdoc.Diagram;
 import org.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import org.sitoolkit.cv.core.domain.uml.LifeLineDef;
@@ -14,6 +16,9 @@ import org.sitoolkit.cv.core.domain.uml.MessageDef;
 import org.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 
 public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram> {
+
+    @Resource
+    PlantUmlWriter plantumlWriter;
 
     public List<String> write(List<SequenceDiagram> diagrams) {
         List<String> lines = new ArrayList<>();
@@ -29,7 +34,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
     @Override
     public Diagram write(SequenceDiagram diagram) {
-        return PlantUmlUtil.createDiagram(diagram, this::serialize);
+        return plantumlWriter.createDiagram(diagram, this::serialize);
     }
 
     public String serialize(SequenceDiagram diagram) {
