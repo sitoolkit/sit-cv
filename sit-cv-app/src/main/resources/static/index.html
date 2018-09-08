@@ -15,14 +15,15 @@
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script>
     <script>
 
         function renderDesingDocList(designDocIds) {
-            var html = '';
+            var ul = $('<ul>');
             $.each(designDocIds, function(idx, designDocId) {
-                html += '<a href="#">' + designDocId + '</a></li>';
+                ul.append('<li><a href="#">' + _.escape(designDocId) + '</a></li>');
             });
-            $('#list').html(html);
+            $('#list').html(ul);
         }
 
         function renderDiagrams(diagrams) {
@@ -69,7 +70,7 @@
                 if (currentDesignDocId) {
                     unsubscribe(currentDesignDocId);
                 }
-                currentDesignDocId = $(this).html();
+                currentDesignDocId = _.unescape($(this).html());
                 subscribe(currentDesignDocId);
                 stompClient.send("/app/designdoc/detail", {}, currentDesignDocId);
             });
