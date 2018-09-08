@@ -15,6 +15,7 @@ start http://localhost:8080/
 * macOS
 
 ```
+brew install graphviz
 git clone https://github.com/sitoolkit/sit-cv.git
 cd sit-cv
 ./mvnw package
