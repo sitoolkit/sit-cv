@@ -8,12 +8,16 @@ import javax.annotation.PostConstruct;
 
 import org.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import org.sitoolkit.cv.core.domain.designdoc.DesignDoc;
+import org.sitoolkit.design.ApplicationConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 public class DesignDocPublisher {
 
@@ -23,10 +27,14 @@ public class DesignDocPublisher {
     @Autowired
     SimpMessagingTemplate template;
 
+    @Autowired
+    ApplicationConfig config;
+
     @PostConstruct
     public void init() {
-        // TODO get from config
-        Path srcDir = Paths.get("../sample/src/main/java");
+        log.debug("loading project:{}", config.getTargetProjectPath());
+
+        Path srcDir = Paths.get(config.getTargetProjectPath(), "src/main/java");
         service.loadDir(srcDir);
 
         ListResponse listResponse = buildDesingDocList();

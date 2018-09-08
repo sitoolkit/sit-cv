@@ -27,6 +27,11 @@ public class Application {
     }
 
     @Bean
+    public ApplicationConfig applicationConfig() {
+        return new ApplicationConfig();
+    }
+
+    @Bean
     public SequenceDiagramProcessor sequenceDiagramProcessor() {
         return new SequenceDiagramProcessor();
     }
