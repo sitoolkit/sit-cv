@@ -49,7 +49,7 @@
     }
 
     function connect() {
-      var socket = new SockJS('/gs-guide-websocket');
+      var socket = new SockJS(`http://${location.hostname}:8080/gs-guide-websocket`);
       stompClient = Stomp.over(socket);
       stompClient.connect({}, function (frame) {
 
