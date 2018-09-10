@@ -20,7 +20,7 @@
       <artifactId>plantuml</artifactId>
       <version>1.2018.9</version>
     </dependency>
-  
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -65,9 +65,9 @@
     </dependency>
 
   </dependencies>
-  
+
   <parent>
-    <groupId>org.sitoolkit.cv</groupId>
+    <groupId>io.sitoolkit.cv</groupId>
     <artifactId>code-visualizer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
