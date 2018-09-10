@@ -6,7 +6,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sitoolkit.cv</groupId>
+      <groupId>io.sitoolkit.cv</groupId>
       <artifactId>sit-cv-core</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
@@ -83,7 +83,7 @@
   </dependencies>
 
   <parent>
-    <groupId>org.sitoolkit.cv</groupId>
+    <groupId>io.sitoolkit.cv</groupId>
     <artifactId>code-visualizer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>

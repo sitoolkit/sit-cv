@@ -9,7 +9,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.sitoolkit" level="DEBUG">
+  <logger name="io.sitoolkit" level="DEBUG">
   </logger>
 
   <root level="INFO">
