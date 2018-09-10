@@ -1,4 +1,4 @@
-package org.sitoolkit.design.infra.websocket;
+package io.sitoolkit.design.infra.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

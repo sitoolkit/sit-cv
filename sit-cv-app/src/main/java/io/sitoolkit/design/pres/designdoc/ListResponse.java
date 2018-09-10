@@ -1,4 +1,4 @@
-package org.sitoolkit.design.pres.designdoc;
+package io.sitoolkit.design.pres.designdoc;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.sitoolkit.design.pres.designdoc;
+package io.sitoolkit.design.pres.designdoc;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -6,7 +6,6 @@ import java.util.Base64;
 
 import javax.annotation.PostConstruct;
 
-import org.sitoolkit.design.ApplicationConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Controller;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
+import io.sitoolkit.design.ApplicationConfig;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

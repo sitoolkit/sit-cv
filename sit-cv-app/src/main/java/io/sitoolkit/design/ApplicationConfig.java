@@ -1,4 +1,4 @@
-package org.sitoolkit.design;
+package io.sitoolkit.design;
 
 import java.util.List;
 import java.util.function.Consumer;

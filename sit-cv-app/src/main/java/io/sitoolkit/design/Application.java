@@ -1,4 +1,4 @@
-package org.sitoolkit.design;
+package io.sitoolkit.design;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
