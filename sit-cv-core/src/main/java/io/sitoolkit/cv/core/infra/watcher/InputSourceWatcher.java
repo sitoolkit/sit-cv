@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 入力ソースの変更を監視するクラスです。
- * 
+ *
  * @author yuichi.kuwahara
  */
 @Slf4j
@@ -53,7 +53,7 @@ public abstract class InputSourceWatcher {
      *
      * @param cg
      *            繰り返し生成インターフェース
-     * @see #watching(org.sitoolkit.tabledata.ContinuousGeneratable)
+     * @see #watching()
      */
     public void start(final ContinuousGeneratable cg) {
         if (!isContinue()) {
@@ -91,7 +91,7 @@ public abstract class InputSourceWatcher {
 
     /**
      * 入力ソースを監視対象に追加する実際の処理を実装します。
-     * 
+     *
      * @param inputSource
      *            入力ソース
      */
