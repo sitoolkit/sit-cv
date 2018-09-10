@@ -1,25 +1,26 @@
 package org.sitoolkit.design;
 
-import org.sitoolkit.cv.core.app.designdoc.DesignDocService;
-import org.sitoolkit.cv.core.domain.classdef.ClassDefReader;
-import org.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
-import org.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
-import org.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
-import org.sitoolkit.cv.core.domain.uml.ClassDiagram;
-import org.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
-import org.sitoolkit.cv.core.domain.uml.DiagramWriter;
-import org.sitoolkit.cv.core.domain.uml.SequenceDiagram;
-import org.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
-import org.sitoolkit.cv.core.domain.uml.plantuml.ClassDiagramWriterPlantUmlImpl;
-import org.sitoolkit.cv.core.domain.uml.plantuml.PlantUmlWriter;
-import org.sitoolkit.cv.core.domain.uml.plantuml.SequenceDiagramWriterPlantUmlImpl;
-import org.sitoolkit.cv.core.infra.config.Config;
-import org.sitoolkit.cv.core.infra.graphviz.GraphvizManager;
-import org.sitoolkit.cv.core.infra.watcher.FileInputSourceWatcher;
-import org.sitoolkit.cv.core.infra.watcher.InputSourceWatcher;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
+import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
+import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
+import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
+import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
+import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
+import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
+import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
+import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
+import io.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
+import io.sitoolkit.cv.core.domain.uml.plantuml.ClassDiagramWriterPlantUmlImpl;
+import io.sitoolkit.cv.core.domain.uml.plantuml.PlantUmlWriter;
+import io.sitoolkit.cv.core.domain.uml.plantuml.SequenceDiagramWriterPlantUmlImpl;
+import io.sitoolkit.cv.core.infra.config.Config;
+import io.sitoolkit.cv.core.infra.graphviz.GraphvizManager;
+import io.sitoolkit.cv.core.infra.watcher.FileInputSourceWatcher;
+import io.sitoolkit.cv.core.infra.watcher.InputSourceWatcher;
 
 @SpringBootApplication
 public class Application {
