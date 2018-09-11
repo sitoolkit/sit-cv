@@ -5,26 +5,17 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './uml.component.html',
   styleUrls: ['./uml.component.css']
 })
-export class UmlComponent implements OnInit {
+export class UmlComponent {
   stompClient = null;
+  designDocIds = [];
+  currentDesignDocId = '';
+  currentDiagrams = [];
+  objectKeys = Object.keys;
 
   constructor() {
     this.connect();
   }
 
-  ngOnInit() {
-    var currentDesignDocId = '';
-
-    $(document).on('click', '#list a', (e) => {
-      if (currentDesignDocId) {
-        this.unsubscribe(currentDesignDocId);
-      }
-      currentDesignDocId = _.unescape($(e.target).html());
-      this.subscribe(currentDesignDocId);
-      this.stompClient.send("/app/designdoc/detail", {}, currentDesignDocId);
-    });
-  }
-  
   connect() {
     var socket = new SockJS(`http://${location.hostname}:8080/gs-guide-websocket`);
     this.stompClient = Stomp.over(socket);
@@ -48,20 +39,20 @@ export class UmlComponent implements OnInit {
   }
 
   renderDesingDocList(designDocIds) {
-    var ul = $('<ul>');
-    $.each(designDocIds, (idx, designDocId) => {
-      ul.append('<li><a href="#">' + _.escape(designDocId) + '</a></li>');
-    });
-    $('#list').html(ul);
+    this.designDocIds = designDocIds;
   }
 
   renderDiagrams(diagrams) {
-    var html = '';
-    $.each(diagrams, (id, data) => {
-      html += '<img src="' + data + '"/>';
-    });
-    $('#designdoc').html(html);
-    $('#designdoc img').css('display', 'block');
+    this.currentDiagrams = diagrams;
+  }
+
+  showDesignDocDetail(designDocId) {
+    if (this.currentDesignDocId) {
+      this.unsubscribe(this.currentDesignDocId);
+    }
+    this.currentDesignDocId = designDocId;
+    this.subscribe(this.currentDesignDocId);
+    this.stompClient.send("/app/designdoc/detail", {}, this.currentDesignDocId);
   }
 
 }
