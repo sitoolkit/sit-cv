@@ -95,7 +95,9 @@ public class ClassDiagramProcessor {
     }
 
     private Stream<RelationDef> getDependencies(MethodDef method) {
-        return method.getMethodCalls().stream().map(call -> getDependency(method, call));
+        return method.getMethodCalls().stream()
+                .map(call -> getDependency(method, call))
+                .filter(rel -> !rel.getSelf().equals(rel.getOther()));
     }
 
     private RelationDef getDependency(MethodDef method, MethodCallDef call) {
