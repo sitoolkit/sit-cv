@@ -1,6 +1,7 @@
 package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -14,7 +15,10 @@ import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ClassDiagramProcessor {
 
     public ClassDiagram process(MethodDef entryPoint) {
@@ -46,8 +50,48 @@ public class ClassDiagramProcessor {
     }
 
     private Set<ClassDef> pickClasses(MethodDef entryPoint) {
-        return entryPoint.getMethodCallsRecursively().map(MethodDef::getClassDef)
-                .filter(Objects::nonNull).collect(Collectors.toSet());
+
+        Set<MethodDef> sequenceMethods = entryPoint.getMethodCallsRecursively().collect(Collectors.toSet());
+
+        Set<ClassDef> sequenceClasses = sequenceMethods.stream()
+                .map(MethodDef::getClassDef)
+                .collect(Collectors.toSet());
+
+        sequenceClasses.forEach(c -> log.debug("Sequence class picked :{}", c.getName()));
+
+        Set<ClassDef> fieldClasses = sequenceClasses.stream()
+                .map(ClassDef::getFields)
+                .flatMap(List::stream)
+                .map(FieldDef::getTypeRef)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        fieldClasses.forEach(c -> log.debug("Field class picked :{}", c.getName()));
+
+        Set<ClassDef> paramClasses = sequenceMethods.stream()
+                .map(MethodDef::getParamTypes)
+                .flatMap(List::stream)
+                .flatMap(TypeDef::getTypeParamsRecursively)
+                .map(TypeDef::getClassRef)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        paramClasses.forEach(c -> log.debug("Param class picked :{}", c.getName()));
+
+        Set<ClassDef> resultClasses = sequenceMethods.stream()
+                .map(MethodDef::getReturnType)
+                .flatMap(TypeDef::getTypeParamsRecursively)
+                .map(TypeDef::getClassRef)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        resultClasses.forEach(c -> log.debug("Result class picked :{}", c.getName()));
+
+        Set<ClassDef> ret = Stream.of(sequenceClasses, fieldClasses, paramClasses, resultClasses)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+
+        return ret;
     }
 
     private Stream<RelationDef> getDependencies(MethodDef method) {
