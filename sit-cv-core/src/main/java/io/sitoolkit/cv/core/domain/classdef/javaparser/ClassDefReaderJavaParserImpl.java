@@ -173,6 +173,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             methodDef.setName(declaredMethod.getName());
             methodDef.setSignature(declaredMethod.getSignature());
             methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
+            methodDef.setReturnType(TypeParser.getTypeDef(declaredMethod.getReturnType()));
+            methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
             methodDefs.add(methodDef);
 
             if (!typeDec.isInterface()) {
@@ -190,6 +192,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
         return methodDefs;
     }
+
 
     boolean equalMethods(ResolvedMethodDeclaration m1, MethodDeclaration m2) {
         if (!m1.getName().equals(m2.getNameAsString())) {
@@ -279,6 +282,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             return fieldDef;
         }).collect(Collectors.toList());
     }
+
+
 
     @Override
     public void init(ClassDefRepositoryParam param) {

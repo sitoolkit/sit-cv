@@ -1,6 +1,7 @@
 package io.sitoolkit.cv.core.domain.classdef;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -17,6 +18,8 @@ public class MethodDef {
     private boolean isPublic;
     private String actionPath;
     private ClassDef classDef;
+    private List<TypeDef> paramTypes;
+    private TypeDef returnType;
     private Set<MethodCallDef> methodCalls = new HashSet<>();
 
     public Stream<MethodDef> getMethodCallsRecursively() {

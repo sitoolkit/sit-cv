@@ -32,6 +32,8 @@ public class MethodCallVisitor extends VoidVisitorAdapter<Set<MethodCallDef>> {
                 methodCall.setName(rmd.getName());
                 methodCall.setClassName(rmd.getClassName());
                 methodCall.setPackageName(rmd.getPackageName());
+                methodCall.setReturnType(TypeParser.getTypeDef(rmd.getReturnType()));
+                methodCall.setParamTypes(TypeParser.getParamTypes(rmd));
                 log.debug("Add method call : {}", methodCall);
                 methodCalls.add(methodCall);
             } else {

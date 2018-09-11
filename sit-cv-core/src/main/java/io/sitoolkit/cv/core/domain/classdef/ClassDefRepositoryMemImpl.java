@@ -44,6 +44,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     @Override
     public void solveMethodCalls(ClassDef classDef) {
         classDef.getMethods().stream().forEach(methodDef -> {
+            solveMethodType(methodDef);
             methodDef.getMethodCalls().stream().forEach(methodCall -> {
                 solveMethodCall(methodCall);
             });
@@ -52,6 +53,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     }
 
     private void solveMethodCall(MethodCallDef methodCall) {
+        solveMethodType(methodCall);
         soleveMethodCallClass(methodCall);
 
         if (methodCall.getMethodCalls().isEmpty()) {
@@ -64,6 +66,20 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
                 });
             }
         }
+    }
+
+    private void solveMethodType(MethodDef methodDef) {
+        methodDef.getParamTypes().forEach(this::solveClassRef);
+        solveClassRef(methodDef.getReturnType());
+    }
+
+    private void solveClassRef(TypeDef type) {
+        type.getTypeParamsRecursively().forEach(t -> {
+            ClassDef refType = classDefMap.get(t.getName());
+            if (refType != null) {
+                t.setClassRef(refType);
+            }
+        });
     }
 
     private void soleveMethodCallClass(MethodCallDef calledMethod) {
