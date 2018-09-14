@@ -36,11 +36,11 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
                 .map(this::method2str)
                 .collect(Collectors.joining("\n"));
 
-        String classStr = String.format("class %s {\n"
+        String classStr = String.format("%s %s {\n"
                 + "%s\n"
                 + "%s\n"
                 + "}\n"
-                , clazz.getName(), fieldsStr, methodsStr);
+                , clazz.getType(), clazz.getName(), fieldsStr, methodsStr);
 
         return classStr;
     }
