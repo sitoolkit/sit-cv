@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.ToString;
 
 @Data
-@ToString
+@ToString(exclude = "classRef")
 public class TypeDef {
     private String name;
     private List<TypeDef> typeParamList = new ArrayList<>();

@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     private Map<String, ClassDef> classDefMap = new HashMap<>();
@@ -37,11 +40,15 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     }
 
     @Override
+    public void solveReferences() {
+        solveMethodCalls();
+        solveClassRefs();
+    }
+
     public void solveMethodCalls() {
         classDefMap.values().stream().forEach(this::solveMethodCalls);
     }
 
-    @Override
     public void solveMethodCalls(ClassDef classDef) {
         classDef.getMethods().stream().forEach(methodDef -> {
             solveMethodType(methodDef);
@@ -105,14 +112,27 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         return classDefMap.get(qualifiedName);
     }
 
-    @Override
     public void solveClassRefs() {
-        classDefMap.values().stream().forEach(clazz -> clazz.getFields().stream().forEach(field -> {
+        classDefMap.values().stream().forEach(this::solveClassRefs);
+    }
+
+    void solveClassRefs(ClassDef clazz) {
+        log.debug("solving class {}" ,clazz.getName());
+        clazz.getFields().stream().forEach(field -> {
             ClassDef refType = classDefMap.get(field.getType());
             if (refType != null) {
                 field.setTypeRef(refType);
             }
-        }));
-    }
+        });
 
+        if (clazz.isClass()) {
+            clazz.getImplInterfaces().stream().forEach(ifName -> {
+                ClassDef refType = classDefMap.get(ifName);
+                if (refType != null) {
+                    refType.getKnownImplClasses().add(clazz);
+                    log.debug("{} is Known implementation of {}", clazz.getName(), ifName);
+                }
+            });
+        }
+    }
 }

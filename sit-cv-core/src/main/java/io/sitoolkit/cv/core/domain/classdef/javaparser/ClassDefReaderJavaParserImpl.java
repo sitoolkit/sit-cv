@@ -6,8 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
@@ -37,6 +40,7 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryParam;
+import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.infra.config.Config;
@@ -91,7 +95,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             throw new IllegalStateException(e);
         }
 
-        reposiotry.solveMethodCalls();
+        reposiotry.solveReferences();
 
     }
 
@@ -140,11 +144,14 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             classDef.setPkg(compilationUnit.getPackageDeclaration().get().getNameAsString());
 
             compilationUnit.getClassByName(typeName).ifPresent(clazz -> {
+                classDef.setType(ClassType.CLASS);
                 classDef.setMethods(readMethodDefs(clazz));
                 classDef.setFields(readFieldDefs(clazz));
+                classDef.setImplInterfaces(readInterfaces(clazz));
             });
 
             compilationUnit.getInterfaceByName(typeName).ifPresent(interfaze -> {
+                classDef.setType(ClassType.INTERFACE);
                 classDef.setMethods(readMethodDefs(interfaze));
                 classDef.setFields(readFieldDefs(interfaze));
             });
@@ -158,6 +165,19 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             log.warn("IOException", e);
             return Optional.empty();
         }
+    }
+
+    private Set<String> readInterfaces(ClassOrInterfaceDeclaration typeDec) {
+        Set<String> interfaces = new HashSet<>();
+
+        interfaces = jpf.getTypeDeclaration(typeDec).getAllAncestors().stream()
+                .map(ResolvedReferenceType::getTypeDeclaration)
+                .filter(ResolvedReferenceTypeDeclaration::isInterface)
+                .map(ResolvedReferenceTypeDeclaration::getQualifiedName)
+                .collect(Collectors.toSet());
+
+        log.debug("{} implements interfaces: {}", typeDec.getNameAsString(), interfaces);
+        return interfaces;
     }
 
     List<MethodDef> readMethodDefs(ClassOrInterfaceDeclaration typeDec) {
@@ -192,7 +212,6 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
         return methodDefs;
     }
-
 
     boolean equalMethods(ResolvedMethodDeclaration m1, MethodDeclaration m2) {
         if (!m1.getName().equals(m2.getNameAsString())) {
@@ -282,8 +301,6 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             return fieldDef;
         }).collect(Collectors.toList());
     }
-
-
 
     @Override
     public void init(ClassDefRepositoryParam param) {
