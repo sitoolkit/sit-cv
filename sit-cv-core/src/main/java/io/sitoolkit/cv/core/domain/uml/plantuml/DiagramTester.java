@@ -19,10 +19,10 @@ import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 
-public class ClassDiagramTester {
+public class DiagramTester {
 
     public static void main(String[] args) throws Exception {
-        new ClassDiagramTester().execute();
+        new DiagramTester().execute();
     }
 
     void execute() throws Exception {
@@ -36,8 +36,6 @@ public class ClassDiagramTester {
         reader.init(param);
         // reader.readDir(Paths.get("src/main/java"));
         reader.readDir(Paths.get("../sample/src/test/java"));
-
-        repository.solveClassRefs();
 
         MethodDef entryPoint = repository.findMethodByQualifiedSignature("sample.SequenceClass1.entryPoint()");
         outputImage(getSequenceDiagramUML(entryPoint), "sequence.png");

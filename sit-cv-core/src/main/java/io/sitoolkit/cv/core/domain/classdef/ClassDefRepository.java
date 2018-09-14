@@ -11,11 +11,7 @@ public interface ClassDefRepository {
 
     int countClassDefs();
 
-    void solveMethodCalls();
-
-    void solveClassRefs();
-
-    void solveMethodCalls(ClassDef classDef);
+    void solveReferences();
 
     Set<String> getEntryPoints();
 

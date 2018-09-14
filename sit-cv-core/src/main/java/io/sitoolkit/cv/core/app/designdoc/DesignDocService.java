@@ -68,7 +68,7 @@ public class DesignDocService {
             inputSources.stream().forEach(inputSource -> {
                 classDefReader.readJava(Paths.get(inputSource)).ifPresent(clazz -> {
                     classDefRepository.save(clazz);
-                    classDefRepository.solveMethodCalls();
+                    classDefRepository.solveReferences();
                     log.info("Read {}", clazz);
 
                     Set<String> entryPoints = entryPointMap.get(clazz.getSourceId());

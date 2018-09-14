@@ -55,6 +55,7 @@ public class ClassDiagramProcessor {
 
         Set<ClassDef> sequenceClasses = sequenceMethods.stream()
                 .map(MethodDef::getClassDef)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         sequenceClasses.forEach(c -> log.debug("Sequence class picked :{}", c.getName()));
