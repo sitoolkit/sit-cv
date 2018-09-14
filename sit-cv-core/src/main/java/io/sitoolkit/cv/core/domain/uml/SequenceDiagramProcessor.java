@@ -1,10 +1,7 @@
 package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
@@ -13,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SequenceDiagramProcessor {
+
+    ImplementDetector implementDetector = new ImplementDetector();
 
     public LifeLineDef process(ClassDef clazz, MethodDef method) {
         LifeLineDef lifeLine = new LifeLineDef();
@@ -32,46 +31,11 @@ public class SequenceDiagramProcessor {
         if (methodCall.getClassDef() == null) {
             return Optional.empty();
         }
-        MethodDef methodImpl = detectMethodImplementation(methodCall);
+        MethodDef methodImpl = implementDetector.detectImplMethod(methodCall);
         MessageDef message = new MessageDef();
         message.setName(methodImpl.getSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl));
 
         return Optional.of(message);
-    }
-
-    MethodDef detectMethodImplementation(MethodCallDef methodCall) {
-
-        ClassDef classOrInterface = methodCall.getClassDef();
-        if (classOrInterface != null && classOrInterface.isInterface()) {
-            ClassDef interfaze = classOrInterface;
-            Set<ClassDef> knownImplClasses = interfaze.getKnownImplClasses();
-            log.debug("Interface {} has KnownImplements : {}", interfaze.getName(), knownImplClasses);
-
-            if (knownImplClasses.size() == 1) {
-                ClassDef onlyImpl = knownImplClasses.iterator().next();
-                log.debug("{}'s the only knoun impl found : {} ", interfaze.getName(), onlyImpl.getName());
-
-                Optional<MethodDef> methodImpl = findMethod(onlyImpl, methodCall.getSignature());
-                if (methodImpl.isPresent()) {
-                    return methodImpl.get();
-                }
-            }
-        }
-        return methodCall;
-    }
-
-    Optional<MethodDef> findMethod(ClassDef classDef, String signature) {
-        log.debug("Finding '{}' from '{}'", signature, classDef.getName());
-        Optional<MethodDef> foundMethod = classDef.getMethods().stream()
-                .filter(m -> StringUtils.equals(signature, m.getSignature()))
-                .findFirst();
-
-        if (foundMethod.isPresent()) {
-            log.debug("Method found : {}", foundMethod.get().getQualifiedSignature());
-        } else {
-            log.debug("'{}' not found from '{}'", signature, classDef.getName());
-        }
-        return foundMethod;
     }
 }

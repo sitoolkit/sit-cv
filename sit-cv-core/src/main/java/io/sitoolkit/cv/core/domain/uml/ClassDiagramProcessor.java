@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
@@ -20,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ClassDiagramProcessor {
+
+    ImplementDetector implementDetector = new ImplementDetector();
 
     public ClassDiagram process(MethodDef entryPoint) {
 
@@ -51,7 +52,8 @@ public class ClassDiagramProcessor {
 
     private Set<ClassDef> pickClasses(MethodDef entryPoint) {
 
-        Set<MethodDef> sequenceMethods = entryPoint.getMethodCallsRecursively().collect(Collectors.toSet());
+        Set<MethodDef> sequenceMethods = getSequenceMethodsRecursively(entryPoint)
+                .collect(Collectors.toSet());
 
         Set<ClassDef> sequenceClasses = sequenceMethods.stream()
                 .map(MethodDef::getClassDef)
@@ -65,6 +67,7 @@ public class ClassDiagramProcessor {
                 .flatMap(List::stream)
                 .flatMap(TypeDef::getTypeParamsRecursively)
                 .map(TypeDef::getClassRef)
+                .map(implementDetector::detectImplClass)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -74,6 +77,7 @@ public class ClassDiagramProcessor {
                 .map(MethodDef::getReturnType)
                 .flatMap(TypeDef::getTypeParamsRecursively)
                 .map(TypeDef::getClassRef)
+                .map(implementDetector::detectImplClass)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -84,6 +88,7 @@ public class ClassDiagramProcessor {
                 .map(ClassDef::getFields)
                 .flatMap(List::stream)
                 .map(FieldDef::getTypeRef)
+                .map(implementDetector::detectImplClass)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -96,13 +101,21 @@ public class ClassDiagramProcessor {
         return ret;
     }
 
+
+    private Stream<MethodDef> getSequenceMethodsRecursively(MethodDef entryPoint) {
+        MethodDef methodImpl = implementDetector.detectImplMethod(entryPoint);
+        return Stream.concat(Stream.of(methodImpl),
+                methodImpl.getMethodCalls().stream().flatMap(this::getSequenceMethodsRecursively));
+    }
+
     private Stream<RelationDef> getDependencies(MethodDef method) {
         return method.getMethodCalls().stream()
+                .map(implementDetector::detectImplMethod)
                 .map(call -> getDependency(method, call))
                 .filter(rel -> !rel.getSelf().equals(rel.getOther()));
     }
 
-    private RelationDef getDependency(MethodDef method, MethodCallDef call) {
+    private RelationDef getDependency(MethodDef method, MethodDef call) {
         return RelationDef.builder().self(method.getClassDef()).other(call.getClassDef())
                 .type(RelationType.DEPENDENCY).description("use").build();
     }
