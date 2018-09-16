@@ -8,14 +8,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavbarComponent } from './navbar/navbar.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
-import { UmlComponent } from './uml/uml.component';
+import { DesignDocComponent } from './designdoc/designdoc.component';
 import { ErrorComponent } from './error.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
-    UmlComponent,
+    DesignDocComponent,
     ErrorComponent,
   ],
   imports: [

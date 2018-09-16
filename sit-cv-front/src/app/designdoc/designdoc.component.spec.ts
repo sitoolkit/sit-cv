@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UmlComponent } from './uml.component';
+import { DesignDocComponent } from './designdoc.component';
 
-describe('UmlComponent', () => {
-  let component: UmlComponent;
-  let fixture: ComponentFixture<UmlComponent>;
+describe('DesignDocComponent', () => {
+  let component: DesignDocComponent;
+  let fixture: ComponentFixture<DesignDocComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UmlComponent ]
+      declarations: [ DesignDocComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UmlComponent);
+    fixture = TestBed.createComponent(DesignDocComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

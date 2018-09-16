@@ -3,11 +3,10 @@ import * as Stomp from '@stomp/stompjs';
 import * as SockJS from 'sockjs-client';
 
 @Component({
-  selector: 'app-uml',
-  templateUrl: './uml.component.html',
-  styleUrls: ['./uml.component.css']
+  templateUrl: './designdoc.component.html',
+  styleUrls: ['./designdoc.component.css']
 })
-export class UmlComponent {
+export class DesignDocComponent {
   stompClient = null;
   designDocIds = [];
   currentDesignDocId = '';
@@ -55,6 +54,7 @@ export class UmlComponent {
     this.currentDesignDocId = designDocId;
     this.subscribe(this.currentDesignDocId);
     this.stompClient.send("/app/designdoc/detail", {}, this.currentDesignDocId);
+    return false;
   }
 
 }
