@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import * as Stomp from '@stomp/stompjs';
+import * as SockJS from 'sockjs-client';
 
 @Component({
   selector: 'app-uml',
