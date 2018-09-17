@@ -1,0 +1,14 @@
+<div id="list">
+  <ul>
+    <li *ngFor="let designDocId of designDocIds">
+      <a href="#" (click)="showDesignDocDetail(designDocId)">
+        {{designDocId}}
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="designdoc">
+  <div *ngFor="let key of objectKeys(currentDiagrams)">
+    <img [src]="currentDiagrams[key]" />
+  </div>
+</div>

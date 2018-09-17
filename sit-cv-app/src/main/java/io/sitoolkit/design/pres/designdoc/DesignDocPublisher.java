@@ -11,6 +11,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
@@ -68,4 +69,8 @@ public class DesignDocPublisher {
         template.convertAndSend("/topic/designdoc/detail/" + designDocId, response);
     }
 
+    @RequestMapping("")
+    public String index() {
+        return "index.html";
+    }
 }
