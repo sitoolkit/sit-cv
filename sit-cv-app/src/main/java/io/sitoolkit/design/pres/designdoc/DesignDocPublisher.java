@@ -35,8 +35,9 @@ public class DesignDocPublisher {
     public void init() {
         log.debug("loading project:{}", config.getTargetProjectPath());
 
+        Path projDir = Paths.get(config.getTargetProjectPath());
         Path srcDir = Paths.get(config.getTargetProjectPath(), "src/main/java");
-        service.loadDir(srcDir);
+        service.loadDir(projDir, srcDir);
 
         ListResponse listResponse = buildDesingDocList();
         template.convertAndSend("/topic/designdoc/list", listResponse);

@@ -1,0 +1,7 @@
+{
+	"types": [
+        "*..*Controller*",
+        "*..*Service*",
+        "*..*Repository*"
+	]
+}
