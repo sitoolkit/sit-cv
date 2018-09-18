@@ -17,7 +17,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     private Map<String, MethodDef> methodDefMap = new HashMap<>();
 
-    private Map<String, Set<MethodCallDef>> methodCallMap = new HashMap<>();
+    private Map<String, List<MethodCallDef>> methodCallMap = new HashMap<>();
 
     @Override
     public void save(ClassDef classDef) {
@@ -64,7 +64,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         soleveMethodCallClass(methodCall);
 
         if (methodCall.getMethodCalls().isEmpty()) {
-            Set<MethodCallDef> calledMethods = methodCallMap
+            List<MethodCallDef> calledMethods = methodCallMap
                     .get(methodCall.getQualifiedSignature());
             if (calledMethods != null) {
                 methodCall.setMethodCalls(calledMethods);
