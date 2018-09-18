@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class MessageDef {
     private MessageType type = MessageType.SYNC;
-    private String name;
+    private String requestName;
     private LifeLineDef target;
+    private String responseName;
 }

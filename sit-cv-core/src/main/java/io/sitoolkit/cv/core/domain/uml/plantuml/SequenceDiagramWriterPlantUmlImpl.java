@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
+
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
@@ -58,7 +60,12 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         List<String> list = lifeline2str(target);
 
         list.add(0, lifeLine.getObjectName() + " -> " + target.getObjectName() + " :"
-                + message.getName());
+                + message.getRequestName());
+
+        if (!StringUtils.equals(message.getResponseName(), "void")) {
+            list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
+                    + message.getResponseName());
+        }
 
         return list;
     }
