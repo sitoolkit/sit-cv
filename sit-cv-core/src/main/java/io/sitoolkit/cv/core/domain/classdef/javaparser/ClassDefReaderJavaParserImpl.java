@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -170,13 +171,20 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     private Set<String> readInterfaces(ClassOrInterfaceDeclaration typeDec) {
         Set<String> interfaces = new HashSet<>();
 
-        interfaces = jpf.getTypeDeclaration(typeDec).getAllAncestors().stream()
-                .map(ResolvedReferenceType::getTypeDeclaration)
-                .filter(ResolvedReferenceTypeDeclaration::isInterface)
-                .map(ResolvedReferenceTypeDeclaration::getQualifiedName)
-                .collect(Collectors.toSet());
+        try {
+            interfaces = jpf.getTypeDeclaration(typeDec).getAllAncestors().stream()
+                    .map(ResolvedReferenceType::getTypeDeclaration)
+                    .filter(ResolvedReferenceTypeDeclaration::isInterface)
+                    .map(ResolvedReferenceTypeDeclaration::getQualifiedName)
+                    .collect(Collectors.toSet());
 
-        log.debug("{} implements interfaces: {}", typeDec.getNameAsString(), interfaces);
+            log.debug("{} implements interfaces: {}", typeDec.getNameAsString(), interfaces);
+
+        } catch (Exception e) {
+            log.debug("Unsolved : Ancestors of '{}', {}", typeDec.getName(), e);
+
+        }
+
         return interfaces;
     }
 
@@ -188,25 +196,31 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
         jpf.getTypeDeclaration(typeDec).getDeclaredMethods().forEach(declaredMethod -> {
 
-            MethodDef methodDef = new MethodDef();
-            methodDef.setPublic(declaredMethod.accessSpecifier() == AccessSpecifier.PUBLIC);
-            methodDef.setName(declaredMethod.getName());
-            methodDef.setSignature(declaredMethod.getSignature());
-            methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
-            methodDef.setReturnType(TypeParser.getTypeDef(declaredMethod.getReturnType()));
-            methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
-            methodDefs.add(methodDef);
+            try {
+                MethodDef methodDef = new MethodDef();
 
-            if (!typeDec.isInterface()) {
-                typeDec.getMethods().stream().forEach(method -> {
-                    if (equalMethods(declaredMethod, method)) {
-                        method.accept(methodCallVisitor, methodDef.getMethodCalls());
-                        methodDef.setActionPath(classActionPath + getActionPath(method));
-                    }
-                });
+                methodDef.setPublic(declaredMethod.accessSpecifier() == AccessSpecifier.PUBLIC);
+                methodDef.setName(declaredMethod.getName());
+                methodDef.setSignature(declaredMethod.getSignature());
+                methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
+                methodDef.setReturnType(TypeParser.getTypeDef(declaredMethod.getReturnType()));
+                methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
+                methodDefs.add(methodDef);
+
+                if (!typeDec.isInterface()) {
+                    typeDec.getMethods().stream().forEach(method -> {
+                        if (equalMethods(declaredMethod, method)) {
+                            method.accept(methodCallVisitor, methodDef.getMethodCalls());
+                            methodDef.setActionPath(classActionPath + getActionPath(method));
+                        }
+                    });
+                }
+
+                log.debug("Add method declaration : {}", methodDef);
+
+            } catch (Exception e) {
+                log.debug("Unsolved: '{}()' in '{}', {}", declaredMethod.getName(), typeDec.getName(), e);
             }
-
-            log.debug("Add method declaration : {}", methodDef);
 
         });
 
@@ -281,25 +295,33 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     List<FieldDef> readFieldDefs(ClassOrInterfaceDeclaration typeDec) {
         return jpf.getTypeDeclaration(typeDec).getDeclaredFields().stream().map(declaredField -> {
-            FieldDef fieldDef = new FieldDef();
-            fieldDef.setName(declaredField.getName());
 
-            ResolvedType type = declaredField.getType();
+            try {
+                FieldDef fieldDef = new FieldDef();
+                fieldDef.setName(declaredField.getName());
 
-            if (type.isPrimitive()) {
-                fieldDef.setType(type.asPrimitive().name().toLowerCase());
-            } else if (type.isArray()) {
-                fieldDef.setType(type.asArrayType().describe());
-            } else if (type.isReference()) {
-                ResolvedReferenceType rType = type.asReferenceType();
-                rType.getTypeParametersMap().stream()
-                        .forEach(param -> fieldDef.getTypeParams().add(param.b.describe()));
-                fieldDef.setType(type.asReferenceType().getQualifiedName());
-            } else {
-                fieldDef.setType(type.toString());
+                ResolvedType type = declaredField.getType();
+
+                if (type.isPrimitive()) {
+                    fieldDef.setType(type.asPrimitive().name().toLowerCase());
+                } else if (type.isArray()) {
+                    fieldDef.setType(type.asArrayType().describe());
+                } else if (type.isReference()) {
+                    ResolvedReferenceType rType = type.asReferenceType();
+                    rType.getTypeParametersMap().stream()
+                            .forEach(param -> fieldDef.getTypeParams().add(param.b.describe()));
+                    fieldDef.setType(type.asReferenceType().getQualifiedName());
+                } else {
+                    fieldDef.setType(type.toString());
+                }
+                return fieldDef;
+
+            } catch (Exception e) {
+                log.debug("Unsolved : '{}' in '{}', {}", declaredField.getName(), typeDec.getName(), e);
+                return null;
             }
-            return fieldDef;
-        }).collect(Collectors.toList());
+
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override
