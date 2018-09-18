@@ -13,7 +13,6 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
-import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
@@ -49,7 +48,7 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
         return String.format("%s%s : %s",
                 method.isPublic() ? "+" : "", // TODO public以外のアクセス制御子
                 method.getSignature(),
-                getTypeStr(method.getReturnType()));
+                method.getReturnType());
     }
 
     private String field2str(FieldDef field) {
@@ -76,17 +75,6 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
 
         default: //TODO 他の関係
             return "--";
-        }
-    }
-
-    private String getTypeStr(TypeDef type) {
-        if (type.getTypeParamList().isEmpty()) {
-            return type.getName();
-        } else {
-            return type.getName() +
-                    type.getTypeParamList().stream()
-                        .map(this::getTypeStr)
-                        .collect(Collectors.joining(",", "<", ">"));
         }
     }
 

@@ -1,6 +1,6 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.util.Set;
+import java.util.List;
 
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
@@ -14,12 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Slf4j
-public class MethodCallVisitor extends VoidVisitorAdapter<Set<MethodCallDef>> {
+public class MethodCallVisitor extends VoidVisitorAdapter<List<MethodCallDef>> {
 
     JavaParserFacade jpf;
 
     @Override
-    public void visit(MethodCallExpr methodCallExpr, Set<MethodCallDef> methodCalls) {
+    public void visit(MethodCallExpr methodCallExpr, List<MethodCallDef> methodCalls) {
         try {
 
             SymbolReference<ResolvedMethodDeclaration> ref = jpf.solve(methodCallExpr);

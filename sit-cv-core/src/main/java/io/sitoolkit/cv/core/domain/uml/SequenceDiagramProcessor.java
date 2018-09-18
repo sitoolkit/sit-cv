@@ -34,8 +34,9 @@ public class SequenceDiagramProcessor {
         }
         MethodDef methodImpl = detectMethodImplementation(methodCall);
         MessageDef message = new MessageDef();
-        message.setName(methodImpl.getSignature());
+        message.setRequestName(methodImpl.getSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl));
+        message.setResponseName(methodCall.getReturnType().toString());
 
         return Optional.of(message);
     }
