@@ -71,22 +71,26 @@ public class ClassDiagramProcessor {
                 .collect(Collectors.toSet());
 
         resultClasses.forEach(c -> log.debug("Result class picked :{}", c.getName()));
-
-        Set<ClassDef> fieldClasses = Stream.of(paramClasses, resultClasses)
+        
+        Set<ClassDef> ret = Stream.of(paramClasses, resultClasses)
                 .flatMap(Set::stream)
-                .map(ClassDef::getFields)
-                .flatMap(List::stream)
-                .map(FieldDef::getTypeRef)
-                .filter(Objects::nonNull)
+                .flatMap(this::getFieldClassesRecursively)
+                .distinct()
                 .collect(Collectors.toSet());
 
-        fieldClasses.forEach(c -> log.debug("Field class picked :{}", c.getName()));
-
-        Set<ClassDef> ret = Stream.of(paramClasses, resultClasses, fieldClasses)
-                .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+        ret.forEach(c -> log.debug("Field class picked :{}", c.getName()));
 
         return ret;
+    }
+
+    Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef) {
+        return Stream.concat(
+                Stream.of(classDef),
+                classDef.getFields().stream()
+                        .map(FieldDef::getTypeRef)
+                        .filter(Objects::nonNull)
+                        .flatMap(this::getFieldClassesRecursively))
+                .distinct();
     }
 
     private Stream<RelationDef> getDependencies(MethodDef method) {
