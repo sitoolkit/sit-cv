@@ -8,6 +8,7 @@ import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
+import io.sitoolkit.cv.core.domain.classdef.filter.ClassDefFilter;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
@@ -67,6 +68,11 @@ public class Application {
     @Bean
     public ClassDefReader classDefReader() {
         return new ClassDefReaderJavaParserImpl();
+    }
+
+    @Bean
+    public ClassDefFilter classDefFilter() {
+        return new ClassDefFilter();
     }
 
     @Bean
