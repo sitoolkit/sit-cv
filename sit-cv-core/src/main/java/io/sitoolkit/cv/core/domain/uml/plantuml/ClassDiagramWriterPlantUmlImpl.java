@@ -55,7 +55,7 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
         return String.format("%s%s : %s",
                 "", // TODO アクセス制御子
                 field.getName(),
-                getTypeStr(field));
+                field.getType().toString());
     }
 
     private String rel2str(RelationDef rel) {
@@ -75,15 +75,6 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
 
         default: //TODO 他の関係
             return "--";
-        }
-    }
-
-    private String getTypeStr(FieldDef field) {
-        if (field.getTypeParams().isEmpty()) {
-            return field.getType();
-        } else {
-            return field.getType() +
-                    field.getTypeParams().stream().collect(Collectors.joining(",", "<", ">"));
         }
     }
 

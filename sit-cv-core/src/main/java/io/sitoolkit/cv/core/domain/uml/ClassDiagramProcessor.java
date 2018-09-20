@@ -71,7 +71,7 @@ public class ClassDiagramProcessor {
                 .collect(Collectors.toSet());
 
         resultClasses.forEach(c -> log.debug("Result class picked :{}", c.getName()));
-        
+
         Set<ClassDef> ret = Stream.of(paramClasses, resultClasses)
                 .flatMap(Set::stream)
                 .flatMap(this::getFieldClassesRecursively)
@@ -84,10 +84,11 @@ public class ClassDiagramProcessor {
     }
 
     Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef) {
-        return Stream.concat(
-                Stream.of(classDef),
+        return Stream.concat(Stream.of(classDef),
                 classDef.getFields().stream()
-                        .map(FieldDef::getTypeRef)
+                        .map(FieldDef::getType)
+                        .flatMap(TypeDef::getTypeParamsRecursively)
+                        .map(TypeDef::getClassRef)
                         .filter(Objects::nonNull)
                         .flatMap(this::getFieldClassesRecursively))
                 .distinct();
