@@ -14,23 +14,26 @@ public class ClassDefFilter implements Predicate<ClassDef> {
 
     @Override
     public boolean test(ClassDef type) {
+        return testType(type) || testAnnotation(type);
+    }
+
+    boolean testType(ClassDef type) {
         if (condition == null) {
             return true;
-
         } else {
-            return condition.getTypes().stream().anyMatch(pattern -> test(type, pattern));
+            return condition.getTypes().stream().anyMatch(pattern -> testType(type, pattern));
         }
     }
 
-    boolean test(ClassDef type, String typePattern) {
-        boolean result = test(type.getPkg() + "." + type.getName(), typePattern);
+    boolean testType(ClassDef type, String typePattern) {
+        boolean result = testType(type.getPkg() + "." + type.getName(), typePattern);
         if (result) {
             log.debug("{}.{} matched to pattern '{}'", type.getPkg(), type.getName(), typePattern);
         }
         return result;
     }
 
-    boolean test(String targetType, String typePattern) {
+    boolean testType(String targetType, String typePattern) {
         return targetType.matches(toRegex(typePattern));
     }
 
@@ -40,4 +43,22 @@ public class ClassDefFilter implements Predicate<ClassDef> {
                 .replace("*", "[^.]*")
                 .replace("\\.\\.", "\\.(.*\\.)?");
     }
+    
+
+    boolean testAnnotation(ClassDef type) {
+        if (condition == null) {
+            return true;
+        } else {
+            return condition.getAnnotations().stream().anyMatch(annotation -> testAnnotation(type, annotation));
+        }
+    }
+
+    boolean testAnnotation(ClassDef type, String annotation) {
+        boolean result = type.getAnnotations().contains(annotation);
+        if (result) {
+            log.debug("{}.{} matched to Annotation '{}'", type.getPkg(), type.getName(), annotation);
+        }
+        return result;
+    }
+
 }

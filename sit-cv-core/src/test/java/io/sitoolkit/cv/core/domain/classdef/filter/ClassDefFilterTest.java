@@ -53,7 +53,7 @@ public class ClassDefFilterTest {
     }
 
     @Test
-    public void testFillter() {
+    public void testTypeNameFillter() {
         ClassDefFilterCondition condition = new ClassDefFilterCondition();
         condition.getTypes().addAll(patterns);
 
@@ -97,6 +97,34 @@ public class ClassDefFilterTest {
     }
 
     @Test
+    public void testAnnotationFillter() {
+        ClassDefFilterCondition condition = new ClassDefFilterCondition();
+        condition.getTypes().add("a..*");
+        condition.getAnnotations().add("Controller");
+        condition.getAnnotations().add("Service");
+
+        List<ClassDef> classList = new ArrayList<>();
+        classList.add(createCD("a.b.c", "XXX")); //match "a..*"
+        classList.add(createCD("b", "Data1")); //no match
+        classList.add(createCD("b", "Data2", "Annotation")); //no match
+        classList.add(createCD("b", "Data2", "Annotation", "Service")); // match "Service"
+
+        List<ClassDef> expected = new ArrayList<>();
+        expected.add(createCD("a.b.c", "XXX")); //match "a..*"
+        expected.add(createCD("b", "Data2", "Annotation", "Service")); // match "Service"
+
+        ClassDefFilter target = new ClassDefFilter();
+        target.setCondition(condition);
+        List<ClassDef> actual = classList.stream().filter(target).collect(Collectors.toList());
+        IntStream.range(0, actual.size()).forEachOrdered(i -> {
+            assertThat(actual.get(i), is(expected.get(i)));
+        });
+        assertThat(actual, is(expected));
+    }
+
+
+
+    @Test
     public void testFillterNoCondition() {
         ClassDefFilter target = new ClassDefFilter();
 
@@ -112,6 +140,12 @@ public class ClassDefFilterTest {
         ClassDef cd = new ClassDef();
         cd.setPkg(pkg);
         cd.setName(name);
+        return cd;
+    }
+
+    private ClassDef createCD(String pkg, String name, String... annotations) {
+        ClassDef cd = createCD(pkg, name);
+        cd.getAnnotations().addAll(Arrays.asList(annotations));
         return cd;
     }
 

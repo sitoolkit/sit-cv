@@ -20,6 +20,7 @@ public class ClassDef {
     private List<FieldDef> fields = new ArrayList<>();
     private Set<String> implInterfaces = new HashSet<>();
     private Set<ClassDef> knownImplClasses =  new HashSet<>();
+    private Set<String> annotations =  new HashSet<>();
 
     public boolean isInterface(){
         return ClassType.INTERFACE.equals(type);
