@@ -53,13 +53,6 @@ public class ClassDiagramProcessor {
 
         Set<MethodDef> sequenceMethods = entryPoint.getMethodCallsRecursively().collect(Collectors.toSet());
 
-        Set<ClassDef> sequenceClasses = sequenceMethods.stream()
-                .map(MethodDef::getClassDef)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
-        sequenceClasses.forEach(c -> log.debug("Sequence class picked :{}", c.getName()));
-
         Set<ClassDef> paramClasses = sequenceMethods.stream()
                 .map(MethodDef::getParamTypes)
                 .flatMap(List::stream)
@@ -79,7 +72,7 @@ public class ClassDiagramProcessor {
 
         resultClasses.forEach(c -> log.debug("Result class picked :{}", c.getName()));
 
-        Set<ClassDef> fieldClasses = Stream.of(sequenceClasses, paramClasses, resultClasses)
+        Set<ClassDef> fieldClasses = Stream.of(paramClasses, resultClasses)
                 .flatMap(Set::stream)
                 .map(ClassDef::getFields)
                 .flatMap(List::stream)
@@ -89,7 +82,7 @@ public class ClassDiagramProcessor {
 
         fieldClasses.forEach(c -> log.debug("Field class picked :{}", c.getName()));
 
-        Set<ClassDef> ret = Stream.of(sequenceClasses, paramClasses, resultClasses, fieldClasses)
+        Set<ClassDef> ret = Stream.of(paramClasses, resultClasses, fieldClasses)
                 .flatMap(Set::stream)
                 .collect(Collectors.toSet());
 
