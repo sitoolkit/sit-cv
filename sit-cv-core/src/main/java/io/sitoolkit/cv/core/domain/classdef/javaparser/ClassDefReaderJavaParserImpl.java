@@ -149,12 +149,14 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 classDef.setMethods(readMethodDefs(clazz));
                 classDef.setFields(readFieldDefs(clazz));
                 classDef.setImplInterfaces(readInterfaces(clazz));
+                classDef.setAnnotations(readAnnotations(clazz));
             });
 
             compilationUnit.getInterfaceByName(typeName).ifPresent(interfaze -> {
                 classDef.setType(ClassType.INTERFACE);
                 classDef.setMethods(readMethodDefs(interfaze));
                 classDef.setFields(readFieldDefs(interfaze));
+                classDef.setAnnotations(readAnnotations(interfaze));
             });
 
             classDef.getMethods().stream().forEach(method -> method.setClassDef(classDef));
@@ -186,6 +188,14 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
         }
 
         return interfaces;
+    }
+
+    Set<String> readAnnotations(ClassOrInterfaceDeclaration typeDec) {
+
+        Set<String> annotations = typeDec.getAnnotations().stream()
+                .map(AnnotationExpr::getNameAsString).collect(Collectors.toSet());
+        log.debug("{} has annotations : {}", typeDec.getNameAsString(), annotations);
+        return annotations;
     }
 
     List<MethodDef> readMethodDefs(ClassOrInterfaceDeclaration typeDec) {

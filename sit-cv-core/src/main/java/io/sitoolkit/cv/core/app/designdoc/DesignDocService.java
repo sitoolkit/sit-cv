@@ -14,6 +14,8 @@ import javax.annotation.Resource;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import io.sitoolkit.cv.core.domain.classdef.filter.ClassDefFilter;
+import io.sitoolkit.cv.core.domain.classdef.filter.ClassDefFilterConditionReader;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
@@ -44,14 +46,18 @@ public class DesignDocService {
     DiagramWriter<ClassDiagram> classWriter;
 
     @Resource
+    ClassDefFilter classFilter;
+
+    @Resource
     ClassDefRepository classDefRepository;
 
     @Resource
     InputSourceWatcher watcher;
 
-    public void loadDir(Path srcDir) {
+    public void loadDir(Path projDir, Path srcDir) {
 
         classDefReader.readDir(srcDir);
+        ClassDefFilterConditionReader.read(projDir).ifPresent(classFilter::setCondition);
 
     }
 
