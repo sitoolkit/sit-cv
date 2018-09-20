@@ -25,6 +25,8 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
     @Resource
     PlantUmlWriter plantumlWriter;
 
+    IdentiferFormatter idFormatter = new IdentiferFormatter();
+
     private String class2str(ClassDef clazz) {
 
         String fieldsStr = clazz.getFields().stream().map(this::field2str).collect(Collectors.joining("\n"));
@@ -47,15 +49,15 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
     private String method2str(MethodDef method) {
         return String.format("%s%s : %s",
                 method.isPublic() ? "+" : "", // TODO public以外のアクセス制御子
-                method.getSignature(),
-                method.getReturnType());
+                idFormatter.format(method.getSignature()),
+                idFormatter.format(method.getReturnType().toString()));
     }
 
     private String field2str(FieldDef field) {
         return String.format("%s%s : %s",
                 "", // TODO アクセス制御子
                 field.getName(),
-                getTypeStr(field));
+                idFormatter.format(getTypeStr(field)));
     }
 
     private String rel2str(RelationDef rel) {
@@ -105,5 +107,4 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
     public Diagram write(ClassDiagram diagram) {
         return plantumlWriter.createDiagram(diagram, this::serialize);
     }
-
 }

@@ -22,6 +22,8 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
     @Resource
     PlantUmlWriter plantumlWriter;
 
+    IdentiferFormatter idFormatter = new IdentiferFormatter();
+
     public List<String> write(List<SequenceDiagram> diagrams) {
         List<String> lines = new ArrayList<>();
         lines.add("@startuml");
@@ -60,11 +62,11 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         List<String> list = lifeline2str(target);
 
         list.add(0, lifeLine.getObjectName() + " -> " + target.getObjectName() + " :"
-                + message.getRequestName());
+                + idFormatter.format(message.getRequestName()));
 
         if (!StringUtils.equals(message.getResponseName(), "void")) {
             list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
-                    + message.getResponseName());
+                    + idFormatter.format(message.getResponseName()));
         }
 
         return list;
@@ -77,4 +79,6 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
             throw new RuntimeException(e);
         }
     }
+
+
 }
