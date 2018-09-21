@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SequenceDiagramProcessor {
 
     @Resource
-    ClassDefFilter classFilter;
+    ClassDefFilter classFilter = new ClassDefFilter();
 
     public LifeLineDef process(ClassDef clazz, MethodDef method) {
         LifeLineDef lifeLine = new LifeLineDef();
@@ -47,7 +47,7 @@ public class SequenceDiagramProcessor {
         message.setRequestName(methodImpl.getSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl));
         message.setResponseName(methodCall.getReturnType().toString());
-        
+
         return Optional.of(message);
 
     }

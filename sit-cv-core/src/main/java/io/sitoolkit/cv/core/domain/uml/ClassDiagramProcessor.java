@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +17,7 @@ import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -106,13 +108,54 @@ public class ClassDiagramProcessor {
     }
 
     private Optional<RelationDef> getInstanceRelation(ClassDef clazz, FieldDef field) {
-        // TODO has-a, part-of 関係の抽出
-        return Optional.empty();
+
+        TypeWithCardinality c = getTypeWithCardinality(field.getType());
+        RelationDef relation = RelationDef.builder()
+                .self(clazz)
+                .other(c.getType().getClassRef())
+                .otherCardinality(c.getCardinality())
+                .type(RelationType.OWNERSHIP)
+                .description("")
+                .build();
+
+        return Optional.ofNullable(relation);
     }
+
+    TypeWithCardinality getTypeWithCardinality(TypeDef type){
+
+        if (isCollection(type) && type.getTypeParamList().size() == 1) {
+            return new TypeWithCardinality(type.getTypeParamList().get(0), "0..*");
+
+        } else if (isOptional(type) && type.getTypeParamList().size() == 1) {
+            return new TypeWithCardinality(type.getTypeParamList().get(0), "0..1");
+
+        } else {
+            return new TypeWithCardinality(type, "1");
+        }
+    }
+
+    boolean isCollection(TypeDef type) {
+        return Arrays.asList(
+                "java.util.Set",
+                "java.util.List",
+                "java.util.Collection").contains(type.getName());
+    }
+
+    boolean isOptional(TypeDef type) {
+        return Arrays.asList(
+                "java.util.Optional").contains(type.getName());
+    }
+
 
     private Set<RelationDef> getClassRelation(ClassDef clazz) {
         // TODO is-a 関係の抽出
         return Collections.emptySet();
     }
 
+
+    @Value
+    class TypeWithCardinality{
+        TypeDef type;
+        String cardinality;
+    }
 }
