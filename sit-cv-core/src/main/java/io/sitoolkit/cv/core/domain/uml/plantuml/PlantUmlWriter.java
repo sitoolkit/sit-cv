@@ -39,7 +39,7 @@ public class PlantUmlWriter {
 
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            reader.outputImage(baos, new FileFormatOption(FileFormat.PNG));
+            reader.outputImage(baos, new FileFormatOption(FileFormat.SVG));
             diagram.setData(baos.toByteArray());
 
             return diagram;

@@ -63,8 +63,7 @@ public class DesignDocPublisher {
         DesignDoc designDoc = service.get(designDocId);
 
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
-            String data = "data:image/png;base64,"
-                    + Base64.getEncoder().encodeToString(diagram.getData());
+            String data = new String(diagram.getData());
             response.getDiagrams().put(diagram.getId(), data);
         });
         template.convertAndSend("/topic/designdoc/detail/" + designDocId, response);

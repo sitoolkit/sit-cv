@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import * as Stomp from '@stomp/stompjs';
 import * as SockJS from 'sockjs-client';
+import { DomSanitizer } from '@angular/platform-browser';
+import * as $ from 'jquery';
 
 @Component({
   templateUrl: './designdoc.component.html',
@@ -10,10 +12,11 @@ export class DesignDocComponent {
   stompClient = null;
   designDocIds = [];
   currentDesignDocId = '';
-  currentDiagrams = [];
+  currentDiagrams = {};
   objectKeys = Object.keys;
 
-  constructor() {
+  constructor(private sanitizer: DomSanitizer) {
+    $(document).on('click', 'svg a', () => false);
     this.connect();
   }
 
@@ -29,22 +32,26 @@ export class DesignDocComponent {
     });
   }
 
-  unsubscribe(designDocId) {
+  unsubscribe(designDocId: string) {
     this.stompClient.unsubscribe('/topic/designdoc/detail/' + designDocId);
   }
 
-  subscribe(designDocId) {
+  subscribe(designDocId: string) {
     this.stompClient.subscribe('/topic/designdoc/detail/' + designDocId, (response) => {
       this.renderDiagrams(JSON.parse(response.body).diagrams);
     });
   }
 
-  renderDesingDocList(designDocIds) {
+  renderDesingDocList(designDocIds: string[]) {
     this.designDocIds = designDocIds;
   }
 
-  renderDiagrams(diagrams) {
-    this.currentDiagrams = diagrams;
+  renderDiagrams(diagrams: object) {
+    let trustDiagrams = {};
+    Object.keys(diagrams).forEach((key) => {
+      trustDiagrams[key] = this.sanitizer.bypassSecurityTrustHtml(diagrams[key].replace(/&amp;#13;&amp;#10;/g, "\n"));
+    });
+    this.currentDiagrams = trustDiagrams;
   }
 
   showDesignDocDetail(designDocId) {

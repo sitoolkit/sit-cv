@@ -27,6 +27,7 @@ public class SequenceDiagramProcessor {
         lifeLine.setObjectName(clazz.getName());
         lifeLine.setMessages(method.getMethodCalls().stream().map(this::methodCall2Message)
                 .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList()));
+        lifeLine.setComment(method.getComment());
 
         log.debug("Add lifeline {} -> {}", clazz.getName(), lifeLine);
 

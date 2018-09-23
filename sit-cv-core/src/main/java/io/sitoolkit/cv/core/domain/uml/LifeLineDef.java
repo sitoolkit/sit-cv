@@ -13,6 +13,7 @@ public class LifeLineDef {
     private String entryMessage;
     private String sourceId;
     private List<MessageDef> messages = new ArrayList<>();
+    private String comment;
 
     public Set<String> getAllSourceIds() {
         Set<String> tags = messages.stream().map(MessageDef::getTarget)
