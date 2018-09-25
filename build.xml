@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:if="ant:if"
+         xmlns:unless="ant:unless"
+         name="sit-cv"
+         basedir="."
+         default="deploy">
+
+  <condition property="os.windows" value="true" else="false">
+    <os family="windows" />
+  </condition>
+  <condition property="mvn.cmd" value="${basedir}\mvnw.cmd" else="${basedir}\mvnw">
+    <os family="windows" />
+  </condition>
+
+  <target name="deploy">
+    <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
+      <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="-P" />
+      <arg value="release" />
+      <arg value="clean" />
+      <arg value="deploy" />
+    </exec>
+  </target>
+
+</project>

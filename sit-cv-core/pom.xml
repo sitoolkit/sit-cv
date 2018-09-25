@@ -59,6 +59,10 @@
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
     </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -76,7 +80,7 @@
   <parent>
     <groupId>io.sitoolkit.cv</groupId>
     <artifactId>code-visualizer</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-appha.1-SNAPSHOT</version>
   </parent>
 
   <dependencyManagement>
