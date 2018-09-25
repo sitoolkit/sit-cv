@@ -55,35 +55,29 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
         return String.format("%s%s : %s",
                 "", // TODO アクセス制御子
                 field.getName(),
-                getTypeStr(field));
+                field.getType().toString());
     }
 
     private String rel2str(RelationDef rel) {
-        return String.format("%s %s %s %s %s : %s",
+        return String.format("%s %s %s %s %s %s",
                 rel.getSelf().getName(),
-                rel.getSelfCardinality(),
+                StringUtils.isEmpty(rel.getSelfCardinality()) ? "" : ("\"" + rel.getSelfCardinality() + "\""),
                 relType2str(rel.getType()),
-                rel.getOtherCardinality(),
+                StringUtils.isEmpty(rel.getOtherCardinality()) ? "" : ("\""+ rel.getOtherCardinality() + "\""),
                 rel.getOther().getName(),
-                StringUtils.isEmpty(rel.getDescription()) ? "" : (rel.getDescription() + " >"));
+                StringUtils.isEmpty(rel.getDescription()) ? "" : ": " + (rel.getDescription() + " >"));
     }
 
     private String relType2str(RelationType relType) {
         switch (relType) {
         case DEPENDENCY:
-            return "."; // 横方向の破線
+            return "."; // horizontal dotted line
 
-        default: //TODO 他の関係
+        case OWNERSHIP:
+            return "-->"; // vertical arrow
+
+        default: //TODO other relation
             return "--";
-        }
-    }
-
-    private String getTypeStr(FieldDef field) {
-        if (field.getTypeParams().isEmpty()) {
-            return field.getType();
-        } else {
-            return field.getType() +
-                    field.getTypeParams().stream().collect(Collectors.joining(",", "<", ">"));
         }
     }
 

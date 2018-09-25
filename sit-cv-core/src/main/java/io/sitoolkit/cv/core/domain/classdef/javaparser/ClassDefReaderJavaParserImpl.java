@@ -311,19 +311,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 fieldDef.setName(declaredField.getName());
 
                 ResolvedType type = declaredField.getType();
-
-                if (type.isPrimitive()) {
-                    fieldDef.setType(type.asPrimitive().name().toLowerCase());
-                } else if (type.isArray()) {
-                    fieldDef.setType(type.asArrayType().describe());
-                } else if (type.isReference()) {
-                    ResolvedReferenceType rType = type.asReferenceType();
-                    rType.getTypeParametersMap().stream()
-                            .forEach(param -> fieldDef.getTypeParams().add(param.b.describe()));
-                    fieldDef.setType(type.asReferenceType().getQualifiedName());
-                } else {
-                    fieldDef.setType(type.toString());
-                }
+                fieldDef.setType(TypeParser.getTypeDef(type));
                 return fieldDef;
 
             } catch (Exception e) {

@@ -118,12 +118,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     void solveClassRefs(ClassDef clazz) {
         log.debug("solving class {}" ,clazz.getName());
-        clazz.getFields().stream().forEach(field -> {
-            ClassDef refType = classDefMap.get(field.getType());
-            if (refType != null) {
-                field.setTypeRef(refType);
-            }
-        });
+        clazz.getFields().stream().map(FieldDef::getType).forEach(this::solveClassRef);
 
         if (clazz.isClass()) {
             clazz.getImplInterfaces().stream().forEach(ifName -> {
