@@ -104,9 +104,6 @@ public abstract class InputSourceWatcher {
      * <li>変更を検知した入力ソースで繰り返しインターフェースの再生成メソッドを実行
      * </ul>
      *
-     * @param cg
-     *            繰り返し生成インターフェース
-     * @see ContinuousGeneratable#regenerate(java.lang.String)
      */
     protected abstract Set<String> watching();
 
