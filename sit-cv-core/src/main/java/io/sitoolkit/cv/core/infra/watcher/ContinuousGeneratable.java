@@ -1,4 +1,4 @@
-/*
+s/*
  * Copyright 2013 Monocrea Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ public interface ContinuousGeneratable {
     /**
      * 繰り返し生成のイベントが検知されたら呼び出されるメソッドです。 実装クラスは生成処理を実装します。
      * 
-     * @param inputSource
+     * @param inputSources
      *            イベントの元となった入力ソース
      */
     void regenerate(Collection<String> inputSources);
