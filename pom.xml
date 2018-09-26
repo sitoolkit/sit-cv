@@ -4,7 +4,7 @@
   <!-- The Basics -->
   <groupId>io.sitoolkit.cv</groupId>
   <artifactId>sit-cv</artifactId>
-  <version>1.0.0-appha.1</version>
+  <version>1.0.0-appha.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <parent>
