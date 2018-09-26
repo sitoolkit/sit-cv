@@ -22,4 +22,16 @@
     </exec>
   </target>
 
+
+  <target name="set-version">
+
+    <property name="version" value="1.0.0-appha.1" />
+
+    <exec executable="${mvn.cmd}" dir="${basedir}">
+      <arg value="-DnewVersion=${version}" />
+      <arg value="versions:set" />
+    </exec>
+
+  </target>
+
 </project>

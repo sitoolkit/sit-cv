@@ -8,7 +8,7 @@
     <dependency>
       <groupId>io.sitoolkit.cv</groupId>
       <artifactId>sit-cv-core</artifactId>
-      <version>1.0.0-appha.1-SNAPSHOT</version>
+      <version>1.0.0-appha.1</version>
     </dependency>
 
     <dependency>
@@ -85,7 +85,7 @@
   <parent>
     <groupId>io.sitoolkit.cv</groupId>
     <artifactId>code-visualizer</artifactId>
-    <version>1.0.0-appha.1-SNAPSHOT</version>
+    <version>1.0.0-appha.1</version>
   </parent>
 
   <dependencyManagement>
