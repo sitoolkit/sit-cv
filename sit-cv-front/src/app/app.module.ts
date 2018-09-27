@@ -8,6 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavbarComponent } from './navbar/navbar.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
+import { MatTreeModule } from '@angular/material/tree';
 import { DesignDocComponent } from './designdoc/designdoc.component';
 import { ErrorComponent } from './error.component';
 
@@ -27,6 +28,7 @@ import { ErrorComponent } from './error.component';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
+    MatTreeModule,
     MY_ROUTES,
   ],
   providers: [],
