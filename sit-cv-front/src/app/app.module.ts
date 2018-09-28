@@ -11,6 +11,7 @@ import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, Mat
 import { MatTreeModule } from '@angular/material/tree';
 import { DesignDocComponent } from './designdoc/designdoc.component';
 import { ErrorComponent } from './error.component';
+import { DoctreeComponent } from './doctree/doctree.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { ErrorComponent } from './error.component';
     NavbarComponent,
     DesignDocComponent,
     ErrorComponent,
+    DoctreeComponent,
   ],
   imports: [
     BrowserModule,
