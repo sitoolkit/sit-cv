@@ -31,8 +31,23 @@ export class DoctreeComponent implements OnChanges {
     }
   }
 
-  onSelected(designDocId: string){
+  onSelected(designDocId: string) {
     this.selected.emit(designDocId);
+  }
+
+  toggleExpanded(node: Node) {
+    if (this.nestedTreeControl.isExpanded(node)) {
+      this.nestedTreeControl.collapse(node);
+    } else {
+      this.expandRecursively(node);
+    }
+  }
+
+  expandRecursively(node: Node) {
+    this.nestedTreeControl.expand(node);
+    if (node.children.length === 1) {
+      this.expandRecursively(node.children[0]);
+    }
   }
 
   createTree(designDocIds: string[]): Node[] {
