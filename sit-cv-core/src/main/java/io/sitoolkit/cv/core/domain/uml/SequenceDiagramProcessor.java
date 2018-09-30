@@ -46,9 +46,10 @@ public class SequenceDiagramProcessor {
         }
         MessageDef message = new MessageDef();
         message.setRequestName(methodImpl.getSignature());
+        message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl));
         message.setResponseName(methodCall.getReturnType().toString());
-        
+
         return Optional.of(message);
 
     }

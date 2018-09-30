@@ -1,7 +1,9 @@
 package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,5 +22,19 @@ public class LifeLineDef {
                 .map(LifeLineDef::getSourceId).collect(Collectors.toSet());
         tags.add(sourceId);
         return tags;
+    }
+
+    public Map<String, String> getAllComments() {
+        Map<String, String> comments = new HashMap<>();
+        getComments(comments, messages);
+        return comments;
+    }
+
+    void getComments(Map<String, String> comments, List<MessageDef> messages) {
+        messages.stream().forEach((message) -> {
+           LifeLineDef target = message.getTarget();
+           getComments(comments, target.getMessages());
+           comments.put(message.getRequestQualifiedSignature(), target.getComment());
+        });
     }
 }

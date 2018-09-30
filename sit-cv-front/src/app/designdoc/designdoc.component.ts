@@ -15,9 +15,11 @@ export class DesignDocComponent {
   currentDiagrams = {};
   objectKeys = Object.keys;
   isDiagramLoading = false;
+  diagramComments = {};
+  selectedMethodSignatures = [];
+  currentMethodSignature = "";
 
   constructor(private sanitizer: DomSanitizer) {
-    $(document).on('click', 'svg a', () => false);
     this.connect();
   }
 
@@ -40,7 +42,9 @@ export class DesignDocComponent {
   subscribe(designDocId: string) {
     this.stompClient.subscribe('/topic/designdoc/detail/' + designDocId, (response) => {
       this.isDiagramLoading = false;
-      this.renderDiagrams(JSON.parse(response.body).diagrams);
+      let docDetail: any = JSON.parse(response.body);
+      this.diagramComments = docDetail.comments;
+      this.renderDiagrams(docDetail.diagrams);
     });
   }
 
@@ -51,7 +55,7 @@ export class DesignDocComponent {
   renderDiagrams(diagrams: object) {
     let trustDiagrams = {};
     Object.keys(diagrams).forEach((key) => {
-      trustDiagrams[key] = this.sanitizer.bypassSecurityTrustHtml(diagrams[key].replace(/&amp;#13;&amp;#10;/g, "\n"));
+      trustDiagrams[key] = this.sanitizer.bypassSecurityTrustHtml(diagrams[key]);
     });
     this.currentDiagrams = trustDiagrams;
   }
@@ -59,8 +63,9 @@ export class DesignDocComponent {
   showDesignDocDetail(designDocId) {
     if (this.currentDesignDocId) {
       this.unsubscribe(this.currentDesignDocId);
+      this.currentDiagrams = {};
+      this.selectedMethodSignatures = [];
     }
-    this.currentDiagrams = {};
     this.currentDesignDocId = designDocId;
     this.subscribe(this.currentDesignDocId);
     this.stompClient.send("/app/designdoc/detail", {}, this.currentDesignDocId);
@@ -68,4 +73,27 @@ export class DesignDocComponent {
     return false;
   }
 
+  methodNameClick(event) {
+    let link: JQuery = $(event.target).closest('a');
+    if (link.length > 0) {
+      this.toggleComment(link);
+    }
+    return false;
+  }
+
+  toggleComment(link: JQuery) {
+    let title: string = link.attr('xlink:title');
+    let index: number = this.selectedMethodSignatures.indexOf(title);
+    if (index < 0) {
+      this.selectedMethodSignatures.push(title);
+    } else {
+      this.selectedMethodSignatures.splice(index, 1);
+    }
+  }
+
+  methodNameMouseover(event) {
+    let link: JQuery = $(event.target).closest('a');
+    this.currentMethodSignature = link.attr('xlink:title');
+    return false;
+  }
 }

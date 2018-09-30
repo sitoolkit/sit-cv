@@ -13,7 +13,8 @@ import {
   MatSidenavModule,
   MatIconModule,
   MatListModule,
-  MatProgressSpinnerModule
+  MatProgressSpinnerModule,
+  MatCardModule
 } from '@angular/material';
 import { DesignDocComponent } from './designdoc/designdoc.component';
 import { ErrorComponent } from './error.component';
@@ -35,6 +36,7 @@ import { ErrorComponent } from './error.component';
     MatIconModule,
     MatListModule,
     MatProgressSpinnerModule,
+    MatCardModule,
     MY_ROUTES,
   ],
   providers: [],

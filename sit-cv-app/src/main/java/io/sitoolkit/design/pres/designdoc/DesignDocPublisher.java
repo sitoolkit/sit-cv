@@ -2,7 +2,6 @@ package io.sitoolkit.design.pres.designdoc;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
 
 import javax.annotation.PostConstruct;
 
@@ -65,6 +64,7 @@ public class DesignDocPublisher {
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
             response.getDiagrams().put(diagram.getId(), data);
+            response.getComments().put(diagram.getId(), diagram.getComments());
         });
         template.convertAndSend("/topic/designdoc/detail/" + designDocId, response);
     }

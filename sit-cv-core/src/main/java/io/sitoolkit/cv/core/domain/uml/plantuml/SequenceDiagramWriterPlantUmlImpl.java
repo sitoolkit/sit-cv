@@ -66,7 +66,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         List<String> list = lifeline2str(target);
 
         list.add(0, lifeLine.getObjectName() + " -> " + target.getObjectName() + " :"
-                + "[[#{" + target.getComment().replaceAll("\r\n", "&#13;&#10;") + "} " + message.getRequestName() + "]]");
+                + "[[#{" + message.getRequestQualifiedSignature() + "} " + message.getRequestName() + "]]");
 
         if (!StringUtils.equals(message.getResponseName(), "void")) {
             list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
