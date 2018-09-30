@@ -20,6 +20,7 @@ public class MethodDef {
     private List<TypeDef> paramTypes;
     private TypeDef returnType;
     private List<MethodCallDef> methodCalls = new ArrayList<>();
+    private String comment = "";
 
     public Stream<MethodDef> getMethodCallsRecursively() {
         return Stream.concat(Stream.of(this),

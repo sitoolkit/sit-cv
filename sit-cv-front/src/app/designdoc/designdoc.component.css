@@ -8,3 +8,15 @@
   margin-bottom: 0;
   list-style-type: none;
 }
+.designdocContainer {
+  padding: 1em;
+}
+mat-spinner {
+  margin: 5em auto auto 5em;
+}
+.comment mat-card-content {
+  white-space: pre-line;
+}
+.active {
+  background: #E8EAF6;
+}

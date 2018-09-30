@@ -11,6 +11,12 @@ public class AServiceImpl implements AService{
     @Autowired
     ARepository aRepository;
 
+    /**
+     * AServiceImpl search method
+     *
+     * @param search condition
+     * @return list of XEntity
+     */
     @Override
     public List<XEntity> search(SearchConditioner condition) {
 

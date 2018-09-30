@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import java.util.Map;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
@@ -14,11 +15,18 @@ import lombok.NoArgsConstructor;
 public class SequenceDiagram implements DiagramModel{
     private LifeLineDef entryLifeLine;
 
+    @Override
     public String getId() {
         return entryLifeLine.getEntryMessage();
     }
 
+    @Override
     public Set<String> getAllTags() {
         return entryLifeLine.getAllSourceIds();
+    }
+
+    @Override
+    public Map<String, String> getAllComments() {
+        return entryLifeLine.getAllComments();
     }
 }

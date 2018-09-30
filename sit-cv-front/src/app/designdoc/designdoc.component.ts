@@ -3,6 +3,8 @@ import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import * as Stomp from '@stomp/stompjs';
 import * as SockJS from 'sockjs-client';
+import { DomSanitizer } from '@angular/platform-browser';
+import * as $ from 'jquery';
 
 class Node {
   children: Node[] = [];
@@ -18,13 +20,16 @@ export class DesignDocComponent {
   stompClient = null;
   designDocIds = [];
   currentDesignDocId = '';
-  currentDiagrams = [];
+  currentDiagrams = {};
   objectKeys = Object.keys;
-
+  isDiagramLoading = false;
+  diagramComments = {};
+  selectedMethodSignatures = [];
+  currentMethodSignature = "";
   nestedTreeControl = new NestedTreeControl<Node>((node: Node) => node.children);
   nestedDataSource = new MatTreeNestedDataSource();
 
-  constructor() {
+  constructor(private sanitizer: DomSanitizer) {
     this.connect();
   }
 
@@ -40,32 +45,42 @@ export class DesignDocComponent {
     });
   }
 
-  unsubscribe(designDocId) {
+  unsubscribe(designDocId: string) {
     this.stompClient.unsubscribe('/topic/designdoc/detail/' + designDocId);
   }
 
-  subscribe(designDocId) {
+  subscribe(designDocId: string) {
     this.stompClient.subscribe('/topic/designdoc/detail/' + designDocId, (response) => {
-      this.renderDiagrams(JSON.parse(response.body).diagrams);
+      this.isDiagramLoading = false;
+      let docDetail: any = JSON.parse(response.body);
+      this.diagramComments = docDetail.comments;
+      this.renderDiagrams(docDetail.diagrams);
     });
   }
 
-  renderDesingDocList(designDocIds) {
+  renderDesingDocList(designDocIds: string[]) {
     this.designDocIds = designDocIds;
     this.nestedDataSource.data = this.createTree(designDocIds);
   }
 
-  renderDiagrams(diagrams) {
-    this.currentDiagrams = diagrams;
+  renderDiagrams(diagrams: object) {
+    let trustDiagrams = {};
+    Object.keys(diagrams).forEach((key) => {
+      trustDiagrams[key] = this.sanitizer.bypassSecurityTrustHtml(diagrams[key]);
+    });
+    this.currentDiagrams = trustDiagrams;
   }
 
   showDesignDocDetail(designDocId) {
     if (this.currentDesignDocId) {
       this.unsubscribe(this.currentDesignDocId);
+      this.currentDiagrams = {};
+      this.selectedMethodSignatures = [];
     }
     this.currentDesignDocId = designDocId;
     this.subscribe(this.currentDesignDocId);
     this.stompClient.send("/app/designdoc/detail", {}, this.currentDesignDocId);
+    this.isDiagramLoading = true;
     return false;
   }
 
@@ -117,4 +132,27 @@ export class DesignDocComponent {
     });
   }
 
+  methodNameClick(event) {
+    let link: JQuery = $(event.target).closest('a');
+    if (link.length > 0) {
+      this.toggleComment(link);
+    }
+    return false;
+  }
+
+  toggleComment(link: JQuery) {
+    let title: string = link.attr('xlink:title');
+    let index: number = this.selectedMethodSignatures.indexOf(title);
+    if (index < 0) {
+      this.selectedMethodSignatures.push(title);
+    } else {
+      this.selectedMethodSignatures.splice(index, 1);
+    }
+  }
+
+  methodNameMouseover(event) {
+    let link: JQuery = $(event.target).closest('a');
+    this.currentMethodSignature = link.attr('xlink:title');
+    return false;
+  }
 }
