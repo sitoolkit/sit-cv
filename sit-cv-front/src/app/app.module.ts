@@ -7,7 +7,14 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavbarComponent } from './navbar/navbar.component';
 import { LayoutModule } from '@angular/cdk/layout';
-import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
+import {
+  MatToolbarModule,
+  MatButtonModule,
+  MatSidenavModule,
+  MatIconModule,
+  MatListModule,
+  MatProgressSpinnerModule
+} from '@angular/material';
 import { DesignDocComponent } from './designdoc/designdoc.component';
 import { ErrorComponent } from './error.component';
 
@@ -27,6 +34,7 @@ import { ErrorComponent } from './error.component';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
+    MatProgressSpinnerModule,
     MY_ROUTES,
   ],
   providers: [],
