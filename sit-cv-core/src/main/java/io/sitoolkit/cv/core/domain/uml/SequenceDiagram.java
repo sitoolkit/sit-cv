@@ -29,4 +29,9 @@ public class SequenceDiagram implements DiagramModel{
     public Map<String, String> getAllComments() {
         return entryLifeLine.getAllComments();
     }
+
+    @Override
+    public Set<String> getAllSourceIds() {
+        return entryLifeLine.getAllSourceIds();
+    }
 }

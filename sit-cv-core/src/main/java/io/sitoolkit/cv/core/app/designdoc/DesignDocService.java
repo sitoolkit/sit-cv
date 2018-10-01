@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
@@ -20,6 +21,7 @@ import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
+import io.sitoolkit.cv.core.domain.uml.DiagramModel;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
@@ -97,18 +99,24 @@ public class DesignDocService {
 
         MethodDef entryPoint = classDefRepository.findMethodByQualifiedSignature(designDocId);
         log.info("Build diagram for {}", entryPoint);
-        LifeLineDef lifeLine = sequenceProcessor.process(entryPoint.getClassDef(), entryPoint);
 
-        lifeLine.getAllSourceIds().stream().forEach(sourceId -> {
+        LifeLineDef lifeLine = sequenceProcessor.process(entryPoint.getClassDef(), entryPoint);
+        SequenceDiagram sequenceModel = SequenceDiagram.builder().entryLifeLine(lifeLine).build();
+        ClassDiagram classModel = classProcessor.process(entryPoint);
+        
+        Stream<String> allSourceIds = Stream.of(sequenceModel, classModel)
+                .map(DiagramModel::getAllSourceIds)
+                .flatMap(Set::stream)
+                .distinct();        
+
+        allSourceIds.forEach(sourceId -> {
             Set<String> entryPoints = entryPointMap.computeIfAbsent(sourceId,
                     key -> new HashSet<>());
             entryPoints.add(entryPoint.getQualifiedSignature());
         });
 
-        Diagram sequenceDiagram = sequenceWriter
-                .write(SequenceDiagram.builder().entryLifeLine(lifeLine).build());
-
-        Diagram classDiagram = classWriter.write(classProcessor.process(entryPoint));
+        Diagram sequenceDiagram = sequenceWriter.write(sequenceModel);
+        Diagram classDiagram = classWriter.write(classModel);
 
         DesignDoc doc = new DesignDoc();
         doc.add(sequenceDiagram);

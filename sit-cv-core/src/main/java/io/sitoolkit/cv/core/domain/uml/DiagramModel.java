@@ -7,4 +7,5 @@ public interface DiagramModel {
     public String getId();
     public Set<String> getAllTags();
     public Map<String, String> getAllComments();
+    public Set<String> getAllSourceIds();
 }
