@@ -36,6 +36,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
@@ -149,12 +150,14 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 classDef.setMethods(readMethodDefs(clazz));
                 classDef.setFields(readFieldDefs(clazz));
                 classDef.setImplInterfaces(readInterfaces(clazz));
+                classDef.setAnnotations(readAnnotations(clazz));
             });
 
             compilationUnit.getInterfaceByName(typeName).ifPresent(interfaze -> {
                 classDef.setType(ClassType.INTERFACE);
                 classDef.setMethods(readMethodDefs(interfaze));
                 classDef.setFields(readFieldDefs(interfaze));
+                classDef.setAnnotations(readAnnotations(interfaze));
             });
 
             classDef.getMethods().stream().forEach(method -> method.setClassDef(classDef));
@@ -188,13 +191,22 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
         return interfaces;
     }
 
+    Set<String> readAnnotations(ClassOrInterfaceDeclaration typeDec) {
+
+        Set<String> annotations = typeDec.getAnnotations().stream()
+                .map(AnnotationExpr::getNameAsString).collect(Collectors.toSet());
+        log.debug("{} has annotations : {}", typeDec.getNameAsString(), annotations);
+        return annotations;
+    }
+
     List<MethodDef> readMethodDefs(ClassOrInterfaceDeclaration typeDec) {
 
         List<MethodDef> methodDefs = new ArrayList<>();
 
         String classActionPath = getActionPath(typeDec);
 
-        jpf.getTypeDeclaration(typeDec).getDeclaredMethods().forEach(declaredMethod -> {
+        jpf.getTypeDeclaration(typeDec).getDeclaredMethods().forEach((ResolvedMethodDeclaration declaredMethod) -> {
+            JavaParserMethodDeclaration jpDeclaredMethod = (JavaParserMethodDeclaration)declaredMethod;
 
             try {
                 MethodDef methodDef = new MethodDef();
@@ -205,6 +217,9 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
                 methodDef.setReturnType(TypeParser.getTypeDef(declaredMethod.getReturnType()));
                 methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
+                jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
+                    methodDef.setComment(comment.toString());
+                });
                 methodDefs.add(methodDef);
 
                 if (!typeDec.isInterface()) {
@@ -301,19 +316,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 fieldDef.setName(declaredField.getName());
 
                 ResolvedType type = declaredField.getType();
-
-                if (type.isPrimitive()) {
-                    fieldDef.setType(type.asPrimitive().name().toLowerCase());
-                } else if (type.isArray()) {
-                    fieldDef.setType(type.asArrayType().describe());
-                } else if (type.isReference()) {
-                    ResolvedReferenceType rType = type.asReferenceType();
-                    rType.getTypeParametersMap().stream()
-                            .forEach(param -> fieldDef.getTypeParams().add(param.b.describe()));
-                    fieldDef.setType(type.asReferenceType().getQualifiedName());
-                } else {
-                    fieldDef.setType(type.toString());
-                }
+                fieldDef.setType(TypeParser.getTypeDef(type));
                 return fieldDef;
 
             } catch (Exception e) {

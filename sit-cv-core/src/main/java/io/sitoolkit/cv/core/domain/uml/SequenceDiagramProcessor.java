@@ -4,15 +4,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import io.sitoolkit.cv.core.domain.classdef.filter.ClassDefFilter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SequenceDiagramProcessor {
+
+    @Resource
+    ClassDefFilter classFilter = new ClassDefFilter();
 
     public LifeLineDef process(ClassDef clazz, MethodDef method) {
         LifeLineDef lifeLine = new LifeLineDef();
@@ -21,6 +27,7 @@ public class SequenceDiagramProcessor {
         lifeLine.setObjectName(clazz.getName());
         lifeLine.setMessages(method.getMethodCalls().stream().map(this::methodCall2Message)
                 .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList()));
+        lifeLine.setComment(method.getComment());
 
         log.debug("Add lifeline {} -> {}", clazz.getName(), lifeLine);
 
@@ -33,12 +40,18 @@ public class SequenceDiagramProcessor {
             return Optional.empty();
         }
         MethodDef methodImpl = detectMethodImplementation(methodCall);
+
+        if (!classFilter.test(methodImpl.getClassDef())) {
+            return Optional.empty();
+        }
         MessageDef message = new MessageDef();
         message.setRequestName(methodImpl.getSignature());
+        message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl));
         message.setResponseName(methodCall.getReturnType().toString());
 
         return Optional.of(message);
+
     }
 
     MethodDef detectMethodImplementation(MethodCallDef methodCall) {

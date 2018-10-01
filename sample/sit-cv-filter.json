@@ -1,0 +1,11 @@
+{
+	"types": [
+        "*..*Controller*",
+        "*..*Service*"
+	],
+    "annotations": [
+        "Service",
+        "Repository"
+    ]
+
+}

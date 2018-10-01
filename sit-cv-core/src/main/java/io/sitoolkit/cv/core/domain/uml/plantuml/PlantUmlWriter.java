@@ -34,12 +34,13 @@ public class PlantUmlWriter {
         Diagram diagram = new Diagram();
         diagram.setId(model.getId());
         diagram.setTags(model.getAllTags());
+        diagram.setComments(model.getAllComments());
 
         SourceStringReader reader = new SourceStringReader(serializer.apply(model));
 
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            reader.outputImage(baos, new FileFormatOption(FileFormat.PNG));
+            reader.outputImage(baos, new FileFormatOption(FileFormat.SVG));
             diagram.setData(baos.toByteArray());
 
             return diagram;

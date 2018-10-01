@@ -12,6 +12,11 @@ public class AController {
     @Autowired
     AService aService;
 
+    /**
+     * AController search method
+     *
+     * @return list of XEntity
+     */
     @RequestMapping("search")
     public List<XEntity> search() {
 

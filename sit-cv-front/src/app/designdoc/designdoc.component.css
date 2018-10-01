@@ -1,0 +1,22 @@
+.designdoc-tree-invisible {
+  display: none;
+}
+
+.designdoc-tree ul,
+.designdoc-tree li {
+  margin-top: 0;
+  margin-bottom: 0;
+  list-style-type: none;
+}
+.designdocContainer {
+  padding: 1em;
+}
+mat-spinner {
+  margin: 5em auto auto 5em;
+}
+.comment mat-card-content {
+  white-space: pre-line;
+}
+.active {
+  background: #E8EAF6;
+}

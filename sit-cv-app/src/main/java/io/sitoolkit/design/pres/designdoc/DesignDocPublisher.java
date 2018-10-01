@@ -2,7 +2,6 @@ package io.sitoolkit.design.pres.designdoc;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
 
 import javax.annotation.PostConstruct;
 
@@ -35,8 +34,9 @@ public class DesignDocPublisher {
     public void init() {
         log.debug("loading project:{}", config.getTargetProjectPath());
 
+        Path projDir = Paths.get(config.getTargetProjectPath());
         Path srcDir = Paths.get(config.getTargetProjectPath(), "src/main/java");
-        service.loadDir(srcDir);
+        service.loadDir(projDir, srcDir);
 
         ListResponse listResponse = buildDesingDocList();
         template.convertAndSend("/topic/designdoc/list", listResponse);
@@ -62,9 +62,9 @@ public class DesignDocPublisher {
         DesignDoc designDoc = service.get(designDocId);
 
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
-            String data = "data:image/png;base64,"
-                    + Base64.getEncoder().encodeToString(diagram.getData());
+            String data = new String(diagram.getData());
             response.getDiagrams().put(diagram.getId(), data);
+            response.getComments().put(diagram.getId(), diagram.getComments());
         });
         template.convertAndSend("/topic/designdoc/detail/" + designDocId, response);
     }
