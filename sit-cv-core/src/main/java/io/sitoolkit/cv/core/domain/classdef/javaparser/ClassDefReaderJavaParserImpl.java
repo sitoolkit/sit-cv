@@ -36,6 +36,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
@@ -204,7 +205,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
         String classActionPath = getActionPath(typeDec);
 
-        jpf.getTypeDeclaration(typeDec).getDeclaredMethods().forEach(declaredMethod -> {
+        jpf.getTypeDeclaration(typeDec).getDeclaredMethods().forEach((ResolvedMethodDeclaration declaredMethod) -> {
+            JavaParserMethodDeclaration jpDeclaredMethod = (JavaParserMethodDeclaration)declaredMethod;
 
             try {
                 MethodDef methodDef = new MethodDef();
@@ -215,6 +217,9 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
                 methodDef.setReturnType(TypeParser.getTypeDef(declaredMethod.getReturnType()));
                 methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
+                jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
+                    methodDef.setComment(comment.toString());
+                });
                 methodDefs.add(methodDef);
 
                 if (!typeDec.isInterface()) {
