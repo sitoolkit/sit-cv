@@ -16,7 +16,9 @@ import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.MessageDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram> {
 
     @Resource
@@ -47,7 +49,11 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
         lines.add("@enduml");
 
-        return lines.stream().collect(Collectors.joining(System.lineSeparator()));
+        String umlString = lines.stream().collect(Collectors.joining(System.lineSeparator()));
+
+        log.debug(umlString);
+
+        return umlString;
     }
 
     private List<String> lifeline2str(LifeLineDef lifeLine) {
@@ -60,7 +66,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         List<String> list = lifeline2str(target);
 
         list.add(0, lifeLine.getObjectName() + " -> " + target.getObjectName() + " :"
-                + message.getRequestName());
+                + "[[#{" + message.getRequestQualifiedSignature() + "} " + message.getRequestName() + "]]");
 
         if (!StringUtils.equals(message.getResponseName(), "void")) {
             list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
