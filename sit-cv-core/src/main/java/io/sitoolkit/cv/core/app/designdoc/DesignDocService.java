@@ -4,12 +4,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
@@ -54,6 +60,12 @@ public class DesignDocService {
     @Resource
     InputSourceWatcher watcher;
 
+    Map<Pair<Path, ClassDefChangeEventListener>, Timer> timerMap = new ConcurrentHashMap<>();
+
+    Map<Pair<Path, ClassDefChangeEventListener>, Set<String>> waitingMap = new ConcurrentHashMap<>();
+
+    final long RELOAD_WAIT_TIME_MILLIS = 300;
+
     public void loadDir(Path projDir, Path srcDir) {
 
         classDefReader.readDir(srcDir);
@@ -62,26 +74,67 @@ public class DesignDocService {
     }
 
     public void watchDir(Path srcDir, ClassDefChangeEventListener listener) {
+
         watcher.setContinue(true);
         try {
             Files.walk(srcDir).forEach(path -> watcher.watch(path.toFile().getAbsolutePath()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        Pair<Path, ClassDefChangeEventListener> key = Pair.of(srcDir, listener);
+
         watcher.start(inputSources -> {
-            classDefReader.init(srcDir);
+            timerMap.computeIfPresent(key, (k, t) -> {
+                t.cancel();
+                log.debug("waiting timer task cancelled");
+                return null;
+            });
+            Timer timer = new Timer();
+            timer.schedule(createTimerTask(key), RELOAD_WAIT_TIME_MILLIS);
+            log.debug("new timer task created");
+            timerMap.put(key, timer);
 
-            inputSources.stream().forEach(inputSource -> {
-                classDefReader.readJava(Paths.get(inputSource)).ifPresent(clazz -> {
-                    classDefRepository.save(clazz);
-                    classDefRepository.solveReferences();
-                    log.info("Read {}", clazz);
+            waitingMap.putIfAbsent(key, new HashSet<>());
+            Set<String> waitingSources = waitingMap.get(key);
+            synchronized (waitingSources) {
+                waitingSources.addAll(inputSources);
+                log.debug("added inputSources: {} , {}", waitingSources, key);
+            }
+        });
+    }
 
-                    Set<String> entryPoints = entryPointMap.get(clazz.getSourceId());
-                    if (entryPoints != null) {
-                        entryPoints.stream().forEach(listener::onChange);
-                    }
-                });
+    private TimerTask createTimerTask(Pair<Path, ClassDefChangeEventListener> key) {
+
+        return new TimerTask() {
+            @Override
+            public void run() {
+                Set<String> inputSources = new HashSet<>();
+                Set<String> waitingSources = waitingMap.get(key);
+                synchronized (waitingSources) {
+                    inputSources.addAll(waitingSources);
+                    waitingSources.clear();
+                }
+                readSources(key.getLeft(), key.getRight(), inputSources);
+            }
+        };
+    }
+
+    private void readSources(Path srcDir, ClassDefChangeEventListener listener, Collection<String> inputSources) {
+
+        log.debug("Read Sources start : sources = {}, dir = {}, listener = {}", inputSources, srcDir, listener);
+        classDefReader.init(srcDir);
+
+        inputSources.stream().forEach(inputSource -> {
+            classDefReader.readJava(Paths.get(inputSource)).ifPresent(clazz -> {
+                classDefRepository.save(clazz);
+                classDefRepository.solveReferences();
+                log.info("Read {}", clazz);
+
+                Set<String> entryPoints = entryPointMap.get(clazz.getSourceId());
+                if (entryPoints != null) {
+                    entryPoints.stream().forEach(listener::onChange);
+                }
             });
         });
     }
