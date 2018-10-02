@@ -13,13 +13,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Resource;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
@@ -65,9 +62,9 @@ public class DesignDocService {
     @Resource
     InputSourceWatcher watcher;
 
-    Map<Pair<Path, ClassDefChangeEventListener>, Timer> timerMap = new ConcurrentHashMap<>();
+    Timer timer;
 
-    Map<Pair<Path, ClassDefChangeEventListener>, Set<String>> waitingMap = new ConcurrentHashMap<>();
+    Set<String> waitingSources = new HashSet<>();
 
     final long RELOAD_WAIT_TIME_MILLIS = 300;
 
@@ -87,47 +84,44 @@ public class DesignDocService {
             throw new RuntimeException(e);
         }
 
-        Pair<Path, ClassDefChangeEventListener> key = Pair.of(srcDir, listener);
-
         watcher.start(inputSources -> {
-            timerMap.computeIfPresent(key, (k, t) -> {
-                t.cancel();
-                log.debug("waiting timer task cancelled");
-                return null;
+            pushWaitingSources(inputSources);
+            registerTimer(RELOAD_WAIT_TIME_MILLIS, () -> {
+                readSources(srcDir, listener, popAllWaitingSources());
             });
-            Timer timer = new Timer();
-            timer.schedule(createTimerTask(key), RELOAD_WAIT_TIME_MILLIS);
-            log.debug("new timer task created");
-            timerMap.put(key, timer);
-
-            waitingMap.putIfAbsent(key, new HashSet<>());
-            Set<String> waitingSources = waitingMap.get(key);
-            synchronized (waitingSources) {
-                waitingSources.addAll(inputSources);
-                log.debug("added inputSources: {} , {}", waitingSources, key);
-            }
         });
     }
 
-    private TimerTask createTimerTask(Pair<Path, ClassDefChangeEventListener> key) {
-
-        return new TimerTask() {
-            @Override
-            public void run() {
-                Set<String> inputSources = new HashSet<>();
-                Set<String> waitingSources = waitingMap.get(key);
-                synchronized (waitingSources) {
-                    inputSources.addAll(waitingSources);
-                    waitingSources.clear();
-                }
-                readSources(key.getLeft(), key.getRight(), inputSources);
-            }
-        };
+    private synchronized void pushWaitingSources(Collection<String> inputSources) {
+        waitingSources.addAll(inputSources);
+        log.debug("added waitingSources: {}", inputSources);
     }
 
-    private void readSources(Path srcDir, ClassDefChangeEventListener listener, Collection<String> inputSources) {
+    private synchronized Set<String> popAllWaitingSources() {
+        Set<String> result = new HashSet<>(waitingSources);
+        waitingSources.clear();
+        log.debug("popped waitingSources: {}", result);
+        return result;
+    }
 
-        log.debug("Read Sources start : sources = {}, dir = {}, listener = {}", inputSources, srcDir, listener);
+    private void registerTimer(long delay, Runnable task) {
+
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                task.run();
+            }
+        };
+
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = new Timer();
+        timer.schedule(timerTask, delay);
+    }
+
+    private void readSources(Path srcDir, ClassDefChangeEventListener listener, Set<String> inputSources) {
+
         classDefReader.init(srcDir);
 
         Set<ClassDef> readDefs = inputSources.stream()
