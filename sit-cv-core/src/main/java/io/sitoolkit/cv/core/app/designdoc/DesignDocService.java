@@ -8,15 +8,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
@@ -125,18 +130,25 @@ public class DesignDocService {
         log.debug("Read Sources start : sources = {}, dir = {}, listener = {}", inputSources, srcDir, listener);
         classDefReader.init(srcDir);
 
-        inputSources.stream().forEach(inputSource -> {
-            classDefReader.readJava(Paths.get(inputSource)).ifPresent(clazz -> {
-                classDefRepository.save(clazz);
-                classDefRepository.solveReferences();
-                log.info("Read {}", clazz);
+        Set<ClassDef> readDefs = inputSources.stream()
+                .map(Paths::get)
+                .map(classDefReader::readJava)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
 
-                Set<String> entryPoints = entryPointMap.get(clazz.getSourceId());
-                if (entryPoints != null) {
-                    entryPoints.stream().forEach(listener::onChange);
-                }
-            });
-        });
+        readDefs.forEach(classDefRepository::save);
+        readDefs.forEach(clazz -> log.info("Read {}", clazz));
+        classDefRepository.solveReferences();
+
+        Stream<String> entryPoints = readDefs.stream()
+                .map(ClassDef::getSourceId)
+                .map(entryPointMap::get)
+                .filter(Objects::nonNull)
+                .flatMap(Set::stream)
+                .distinct();
+
+        entryPoints.forEach(listener::onChange);
     }
 
     public Set<String> getAllIds() {
