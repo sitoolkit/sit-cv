@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,12 +60,6 @@ public class DesignDocService {
     @Resource
     InputSourceWatcher watcher;
 
-    Timer timer;
-
-    Set<String> waitingSources = new HashSet<>();
-
-    final long RELOAD_WAIT_TIME_MILLIS = 300;
-
     public void loadDir(Path projDir, Path srcDir) {
 
         classDefReader.readDir(srcDir);
@@ -85,42 +77,12 @@ public class DesignDocService {
         }
 
         watcher.start(inputSources -> {
-            pushWaitingSources(inputSources);
-            registerTimer(RELOAD_WAIT_TIME_MILLIS, () -> {
-                readSources(srcDir, listener, popAllWaitingSources());
-            });
+            readSources(srcDir, listener, inputSources);
         });
     }
 
-    private synchronized void pushWaitingSources(Collection<String> inputSources) {
-        waitingSources.addAll(inputSources);
-        log.debug("added waitingSources: {}", inputSources);
-    }
 
-    private synchronized Set<String> popAllWaitingSources() {
-        Set<String> result = new HashSet<>(waitingSources);
-        waitingSources.clear();
-        log.debug("popped waitingSources: {}", result);
-        return result;
-    }
-
-    private void registerTimer(long delay, Runnable task) {
-
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                task.run();
-            }
-        };
-
-        if (timer != null) {
-            timer.cancel();
-        }
-        timer = new Timer();
-        timer.schedule(timerTask, delay);
-    }
-
-    private void readSources(Path srcDir, ClassDefChangeEventListener listener, Set<String> inputSources) {
+    private void readSources(Path srcDir, ClassDefChangeEventListener listener, Collection<String> inputSources) {
 
         classDefReader.init(srcDir);
 

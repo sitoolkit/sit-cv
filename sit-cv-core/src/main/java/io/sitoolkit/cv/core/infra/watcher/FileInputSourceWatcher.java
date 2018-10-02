@@ -25,11 +25,16 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import lombok.Data;
@@ -44,9 +49,15 @@ import lombok.extern.slf4j.Slf4j;
 public class FileInputSourceWatcher extends InputSourceWatcher {
 
     private WatchService watcher;
+    private ExecutorService executor;
     private final Set<String> watchingDirSet = new HashSet<>();
     private final Map<String, InputSource> watchingFileMap = new HashMap<>();
     private final Map<WatchKey, Path> pathMap = new HashMap<>();
+
+    Set<String> waitingSources = new HashSet<>();
+    Instant lastSourceChangedTime;
+
+    final long RELOAD_WAIT_TIME_MILLIS = 300;
 
     /**
      * ファイルを監視対象に含めます。
@@ -85,6 +96,12 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
                 // TODO ファイル監視方式の統一
                 watcher = FileSystems.getDefault().newWatchService();
             }
+            if (executor == null) {
+                executor = Executors.newSingleThreadExecutor();
+                if (!executor.isShutdown()) {
+                    executor.execute(this::watchChangedSources);
+                }
+            }
             WatchKey watchKey = dirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
             pathMap.put(watchKey, dirPath);
         } catch (IOException e) {
@@ -94,6 +111,25 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
 
     @Override
     public Set<String> watching() {
+        while (!readyToReload()) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(RELOAD_WAIT_TIME_MILLIS);
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return popAllWaitingSources();
+    }
+
+    void watchChangedSources() {
+        Set<String> sources = getChangedSources();
+        pushWaitingSources(sources);
+        if (!executor.isShutdown()) {
+            executor.execute(this::watchChangedSources);
+        }
+    }
+
+    Set<String> getChangedSources() {
         WatchKey watchKey;
         try {
             watchKey = watcher.take();
@@ -127,10 +163,31 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
         return inputSources;
     }
 
+    private synchronized boolean readyToReload() {
+        return !waitingSources.isEmpty() &&
+                Instant.now().isAfter(lastSourceChangedTime.plusMillis(RELOAD_WAIT_TIME_MILLIS));
+    }
+
+   private synchronized void pushWaitingSources(Collection<String> inputSources) {
+        waitingSources.addAll(inputSources);
+        lastSourceChangedTime = Instant.now();
+        log.debug("pushed waitingSources: {}", inputSources);
+    }
+
+    private synchronized Set<String> popAllWaitingSources() {
+        Set<String> result = new HashSet<>(waitingSources);
+        waitingSources.clear();
+        log.debug("popped waitingSources: {}", result);
+        return result;
+    }
+
     @Override
     protected void end(ContinuousGeneratable cg) {
         try {
             watcher.close();
+            if (executor != null) {
+                executor.shutdownNow();
+            }
         } catch (IOException e) {
             log.warn("Exception when watcher close", e);
         }
