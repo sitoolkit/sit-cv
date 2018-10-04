@@ -30,8 +30,8 @@ export class DesignDocComponent {
     private sanitizer: DomSanitizer,
     @Inject('DesignDocService') private ddService: DesignDocService
   ) {
-    ddService.getDesignDocIdList().subscribe((response) => {
-      this.renderDesingDocList(response.designDocIds);
+    this.ddService.getIdList((idList) => {
+      this.renderDesingDocList(idList.ids);
     });
   }
 
@@ -54,10 +54,10 @@ export class DesignDocComponent {
     }
     this.currentDesignDocId = designDocId;
     this.isDiagramLoading = true;
-    this.ddService.getDesignDocDetail(designDocId).subscribe((response) => {
+    this.ddService.getDetail(designDocId, (detail) => {
       this.isDiagramLoading = false;
-      this.renderDiagrams(response.diagrams);
-      this.diagramComments = response.comments;
+      this.renderDiagrams(detail.diagrams);
+      this.diagramComments = detail.comments;
     })
     return false;
   }

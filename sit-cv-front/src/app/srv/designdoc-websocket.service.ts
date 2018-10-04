@@ -3,6 +3,8 @@ import * as SockJS from 'sockjs-client';
 import { AsyncSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { DesignDocService } from './designdoc.service';
+import { DesignDocIdList } from './designdoc-id-list';
+import { DesignDocDetail } from './designdoc-detail';
 
 @Injectable()
 export class DesignDocWebsocketService implements DesignDocService {
@@ -10,13 +12,14 @@ export class DesignDocWebsocketService implements DesignDocService {
   private serverUrl: string = `http://${location.hostname}:8080/gs-guide-websocket`;
   private socket: SockJS;
   private stompClient: Stomp.Client;
-  private connectionSource: AsyncSubject<any> = new AsyncSubject();
+  private connectionSource: AsyncSubject<Stomp.Frame> = new AsyncSubject();
 
   constructor() {
     this.connect();
   }
 
-  connect(headers: any = {}) {
+  connect() {
+    let headers = {};
     this.socket = new SockJS(this.serverUrl);
     this.stompClient = Stomp.over(this.socket);
     this.stompClient.connect(headers, (frame: Stomp.Frame) => {
@@ -27,41 +30,32 @@ export class DesignDocWebsocketService implements DesignDocService {
     });
   }
 
-  getDesignDocIdList(): AsyncSubject<any> {
-    let subject: AsyncSubject<any> = this.sendAndSubscribe(
-      '/app/designdoc/list',
-      '/topic/designdoc/list'
-    );
-    return subject;
+  getIdList(
+    callback: (idList: DesignDocIdList) => void
+  ): void {
+    this.connectionSource.subscribe(() => {
+      this.stompClient.subscribe('/topic/designdoc/list', (response: any) => {
+        let idList = new DesignDocIdList();
+        idList.ids = JSON.parse(response.body).designDocIds;
+        callback(idList);
+      });
+      this.stompClient.send('/app/designdoc/list');
+    })
   }
 
-  getDesignDocDetail(designDocId: string): AsyncSubject<any> {
+  getDetail(
+    designDocId: string,
+    callback: (detail: DesignDocDetail) => void
+  ): void {
     let subscribeUrl: string = '/topic/designdoc/detail/' + designDocId;
-    let subject: AsyncSubject<any> = this.sendAndSubscribe(
-      '/app/designdoc/detail',
-      subscribeUrl,
-      {},
-      designDocId
-    );
-    return subject;
-  }
-
-  private sendAndSubscribe(
-    sendUrl: string,
-    subscribeUrl: string,
-    sendHeaders?: Stomp.StompHeaders,
-    sendBody?: string
-  ): AsyncSubject<any> {
-    let subject: AsyncSubject<any> = new AsyncSubject();
     this.connectionSource.subscribe(() => {
       let subscriber: any = this.stompClient.subscribe(subscribeUrl, (response: any) => {
-        subject.next(JSON.parse(response.body));
-        subject.complete();
+        let detail = (<DesignDocDetail>JSON.parse(response.body));
+        callback(detail);
         subscriber.unsubscribe();
       });
-      this.stompClient.send(sendUrl, sendHeaders, sendBody);
+      this.stompClient.send('/app/designdoc/detail', {}, designDocId);
     })
-    return subject;
   }
 
 }
