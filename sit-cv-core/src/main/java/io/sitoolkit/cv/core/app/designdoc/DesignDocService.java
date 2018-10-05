@@ -89,6 +89,7 @@ public class DesignDocService {
 
         Set<ClassDef> readDefs = inputSources.stream()
                 .map(Paths::get)
+                .filter(path -> !Files.isDirectory(path))
                 .filter(Files::isReadable)
                 .map(classDefReader::readJava)
                 .filter(Optional::isPresent)
@@ -99,6 +100,7 @@ public class DesignDocService {
         readDefs.forEach(clazz -> log.info("Read {}", clazz));
 
         Set<String> deletedIds = inputSources.stream()
+                .filter(s -> !Files.isDirectory(Paths.get(s)))
                 .filter(sId -> !readDefs.stream().anyMatch(clazz -> StringUtils.equals(sId, clazz.getSourceId())))
                 .collect(Collectors.toSet());
         deletedIds.forEach(clazz -> log.info("Remove {}", clazz));
