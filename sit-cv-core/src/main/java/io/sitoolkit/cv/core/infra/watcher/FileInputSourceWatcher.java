@@ -48,6 +48,8 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
     private final Map<String, InputSource> watchingFileMap = new HashMap<>();
     private final Map<WatchKey, Path> pathMap = new HashMap<>();
 
+
+
     /**
      * ファイルを監視対象に含めます。
      *
@@ -122,6 +124,9 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
 
         return inputSources;
     }
+
+
+
 
     @Override
     protected void end(ContinuousGeneratable cg) {
