@@ -1,7 +1,7 @@
 import { ModuleWithProviders }   from '@angular/core';
 import { RouterModule }   from '@angular/router';
 
-import { DesignDocComponent } from './designdoc/designdoc.component';
+import { DesignDocComponent } from './cmp/designdoc/designdoc.component';
 import { ErrorComponent } from './error.component';
 
 const routes = [
