@@ -5,8 +5,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +29,22 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         classDef.getMethods().stream().forEach(methodDef -> {
             methodDefMap.put(methodDef.getQualifiedSignature(), methodDef);
             methodCallMap.put(methodDef.getQualifiedSignature(), methodDef.getMethodCalls());
+        });
+    }
+
+    @Override
+    public void remove(String sourceId) {
+
+        Optional<ClassDef> removingClass = classDefMap.values().stream()
+                .filter(clazz -> StringUtils.equals(clazz.getSourceId(), sourceId))
+                .findFirst();
+
+        removingClass.ifPresent(classDef ->{
+            classDefMap.remove(classDef.getPkg() + "." + classDef.getName());
+            classDef.getMethods().stream().forEach(methodDef -> {
+                methodDefMap.remove(methodDef.getQualifiedSignature());
+                methodCallMap.remove(methodDef.getQualifiedSignature());
+            });
         });
     }
 
