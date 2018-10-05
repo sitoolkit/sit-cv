@@ -4,14 +4,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
+import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
@@ -64,28 +69,43 @@ public class DesignDocService {
     }
 
     public void watchDir(Path srcDir, ClassDefChangeEventListener listener) {
+
         watcher.setContinue(true);
         try {
             Files.walk(srcDir).forEach(path -> watcher.watch(path.toFile().getAbsolutePath()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         watcher.start(inputSources -> {
-            classDefReader.init(srcDir);
-
-            inputSources.stream().forEach(inputSource -> {
-                classDefReader.readJava(Paths.get(inputSource)).ifPresent(clazz -> {
-                    classDefRepository.save(clazz);
-                    classDefRepository.solveReferences();
-                    log.info("Read {}", clazz);
-
-                    Set<String> entryPoints = entryPointMap.get(clazz.getSourceId());
-                    if (entryPoints != null) {
-                        entryPoints.stream().forEach(listener::onChange);
-                    }
-                });
-            });
+            readSources(srcDir, listener, inputSources);
         });
+    }
+
+
+    private void readSources(Path srcDir, ClassDefChangeEventListener listener, Collection<String> inputSources) {
+
+        classDefReader.init(srcDir);
+
+        Set<ClassDef> readDefs = inputSources.stream()
+                .map(Paths::get)
+                .map(classDefReader::readJava)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+
+        readDefs.forEach(classDefRepository::save);
+        readDefs.forEach(clazz -> log.info("Read {}", clazz));
+        classDefRepository.solveReferences();
+
+        Stream<String> entryPoints = readDefs.stream()
+                .map(ClassDef::getSourceId)
+                .map(entryPointMap::get)
+                .filter(Objects::nonNull)
+                .flatMap(Set::stream)
+                .distinct();
+
+        entryPoints.forEach(listener::onChange);
     }
 
     public Set<String> getAllIds() {
@@ -103,11 +123,11 @@ public class DesignDocService {
         LifeLineDef lifeLine = sequenceProcessor.process(entryPoint.getClassDef(), entryPoint);
         SequenceDiagram sequenceModel = SequenceDiagram.builder().entryLifeLine(lifeLine).build();
         ClassDiagram classModel = classProcessor.process(entryPoint);
-        
+
         Stream<String> allSourceIds = Stream.of(sequenceModel, classModel)
                 .map(DiagramModel::getAllSourceIds)
                 .flatMap(Set::stream)
-                .distinct();        
+                .distinct();
 
         allSourceIds.forEach(sourceId -> {
             Set<String> entryPoints = entryPointMap.computeIfAbsent(sourceId,

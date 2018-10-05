@@ -124,9 +124,11 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
             clazz.getImplInterfaces().stream().forEach(ifName -> {
                 ClassDef refType = classDefMap.get(ifName);
                 if (refType != null) {
+                    refType.getKnownImplClasses().remove(clazz); //remove to replace classdef to newer
                     refType.getKnownImplClasses().add(clazz);
                     log.debug("{} is Known implementation of {}", clazz.getName(), ifName);
                 }
+
             });
         }
     }
