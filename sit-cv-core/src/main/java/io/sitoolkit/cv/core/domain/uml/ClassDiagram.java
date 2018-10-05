@@ -29,4 +29,10 @@ public class ClassDiagram implements DiagramModel {
     public Map<String, String> getAllComments() {
         return new HashMap<String, String>();
     }
+
+    @Override
+    public Set<String> getAllSourceIds() {
+        return classes.stream().map(ClassDef::getSourceId).collect(Collectors.toSet());
+    }
+
 }
