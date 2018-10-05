@@ -115,7 +115,11 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
             File changedFile = dir.resolve((Path) event.context()).toFile();
 
             InputSource inputSource = watchingFileMap.get(changedFile.getAbsolutePath());
-            if (inputSource != null && inputSource.lastModified != changedFile.lastModified()) {
+            if (inputSource == null) {
+                inputSource = new InputSource(changedFile.getAbsolutePath(), 0);
+                watchingFileMap.put(changedFile.getAbsolutePath(), inputSource);
+            }
+            if (inputSource.lastModified != changedFile.lastModified()) {
                 inputSources.add(inputSource.name);
                 inputSource.lastModified = changedFile.lastModified();
             }
