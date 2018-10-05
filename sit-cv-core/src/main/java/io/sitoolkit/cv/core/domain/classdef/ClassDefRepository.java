@@ -7,6 +7,8 @@ public interface ClassDefRepository {
 
     void save(ClassDef classDef);
 
+    void remove(String sourceId);
+
     Collection<ClassDef> getAllClassDefs();
 
     int countClassDefs();

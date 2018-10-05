@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
+
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
@@ -81,13 +83,13 @@ public class DesignDocService {
         });
     }
 
-
     private void readSources(Path srcDir, ClassDefChangeEventListener listener, Collection<String> inputSources) {
 
         classDefReader.init(srcDir);
 
         Set<ClassDef> readDefs = inputSources.stream()
                 .map(Paths::get)
+                .filter(Files::isReadable)
                 .map(classDefReader::readJava)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -95,6 +97,13 @@ public class DesignDocService {
 
         readDefs.forEach(classDefRepository::save);
         readDefs.forEach(clazz -> log.info("Read {}", clazz));
+
+        Set<String> deletedIds = inputSources.stream()
+                .filter(sId -> !readDefs.stream().anyMatch(clazz -> StringUtils.equals(sId, clazz.getSourceId())))
+                .collect(Collectors.toSet());
+        deletedIds.forEach(clazz -> log.info("Remove {}", clazz));
+        deletedIds.forEach(classDefRepository::remove);
+
         classDefRepository.solveReferences();
 
         Stream<String> entryPoints = readDefs.stream()

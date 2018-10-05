@@ -87,7 +87,8 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
                 // TODO ファイル監視方式の統一
                 watcher = FileSystems.getDefault().newWatchService();
             }
-            WatchKey watchKey = dirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+            WatchKey watchKey = dirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY,
+                    StandardWatchEventKinds.ENTRY_DELETE);
             pathMap.put(watchKey, dirPath);
         } catch (IOException e) {
             throw new IllegalStateException(e);
