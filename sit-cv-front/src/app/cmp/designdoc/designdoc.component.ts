@@ -1,24 +1,12 @@
 import { Component, Inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as $ from 'jquery';
-import { DesignDocWebsocketService } from '../../srv/designdoc-websocket.service';
-import { DesignDocLocalService } from '../../srv/designdoc-local.service';
 import { DesignDocService } from '../../srv/designdoc.service';
 
 @Component({
   selector: 'app-designdoc',
   templateUrl: './designdoc.component.html',
   styleUrls: ['./designdoc.component.css'],
-  providers: [{
-    provide: 'DesignDocService',
-    useFactory: () => {
-      if ((<any>window).designDocsData == null) {
-        return new DesignDocWebsocketService();
-      } else {
-        return new DesignDocLocalService()
-      }
-    }
-  }]
 })
 
 export class DesignDocComponent {

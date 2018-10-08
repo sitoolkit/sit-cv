@@ -21,6 +21,10 @@ import { DesignDocComponent } from './cmp/designdoc/designdoc.component';
 import { ErrorComponent } from './error.component';
 import { DoctreeComponent } from './cmp/doctree/doctree.component';
 
+import { DesignDocLocalRepository } from './srv/designdoc-local.repository';
+import { DesignDocWebsocketService } from './srv/designdoc-websocket.service';
+import { DesignDocLocalService } from './srv/designdoc-local.service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -43,7 +47,20 @@ import { DoctreeComponent } from './cmp/doctree/doctree.component';
     MatCardModule,
     MY_ROUTES,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: 'DesignDocService',
+      useFactory: (repository: DesignDocLocalRepository) => {
+        if (repository.isReady()) {
+          return new DesignDocLocalService(repository);
+        } else {
+          return new DesignDocWebsocketService();
+        }
+      },
+      deps: [DesignDocLocalRepository]
+    },
+    DesignDocLocalRepository
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
