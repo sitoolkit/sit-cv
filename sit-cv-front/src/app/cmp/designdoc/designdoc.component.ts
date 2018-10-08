@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as $ from 'jquery';
-import { DesignDocService } from '../../srv/designdoc.service';
+import { DesignDocService } from '../../srv/designdoc/designdoc.service';
 
 @Component({
   selector: 'app-designdoc',

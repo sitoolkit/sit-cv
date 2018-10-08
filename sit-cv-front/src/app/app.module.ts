@@ -21,9 +21,9 @@ import { DesignDocComponent } from './cmp/designdoc/designdoc.component';
 import { ErrorComponent } from './error.component';
 import { DoctreeComponent } from './cmp/doctree/doctree.component';
 
-import { DesignDocLocalRepository } from './srv/designdoc-local.repository';
-import { DesignDocWebsocketService } from './srv/designdoc-websocket.service';
-import { DesignDocLocalService } from './srv/designdoc-local.service';
+import { DesignDocLocalRepository } from './srv/designdoc/designdoc-local.repository';
+import { DesignDocWebsocketService } from './srv/designdoc/designdoc-websocket.service';
+import { DesignDocLocalService } from './srv/designdoc/designdoc-local.service';
 
 @NgModule({
   declarations: [
