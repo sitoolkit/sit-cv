@@ -24,6 +24,7 @@ import { DoctreeComponent } from './cmp/doctree/doctree.component';
 import { DesignDocLocalRepository } from './srv/designdoc/designdoc-local.repository';
 import { DesignDocWebsocketService } from './srv/designdoc/designdoc-websocket.service';
 import { DesignDocLocalService } from './srv/designdoc/designdoc-local.service';
+import { LocalData } from './srv/shared/local-data';
 
 @NgModule({
   declarations: [
@@ -50,16 +51,17 @@ import { DesignDocLocalService } from './srv/designdoc/designdoc-local.service';
   providers: [
     {
       provide: 'DesignDocService',
-      useFactory: (repository: DesignDocLocalRepository) => {
-        if (repository.isReady()) {
+      useFactory: (repository: DesignDocLocalRepository, localData: LocalData) => {
+        if (localData.isReady) {
           return new DesignDocLocalService(repository);
         } else {
           return new DesignDocWebsocketService();
         }
       },
-      deps: [DesignDocLocalRepository]
+      deps: [DesignDocLocalRepository, LocalData]
     },
-    DesignDocLocalRepository
+    DesignDocLocalRepository,
+    LocalData
   ],
   bootstrap: [AppComponent]
 })

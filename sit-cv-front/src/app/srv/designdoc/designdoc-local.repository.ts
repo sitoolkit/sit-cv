@@ -1,30 +1,19 @@
 import { DesignDocDetail } from "./designdoc-detail";
 import { DesignDocIdList } from "./designdoc-id-list";
 import { Injectable } from "@angular/core";
-
-interface Window {
-  designDocsData: any
-}
-declare var window: Window;
+import { LocalData } from "../shared/local-data";
 
 @Injectable()
 export class DesignDocLocalRepository {
 
-  private localData: any;
   private idList: { [designDocId: string]: string }
   private detailList: { [designDocId: string]: DesignDocDetail }
 
-  constructor() {
-    this.localData = window.designDocsData;
-
-    if (this.isReady()) {
-      this.idList = this.localData.idList;
-      this.detailList = this.localData.detailList;
+  constructor(private localData: LocalData) {
+    if (this.localData.isReady) {
+      this.idList = this.localData.designDoc.idList;
+      this.detailList = this.localData.designDoc.detailList;
     }
-  }
-
-  isReady(): boolean {
-    return this.localData != null;
   }
 
   getIdList(
