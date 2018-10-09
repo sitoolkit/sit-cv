@@ -1,0 +1,3 @@
+window.localConfig = {
+  enabled: false
+}

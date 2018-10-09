@@ -7,8 +7,7 @@ import { DesignDocLocalRepository } from './designdoc-local.repository';
 @Injectable()
 export class DesignDocLocalService implements DesignDocService {
 
-  constructor(private repository: DesignDocLocalRepository) {
-  }
+  constructor(private repository: DesignDocLocalRepository) {}
 
   getIdList(
     callback: (idList: DesignDocIdList) => void
