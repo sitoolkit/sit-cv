@@ -1,6 +1,12 @@
 .designdocContainer {
   padding: 1em;
 }
+.designdoc >>> img,
+.designdoc >>> svg {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
 mat-spinner {
   margin: 5em auto auto 5em;
 }
