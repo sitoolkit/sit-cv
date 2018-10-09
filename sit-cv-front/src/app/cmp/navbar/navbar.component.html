@@ -1,4 +1,4 @@
-<mat-sidenav-container class="sidenav-container">
+<mat-sidenav-container class="sidenav-container" autosize>
   <mat-sidenav
     #drawer
     class="sidenav"
@@ -6,7 +6,13 @@
     [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="!(isHandset$ | async)">
-    <mat-toolbar color="primary">Menu</mat-toolbar>
+    <mat-toolbar color="primary">
+      <button type="button" aria-label="Toggle sidenav"
+        mat-icon-button (click)="drawer.toggle()" *ngIf="drawer.opened">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <span>Menu</span>
+    </mat-toolbar>
     <app-doctree [designDocIds]="dd.designDocIds" (selected)="dd.showDesignDocDetail($event)">
     </app-doctree>
   </mat-sidenav>
@@ -17,7 +23,7 @@
         aria-label="Toggle sidenav"
         mat-icon-button
         (click)="drawer.toggle()"
-        *ngIf="isHandset$ | async">
+        *ngIf="!drawer.opened">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span>sit-cv-front</span>
