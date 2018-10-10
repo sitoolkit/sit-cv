@@ -5,22 +5,22 @@ import { Injectable } from '@angular/core';
 import { DesignDocService } from './designdoc.service';
 import { DesignDocIdList } from './designdoc-id-list';
 import { DesignDocDetail } from './designdoc-detail';
+import { Config } from '../shared/config';
 
 @Injectable()
 export class DesignDocWebsocketService implements DesignDocService {
 
-  private serverUrl: string = `http://${location.hostname}:8080/gs-guide-websocket`;
   private socket: SockJS;
   private stompClient: Stomp.Client;
   private connectionSource: AsyncSubject<Stomp.Frame> = new AsyncSubject();
 
-  constructor() {
+  constructor(private config: Config) {
     this.connect();
   }
 
   connect() {
     let headers = {};
-    this.socket = new SockJS(this.serverUrl);
+    this.socket = new SockJS(this.config.webSocketEndpoint);
     this.stompClient = Stomp.over(this.socket);
     this.stompClient.connect(headers, (frame: Stomp.Frame) => {
       this.connectionSource.next(frame);

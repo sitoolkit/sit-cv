@@ -24,8 +24,7 @@ import { DoctreeComponent } from './cmp/doctree/doctree.component';
 import { DesignDocLocalRepository } from './srv/designdoc/designdoc-local.repository';
 import { DesignDocWebsocketService } from './srv/designdoc/designdoc-websocket.service';
 import { DesignDocLocalService } from './srv/designdoc/designdoc-local.service';
-import { LocalDataLoader } from './srv/shared/local-data-loader';
-import { LocalConfig } from './srv/shared/local-config';
+import { Config } from './srv/shared/config';
 
 @NgModule({
   declarations: [
@@ -52,14 +51,14 @@ import { LocalConfig } from './srv/shared/local-config';
   providers: [
     {
       provide: 'DesignDocService',
-      useFactory: (repository: DesignDocLocalRepository, localConfig: LocalConfig) => {
-        if (localConfig.enabled) {
+      useFactory: (repository: DesignDocLocalRepository, config: Config) => {
+        if (config.isReportMode()) {
           return new DesignDocLocalService(repository);
         } else {
-          return new DesignDocWebsocketService();
+          return new DesignDocWebsocketService(config);
         }
       },
-      deps: [DesignDocLocalRepository, LocalConfig]
+      deps: [DesignDocLocalRepository, Config]
     },
   ],
   bootstrap: [AppComponent]

@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { DesignDocLocalData } from "../designdoc/designdoc-local-data";
-import { LocalConfig } from "./local-config";
+import { Config } from "./config";
 
 interface Window {
   localData: any
@@ -13,10 +13,10 @@ export class LocalDataLoader {
   private loadedScripts = new Array<string>();
 
   constructor(
-    private localConfig: LocalConfig,
+    private config: Config,
     private designDoc: DesignDocLocalData
   ) {
-    if (this.localConfig.enabled) {
+    if (this.config.isReportMode()) {
       window.localData = {
         designDoc: this.designDoc
       };
@@ -28,7 +28,10 @@ export class LocalDataLoader {
       callback();
     } else {
       let script = document.createElement("script");
-      script.onload = callback;
+      script.onload = () => {
+        document.body.removeChild(script);
+        callback();
+      }
       script.src = scriptPath;
       document.body.appendChild(script);
     }
