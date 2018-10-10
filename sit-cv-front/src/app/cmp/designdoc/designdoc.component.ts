@@ -1,19 +1,12 @@
 import { Component, Inject } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as $ from 'jquery';
-import { DesignDocWebsocketService } from '../../srv/designdoc-websocket.service';
-import { DesignDocService } from '../../srv/designdoc.service';
+import { DesignDocService } from '../../srv/designdoc/designdoc.service';
 
 @Component({
   selector: 'app-designdoc',
   templateUrl: './designdoc.component.html',
   styleUrls: ['./designdoc.component.css'],
-  providers: [{
-    provide: 'DesignDocService',
-    useFactory: () => {
-      return new DesignDocWebsocketService();
-    }
-  }]
 })
 
 export class DesignDocComponent {

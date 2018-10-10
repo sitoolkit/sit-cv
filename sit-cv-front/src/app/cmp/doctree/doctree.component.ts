@@ -33,6 +33,7 @@ export class DoctreeComponent implements OnChanges {
 
   onSelected(designDocId: string) {
     this.selected.emit(designDocId);
+    return false;
   }
 
   toggleExpanded(node: Node) {
