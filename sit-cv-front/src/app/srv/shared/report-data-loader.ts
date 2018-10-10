@@ -1,14 +1,14 @@
 import { Injectable } from "@angular/core";
-import { DesignDocLocalData } from "../designdoc/designdoc-local-data";
+import { DesignDocLocalData } from "../designdoc/designdoc-report-data";
 import { Config } from "./config";
 
 interface Window {
-  localData: any
+  reportData: any
 }
 declare var window: Window;
 
 @Injectable({ providedIn: 'root' })
-export class LocalDataLoader {
+export class ReportDataLoader {
 
   private loadedScripts = new Array<string>();
 
@@ -17,7 +17,7 @@ export class LocalDataLoader {
     private designDoc: DesignDocLocalData
   ) {
     if (this.config.isReportMode()) {
-      window.localData = {
+      window.reportData = {
         designDoc: this.designDoc
       };
     }

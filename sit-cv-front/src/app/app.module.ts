@@ -21,9 +21,9 @@ import { DesignDocComponent } from './cmp/designdoc/designdoc.component';
 import { ErrorComponent } from './error.component';
 import { DoctreeComponent } from './cmp/doctree/doctree.component';
 
-import { DesignDocLocalRepository } from './srv/designdoc/designdoc-local.repository';
-import { DesignDocWebsocketService } from './srv/designdoc/designdoc-websocket.service';
-import { DesignDocLocalService } from './srv/designdoc/designdoc-local.service';
+import { DesignDocReportRepository } from './srv/designdoc/designdoc-report.repository';
+import { DesignDocServerService } from './srv/designdoc/designdoc-server.service';
+import { DesignDocReportService } from './srv/designdoc/designdoc-report.service';
 import { Config } from './srv/shared/config';
 
 @NgModule({
@@ -51,14 +51,14 @@ import { Config } from './srv/shared/config';
   providers: [
     {
       provide: 'DesignDocService',
-      useFactory: (repository: DesignDocLocalRepository, config: Config) => {
+      useFactory: (repository: DesignDocReportRepository, config: Config) => {
         if (config.isReportMode()) {
-          return new DesignDocLocalService(repository);
+          return new DesignDocReportService(repository);
         } else {
-          return new DesignDocWebsocketService(config);
+          return new DesignDocServerService(config);
         }
       },
-      deps: [DesignDocLocalRepository, Config]
+      deps: [DesignDocReportRepository, Config]
     },
   ],
   bootstrap: [AppComponent]

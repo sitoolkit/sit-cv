@@ -1,14 +1,14 @@
 import { DesignDocDetail } from "./designdoc-detail";
 import { DesignDocIdList } from "./designdoc-id-list";
 import { Injectable } from "@angular/core";
-import { LocalDataLoader } from "../shared/local-data-loader";
-import { DesignDocLocalData } from "./designdoc-local-data";
+import { ReportDataLoader } from "../shared/report-data-loader";
+import { DesignDocLocalData } from "./designdoc-report-data";
 
 @Injectable({ providedIn: 'root' })
-export class DesignDocLocalRepository {
+export class DesignDocReportRepository {
 
   constructor(
-    private loader: LocalDataLoader,
+    private loader: ReportDataLoader,
     private data: DesignDocLocalData
   ) {}
 

@@ -8,7 +8,7 @@ import { DesignDocDetail } from './designdoc-detail';
 import { Config } from '../shared/config';
 
 @Injectable()
-export class DesignDocWebsocketService implements DesignDocService {
+export class DesignDocServerService implements DesignDocService {
 
   private socket: SockJS;
   private stompClient: Stomp.Client;

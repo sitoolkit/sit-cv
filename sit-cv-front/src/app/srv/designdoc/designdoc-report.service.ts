@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { DesignDocService } from './designdoc.service';
 import { DesignDocIdList } from './designdoc-id-list';
 import { DesignDocDetail } from './designdoc-detail';
-import { DesignDocLocalRepository } from './designdoc-local.repository';
+import { DesignDocReportRepository } from './designdoc-report.repository';
 
 @Injectable()
-export class DesignDocLocalService implements DesignDocService {
+export class DesignDocReportService implements DesignDocService {
 
-  constructor(private repository: DesignDocLocalRepository) {}
+  constructor(private repository: DesignDocReportRepository) {}
 
   getIdList(
     callback: (idList: DesignDocIdList) => void
