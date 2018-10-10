@@ -24,7 +24,7 @@ export class ReportDataLoader {
   }
 
   loadScript(scriptPath, callback: () => void) {
-    if (this.loadedScripts.includes(scriptPath)) {
+    if (this.loadedScripts.indexOf(scriptPath) >= 0) {
       callback();
     } else {
       let script = document.createElement("script");
