@@ -6,6 +6,7 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,8 +16,17 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ClassDefRepositoryParam {
 
+    private Path projectDir;
+
+    @Default
     private List<Path> srcDirs = new ArrayList<>();
+
+    @Default
     private List<Path> binDirs = new ArrayList<>();
+
+    @Default
+    private List<Path> jarPaths = new ArrayList<>();
+
     private Path jarList;
 
 }
