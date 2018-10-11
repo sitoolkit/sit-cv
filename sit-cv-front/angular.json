@@ -48,7 +48,9 @@
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true
+              "buildOptimizer": true,
+              "outputPath": "../sit-cv-app/src/main/resources/static/",
+              "deployUrl": "./"
             }
           }
         },
