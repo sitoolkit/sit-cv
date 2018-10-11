@@ -64,10 +64,10 @@ public class DesignDocService {
     InputSourceWatcher watcher;
 
     public void loadDir(Path projDir, Path srcDir) {
-
+        
+        classDefReader.init(projDir, srcDir);
         classDefReader.readDir(srcDir);
         ClassDefFilterConditionReader.read(projDir).ifPresent(classFilter::setCondition);
-
     }
 
     public void watchDir(Path srcDir, ClassDefChangeEventListener listener) {
@@ -86,8 +86,8 @@ public class DesignDocService {
 
     private void readSources(Path srcDir, ClassDefChangeEventListener listener, Collection<String> inputSources) {
 
-        classDefReader.init(srcDir);
-
+        classDefReader.rebuild();
+        
         Set<ClassDef> readDefs = inputSources.stream()
                 .map(Paths::get)
                 .filter(path -> !Files.isDirectory(path))
