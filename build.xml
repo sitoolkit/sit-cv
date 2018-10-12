@@ -25,7 +25,7 @@
 
   <target name="set-version">
 
-    <property name="version" value="1.0.0-appha.2-SNAPSHOT" />
+    <property name="version" value="1.0.0-appha.2" />
 
     <exec executable="${mvn.cmd}" dir="${basedir}">
       <arg value="-DnewVersion=${version}" />

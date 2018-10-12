@@ -80,7 +80,7 @@
   <parent>
     <groupId>io.sitoolkit.cv</groupId>
     <artifactId>sit-cv</artifactId>
-    <version>1.0.0-appha.2-SNAPSHOT</version>
+    <version>1.0.0-appha.2</version>
   </parent>
 
   <dependencyManagement>
