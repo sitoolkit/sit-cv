@@ -68,8 +68,7 @@ public class DesignDocReportExporter {
     private Deflater compresser = new Deflater();
 
     public void export() {
-        String prjDir = "../sample";
-        export(prjDir);
+        export("./");
     }
 
     public void export(String prjDirName) {
@@ -93,7 +92,7 @@ public class DesignDocReportExporter {
                 StandardCopyOption.REPLACE_EXISTING
             );
 
-            log.debug("output report to: " + outputDir.toPath());
+            log.info("exported report to: " + outputDir.toPath());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
