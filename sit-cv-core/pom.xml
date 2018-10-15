@@ -99,7 +99,7 @@
     <resources>
       <resource>
         <directory>../sit-cv-app/src/main/resources/static</directory>
-        <targetPath>static</targetPath>
+        <targetPath>report-resource</targetPath>
       </resource>
     </resources>
   </build>

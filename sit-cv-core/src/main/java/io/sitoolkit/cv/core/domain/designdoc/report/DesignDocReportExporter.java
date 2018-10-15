@@ -4,28 +4,30 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
+import java.io.InputStream;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.Deflater;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -55,7 +57,14 @@ import io.sitoolkit.cv.core.infra.graphviz.GraphvizManager;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 
+@Slf4j
 public class DesignDocReportExporter {
+
+    private final String jarList = "sit-cv-jar-list.txt";
+
+    private final String outputDirName = "docs/designdocs";
+
+    private final String resourceName = "report-resource";
 
     private PlantUmlWriter plantumlWriter = new PlantUmlWriter();
 
@@ -64,30 +73,31 @@ public class DesignDocReportExporter {
     public void export() {
         String prjDir = "../sample";
         String srcDir = "../sample/src/main/java";
-        String jarList = "sit-cv-jar-list.txt";
-        export(prjDir, srcDir, jarList);
+        export(prjDir, srcDir);
     }
 
-    public void export(String prjDir, String srcDir, String jarList) {
-        String outputDirName = "docs/designdocs";
-
+    public void export(String prjDir, String srcDir) {
         initGraphviz();
 
-        ClassDefRepository repository = createClassDefRepository(prjDir, srcDir, jarList);
-
-        File outputDir = new File(prjDir, outputDirName);
-        outputDir.mkdirs();
+        ClassDefRepository repository = createClassDefRepository(prjDir, srcDir);
 
         try {
-            deleteDirectory(outputDir.toString());
+            File outputDir = new File(prjDir, outputDirName);
 
-            copyResource("static", outputDir.toPath());
-            writeDesignDocsData(outputDir, repository);
+            if(outputDir.exists()) {
+                deleteDirectory(outputDir);
+            }
+            outputDir.mkdirs();
+
+            copyResource(resourceName, outputDir);
+            writeDesignDocs(outputDir, repository);
             Files.copy(
                 new File(outputDir, "assets/config-report.js").toPath(),
                 new File(outputDir, "assets/config.js").toPath(),
                 StandardCopyOption.REPLACE_EXISTING
             );
+
+            log.debug("output report to: " + outputDir.toPath());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -101,7 +111,7 @@ public class DesignDocReportExporter {
         }
     }
 
-    ClassDefRepository createClassDefRepository(String prjDir, String srcDir, String jarList) {
+    ClassDefRepository createClassDefRepository(String prjDir, String srcDir) {
         ClassDefFilter filter = new ClassDefFilter();
         ClassDefFilterConditionReader.read(Paths.get(prjDir)).ifPresent(filter::setCondition);
 
@@ -112,7 +122,6 @@ public class DesignDocReportExporter {
         param.setJarPaths(new ArrayList<>());
         param.setJarList(Paths.get(jarList));
         param.setBinDirs(new ArrayList<>());
-//        param.getBinDirs().add(Paths.get("target/classes"));
 
         ClassDefRepository repository = new ClassDefRepositoryMemImpl();
         Config config = new Config();
@@ -124,13 +133,13 @@ public class DesignDocReportExporter {
         return repository;
     }
 
-    void writeDesignDocsData(File outputDir, ClassDefRepository repository) {
+    void writeDesignDocs(File outputDir, ClassDefRepository repository) {
         Map<String, String> idList = new HashMap<>();
 
         Set<String> designDocIds = repository.getEntryPoints();
         designDocIds.stream().forEach((designDocId) -> {
             MethodDef entryPoint = repository.findMethodByQualifiedSignature(designDocId);
-            DesignDocReportDetailData detail = createDetailData(entryPoint);
+            DesignDocReportDetail detail = createDetail(entryPoint);
 
             String detailDirName = createDetailDirName(entryPoint);
             String detailFileName = createDetailFileName(entryPoint);
@@ -140,13 +149,76 @@ public class DesignDocReportExporter {
             detailDir.mkdirs();
 
             File detailFile = new File(detailDir, detailFileName);
-            String detailValue = toJsonString(detail);
+            String detailValue = convertToJsonString(detail);
             writeFile(detailFile, "window.reportData.designDoc.detailList['" + designDocId + "'] = " + detailValue);
         });
 
         File idListFile = new File(outputDir, "assets/designdoc-id-list.js");
-        String idListValue = toJsonString(idList);
+        String idListValue = convertToJsonString(idList);
         writeFile(idListFile, "window.reportData.designDoc.idList = " + idListValue);
+    }
+
+    void deleteDirectory(File target) {
+        Path targetPath = target.toPath();
+        try(Stream<Path> walk = Files.walk(targetPath))
+        {
+            walk.sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void copyResource(String source, File target) {
+        try {
+            URL url = new URL(getClass().getClassLoader().getResource(source).toString());
+            URLConnection connection = url.openConnection();
+            connection.setUseCaches(false);
+
+            if (connection instanceof JarURLConnection) {
+                copyJarResource((JarURLConnection)connection, target);
+            } else {
+                FileUtils.copyDirectory(new File(url.getPath()), target);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void copyJarResource(JarURLConnection connection, File target) {
+        try {
+            JarFile jarFile = connection.getJarFile();
+            for(JarEntry entry : Collections.list(jarFile.entries())) {
+                if(entry.getName().startsWith(connection.getEntryName())) {
+                    String fileName = StringUtils.removeStart(entry.getName(), connection.getEntryName());
+                    File targetFile = new File(target, fileName);
+
+                    if (entry.isDirectory()) {
+                        targetFile.mkdirs();
+                    } else {
+                        try (InputStream entryInputStream = jarFile.getInputStream(entry)) {
+                            FileUtils.copyInputStreamToFile(entryInputStream, targetFile);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    DesignDocReportDetail createDetail(MethodDef entryPoint) {
+        DesignDocReportDetail detail = new DesignDocReportDetail();
+        List<Diagram> diagrams = new ArrayList<>();
+        diagrams.add(getSequenceDiagram(entryPoint));
+        diagrams.add(getClassDiagram(entryPoint));
+
+        diagrams.stream().forEach((diagram) -> {
+            detail.getDiagrams().put(diagram.getId(), new String(diagram.getData()));
+            detail.getComments().put(diagram.getId(), diagram.getComments());
+        });
+        return detail;
     }
 
     Diagram getSequenceDiagram(MethodDef entryPoint) {
@@ -164,60 +236,20 @@ public class DesignDocReportExporter {
         return plantumlWriter.createDiagram(cd, writer::serialize);
     }
 
-    void deleteDirectory(String target) {
-        Path targetPath = Paths.get(target);
-        try(Stream<Path> walk = Files.walk(targetPath))
-        {
-            walk.sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    String createDetailFileName(MethodDef entryPoint) {
+        ClassDef classDef = entryPoint.getClassDef();
+        String className = classDef.getName();
+        String methodName = entryPoint.getName();
+        String argTypes = String.join("_", entryPoint.getParamTypes()
+                .stream().map(TypeDef::getName).collect(Collectors.toList()));
+        String uniqName = String.join("_", new String[] {className, methodName, argTypes});
+        String fileName = compressString(uniqName) + ".js";
+        return fileName;
     }
 
-    void copyResource(String source, Path target) {
-        Path resourcePath = getResourcePath(source);
-
-        try {
-            Files.walkFileTree(resourcePath, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                    Path targetDir = target.resolve(resourcePath.relativize(dir).toString());
-                    Files.createDirectories(targetDir);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.copy(file, target.resolve(resourcePath.relativize(file).toString()), StandardCopyOption.REPLACE_EXISTING);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    Path getResourcePath(String source) {
-        Path path = null;
-
-        try {
-            URI resource = DesignDocReportExporter.class.getClassLoader().getResource(source).toURI();
-
-            try {
-                path = Paths.get(resource);
-            } catch (FileSystemNotFoundException e) {
-                Map<String, String> env = new HashMap<>();
-                env.put("create", "true");
-                FileSystem fileSystem = FileSystems.newFileSystem(resource, env);
-                path = fileSystem.getPath(resource.toString());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return path;
+    String createDetailDirName(MethodDef entryPoint) {
+        ClassDef classDef = entryPoint.getClassDef();
+        return classDef.getPkg().replaceAll("\\.", "/");
     }
 
     String compressString(String input) {
@@ -230,54 +262,22 @@ public class DesignDocReportExporter {
             compresser.setInput(dataByte);
             compresser.finish();
 
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(dataByte.length);
-            byte[] buf = new byte[1024];
-            while(!compresser.finished()) {
-                int compByte = compresser.deflate(buf);
-                byteArrayOutputStream.write(buf, 0, compByte);
+            try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(dataByte.length)){
+                byte[] buf = new byte[1024];
+                while(!compresser.finished()) {
+                    int compByte = compresser.deflate(buf);
+                    byteArrayOutputStream.write(buf, 0, compByte);
+                }
+                byte[] compData = byteArrayOutputStream.toByteArray();
+                encoded = Base64.getEncoder().withoutPadding().encodeToString(compData);
             }
-            byteArrayOutputStream.close();
-
-            byte[] compData = byteArrayOutputStream.toByteArray();
-            encoded = Base64.getEncoder().withoutPadding().encodeToString(compData);
-        } catch(java.io.UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return encoded;
     }
 
-    DesignDocReportDetailData createDetailData(MethodDef entryPoint) {
-        DesignDocReportDetailData detail = new DesignDocReportDetailData();
-        List<Diagram> diagrams = new ArrayList<>();
-        diagrams.add(getSequenceDiagram(entryPoint));
-        diagrams.add(getClassDiagram(entryPoint));
-
-        diagrams.stream().forEach((diagram) -> {
-            detail.getDiagrams().put(diagram.getId(), new String(diagram.getData()));
-            detail.getComments().put(diagram.getId(), diagram.getComments());
-        });
-        return detail;
-    }
-
-    String createDetailFileName(MethodDef entryPoint) {
-        ClassDef classDef = entryPoint.getClassDef();
-        String className = classDef.getName();
-        String name = entryPoint.getName();
-        String argType = String.join("_", entryPoint.getParamTypes().stream().map(TypeDef::getName).collect(Collectors.toList()));
-        String fileName = String.join("_", new String[] {className, argType, name});
-        String fullFileName = compressString(fileName) + ".js";
-        return fullFileName;
-    }
-
-    String createDetailDirName(MethodDef entryPoint) {
-        ClassDef classDef = entryPoint.getClassDef();
-        String pkgDir = classDef.getPkg().replaceAll("\\.", "/");
-        return pkgDir;
-    }
-
-    String toJsonString(Object src) {
+    String convertToJsonString(Object src) {
         ObjectMapper mapper = new ObjectMapper();
         String value;
         try {
@@ -289,8 +289,8 @@ public class DesignDocReportExporter {
     }
 
     void writeFile(File file, String value) {
-        try(FileWriter filewriter = new FileWriter(file);){
-            filewriter.write(value);
+        try(FileWriter writer = new FileWriter(file);){
+            writer.write(value);
         }catch(IOException e){
             throw new RuntimeException(e);
         }
