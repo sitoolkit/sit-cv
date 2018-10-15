@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
@@ -59,30 +60,25 @@ import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 
 @Slf4j
 public class DesignDocReportExporter {
-
     private final String jarList = "sit-cv-jar-list.txt";
-
+    private final String srcDirName = "src/main/java";
     private final String outputDirName = "docs/designdocs";
-
     private final String resourceName = "report-resource";
-
     private PlantUmlWriter plantumlWriter = new PlantUmlWriter();
-
     private Deflater compresser = new Deflater();
 
     public void export() {
         String prjDir = "../sample";
-        String srcDir = "../sample/src/main/java";
-        export(prjDir, srcDir);
+        export(prjDir);
     }
 
-    public void export(String prjDir, String srcDir) {
+    public void export(String prjDirName) {
         initGraphviz();
 
-        ClassDefRepository repository = createClassDefRepository(prjDir, srcDir);
+        ClassDefRepository repository = createClassDefRepository(prjDirName, srcDirName);
 
         try {
-            File outputDir = new File(prjDir, outputDirName);
+            File outputDir = new File(prjDirName, outputDirName);
 
             if(outputDir.exists()) {
                 deleteDirectory(outputDir);
@@ -117,15 +113,14 @@ public class DesignDocReportExporter {
 
         ClassDefRepositoryParam param = new ClassDefRepositoryParam();
         param.setProjectDir(Paths.get(prjDir));
-        param.setSrcDirs(new ArrayList<>());
-        param.getSrcDirs().add(Paths.get(srcDir));
-        param.setJarPaths(new ArrayList<>());
-        param.setJarList(Paths.get(jarList));
-        param.setBinDirs(new ArrayList<>());
+        param.setSrcDirs(Arrays.asList(Paths.get(srcDir)));
+        param.setJarPaths(Arrays.asList());
+        param.setJarList(Paths.get(prjDir, jarList));
+        param.setBinDirs(Arrays.asList());
 
         ClassDefRepository repository = new ClassDefRepositoryMemImpl();
         Config config = new Config();
-        config.setJarList(jarList);
+
         ClassDefReader reader = new ClassDefReaderJavaParserImpl(repository, config);
         reader.init(param);
         reader.readDir(Paths.get(srcDir));
@@ -269,7 +264,7 @@ public class DesignDocReportExporter {
                     byteArrayOutputStream.write(buf, 0, compByte);
                 }
                 byte[] compData = byteArrayOutputStream.toByteArray();
-                encoded = Base64.getEncoder().withoutPadding().encodeToString(compData);
+                encoded = Base64.getUrlEncoder().withoutPadding().encodeToString(compData);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
