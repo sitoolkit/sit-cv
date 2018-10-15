@@ -95,6 +95,15 @@
     </dependencies>
   </dependencyManagement>
 
+  <build>
+    <resources>
+      <resource>
+        <directory>../sit-cv-app/src/main/resources/static</directory>
+        <targetPath>report-resource</targetPath>
+      </resource>
+    </resources>
+  </build>
+  
   <properties>
     <javaparser.version>3.6.18</javaparser.version>
   </properties>
