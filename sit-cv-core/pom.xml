@@ -62,7 +62,7 @@
     <dependency>
         <groupId>io.sitoolkit.util.bth</groupId>
         <artifactId>sit-util-bth</artifactId>
-        <version>1.0.0-alpha.2</version>
+        <version>1.0.0-alpha.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
