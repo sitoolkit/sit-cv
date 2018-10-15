@@ -14,14 +14,11 @@ import java.util.stream.Stream;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryParam;
 import io.sitoolkit.cv.core.infra.bt.gradle.GradleDependencyFinder;
-import io.sitoolkit.util.buidtoolhelper.maven.MavenProject;
-import io.sitoolkit.util.buidtoolhelper.process.StdoutListener;
+import io.sitoolkit.cv.core.infra.bt.maven.MavenDependencyFinder;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JarPathFinder {
-
-    GradleDependencyFinder gradleFinder = new GradleDependencyFinder();
 
     public ClassDefRepositoryParam solveJarParams(ClassDefRepositoryParam param) {
         Set<Path> jarPaths = new HashSet<>();
@@ -57,50 +54,12 @@ public class JarPathFinder {
     }
 
     public Collection<Path> getPathsProjectDepending(Path projectDir) {
-        if (gradleFinder.isGradleProject(projectDir)) {
-            return gradleFinder.findJarPaths(projectDir);
 
-        } else if (isMavenProject(projectDir)) {
-            log.info("project: {} is a maven project - finding depending jars... ", projectDir);
-            DependencyListener listener = new DependencyListener();
-            MavenProject.load(projectDir)
-                    .mvnw("dependency:build-classpath")
-                    .stdout(listener)
-                    .execute();
-
-            Collection<Path> gotPaths = listener.listenedPath;
-            log.info("jarPaths got from maven dependency - Paths: {}", gotPaths);
-            return gotPaths;
-
-        } else {
-            log.info("project: {} is not a maven project", projectDir);
-            return Collections.emptySet();
-        }
+        return Stream.of(new GradleDependencyFinder(), new MavenDependencyFinder())
+                .filter(finder -> finder.canFindDependencies(projectDir))
+                .findFirst()
+                .map(finder -> finder.findJarPaths(projectDir))
+                .orElse(Collections.emptySet());
     }
 
-    boolean isMavenProject(Path projectDir) {
-        return Files.exists(projectDir.resolve("pom.xml"));
-    }
-
-}
-
-@Slf4j
-class DependencyListener implements StdoutListener {
-
-    Collection<Path> listenedPath = new HashSet<>();
-    String previousLine = "";
-
-    @Override
-    public void nextLine(String line) {
-        log.debug("listening to mvn cmd stdout: {}", line);
-        if (isClassPathLine()) {
-            Stream.of(line.split(File.pathSeparator)).map(Paths::get).forEach(listenedPath::add);
-            log.debug("dependency listened", line);
-        }
-        previousLine = line;
-    }
-
-    boolean isClassPathLine() {
-        return previousLine.contains("Dependencies classpath:");
-    }
 }

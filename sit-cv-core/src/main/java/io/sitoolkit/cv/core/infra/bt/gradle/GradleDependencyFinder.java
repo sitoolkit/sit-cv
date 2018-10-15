@@ -13,16 +13,17 @@ import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
 
+import io.sitoolkit.cv.core.domain.classdef.javaparser.DependencyFinder;
 import io.sitoolkit.util.buidtoolhelper.gradle.GradleProject;
 import io.sitoolkit.util.buidtoolhelper.process.StdoutListener;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class GradleDependencyFinder {
+public class GradleDependencyFinder implements DependencyFinder {
 
+    @Override
     public Collection<Path> findJarPaths(Path projectDir) {
         if (!isGradleProject(projectDir)) {
-            log.info("project: {} is not a gradle project", projectDir);
             return Collections.emptySet();
         }
         log.info("project: {} is a gradle project - finding depending jars... ", projectDir);
@@ -71,12 +72,17 @@ public class GradleDependencyFinder {
         }
     }
 
-    public Path getBuildScriptPath(Path projectDir) {
+    Path getBuildScriptPath(Path projectDir) {
         return projectDir.resolve("build.gradle");
     }
 
     public boolean isGradleProject(Path projectDir) {
         return Files.exists(getBuildScriptPath(projectDir));
+    }
+
+    @Override
+    public boolean canFindDependencies(Path projectDir) {
+        return isGradleProject(projectDir);
     }
 }
 
