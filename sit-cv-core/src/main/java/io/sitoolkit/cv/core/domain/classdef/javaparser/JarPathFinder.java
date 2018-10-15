@@ -13,12 +13,15 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryParam;
+import io.sitoolkit.cv.core.infra.bt.gradle.GradleDependencyFinder;
 import io.sitoolkit.util.buidtoolhelper.maven.MavenProject;
 import io.sitoolkit.util.buidtoolhelper.process.StdoutListener;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JarPathFinder {
+
+    GradleDependencyFinder gradleFinder = new GradleDependencyFinder();
 
     public ClassDefRepositoryParam solveJarParams(ClassDefRepositoryParam param) {
         Set<Path> jarPaths = new HashSet<>();
@@ -54,7 +57,10 @@ public class JarPathFinder {
     }
 
     public Collection<Path> getPathsProjectDepending(Path projectDir) {
-        if (isMavenProject(projectDir)) {
+        if (gradleFinder.isGradleProject(projectDir)) {
+            return gradleFinder.findJarPaths(projectDir);
+
+        } else if (isMavenProject(projectDir)) {
             log.info("project: {} is a maven project - finding depending jars... ", projectDir);
             DependencyListener listener = new DependencyListener();
             MavenProject.load(projectDir)
