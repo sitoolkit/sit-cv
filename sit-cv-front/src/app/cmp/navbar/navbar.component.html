@@ -13,8 +13,7 @@
     [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="!(isHandset$ | async)">
-    <app-doctree [designDocIds]="dd.designDocIds" (selected)="dd.showDesignDocDetail($event)">
-    </app-doctree>
+    <app-doctree></app-doctree>
   </mat-sidenav>
   <mat-sidenav-content>
     <app-designdoc #dd></app-designdoc>

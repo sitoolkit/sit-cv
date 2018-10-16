@@ -1,6 +1,8 @@
-import { Component, OnChanges, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { Component, Inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { DesignDocService } from '../../srv/designdoc/designdoc.service';
 
 class Node {
   children: Node[] = [];
@@ -13,28 +15,18 @@ class Node {
   templateUrl: './doctree.component.html',
   styleUrls: ['./doctree.component.css']
 })
-export class DoctreeComponent implements OnChanges {
-
-  @Input() designDocIds: string[];
-  @Output() selected = new EventEmitter<string>();
+export class DoctreeComponent {
 
   nestedTreeControl = new NestedTreeControl<Node>((node: Node) => node.children);
   nestedDataSource = new MatTreeNestedDataSource();
 
-  constructor() { }
+  constructor( @Inject('DesignDocService') private ddService: DesignDocService) {
+    this.ddService.getIdList((idList) => {
+      this.nestedDataSource.data = this.createTree(idList.ids);
+    });
+  }
 
   hasNestedChild = (_: number, nodeData: Node) => !nodeData.designDocId;
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['designDocIds']) {
-      this.nestedDataSource.data = this.createTree(this.designDocIds);
-    }
-  }
-
-  onSelected(designDocId: string) {
-    this.selected.emit(designDocId);
-    return false;
-  }
 
   toggleExpanded(node: Node) {
     if (this.nestedTreeControl.isExpanded(node)) {

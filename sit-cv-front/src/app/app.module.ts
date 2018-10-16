@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { MY_ROUTES } from './app.routing';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavbarComponent } from './cmp/navbar/navbar.component';
@@ -44,6 +45,7 @@ import { Config } from './srv/shared/config';
     MatTreeModule,
     MatProgressSpinnerModule,
     MatCardModule,
+    MY_ROUTES,
   ],
   providers: [
     {
