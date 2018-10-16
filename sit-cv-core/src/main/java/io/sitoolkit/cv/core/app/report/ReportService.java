@@ -32,8 +32,8 @@ import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
 
 public class ReportService {
-    private final String srcDirName = "src/main/java";
-    private final String jarList = "sit-cv-jar-list.txt";
+    private static final String SRC_DIR = "src/main/java";
+    private static final String JAR_LIST = "sit-cv-jar-list.txt";
     private PlantUmlWriter plantumlWriter = new PlantUmlWriter();
     private ReportWriter reportWriter = new ReportWriter();
     private SequenceDiagramWriterPlantUmlImpl sequenceWriter = new SequenceDiagramWriterPlantUmlImpl();
@@ -50,7 +50,7 @@ public class ReportService {
     }
 
     public void write(String prjDirName) {
-        ClassDefRepository repository = getClassDefRepository(prjDirName, srcDirName);
+        ClassDefRepository repository = getClassDefRepository(prjDirName, SRC_DIR);
 
         Set<String> designDocIds = repository.getEntryPoints();
         List<DesignDoc> designDocs = new ArrayList<>();
@@ -84,7 +84,7 @@ public class ReportService {
         param.setProjectDir(Paths.get(prjDir));
         param.setSrcDirs(Arrays.asList(Paths.get(srcDir)));
         param.setJarPaths(Arrays.asList());
-        param.setJarList(Paths.get(prjDir, jarList));
+        param.setJarList(Paths.get(prjDir, JAR_LIST));
         param.setBinDirs(Arrays.asList());
 
         ClassDefRepository repository = new ClassDefRepositoryMemImpl();

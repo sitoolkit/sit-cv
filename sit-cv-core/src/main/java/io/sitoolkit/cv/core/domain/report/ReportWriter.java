@@ -30,62 +30,23 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ReportWriter {
-    private final String outputDirName = "docs/designdocs";
-    private final String resourceName = "report-resource";
+    private static final String OUTPUT_DIR = "docs/designdocs";
+    private static final String RESOURCE_NAME = "report-resource";
     private Deflater compresser = new Deflater();
 
     public void write(List<DesignDoc> designDocs, String prjDirName) {
         try {
-            File outputDir = new File(prjDirName, outputDirName);
+            File outputDir = new File(prjDirName, OUTPUT_DIR);
             FileUtils.deleteDirectory(outputDir);
 
-            copyFromResource(resourceName, outputDir);
+            copyFromResource(RESOURCE_NAME, outputDir);
             writeDesignDocs(outputDir, designDocs);
-
-            Files.copy(
-                new File(outputDir, "assets/config-report.js").toPath(),
-                new File(outputDir, "assets/config.js").toPath(),
-                StandardCopyOption.REPLACE_EXISTING
-            );
+            setReportCconfig(outputDir);
 
             log.info("exported report to: {}", outputDir.toPath().toAbsolutePath().normalize());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    void writeDesignDocs(File outputDir, List<DesignDoc> designDocs) {
-        Map<String, String> idList = new HashMap<>();
-
-        designDocs.stream().forEach((designDoc) -> {
-            String designDocId = designDoc.getId();
-            ReportDetailDef detail = getDetail(designDoc);
-            String detailDirName = getDetailDirName(designDoc.getPkg());
-            String detailFileName = getDetailFileName(designDoc.getId());
-            idList.put(designDocId, detailDirName + "/" + detailFileName);
-
-            File detailDir = new File(outputDir, detailDirName);
-            detailDir.mkdirs();
-
-            File detailFile = new File(detailDir, detailFileName);
-            String detailValue = convertToJsonString(detail);
-            writeToFile(detailFile, "window.reportData.designDoc.detailList['" + designDocId + "'] = " + detailValue);
-        });
-
-        File idListFile = new File(outputDir, "assets/designdoc-id-list.js");
-        String idListValue = convertToJsonString(idList);
-        writeToFile(idListFile, "window.reportData.designDoc.idList = " + idListValue);
-    }
-
-    ReportDetailDef getDetail(DesignDoc designDoc) {
-        ReportDetailDef detail = new ReportDetailDef();
-
-        designDoc.getAllDiagrams().stream().forEach(diagram -> {
-            String data = new String(diagram.getData());
-            detail.getDiagrams().put(diagram.getId(), data);
-            detail.getComments().put(diagram.getId(), diagram.getComments());
-        });
-        return detail;
     }
 
     void copyFromResource(String source, File target) {
@@ -126,12 +87,43 @@ public class ReportWriter {
         }
     }
 
-    String getDetailFileName(String designDocId) {
-        return compressString(designDocId) + ".js";
+    void writeDesignDocs(File outputDir, List<DesignDoc> designDocs) {
+        Map<String, String> idList = new HashMap<>();
+
+        designDocs.stream().forEach((designDoc) -> {
+            String detailScriptPath = writeDesignDocDetail(outputDir, designDoc);
+            idList.put(designDoc.getId(), detailScriptPath);
+        });
+
+        writeDesignDocIdList(outputDir, idList);
     }
 
-    String getDetailDirName(String pkg) {
-        return pkg.replaceAll("\\.", "/");
+    String writeDesignDocDetail(File outputDir, DesignDoc designDoc) {
+        ReportDetailDef detail = new ReportDetailDef();
+        designDoc.getAllDiagrams().stream().forEach(diagram -> {
+            String data = new String(diagram.getData());
+            detail.getDiagrams().put(diagram.getId(), data);
+            detail.getComments().put(diagram.getId(), diagram.getComments());
+        });
+
+        String dirName = designDoc.getPkg().replaceAll("\\.", "/");
+        String fileName = compressString(designDoc.getId()) + ".js";
+
+        File detailDir = new File(outputDir, dirName);
+        detailDir.mkdirs();
+
+        File detailFile = new File(detailDir, fileName);
+        String value = "window.reportData.designDoc.detailList['" +  designDoc.getId() + "'] = "
+                + convertToJsonString(detail);
+        writeToFile(detailFile, value);
+
+        return dirName + "/" + fileName;
+    }
+
+    void writeDesignDocIdList(File outputDir, Map<String, String> idList) {
+        File idListFile = new File(outputDir, "assets/designdoc-id-list.js");
+        String idListValue = convertToJsonString(idList);
+        writeToFile(idListFile, "window.reportData.designDoc.idList = " + idListValue);
     }
 
     String compressString(String input) {
@@ -174,6 +166,18 @@ public class ReportWriter {
         try {
             FileUtils.writeStringToFile(file, value, StandardCharsets.UTF_8);
         }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    void setReportCconfig(File outputDir) {
+        try {
+            Files.copy(
+                new File(outputDir, "assets/config-report.js").toPath(),
+                new File(outputDir, "assets/config.js").toPath(),
+                StandardCopyOption.REPLACE_EXISTING
+            );
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
