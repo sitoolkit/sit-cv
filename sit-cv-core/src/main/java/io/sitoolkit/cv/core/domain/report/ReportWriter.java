@@ -41,7 +41,7 @@ public class ReportWriter {
 
             copyFromResource(RESOURCE_NAME, outputDir);
             writeDesignDocs(outputDir, designDocs);
-            setReportCconfig(outputDir);
+            setReportConfig(outputDir);
 
             log.info("exported report to: {}", outputDir.toPath().toAbsolutePath().normalize());
         } catch (Exception e) {
@@ -170,7 +170,7 @@ public class ReportWriter {
         }
     }
 
-    void setReportCconfig(File outputDir) {
+    void setReportConfig(File outputDir) {
         try {
             Files.copy(
                 new File(outputDir, "assets/config-report.js").toPath(),
