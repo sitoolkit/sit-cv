@@ -6,12 +6,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
+import io.sitoolkit.cv.core.app.report.ReportService;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
 import io.sitoolkit.cv.core.domain.classdef.filter.ClassDefFilter;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
-import io.sitoolkit.cv.core.domain.designdoc.report.DesignDocReportExporter;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
@@ -31,7 +31,7 @@ public class Application {
     public static void main(String[] args) {
         SimpleCommandLinePropertySource ps = new SimpleCommandLinePropertySource(args);
         if(ps.containsProperty("report")) {
-            new DesignDocReportExporter().export();
+            new ReportService().write();
         } else {
             SpringApplication.run(Application.class, args);
         }
