@@ -9,7 +9,7 @@
     right: 0;
     z-index: 2;
 }
-app-navbar {
+.sit-app >>> app-navbar {
   display: flex;
   flex-direction: column;
   height: 100%;

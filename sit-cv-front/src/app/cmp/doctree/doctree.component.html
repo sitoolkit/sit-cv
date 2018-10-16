@@ -2,7 +2,7 @@
   <mat-tree [dataSource]="nestedDataSource" [treeControl]="nestedTreeControl" class="designdoc-tree">
     <mat-tree-node *matTreeNodeDef="let node">
       <li class="mat-tree-node">
-        <a routerLink="/" fragment="designdoc/{{node.designDocId}}">
+        <a [routerLink]="['/', 'designdoc', node.designDocId]">
           {{node.name | hidePackage}}
         </a>
       </li>
