@@ -24,6 +24,7 @@ import { DesignDocReportRepository } from './srv/designdoc/designdoc-report.repo
 import { DesignDocServerService } from './srv/designdoc/designdoc-server.service';
 import { DesignDocReportService } from './srv/designdoc/designdoc-report.service';
 import { Config } from './srv/shared/config';
+import { HidePackagePipe } from './pipe/hide-package.pipe';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { Config } from './srv/shared/config';
     DesignDocComponent,
     ErrorComponent,
     DoctreeComponent,
+    HidePackagePipe,
   ],
   imports: [
     BrowserModule,
