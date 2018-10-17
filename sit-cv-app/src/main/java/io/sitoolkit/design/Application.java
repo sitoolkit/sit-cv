@@ -1,9 +1,11 @@
 package io.sitoolkit.design;
 
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.SimpleCommandLinePropertySource;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.app.report.ReportService;
@@ -12,6 +14,7 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
 import io.sitoolkit.cv.core.domain.classdef.filter.ClassDefFilter;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
+import io.sitoolkit.cv.core.domain.report.ReportWriter;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
@@ -29,9 +32,19 @@ import io.sitoolkit.cv.core.infra.watcher.InputSourceWatcher;
 public class Application {
 
     public static void main(String[] args) {
-        SimpleCommandLinePropertySource ps = new SimpleCommandLinePropertySource(args);
-        if(ps.containsProperty("report")) {
-            new ReportService().write();
+        ApplicationArguments appArgs = new DefaultApplicationArguments(args);
+
+        if(appArgs.containsOption("report")) {
+            AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext();
+            try {
+                appCtx.getBeanFactory().registerSingleton("springApplicationArguments", appArgs);
+                appCtx.register(Application.class);
+                appCtx.refresh();
+                ReportService reportService = appCtx.getBean(ReportService.class);
+                reportService.write();
+            } finally {
+                System.exit(SpringApplication.exit(appCtx));
+            }
         } else {
             SpringApplication.run(Application.class, args);
         }
@@ -55,6 +68,11 @@ public class Application {
     @Bean
     public DesignDocService designService() {
         return new DesignDocService();
+    }
+
+    @Bean
+    public ReportService reportService() {
+        return new ReportService();
     }
 
     @Bean
@@ -100,5 +118,10 @@ public class Application {
     @Bean
     public Config config() {
         return new Config();
+    }
+
+    @Bean
+    public ReportWriter reportWriter() {
+        return new ReportWriter();
     }
 }
