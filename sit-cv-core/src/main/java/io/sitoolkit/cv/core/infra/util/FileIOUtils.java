@@ -1,6 +1,7 @@
 package io.sitoolkit.cv.core.infra.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
@@ -13,11 +14,16 @@ import java.util.jar.JarFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import io.sitoolkit.util.buidtoolhelper.UnExpectedException;
+
 public class FileIOUtils {
 
     public static void copyFromResource(Class<?> clazz, String source, File target) {
         try {
-            URL url = new URL(clazz.getClassLoader().getResource(source).toString());
+            URL url = clazz.getClassLoader().getResource(source);
+            if (url == null) {
+                throw new FileNotFoundException("resource not found: " + source);
+            }
             URLConnection connection = url.openConnection();
             connection.setUseCaches(false);
 
@@ -27,7 +33,7 @@ public class FileIOUtils {
                 FileUtils.copyDirectory(new File(url.getPath()), target);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UnExpectedException(e);
         }
     }
 
@@ -49,7 +55,7 @@ public class FileIOUtils {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UnExpectedException(e);
         }
     }
 

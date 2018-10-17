@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import io.sitoolkit.cv.core.infra.util.FileIOUtils;
+import io.sitoolkit.util.buidtoolhelper.UnExpectedException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -30,8 +31,8 @@ public class ReportWriter {
 
             log.info("completed write to: {}",
                     outputDir.toPath().toAbsolutePath().normalize());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new UnExpectedException(e);
         }
     }
 
@@ -39,7 +40,7 @@ public class ReportWriter {
         try {
             FileUtils.writeStringToFile(file, value, DEFAULT_CHARSET);
         }catch(IOException e){
-            throw new RuntimeException(e);
+            throw new UnExpectedException(e);
         }
     }
 
@@ -51,7 +52,7 @@ public class ReportWriter {
                 StandardCopyOption.REPLACE_EXISTING
             );
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UnExpectedException(e);
         }
     }
 
