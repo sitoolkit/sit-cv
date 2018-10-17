@@ -1,5 +1,7 @@
 package io.sitoolkit.cv.core.app.report;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,6 +25,10 @@ public class ReportService {
     }
 
     public void write(String prjDirName) {
+        Path prjDir = Paths.get(prjDirName);
+        Path srcDir = prjDir.resolve("src/main/java");
+        designDocService.loadDir(prjDir, srcDir);
+
         Set<String> designDocIds = designDocService.getAllIds();
 
         List<DesignDoc> designDocs = designDocIds.stream().map((designDocId) -> {
