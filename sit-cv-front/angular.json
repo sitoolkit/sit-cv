@@ -49,7 +49,7 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "outputPath": "../sit-cv-app/src/main/resources/static/",
+              "outputPath": "../sit-cv-core/src/main/resources/static/",
               "deployUrl": "./"
             }
           }

@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ReportWriter {
     private static final String OUTPUT_DIR = "docs/designdocs";
-    private static final String RESOURCE_NAME = "report-resource";
+    private static final String RESOURCE_NAME = "static";
     private Deflater compresser = new Deflater();
 
     public void write(List<DesignDoc> designDocs, String prjDirName) {
