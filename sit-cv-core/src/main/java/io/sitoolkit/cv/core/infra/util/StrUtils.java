@@ -9,9 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class StrUtils {
-    private static Deflater compresser = new Deflater();
-
     public static String compressAsFilename(String filename) {
+        Deflater compresser = new Deflater();
+
         String encoded = null;
         byte[] dataByte = filename.getBytes();
 
