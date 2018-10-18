@@ -10,6 +10,7 @@ public class ARepositoryImpl implements ARepository{
 
     /**
      * ARepositoryImpl searchBy method
+     * 指定された条件で検索を行い結果を返却します。
      *
      * @param search condition
      * @return list of XEntity
