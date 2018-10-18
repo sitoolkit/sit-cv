@@ -2,6 +2,8 @@ package io.sitoolkit.cv.core.domain.report;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ReportWriter {
     private static final String OUTPUT_DIR = "docs/designdocs";
     private static final String RESOURCE_NAME = "static";
+    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     public void write(List<ReportModel> models, String prjDirName) {
         File outputDir = new File(prjDirName, OUTPUT_DIR);
@@ -26,11 +29,19 @@ public class ReportWriter {
         }
 
         ResourceUtils.copy(getClass(), RESOURCE_NAME, outputDir);
-        models.stream().forEach((m) -> m.write(outputDir));
+        models.stream().forEach((m) -> m.write(outputDir, this::writeToFile));
         setReportConfig(outputDir);
 
         log.info("completed write to: {}",
                 outputDir.toPath().toAbsolutePath().normalize());
+    }
+
+    void writeToFile(File file, String value) {
+        try {
+            FileUtils.writeStringToFile(file, value, DEFAULT_CHARSET);
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     void setReportConfig(File outputDir) {
