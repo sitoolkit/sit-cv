@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.report;
+package io.sitoolkit.cv.core.domain.report.designdoc;
 
 import java.io.File;
 import java.util.HashMap;
@@ -7,26 +7,30 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
+import io.sitoolkit.cv.core.domain.report.ReportModel;
+import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.StrUtils;
 import lombok.Builder;
+import lombok.Value;
 
+@Value
 @Builder
 public class ReportDesignDoc implements ReportModel {
-    List<DesignDoc> designDocs;
+    private List<DesignDoc> designDocs;
 
     @Override
     public void write(File outputDir, BiConsumer<File, String> writeToFile) {
         Map<String, String> idList = new HashMap<>();
 
-        designDocs.stream().forEach((designDoc) -> {
-            String detailScriptPath = writeDesignDocDetail(outputDir, designDoc, writeToFile);
+        getDesignDocs().stream().forEach((designDoc) -> {
+            String detailScriptPath = writeDetail(outputDir, designDoc, writeToFile);
             idList.put(designDoc.getId(), detailScriptPath);
         });
 
-        writeDesignDocIdList(outputDir, idList, writeToFile);
+        writeIdList(outputDir, idList, writeToFile);
     }
 
-    private String writeDesignDocDetail(File outputDir, DesignDoc designDoc
+    private String writeDetail(File outputDir, DesignDoc designDoc
             , BiConsumer<File, String> writeToFile) {
         ReportDesignDocDetailDef detail = new ReportDesignDocDetailDef();
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
@@ -36,24 +40,24 @@ public class ReportDesignDoc implements ReportModel {
         });
 
         String dirName = designDoc.getPkg().replaceAll("\\.", "/");
-        String fileName = StrUtils.compressFilename(designDoc.getId()) + ".js";
+        String fileName = StrUtils.compressAsFilename(designDoc.getId()) + ".js";
 
         File detailDir = new File(outputDir, dirName);
         detailDir.mkdirs();
 
         File detailFile = new File(detailDir, fileName);
         String value = "window.reportData.designDoc.detailList['" +  designDoc.getId() + "'] = "
-                + StrUtils.convertToJsonString(detail);
+                + JsonUtils.convertObjectToString(detail);
         writeToFile.accept(detailFile, value);
 
         return dirName + "/" + fileName;
     }
 
-    private void writeDesignDocIdList(File outputDir, Map<String, String> idList
+    private void writeIdList(File outputDir, Map<String, String> idList
             , BiConsumer<File, String> writeToFile) {
         File idListFile = new File(outputDir, "assets/designdoc-id-list.js");
         String value = "window.reportData.designDoc.idList = "
-                + StrUtils.convertToJsonString(idList);
+                + JsonUtils.convertObjectToString(idList);
         writeToFile.accept(idListFile, value);
     }
 

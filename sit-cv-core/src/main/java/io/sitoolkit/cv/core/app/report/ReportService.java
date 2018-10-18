@@ -11,7 +11,7 @@ import javax.annotation.Resource;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
-import io.sitoolkit.cv.core.domain.report.ReportDesignDoc;
+import io.sitoolkit.cv.core.domain.report.designdoc.ReportDesignDoc;
 import io.sitoolkit.cv.core.domain.report.ReportModel;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
 

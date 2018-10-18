@@ -14,9 +14,9 @@ import java.util.jar.JarFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public class FileIOUtils {
+public class ResourceUtils {
 
-    public static void copyFromResource(Class<?> clazz, String source, File target) {
+    public static void copy(Class<?> clazz, String source, File target) {
         try {
             URL url = clazz.getClassLoader().getResource(source);
             if (url == null) {
@@ -26,7 +26,7 @@ public class FileIOUtils {
             connection.setUseCaches(false);
 
             if (connection instanceof JarURLConnection) {
-                copyFromJarResource((JarURLConnection)connection, target);
+                copyFromJar((JarURLConnection)connection, target);
             } else {
                 FileUtils.copyDirectory(new File(url.getPath()), target);
             }
@@ -35,7 +35,7 @@ public class FileIOUtils {
         }
     }
 
-    private static void copyFromJarResource(JarURLConnection connection, File target) {
+    private static void copyFromJar(JarURLConnection connection, File target) {
         try {
             JarFile jarFile = connection.getJarFile();
             for(JarEntry entry : Collections.list(jarFile.entries())) {

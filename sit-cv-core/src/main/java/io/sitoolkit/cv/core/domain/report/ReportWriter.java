@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
-import io.sitoolkit.cv.core.infra.util.FileIOUtils;
+import io.sitoolkit.cv.core.infra.util.ResourceUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -28,7 +28,7 @@ public class ReportWriter {
             throw new RuntimeException(e);
         }
 
-        FileIOUtils.copyFromResource(getClass(), RESOURCE_NAME, outputDir);
+        ResourceUtils.copy(getClass(), RESOURCE_NAME, outputDir);
         models.stream().forEach((m) -> m.write(outputDir, this::writeToFile));
         setReportConfig(outputDir);
 

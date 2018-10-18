@@ -5,18 +5,13 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.zip.Deflater;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class StrUtils {
     private static Deflater compresser = new Deflater();
-    private static ObjectWriter objectWriter = new ObjectMapper().writer();
 
-    public static String compressFilename(String filename) {
+    public static String compressAsFilename(String filename) {
         String encoded = null;
         byte[] dataByte = filename.getBytes();
 
@@ -37,15 +32,5 @@ public class StrUtils {
             log.warn("IOException", e);
         }
         return encoded;
-    }
-
-    public static String convertToJsonString(Object src) {
-        String value;
-        try {
-            value = objectWriter.writeValueAsString(src);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        return value;
     }
 }
