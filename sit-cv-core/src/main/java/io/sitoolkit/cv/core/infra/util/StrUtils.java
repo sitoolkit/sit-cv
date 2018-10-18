@@ -9,8 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-import io.sitoolkit.util.buidtoolhelper.UnExpectedException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class StrUtils {
     private static Deflater compresser = new Deflater();
     private static ObjectWriter objectWriter = new ObjectMapper().writer();
@@ -33,7 +34,7 @@ public class StrUtils {
             byte[] compData = baos.toByteArray();
             encoded = Base64.getUrlEncoder().withoutPadding().encodeToString(compData);
         } catch (IOException e) {
-            throw new UnExpectedException(e);
+            log.warn("IOException", e);
         }
         return encoded;
     }
@@ -43,7 +44,7 @@ public class StrUtils {
         try {
             value = objectWriter.writeValueAsString(src);
         } catch (JsonProcessingException e) {
-            throw new UnExpectedException(e);
+            throw new RuntimeException(e);
         }
         return value;
     }

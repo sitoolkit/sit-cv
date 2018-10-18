@@ -14,8 +14,6 @@ import java.util.jar.JarFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import io.sitoolkit.util.buidtoolhelper.UnExpectedException;
-
 public class FileIOUtils {
 
     public static void copyFromResource(Class<?> clazz, String source, File target) {
@@ -33,7 +31,7 @@ public class FileIOUtils {
                 FileUtils.copyDirectory(new File(url.getPath()), target);
             }
         } catch (IOException e) {
-            throw new UnExpectedException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -55,7 +53,7 @@ public class FileIOUtils {
                 }
             }
         } catch (IOException e) {
-            throw new UnExpectedException(e);
+            throw new RuntimeException(e);
         }
     }
 

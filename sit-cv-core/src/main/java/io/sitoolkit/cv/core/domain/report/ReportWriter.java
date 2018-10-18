@@ -11,7 +11,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import io.sitoolkit.cv.core.infra.util.FileIOUtils;
-import io.sitoolkit.util.buidtoolhelper.UnExpectedException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -21,26 +20,27 @@ public class ReportWriter {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     public void write(List<ReportModel> models, String prjDirName) {
+        File outputDir = new File(prjDirName, OUTPUT_DIR);
+
         try {
-            File outputDir = new File(prjDirName, OUTPUT_DIR);
             FileUtils.deleteDirectory(outputDir);
-
-            FileIOUtils.copyFromResource(getClass(), RESOURCE_NAME, outputDir);
-            models.stream().forEach((m) -> m.write(outputDir, this::writeToFile));
-            setReportConfig(outputDir);
-
-            log.info("completed write to: {}",
-                    outputDir.toPath().toAbsolutePath().normalize());
         } catch (IOException e) {
-            throw new UnExpectedException(e);
+            throw new RuntimeException(e);
         }
+
+        FileIOUtils.copyFromResource(getClass(), RESOURCE_NAME, outputDir);
+        models.stream().forEach((m) -> m.write(outputDir, this::writeToFile));
+        setReportConfig(outputDir);
+
+        log.info("completed write to: {}",
+                outputDir.toPath().toAbsolutePath().normalize());
     }
 
     void writeToFile(File file, String value) {
         try {
             FileUtils.writeStringToFile(file, value, DEFAULT_CHARSET);
         }catch(IOException e){
-            throw new UnExpectedException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -52,7 +52,7 @@ public class ReportWriter {
                 StandardCopyOption.REPLACE_EXISTING
             );
         } catch (IOException e) {
-            throw new UnExpectedException(e);
+            throw new RuntimeException(e);
         }
     }
 
