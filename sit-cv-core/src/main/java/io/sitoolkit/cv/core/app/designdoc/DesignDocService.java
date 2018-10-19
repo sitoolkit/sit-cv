@@ -160,9 +160,9 @@ public class DesignDocService {
     }
 
     public List<DesignDoc> getAll() {
-        List<DesignDoc> designDocs = getAllIds().stream().map((designDocId) -> {
-            return get(designDocId);
-        }).collect(Collectors.toList());
+        List<DesignDoc> designDocs = getAllIds().stream()
+                .map(this::get)
+                .collect(Collectors.toList());
 
         return designDocs;
     }
