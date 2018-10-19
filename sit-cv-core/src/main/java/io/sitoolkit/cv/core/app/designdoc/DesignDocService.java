@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,7 +65,7 @@ public class DesignDocService {
     InputSourceWatcher watcher;
 
     public void loadDir(Path projDir, Path srcDir) {
-        
+
         classDefReader.init(projDir, srcDir);
         classDefReader.readDir(srcDir);
         ClassDefFilterConditionReader.read(projDir).ifPresent(classFilter::setCondition);
@@ -87,7 +88,7 @@ public class DesignDocService {
     private void readSources(Path srcDir, ClassDefChangeEventListener listener, Collection<String> inputSources) {
 
         classDefReader.rebuild();
-        
+
         Set<ClassDef> readDefs = inputSources.stream()
                 .map(Paths::get)
                 .filter(path -> !Files.isDirectory(path))
@@ -150,10 +151,26 @@ public class DesignDocService {
         Diagram classDiagram = classWriter.write(classModel);
 
         DesignDoc doc = new DesignDoc();
+        doc.setId(designDocId);
+        doc.setPkg(entryPoint.getClassDef().getPkg());
         doc.add(sequenceDiagram);
         doc.add(classDiagram);
 
         return doc;
     }
 
+    public List<DesignDoc> getAll() {
+        List<DesignDoc> designDocs = getAllIds().stream().map((designDocId) -> {
+            return get(designDocId);
+        }).collect(Collectors.toList());
+
+        return designDocs;
+    }
+
+    public List<DesignDoc> loadDesignDocs(Path projectDir) {
+        Path srcDir = projectDir.resolve("src/main/java");
+        loadDir(projectDir, srcDir);
+
+        return getAll();
+    }
 }
