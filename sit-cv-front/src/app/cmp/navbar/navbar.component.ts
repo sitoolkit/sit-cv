@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
@@ -12,8 +12,7 @@ import { DesignDocComponent } from '../designdoc/designdoc.component';
 })
 export class NavbarComponent implements OnInit {
 
-  @ViewChild(DesignDocComponent)
-  protected designDoc: DesignDocComponent;
+  currentDesignDocId = '';
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -26,7 +25,7 @@ export class NavbarComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       if (params['designDocId']) {
-        this.designDoc.showDesignDocDetail(params['designDocId']);
+        this.currentDesignDocId=params['designDocId'];
       }
     });
   }

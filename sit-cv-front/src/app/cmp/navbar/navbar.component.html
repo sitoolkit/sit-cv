@@ -3,7 +3,7 @@
     mat-icon-button (click)="drawer.toggle()">
     <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
   </button>
-  <span>{{dd.currentDesignDocId | hidePackage: 'PARAM_TYPE_ONLY' }}</span>
+  <span>{{currentDesignDocId | hidePackage: 'PARAM_TYPE_ONLY' }}</span>
 </mat-toolbar>
 <mat-sidenav-container class="sidenav-container" autosize>
   <mat-sidenav
@@ -16,6 +16,6 @@
     <app-doctree></app-doctree>
   </mat-sidenav>
   <mat-sidenav-content>
-    <app-designdoc #dd></app-designdoc>
+    <app-designdoc [designDocId]="currentDesignDocId"></app-designdoc>
   </mat-sidenav-content>
 </mat-sidenav-container>

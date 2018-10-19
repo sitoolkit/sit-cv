@@ -1,4 +1,4 @@
-import { Component, Inject} from '@angular/core';
+import { Component, Inject, Input} from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import * as $ from 'jquery';
@@ -10,7 +10,7 @@ import { DesignDocService } from '../../srv/designdoc/designdoc.service';
   styleUrls: ['./designdoc.component.css'],
 })
 
-export class DesignDocComponent {
+export class DesignDocComponent{
   designDocIds = [];
   currentDesignDocId = '';
   currentDiagrams = {};
@@ -24,6 +24,13 @@ export class DesignDocComponent {
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
     @Inject('DesignDocService') private ddService: DesignDocService) {}
+
+  @Input ()
+  set designDocId(docId: string) {
+      if (docId.length > 0) {
+          this.showDesignDocDetail(docId);
+      }
+  }
 
   renderDiagrams(diagrams: object) {
     let trustDiagrams = {};
