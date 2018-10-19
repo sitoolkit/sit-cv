@@ -2,20 +2,20 @@ package io.sitoolkit.cv.core.app.report;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
-import io.sitoolkit.cv.core.domain.report.designdoc.ReportDesignDoc;
-import io.sitoolkit.cv.core.domain.report.ReportModel;
+import io.sitoolkit.cv.core.domain.report.Report;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
+import io.sitoolkit.cv.core.domain.report.designdoc.DesignDocReportProcessor;
 
 public class ReportService {
+
+    @Resource
+    DesignDocReportProcessor designDocReportProcessor;
 
     @Resource
     ReportWriter reportWriter;
@@ -24,25 +24,15 @@ public class ReportService {
     DesignDocService designDocService;
 
     public void write() {
-        write("./");
+        write(Paths.get("./"));
     }
 
-    public void write(String prjDirName) {
-        Path prjDir = Paths.get(prjDirName);
-        Path srcDir = prjDir.resolve("src/main/java");
-        designDocService.loadDir(prjDir, srcDir);
+    public void write(Path projectDir) {
+        List<DesignDoc> designDocs = designDocService.loadDesignDocs(projectDir);
 
-        Set<String> designDocIds = designDocService.getAllIds();
-        List<DesignDoc> designDocs = designDocIds.stream().map((designDocId) -> {
-            return designDocService.get(designDocId);
-        }).collect(Collectors.toList());
+        List<Report> reports = designDocReportProcessor.process(designDocs);
 
-        ReportDesignDoc reportDesignDoc = ReportDesignDoc.builder()
-                .designDocs(designDocs).build();
-        List<ReportModel> models = new ArrayList<>();
-        models.add(reportDesignDoc);
-
-        reportWriter.write(models, prjDirName);
+        reportWriter.write(projectDir, reports);
     }
 
 }

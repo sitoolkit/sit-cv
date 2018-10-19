@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -158,4 +159,18 @@ public class DesignDocService {
         return doc;
     }
 
+    public List<DesignDoc> getAll() {
+        List<DesignDoc> designDocs = getAllIds().stream().map((designDocId) -> {
+            return get(designDocId);
+        }).collect(Collectors.toList());
+
+        return designDocs;
+    }
+
+    public List<DesignDoc> loadDesignDocs(Path projectDir) {
+        Path srcDir = projectDir.resolve("src/main/java");
+        loadDir(projectDir, srcDir);
+
+        return getAll();
+    }
 }
