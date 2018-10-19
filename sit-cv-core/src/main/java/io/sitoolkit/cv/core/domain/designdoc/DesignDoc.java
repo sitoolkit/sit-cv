@@ -15,6 +15,7 @@ import lombok.Setter;
 @Data
 public class DesignDoc {
     private String id;
+    private String pkg;
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)

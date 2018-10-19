@@ -13,6 +13,7 @@ public class AServiceImpl implements AService{
 
     /**
      * AServiceImpl search method
+     * 指定された条件で検索を行い結果を返却します。
      *
      * @param search condition
      * @return list of XEntity
