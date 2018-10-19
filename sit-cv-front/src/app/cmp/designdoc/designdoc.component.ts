@@ -1,4 +1,4 @@
-import { Component, Inject, Input} from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import * as $ from 'jquery';
@@ -10,7 +10,7 @@ import { DesignDocService } from '../../srv/designdoc/designdoc.service';
   styleUrls: ['./designdoc.component.css'],
 })
 
-export class DesignDocComponent{
+export class DesignDocComponent implements OnInit {
   designDocIds = [];
   currentDesignDocId = '';
   currentDiagrams = {};
@@ -25,12 +25,13 @@ export class DesignDocComponent{
     private sanitizer: DomSanitizer,
     @Inject('DesignDocService') private ddService: DesignDocService) {}
 
-  @Input ()
-  set designDocId(docId: string) {
-      if (docId.length > 0) {
-          this.showDesignDocDetail(docId);
-      }
-  }
+  ngOnInit() {
+      this.route.params.subscribe(params => {
+        if (params['designDocId']) {
+            this.showDesignDocDetail(params['designDocId']);
+        }
+      });
+    }
 
   renderDiagrams(diagrams: object) {
     let trustDiagrams = {};
