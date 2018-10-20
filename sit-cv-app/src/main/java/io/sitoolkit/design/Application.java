@@ -23,7 +23,7 @@ public class Application {
             try (AnnotationConfigApplicationContext appCtx = getApplicationContext(
                     appArgs, BaseConfig.class, ReportConfig.class)) {
                 ReportService reportService = appCtx.getBean(ReportService.class);
-                reportService.write();
+                reportService.export();
             }
         } else {
             SpringApplication.run(Application.class, args);

@@ -14,8 +14,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.javaparser.JavaParser;
@@ -56,10 +54,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     private MethodCallVisitor methodCallVisitor;
 
-    @Resource
     ClassDefRepository reposiotry;
 
-    @Resource
     Config config;
 
     JarPathFinder jarPathFinder = new JarPathFinder();
@@ -179,39 +175,44 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
         String classActionPath = getActionPath(typeDec);
 
-        jpf.getTypeDeclaration(typeDec).getDeclaredMethods().forEach((ResolvedMethodDeclaration declaredMethod) -> {
-            JavaParserMethodDeclaration jpDeclaredMethod = (JavaParserMethodDeclaration)declaredMethod;
+        jpf.getTypeDeclaration(typeDec).getDeclaredMethods()
+                .forEach((ResolvedMethodDeclaration declaredMethod) -> {
+                    JavaParserMethodDeclaration jpDeclaredMethod = (JavaParserMethodDeclaration) declaredMethod;
 
-            try {
-                MethodDef methodDef = new MethodDef();
+                    try {
+                        MethodDef methodDef = new MethodDef();
 
-                methodDef.setPublic(declaredMethod.accessSpecifier() == AccessSpecifier.PUBLIC);
-                methodDef.setName(declaredMethod.getName());
-                methodDef.setSignature(declaredMethod.getSignature());
-                methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
-                methodDef.setReturnType(TypeParser.getTypeDef(declaredMethod.getReturnType()));
-                methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
-                jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
-                    methodDef.setComment(comment.toString());
-                });
-                methodDefs.add(methodDef);
+                        methodDef.setPublic(
+                                declaredMethod.accessSpecifier() == AccessSpecifier.PUBLIC);
+                        methodDef.setName(declaredMethod.getName());
+                        methodDef.setSignature(declaredMethod.getSignature());
+                        methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
+                        methodDef.setReturnType(
+                                TypeParser.getTypeDef(declaredMethod.getReturnType()));
+                        methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
+                        jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
+                            methodDef.setComment(comment.toString());
+                        });
+                        methodDefs.add(methodDef);
 
-                if (!typeDec.isInterface()) {
-                    typeDec.getMethods().stream().forEach(method -> {
-                        if (equalMethods(declaredMethod, method)) {
-                            method.accept(methodCallVisitor, methodDef.getMethodCalls());
-                            methodDef.setActionPath(classActionPath + getActionPath(method));
+                        if (!typeDec.isInterface()) {
+                            typeDec.getMethods().stream().forEach(method -> {
+                                if (equalMethods(declaredMethod, method)) {
+                                    method.accept(methodCallVisitor, methodDef.getMethodCalls());
+                                    methodDef
+                                            .setActionPath(classActionPath + getActionPath(method));
+                                }
+                            });
                         }
-                    });
-                }
 
-                log.debug("Add method declaration : {}", methodDef);
+                        log.debug("Add method declaration : {}", methodDef);
 
-            } catch (Exception e) {
-                log.debug("Unsolved: '{}()' in '{}', {}", declaredMethod.getName(), typeDec.getName(), e);
-            }
+                    } catch (Exception e) {
+                        log.debug("Unsolved: '{}()' in '{}', {}", declaredMethod.getName(),
+                                typeDec.getName(), e);
+                    }
 
-        });
+                });
 
         return methodDefs;
     }
@@ -294,7 +295,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 return fieldDef;
 
             } catch (Exception e) {
-                log.debug("Unsolved : '{}' in '{}', {}", declaredField.getName(), typeDec.getName(), e);
+                log.debug("Unsolved : '{}' in '{}', {}", declaredField.getName(), typeDec.getName(),
+                        e);
                 return null;
             }
 
@@ -303,12 +305,9 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     @Override
     public void init(Path projectDir, Path srcDir) {
-      ClassDefRepositoryParam param = ClassDefRepositoryParam.builder()
-              .projectDir(projectDir)
-              .srcDirs(Arrays.asList(srcDir))
-              .jarList(Paths.get(config.getJarList()))
-              .build();
-      init(param);
+        ClassDefRepositoryParam param = ClassDefRepositoryParam.builder().projectDir(projectDir)
+                .srcDirs(Arrays.asList(srcDir)).jarList(Paths.get(config.getJarList())).build();
+        init(param);
     }
 
     @Override
@@ -327,7 +326,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
         }
     }
 
-    void buildParserFacade(ClassDefRepositoryParam param){
+    void buildParserFacade(ClassDefRepositoryParam param) {
         CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
         combinedTypeSolver.add(new ReflectionTypeSolver());
         param.getSrcDirs().stream().forEach(

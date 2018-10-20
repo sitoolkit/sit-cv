@@ -15,8 +15,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
@@ -35,34 +33,40 @@ import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
 import io.sitoolkit.cv.core.infra.watcher.InputSourceWatcher;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class DesignDocService {
 
-    @Resource
-    ClassDefReader classDefReader;
+    @NonNull
+    private ClassDefReader classDefReader;
 
-    @Resource
-    SequenceDiagramProcessor sequenceProcessor;
+    @NonNull
+    private SequenceDiagramProcessor sequenceProcessor;
 
-    @Resource
-    ClassDiagramProcessor classProcessor;
+    @NonNull
+    private ClassDiagramProcessor classProcessor;
 
-    @Resource
-    DiagramWriter<SequenceDiagram> sequenceWriter;
+    @NonNull
+    private DiagramWriter<SequenceDiagram> sequenceWriter;
 
-    @Resource
-    DiagramWriter<ClassDiagram> classWriter;
+    @NonNull
+    private DiagramWriter<ClassDiagram> classWriter;
 
-    @Resource
-    ClassDefFilter classFilter;
+    @NonNull
+    private ClassDefFilter classFilter;
 
-    @Resource
-    ClassDefRepository classDefRepository;
+    @NonNull
+    private ClassDefRepository classDefRepository;
 
-    @Resource
-    InputSourceWatcher watcher;
+    @NonNull
+    private InputSourceWatcher watcher;
+
+    // key:classDef.sourceId, value:entrypoint
+    private Map<String, Set<String>> entryPointMap = new HashMap<>();
 
     public void loadDir(Path projDir, Path srcDir) {
 
@@ -85,37 +89,30 @@ public class DesignDocService {
         });
     }
 
-    private void readSources(Path srcDir, ClassDefChangeEventListener listener, Collection<String> inputSources) {
+    private void readSources(Path srcDir, ClassDefChangeEventListener listener,
+            Collection<String> inputSources) {
 
         classDefReader.rebuild();
 
-        Set<ClassDef> readDefs = inputSources.stream()
-                .map(Paths::get)
-                .filter(path -> !Files.isDirectory(path))
-                .filter(Files::isReadable)
-                .map(classDefReader::readJava)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        Set<ClassDef> readDefs = inputSources.stream().map(Paths::get)
+                .filter(path -> !Files.isDirectory(path)).filter(Files::isReadable)
+                .map(classDefReader::readJava).filter(Optional::isPresent).map(Optional::get)
                 .collect(Collectors.toSet());
 
         readDefs.forEach(classDefRepository::save);
         readDefs.forEach(clazz -> log.info("Read {}", clazz));
 
-        Set<String> deletedIds = inputSources.stream()
-                .filter(s -> !Files.isDirectory(Paths.get(s)))
-                .filter(sId -> !readDefs.stream().anyMatch(clazz -> StringUtils.equals(sId, clazz.getSourceId())))
+        Set<String> deletedIds = inputSources.stream().filter(s -> !Files.isDirectory(Paths.get(s)))
+                .filter(sId -> !readDefs.stream()
+                        .anyMatch(clazz -> StringUtils.equals(sId, clazz.getSourceId())))
                 .collect(Collectors.toSet());
         deletedIds.forEach(clazz -> log.info("Remove {}", clazz));
         deletedIds.forEach(classDefRepository::remove);
 
         classDefRepository.solveReferences();
 
-        Stream<String> entryPoints = readDefs.stream()
-                .map(ClassDef::getSourceId)
-                .map(entryPointMap::get)
-                .filter(Objects::nonNull)
-                .flatMap(Set::stream)
-                .distinct();
+        Stream<String> entryPoints = readDefs.stream().map(ClassDef::getSourceId)
+                .map(entryPointMap::get).filter(Objects::nonNull).flatMap(Set::stream).distinct();
 
         entryPoints.forEach(listener::onChange);
     }
@@ -123,9 +120,6 @@ public class DesignDocService {
     public Set<String> getAllIds() {
         return classDefRepository.getEntryPoints();
     }
-
-    // key:classDef.sourceId, value:entrypoint
-    Map<String, Set<String>> entryPointMap = new HashMap<>();
 
     public DesignDoc get(String designDocId) {
 
@@ -137,9 +131,7 @@ public class DesignDocService {
         ClassDiagram classModel = classProcessor.process(entryPoint);
 
         Stream<String> allSourceIds = Stream.of(sequenceModel, classModel)
-                .map(DiagramModel::getAllSourceIds)
-                .flatMap(Set::stream)
-                .distinct();
+                .map(DiagramModel::getAllSourceIds).flatMap(Set::stream).distinct();
 
         allSourceIds.forEach(sourceId -> {
             Set<String> entryPoints = entryPointMap.computeIfAbsent(sourceId,
@@ -160,8 +152,7 @@ public class DesignDocService {
     }
 
     public List<DesignDoc> getAll() {
-        List<DesignDoc> designDocs = getAllIds().stream()
-                .map(this::get)
+        List<DesignDoc> designDocs = getAllIds().stream().map(this::get)
                 .collect(Collectors.toList());
 
         return designDocs;

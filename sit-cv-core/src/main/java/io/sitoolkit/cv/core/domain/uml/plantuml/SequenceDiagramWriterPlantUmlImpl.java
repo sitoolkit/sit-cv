@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
@@ -16,12 +14,15 @@ import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.MessageDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram> {
 
-    @Resource
+    @NonNull
     PlantUmlWriter plantumlWriter;
 
     IdentiferFormatter idFormatter = new IdentiferFormatter();
@@ -67,9 +68,10 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         LifeLineDef target = message.getTarget();
         List<String> list = lifeline2str(target);
 
-        list.add(0, lifeLine.getObjectName() + " -> " + target.getObjectName() + " :"
-                + "[[#{" + message.getRequestQualifiedSignature() + "} "
-                + idFormatter.format(message.getRequestName()) + "]]");
+        list.add(0,
+                lifeLine.getObjectName() + " -> " + target.getObjectName() + " :" + "[[#{"
+                        + message.getRequestQualifiedSignature() + "} "
+                        + idFormatter.format(message.getRequestName()) + "]]");
 
         if (!StringUtils.equals(message.getResponseName(), "void")) {
             list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
@@ -86,6 +88,5 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
             throw new RuntimeException(e);
         }
     }
-
 
 }

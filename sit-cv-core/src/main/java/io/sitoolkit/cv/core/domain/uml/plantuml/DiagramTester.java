@@ -37,14 +37,16 @@ public class DiagramTester {
         // reader.readDir(Paths.get("src/main/java"));
         reader.readDir(Paths.get("../sample/src/test/java"));
 
-        MethodDef entryPoint = repository.findMethodByQualifiedSignature("sample.SequenceClass1.entryPoint()");
+        MethodDef entryPoint = repository
+                .findMethodByQualifiedSignature("sample.SequenceClass1.entryPoint()");
         outputImage(getSequenceDiagramUML(entryPoint), "sequence.png");
         outputImage(getClassDiagramUML(entryPoint), "class.png");
 
     }
 
     String getSequenceDiagramUML(MethodDef entryPoint) {
-        SequenceDiagramWriterPlantUmlImpl writer = new SequenceDiagramWriterPlantUmlImpl();
+        SequenceDiagramWriterPlantUmlImpl writer = new SequenceDiagramWriterPlantUmlImpl(
+                new PlantUmlWriter());
         SequenceDiagramProcessor processor = new SequenceDiagramProcessor();
         LifeLineDef entryLifeLine = processor.process(entryPoint.getClassDef(), entryPoint);
         SequenceDiagram sd = SequenceDiagram.builder().entryLifeLine(entryLifeLine).build();
@@ -52,7 +54,8 @@ public class DiagramTester {
     }
 
     String getClassDiagramUML(MethodDef entryPoint) {
-        ClassDiagramWriterPlantUmlImpl writer = new ClassDiagramWriterPlantUmlImpl();
+        ClassDiagramWriterPlantUmlImpl writer = new ClassDiagramWriterPlantUmlImpl(
+                new PlantUmlWriter());
         ClassDiagramProcessor processor = new ClassDiagramProcessor();
         return writer.serialize(processor.process(entryPoint));
     }
