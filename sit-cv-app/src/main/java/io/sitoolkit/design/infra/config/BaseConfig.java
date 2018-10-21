@@ -1,25 +1,26 @@
-package io.sitoolkit.design.app.config;
+package io.sitoolkit.design.infra.config;
 
 import java.nio.file.Paths;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
-import io.sitoolkit.design.ApplicationConfig;
 
 @Configuration
 public class BaseConfig {
 
     @Bean
+    @ConfigurationProperties(prefix = "cv")
     public ApplicationConfig applicationConfig() {
         return new ApplicationConfig();
     }
 
     @Bean
     public ServiceFactory serviceFactory(ApplicationConfig appilcationConfig) {
-        return ServiceFactory.initialize(Paths.get(appilcationConfig.getTargetProjectPath()));
+        return ServiceFactory.initialize(Paths.get(appilcationConfig.getProject()));
     }
 
     @Bean

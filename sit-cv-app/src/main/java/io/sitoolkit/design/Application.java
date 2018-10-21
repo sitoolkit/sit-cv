@@ -1,17 +1,15 @@
 package io.sitoolkit.design;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.SimpleCommandLinePropertySource;
-import org.springframework.core.env.StandardEnvironment;
 
-import io.sitoolkit.cv.core.app.report.ReportService;
-import io.sitoolkit.design.app.config.BaseConfig;
-import io.sitoolkit.design.app.config.ReportConfig;
+import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
 @SpringBootApplication
 public class Application {
@@ -19,28 +17,17 @@ public class Application {
     public static void main(String[] args) {
         ApplicationArguments appArgs = new DefaultApplicationArguments(args);
 
-        if(appArgs.containsOption("report")) {
-            try (AnnotationConfigApplicationContext appCtx = getApplicationContext(
-                    appArgs, BaseConfig.class, ReportConfig.class)) {
-                ReportService reportService = appCtx.getBean(ReportService.class);
-                reportService.export();
-            }
+        if (appArgs.containsOption("report")) {
+            executeReportMode(appArgs);
         } else {
             SpringApplication.run(Application.class, args);
         }
     }
 
-    static AnnotationConfigApplicationContext getApplicationContext(
-            ApplicationArguments appArgs, Class<?>... annotatedClasses) {
-        AnnotationConfigApplicationContext appCtx = new AnnotationConfigApplicationContext();
-        appCtx.getBeanFactory().registerSingleton("springApplicationArguments", appArgs);
-        ConfigurableEnvironment env = new StandardEnvironment();
-        env.getPropertySources().addFirst(
-                new SimpleCommandLinePropertySource(appArgs.getSourceArgs()));
-        appCtx.setEnvironment(env);
-        appCtx.register(annotatedClasses);
-        appCtx.refresh();
-        return appCtx;
+    static void executeReportMode(ApplicationArguments appArgs) {
+        List<String> projects = appArgs.getOptionValues("project");
+        Path projectDir = projects == null || projects.isEmpty() ? Paths.get(".")
+                : Paths.get(projects.get(0));
+        ServiceFactory.initialize(projectDir).getReportService().export(projectDir);
     }
-
 }

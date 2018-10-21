@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
-import io.sitoolkit.design.ApplicationConfig;
+import io.sitoolkit.design.infra.config.ApplicationConfig;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,10 +32,10 @@ public class DesignDocPublisher {
 
     @PostConstruct
     public void init() {
-        log.debug("loading project:{}", config.getTargetProjectPath());
 
-        Path projDir = Paths.get(config.getTargetProjectPath());
-        Path srcDir = Paths.get(config.getTargetProjectPath(), "src/main/java");
+        Path projDir = Paths.get(config.getProject());
+        log.debug("loading project:{}", projDir);
+        Path srcDir = projDir.resolve("src/main/java");
         service.loadDir(projDir, srcDir);
 
         ListResponse listResponse = buildDesingDocList();

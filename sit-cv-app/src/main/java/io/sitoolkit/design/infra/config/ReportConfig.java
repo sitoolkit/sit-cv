@@ -1,4 +1,4 @@
-package io.sitoolkit.design.app.config;
+package io.sitoolkit.design.infra.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
