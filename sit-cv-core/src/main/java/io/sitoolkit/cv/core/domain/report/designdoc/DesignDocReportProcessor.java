@@ -33,7 +33,7 @@ public class DesignDocReportProcessor {
 
         Path path = Paths.get(getDetailPath(designDoc));
         String content = "window.reportData.designDoc.detailList['" +  designDoc.getId() + "'] = "
-                + JsonUtils.convertObjectToString(detail);
+                + JsonUtils.obj2str(detail);
 
         return new Report(path, content);
     }
@@ -46,7 +46,7 @@ public class DesignDocReportProcessor {
 
         Path path = Paths.get("assets/designdoc-id-list.js");
         String content = "window.reportData.designDoc.idList = "
-                + JsonUtils.convertObjectToString(idList);
+                + JsonUtils.obj2str(idList);
 
         return new Report(path, content);
     }

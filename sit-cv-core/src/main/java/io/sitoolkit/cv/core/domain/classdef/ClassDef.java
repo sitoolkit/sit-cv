@@ -19,13 +19,18 @@ public class ClassDef {
     private List<MethodDef> methods = new ArrayList<>();
     private List<FieldDef> fields = new ArrayList<>();
     private Set<String> implInterfaces = new HashSet<>();
-    private Set<ClassDef> knownImplClasses =  new HashSet<>();
-    private Set<String> annotations =  new HashSet<>();
+    private Set<ClassDef> knownImplClasses = new HashSet<>();
+    private Set<String> annotations = new HashSet<>();
 
-    public boolean isInterface(){
+    public boolean isInterface() {
         return ClassType.INTERFACE.equals(type);
     }
-    public boolean isClass(){
+
+    public boolean isClass() {
         return ClassType.CLASS.equals(type);
+    }
+
+    public String getFullyQualifiedName() {
+        return pkg + "." + name;
     }
 }

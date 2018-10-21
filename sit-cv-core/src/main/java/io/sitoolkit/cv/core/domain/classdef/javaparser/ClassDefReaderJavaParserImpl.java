@@ -43,30 +43,27 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryParam;
 import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.infra.config.Config;
-import lombok.NoArgsConstructor;
+import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     private JavaParserFacade jpf;
 
     private MethodCallVisitor methodCallVisitor;
 
-    ClassDefRepository reposiotry;
-
-    Config config;
+    @NonNull
+    private ClassDefRepository reposiotry;
 
     JarPathFinder jarPathFinder = new JarPathFinder();
 
     ClassDefRepositoryParam paramOfBuiltParser;
 
-    public ClassDefReaderJavaParserImpl(ClassDefRepository reposiotry, Config config) {
-        super();
-        this.reposiotry = reposiotry;
-        this.config = config;
-    }
+    @NonNull
+    private SitCvConfig config;
 
     @Override
     public void readDir(Path srcDir) {

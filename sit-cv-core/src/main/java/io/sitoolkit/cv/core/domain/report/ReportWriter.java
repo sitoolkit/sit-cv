@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
-import io.sitoolkit.cv.core.infra.util.ResourceUtils;
+import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -29,7 +29,7 @@ public class ReportWriter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        ResourceUtils.copy(getClass(), RESOURCE_NAME, outputDir);
+        SitResourceUtils.copy(getClass(), RESOURCE_NAME, outputDir);
         setReportConfig(outputDirPath);
 
         writeReports(outputDirPath, reports);

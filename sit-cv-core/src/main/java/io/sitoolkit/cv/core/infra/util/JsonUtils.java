@@ -1,19 +1,31 @@
 package io.sitoolkit.cv.core.infra.util;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 public class JsonUtils {
-    private static ObjectWriter objectWriter = new ObjectMapper().writer();
 
-    public static String convertObjectToString(Object src) {
-        String value;
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    private JsonUtils() {
+    }
+
+    public static String obj2str(Object obj) {
         try {
-            value = objectWriter.writeValueAsString(src);
+            return mapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
-        return value;
+    }
+
+    public static <T> T str2obj(String str, Class<T> objType) {
+        try {
+            return mapper.readValue(str, objType);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }

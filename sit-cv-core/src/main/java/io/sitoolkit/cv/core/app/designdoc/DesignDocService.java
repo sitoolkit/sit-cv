@@ -21,8 +21,6 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.domain.classdef.filter.ClassDefFilter;
-import io.sitoolkit.cv.core.domain.classdef.filter.ClassDefFilterConditionReader;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
@@ -57,9 +55,6 @@ public class DesignDocService {
     private DiagramWriter<ClassDiagram> classWriter;
 
     @NonNull
-    private ClassDefFilter classFilter;
-
-    @NonNull
     private ClassDefRepository classDefRepository;
 
     @NonNull
@@ -72,7 +67,6 @@ public class DesignDocService {
 
         classDefReader.init(projDir, srcDir);
         classDefReader.readDir(srcDir);
-        ClassDefFilterConditionReader.read(projDir).ifPresent(classFilter::setCondition);
     }
 
     public void watchDir(Path srcDir, ClassDefChangeEventListener listener) {

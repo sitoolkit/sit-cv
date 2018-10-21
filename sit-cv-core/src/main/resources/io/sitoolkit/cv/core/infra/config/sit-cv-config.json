@@ -1,0 +1,20 @@
+{
+  "entryPointFilter": {
+    "include":[],
+    "exclude":[]
+  },
+  "sequenceDiagramFilter": {
+    "include": [
+      {
+        "name": ".*Controller.*"
+      },
+      {
+        "name": ".*Service.*"
+      },
+      {
+        "name": ".*Repository.*"
+      }
+    ],
+    "exclude": []
+  }
+}

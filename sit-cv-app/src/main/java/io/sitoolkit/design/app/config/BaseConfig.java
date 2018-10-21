@@ -1,5 +1,7 @@
 package io.sitoolkit.design.app.config;
 
+import java.nio.file.Paths;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,8 +18,8 @@ public class BaseConfig {
     }
 
     @Bean
-    public ServiceFactory serviceFactory() {
-        return ServiceFactory.initialize();
+    public ServiceFactory serviceFactory(ApplicationConfig appilcationConfig) {
+        return ServiceFactory.initialize(Paths.get(appilcationConfig.getTargetProjectPath()));
     }
 
     @Bean
