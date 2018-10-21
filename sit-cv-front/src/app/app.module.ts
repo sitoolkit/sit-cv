@@ -13,7 +13,8 @@ import {
   MatIconModule,
   MatListModule,
   MatProgressSpinnerModule,
-  MatCardModule
+  MatCardModule,
+  MatSnackBarModule
 } from '@angular/material';
 import { MatTreeModule } from '@angular/material/tree';
 import { DesignDocComponent } from './cmp/designdoc/designdoc.component';
@@ -25,6 +26,7 @@ import { DesignDocServerService } from './srv/designdoc/designdoc-server.service
 import { DesignDocReportService } from './srv/designdoc/designdoc-report.service';
 import { Config } from './srv/shared/config';
 import { HidePackagePipe } from './pipe/hide-package.pipe';
+import { CommentComponent } from './cmp/designdoc/comment/comment.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +36,7 @@ import { HidePackagePipe } from './pipe/hide-package.pipe';
     ErrorComponent,
     DoctreeComponent,
     HidePackagePipe,
+    CommentComponent,
   ],
   imports: [
     BrowserModule,
@@ -47,6 +50,7 @@ import { HidePackagePipe } from './pipe/hide-package.pipe';
     MatTreeModule,
     MatProgressSpinnerModule,
     MatCardModule,
+    MatSnackBarModule,
     MY_ROUTES,
   ],
   providers: [
@@ -62,6 +66,9 @@ import { HidePackagePipe } from './pipe/hide-package.pipe';
       deps: [DesignDocReportRepository, Config]
     },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents :[
+    CommentComponent
+  ]
 })
 export class AppModule { }

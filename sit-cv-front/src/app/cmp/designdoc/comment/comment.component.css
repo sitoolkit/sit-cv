@@ -1,0 +1,11 @@
+.comment-header {
+  overflow-wrap: break-word;
+}
+
+.comment-body {
+  overflow-wrap: break-word;
+}
+
+.comment-footer {
+  text-align: right;
+}

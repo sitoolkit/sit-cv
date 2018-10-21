@@ -1,8 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
+import {MatSnackBar} from '@angular/material';
 import * as $ from 'jquery';
 import { DesignDocService } from '../../srv/designdoc/designdoc.service';
+import { CommentComponent } from './comment/comment.component';
 
 @Component({
   selector: 'app-designdoc',
@@ -23,6 +25,7 @@ export class DesignDocComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
+    public snackBar: MatSnackBar,
     @Inject('DesignDocService') private ddService: DesignDocService) {}
 
   ngOnInit() {
@@ -59,19 +62,14 @@ export class DesignDocComponent implements OnInit {
   methodNameClick(event) {
     let link: JQuery = $(event.target).closest('a');
     if (link.length > 0) {
-      this.toggleComment(link);
+      this.snackBar.openFromComponent(CommentComponent, {
+            data: {
+                commentId: link.attr('xlink:title'),
+                comments: this.diagramComments
+            }
+        });
     }
     return false;
-  }
-
-  toggleComment(link: JQuery) {
-    let title: string = link.attr('xlink:title');
-    let index: number = this.selectedMethodSignatures.indexOf(title);
-    if (index < 0) {
-      this.selectedMethodSignatures.push(title);
-    } else {
-      this.selectedMethodSignatures.splice(index, 1);
-    }
   }
 
   methodNameMouseover(event) {
