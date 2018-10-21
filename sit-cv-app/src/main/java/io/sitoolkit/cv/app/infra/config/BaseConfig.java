@@ -1,4 +1,4 @@
-package io.sitoolkit.design.infra.config;
+package io.sitoolkit.cv.app.infra.config;
 
 import java.nio.file.Paths;
 

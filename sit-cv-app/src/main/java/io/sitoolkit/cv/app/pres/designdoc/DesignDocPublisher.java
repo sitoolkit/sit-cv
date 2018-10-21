@@ -1,4 +1,4 @@
-package io.sitoolkit.design.pres.designdoc;
+package io.sitoolkit.cv.app.pres.designdoc;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,9 +12,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import io.sitoolkit.cv.app.infra.config.ApplicationConfig;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
-import io.sitoolkit.design.infra.config.ApplicationConfig;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

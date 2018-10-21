@@ -1,4 +1,4 @@
-package io.sitoolkit.design;
+package io.sitoolkit.cv.app;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

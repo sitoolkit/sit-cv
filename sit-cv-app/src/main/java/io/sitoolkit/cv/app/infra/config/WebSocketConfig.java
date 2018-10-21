@@ -1,4 +1,4 @@
-package io.sitoolkit.design.infra.config;
+package io.sitoolkit.cv.app.infra.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
