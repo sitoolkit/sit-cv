@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
 @SpringBootApplication
-public class Application {
+public class SitCvApplication {
 
     public static void main(String[] args) {
         ApplicationArguments appArgs = new DefaultApplicationArguments(args);
@@ -20,7 +20,7 @@ public class Application {
         if (appArgs.containsOption("report")) {
             executeReportMode(appArgs);
         } else {
-            SpringApplication.run(Application.class, args);
+            SpringApplication.run(SitCvApplication.class, args);
         }
     }
 
