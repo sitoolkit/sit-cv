@@ -5,11 +5,17 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FilterCondition {
 
     private String name;
@@ -21,20 +27,27 @@ public class FilterCondition {
     @Getter(AccessLevel.NONE)
     private Pattern annotationPattern;
 
-    public void compilePattern() {
-        if (StringUtils.isNotEmpty(name)) {
-            namePattern = Pattern.compile(name);
-        }
-        if (StringUtils.isNotEmpty(annotation)) {
-            annotationPattern = Pattern.compile(annotation);
-        }
-    }
-
     public boolean matchName(String name) {
-        return namePattern == null ? true : namePattern.matcher(name).matches();
+        if (StringUtils.isEmpty(this.name)) {
+            return true;
+        }
+
+        if (namePattern == null) {
+            namePattern = Pattern.compile(this.name);
+        }
+
+        return namePattern.matcher(name).matches();
     }
 
     public boolean matchAnnotation(String annotation) {
-        return annotationPattern == null ? true : annotationPattern.matcher(annotation).matches();
+        if (StringUtils.isEmpty(this.annotation)) {
+            return true;
+        }
+
+        if (annotationPattern == null) {
+            annotationPattern = Pattern.compile(this.annotation);
+        }
+
+        return annotationPattern.matcher(annotation).matches();
     }
 }
