@@ -100,7 +100,7 @@
   </dependencyManagement>
 
   <properties>
-    <javaparser.version>3.6.18</javaparser.version>
+    <javaparser.version>3.6.26</javaparser.version>
   </properties>
 
 </project>
