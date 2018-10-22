@@ -127,6 +127,10 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 classDef.setAnnotations(readAnnotations(interfaze));
             });
 
+            compilationUnit.getEnumByName(typeName).ifPresent(enumz -> {
+                classDef.setType(ClassType.ENUM);
+            });
+
             classDef.getMethods().stream().forEach(method -> method.setClassDef(classDef));
 
             log.debug("Read class : {}", classDef);

@@ -1,7 +1,7 @@
 package io.sitoolkit.cv.core.domain.classdef;
 
 public enum ClassType {
-    CLASS, INTERFACE;
+    CLASS, INTERFACE, ENUM;
 
     @Override
     public String toString() {
