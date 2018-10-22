@@ -53,8 +53,8 @@ public class ServiceFactory {
         SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(
                 config.getSequenceDiagramFilter());
         ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
-        GraphvizManager graphvizManager = new GraphvizManager();
-        PlantUmlWriter plantumlWriter = new PlantUmlWriter(graphvizManager);
+        GraphvizManager.initialize();
+        PlantUmlWriter plantumlWriter = new PlantUmlWriter();
         DiagramWriter<SequenceDiagram> sequenceWriter = new SequenceDiagramWriterPlantUmlImpl(
                 plantumlWriter);
         DiagramWriter<ClassDiagram> classWriter = new ClassDiagramWriterPlantUmlImpl(

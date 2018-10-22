@@ -12,34 +12,39 @@ import org.zeroturnaround.zip.ZipUtil;
 
 import io.sitoolkit.cv.core.infra.SitRepository;
 import lombok.extern.slf4j.Slf4j;
+import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 
 @Slf4j
 public class GraphvizManager {
-    private String winGraphvizDownloadUrl;
-    private String winGraphvizInstallFile;
+    private static String winGraphvizDownloadUrl;
+    private static String winGraphvizInstallFile;
 
-    public GraphvizManager() {
+    private GraphvizManager() {
+    }
+
+    public static void initialize() {
         if (SystemUtils.IS_OS_WINDOWS) {
             loadProperties();
             checkBinary();
+            GraphvizUtils.setDotExecutable(getBinaryPath().toAbsolutePath().toString());
         }
     }
 
-    private Path getGraphvizPath() {
+    private static Path getGraphvizPath() {
         return SitRepository.getRepositoryPath().resolve("graphviz");
     };
 
-    public Path getBinaryPath() {
+    private static Path getBinaryPath() {
         return getGraphvizPath().resolve("release/bin/dot.exe");
     }
 
-    private void loadProperties() {
+    private static void loadProperties() {
         ResourceBundle rb = ResourceBundle.getBundle("graphviz");
         winGraphvizDownloadUrl = rb.getString("win.graphviz.downloadUrl");
         winGraphvizInstallFile = rb.getString("win.graphviz.installFile");
     }
 
-    private void checkBinary() {
+    private static void checkBinary() {
         Path binaryPath = getBinaryPath();
         if (Files.exists(binaryPath)) {
             log.info("Executable Graphviz found in SitRepository : {}", binaryPath);
@@ -50,19 +55,19 @@ public class GraphvizManager {
         }
     }
 
-    private void installGraphviz() {
+    private static void installGraphviz() {
         prepareDirectory();
         installGraphvizWindows();
     }
 
-    private void installGraphvizWindows() {
+    private static void installGraphvizWindows() {
         log.info("Installing Graphviz...");
         downloadWindowsBinary();
         extractBinary();
         log.info("Finished Installing Graphviz");
     }
 
-    private void prepareDirectory() {
+    private static void prepareDirectory() {
         if (!Files.exists(getGraphvizPath())) {
             try {
                 Files.createDirectories(getGraphvizPath());
@@ -72,7 +77,7 @@ public class GraphvizManager {
         }
     }
 
-    private void downloadWindowsBinary() {
+    private static void downloadWindowsBinary() {
         Path zipFile = getGraphvizPath().resolve(winGraphvizInstallFile);
 
         if (Files.exists(zipFile)) {
@@ -89,7 +94,7 @@ public class GraphvizManager {
         }
     }
 
-    private void extractBinary() {
+    private static void extractBinary() {
         Path zipFile = getGraphvizPath().resolve(winGraphvizInstallFile);
         log.info("extracting zipfile '{}' ... ", zipFile);
         ZipUtil.unpack(zipFile.toFile(), getGraphvizPath().toFile());
