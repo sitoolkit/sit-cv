@@ -37,10 +37,10 @@ public class MethodCallVisitor extends VoidVisitorAdapter<List<MethodCallDef>> {
                 log.debug("Add method call : {}", methodCall);
                 methodCalls.add(methodCall);
             } else {
-                log.debug("Unsolved : {}", methodCallExpr);
+                log.debug("Unsolved method call: {}", methodCallExpr);
             }
         } catch (Exception e) {
-            log.debug("Unsolved:{}, {}", methodCallExpr, e);
+            log.debug("Unsolved method call: {}, {}", methodCallExpr, e.getMessage());
         }
 
     }

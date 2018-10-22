@@ -10,15 +10,15 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class TypeParser {
 
     public static List<TypeDef> getParamTypes(ResolvedMethodDeclaration declaredMethod) {
         return IntStream.range(0, declaredMethod.getNumberOfParams())
-                .mapToObj(declaredMethod::getParam)
-                .map(ResolvedParameterDeclaration::getType)
-                .map(TypeParser::getTypeDef)
-                .collect(Collectors.toList());
+                .mapToObj(declaredMethod::getParam).map(ResolvedParameterDeclaration::getType)
+                .map(TypeParser::getTypeDef).collect(Collectors.toList());
     }
 
     public static TypeDef getTypeDef(ResolvedType type) {
@@ -30,13 +30,16 @@ public class TypeParser {
         } else if (type.isArray()) {
             typeDef.setName(type.asArrayType().describe());
         } else if (type.isReference()) {
-            ResolvedReferenceType rType = type.asReferenceType();
-            typeDef.setName(rType.getQualifiedName());
-            List<TypeDef> typeList = rType.getTypeParametersMap().stream()
-                    .map(pair -> pair.b)
-                    .map(TypeParser::getTypeDef)
-                    .collect(Collectors.toList());
-            typeDef.setTypeParamList(typeList);
+            try {
+                ResolvedReferenceType rType = type.asReferenceType();
+                typeDef.setName(rType.getQualifiedName());
+                List<TypeDef> typeList = rType.getTypeParametersMap().stream().map(pair -> pair.b)
+                        .map(TypeParser::getTypeDef).collect(Collectors.toList());
+                typeDef.setTypeParamList(typeList);
+            } catch (UnsupportedOperationException e) {
+                log.debug("Unsolved type:{}, {}", type, e.getMessage());
+                typeDef.setName(type.toString());
+            }
         } else {
             typeDef.setName(type.toString());
         }
