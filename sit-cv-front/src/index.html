@@ -5,7 +5,11 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
   <meta charset="utf-8">
   <title>Code Visualizer</title>
-  <base href="/" >
+  <script type="text/javascript">
+    let base = document.createElement("base");
+    base.href = window.location.href.split("#")[0];
+    document.head.appendChild(base);
+  </script>
   <script src="./assets/config.js"></script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
