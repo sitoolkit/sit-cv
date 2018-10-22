@@ -4,9 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.function.Function;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.SystemUtils;
 
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
@@ -19,11 +16,10 @@ import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 
 public class PlantUmlWriter {
 
-    @Resource
     GraphvizManager graphvizManager;
 
-    @PostConstruct
-    public void init() {
+    public PlantUmlWriter(GraphvizManager graphvizManager) {
+        this.graphvizManager = graphvizManager;
         if (SystemUtils.IS_OS_WINDOWS) {
             String graphvizPath = graphvizManager.getBinaryPath().toAbsolutePath().toString();
             GraphvizUtils.setDotExecutable(graphvizPath);

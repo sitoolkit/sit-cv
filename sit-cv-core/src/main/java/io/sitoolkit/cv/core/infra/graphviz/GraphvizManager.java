@@ -6,8 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ResourceBundle;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.zeroturnaround.zip.ZipUtil;
@@ -20,20 +18,19 @@ public class GraphvizManager {
     private String winGraphvizDownloadUrl;
     private String winGraphvizInstallFile;
 
+    public GraphvizManager() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            loadProperties();
+            checkBinary();
+        }
+    }
+
     private Path getGraphvizPath() {
         return SitRepository.getRepositoryPath().resolve("graphviz");
     };
 
     public Path getBinaryPath() {
         return getGraphvizPath().resolve("release/bin/dot.exe");
-    }
-
-    @PostConstruct
-    public void init() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            loadProperties();
-            checkBinary();
-        }
     }
 
     private void loadProperties() {
