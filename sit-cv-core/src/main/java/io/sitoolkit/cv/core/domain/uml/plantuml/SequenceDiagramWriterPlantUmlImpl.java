@@ -7,18 +7,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
+import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.MessageDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
+@RequiredArgsConstructor
 public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram> {
 
-    @Resource
+    @NonNull
     PlantUmlWriter plantumlWriter;
+
+    IdentiferFormatter idFormatter = new IdentiferFormatter();
 
     public List<String> write(List<SequenceDiagram> diagrams) {
         List<String> lines = new ArrayList<>();
@@ -45,7 +52,11 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
         lines.add("@enduml");
 
-        return lines.stream().collect(Collectors.joining(System.lineSeparator()));
+        String umlString = lines.stream().collect(Collectors.joining(System.lineSeparator()));
+
+        log.debug(umlString);
+
+        return umlString;
     }
 
     private List<String> lifeline2str(LifeLineDef lifeLine) {
@@ -57,8 +68,15 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         LifeLineDef target = message.getTarget();
         List<String> list = lifeline2str(target);
 
-        list.add(0, lifeLine.getObjectName() + " -> " + target.getObjectName() + " :"
-                + message.getName());
+        list.add(0,
+                lifeLine.getObjectName() + " -> " + target.getObjectName() + " :" + "[[#{"
+                        + message.getRequestQualifiedSignature() + "} "
+                        + idFormatter.format(message.getRequestName()) + "]]");
+
+        if (!StringUtils.equals(message.getResponseName(), "void")) {
+            list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
+                    + idFormatter.format(message.getResponseName()));
+        }
 
         return list;
     }
@@ -70,4 +88,5 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
             throw new RuntimeException(e);
         }
     }
+
 }

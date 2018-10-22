@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +16,7 @@ import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -55,19 +57,11 @@ public class ClassDiagramProcessor {
         Set<MethodDef> sequenceMethods = getSequenceMethodsRecursively(entryPoint)
                 .collect(Collectors.toSet());
 
-        Set<ClassDef> sequenceClasses = sequenceMethods.stream()
-                .map(MethodDef::getClassDef)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
-        sequenceClasses.forEach(c -> log.debug("Sequence class picked :{}", c.getName()));
-
         Set<ClassDef> paramClasses = sequenceMethods.stream()
                 .map(MethodDef::getParamTypes)
                 .flatMap(List::stream)
                 .flatMap(TypeDef::getTypeParamsRecursively)
                 .map(TypeDef::getClassRef)
-                .map(implementDetector::detectImplClass)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -77,30 +71,21 @@ public class ClassDiagramProcessor {
                 .map(MethodDef::getReturnType)
                 .flatMap(TypeDef::getTypeParamsRecursively)
                 .map(TypeDef::getClassRef)
-                .map(implementDetector::detectImplClass)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         resultClasses.forEach(c -> log.debug("Result class picked :{}", c.getName()));
 
-        Set<ClassDef> fieldClasses = Stream.of(sequenceClasses, paramClasses, resultClasses)
+        Set<ClassDef> ret = Stream.of(paramClasses, resultClasses)
                 .flatMap(Set::stream)
-                .map(ClassDef::getFields)
-                .flatMap(List::stream)
-                .map(FieldDef::getTypeRef)
-                .map(implementDetector::detectImplClass)
-                .filter(Objects::nonNull)
+                .flatMap(this::getFieldClassesRecursively)
+                .distinct()
                 .collect(Collectors.toSet());
 
-        fieldClasses.forEach(c -> log.debug("Field class picked :{}", c.getName()));
-
-        Set<ClassDef> ret = Stream.of(sequenceClasses, paramClasses, resultClasses, fieldClasses)
-                .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+        ret.forEach(c -> log.debug("Field class picked :{}", c.getName()));
 
         return ret;
     }
-
 
     private Stream<MethodDef> getSequenceMethodsRecursively(MethodDef entryPoint) {
         MethodDef methodImpl = implementDetector.detectImplMethod(entryPoint);
@@ -108,9 +93,19 @@ public class ClassDiagramProcessor {
                 methodImpl.getMethodCalls().stream().flatMap(this::getSequenceMethodsRecursively));
     }
 
+    Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef) {
+        return Stream.concat(Stream.of(classDef),
+                classDef.getFields().stream()
+                        .map(FieldDef::getType)
+                        .flatMap(TypeDef::getTypeParamsRecursively)
+                        .map(TypeDef::getClassRef)
+                        .filter(Objects::nonNull)
+                        .flatMap(this::getFieldClassesRecursively))
+                .distinct();
+    }
+
     private Stream<RelationDef> getDependencies(MethodDef method) {
         return method.getMethodCalls().stream()
-                .map(implementDetector::detectImplMethod)
                 .map(call -> getDependency(method, call))
                 .filter(rel -> !rel.getSelf().equals(rel.getOther()));
     }
@@ -121,13 +116,54 @@ public class ClassDiagramProcessor {
     }
 
     private Optional<RelationDef> getInstanceRelation(ClassDef clazz, FieldDef field) {
-        // TODO has-a, part-of 関係の抽出
-        return Optional.empty();
+
+        TypeWithCardinality c = getTypeWithCardinality(field.getType());
+        RelationDef relation = RelationDef.builder()
+                .self(clazz)
+                .other(c.getType().getClassRef())
+                .otherCardinality(c.getCardinality())
+                .type(RelationType.OWNERSHIP)
+                .description("")
+                .build();
+
+        return Optional.ofNullable(relation);
     }
+
+    TypeWithCardinality getTypeWithCardinality(TypeDef type){
+
+        if (isCollection(type) && type.getTypeParamList().size() == 1) {
+            return new TypeWithCardinality(type.getTypeParamList().get(0), "0..*");
+
+        } else if (isOptional(type) && type.getTypeParamList().size() == 1) {
+            return new TypeWithCardinality(type.getTypeParamList().get(0), "0..1");
+
+        } else {
+            return new TypeWithCardinality(type, "1");
+        }
+    }
+
+    boolean isCollection(TypeDef type) {
+        return Arrays.asList(
+                "java.util.Set",
+                "java.util.List",
+                "java.util.Collection").contains(type.getName());
+    }
+
+    boolean isOptional(TypeDef type) {
+        return Arrays.asList(
+                "java.util.Optional").contains(type.getName());
+    }
+
 
     private Set<RelationDef> getClassRelation(ClassDef clazz) {
         // TODO is-a 関係の抽出
         return Collections.emptySet();
     }
 
+
+    @Value
+    class TypeWithCardinality{
+        TypeDef type;
+        String cardinality;
+    }
 }

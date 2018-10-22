@@ -16,9 +16,14 @@
 
 package io.sitoolkit.cv.core.infra.watcher;
 
+import java.time.Instant;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +36,11 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class InputSourceWatcher {
 
     private boolean isContinue = false;
+
+    Set<String> waitingSources = new HashSet<>();
+    Instant lastSourceChangedTime;
+
+    final long RELOAD_WAIT_TIME_MILLIS = 300;
 
     /**
      * 入力ソースを監視対象に追加します。 実際の処理はサブクラスに委譲します。 また、プロセス開始後の初回実行時には監視中ファイルを作成します。
@@ -61,24 +71,27 @@ public abstract class InputSourceWatcher {
         }
 
         ExecutorService executor = Executors.newCachedThreadPool();
-        executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                while (isContinue()) {
-                    Set<String> inputSources = watching();
-                    log.info("Detected input source change {}", inputSources);
-                    cg.regenerate(inputSources);
-                }
+        executor.execute(() -> {
+            while (isContinue()) {
+                Set<String> inputSources = watching();
+                putInputSources(inputSources);
+                log.info("Detected input source change {}", inputSources);
             }
         });
-        // while (isContinue()) {
-        // try {
-        // Thread.sleep(3000);
-        // } catch (InterruptedException e) {
-        // log.warn("スレッドの待機に失敗しました", e);
-        // }
-        // }
-        // end(cg);
+
+        executor.execute(() -> {
+            while (isContinue()) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(RELOAD_WAIT_TIME_MILLIS);
+                } catch (InterruptedException e) {
+                    throw new IllegalStateException(e);
+                }
+                getReadyToRegenerateSources().ifPresent(sources -> {
+                    log.info("Regenarate from source change {}", sources);
+                    cg.regenerate(sources);
+                });
+            }
+        });
     }
 
     public boolean isContinue() {
@@ -87,6 +100,22 @@ public abstract class InputSourceWatcher {
 
     public void setContinue(boolean isContinue) {
         this.isContinue = isContinue;
+    }
+
+    private synchronized void putInputSources(Collection<String> inputSources) {
+        waitingSources.addAll(inputSources);
+        lastSourceChangedTime = Instant.now();
+    }
+
+    private synchronized Optional<Set<String>> getReadyToRegenerateSources() {
+        if (!waitingSources.isEmpty() &&
+                Instant.now().isAfter(lastSourceChangedTime.plusMillis(RELOAD_WAIT_TIME_MILLIS))) {
+            Set<String> result = new HashSet<>(waitingSources);
+            waitingSources.clear();
+            return Optional.of(result);
+        } else {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -104,9 +133,6 @@ public abstract class InputSourceWatcher {
      * <li>変更を検知した入力ソースで繰り返しインターフェースの再生成メソッドを実行
      * </ul>
      *
-     * @param cg
-     *            繰り返し生成インターフェース
-     * @see ContinuousGeneratable#regenerate(java.lang.String)
      */
     protected abstract Set<String> watching();
 

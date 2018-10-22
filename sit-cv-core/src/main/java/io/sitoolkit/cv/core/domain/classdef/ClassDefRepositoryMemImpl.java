@@ -5,8 +5,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +20,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     private Map<String, MethodDef> methodDefMap = new HashMap<>();
 
-    private Map<String, Set<MethodCallDef>> methodCallMap = new HashMap<>();
+    private Map<String, List<MethodCallDef>> methodCallMap = new HashMap<>();
 
     @Override
     public void save(ClassDef classDef) {
@@ -26,6 +29,22 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         classDef.getMethods().stream().forEach(methodDef -> {
             methodDefMap.put(methodDef.getQualifiedSignature(), methodDef);
             methodCallMap.put(methodDef.getQualifiedSignature(), methodDef.getMethodCalls());
+        });
+    }
+
+    @Override
+    public void remove(String sourceId) {
+
+        Optional<ClassDef> removingClass = classDefMap.values().stream()
+                .filter(clazz -> StringUtils.equals(clazz.getSourceId(), sourceId))
+                .findFirst();
+
+        removingClass.ifPresent(classDef ->{
+            classDefMap.remove(classDef.getPkg() + "." + classDef.getName());
+            classDef.getMethods().stream().forEach(methodDef -> {
+                methodDefMap.remove(methodDef.getQualifiedSignature());
+                methodCallMap.remove(methodDef.getQualifiedSignature());
+            });
         });
     }
 
@@ -64,7 +83,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         soleveMethodCallClass(methodCall);
 
         if (methodCall.getMethodCalls().isEmpty()) {
-            Set<MethodCallDef> calledMethods = methodCallMap
+            List<MethodCallDef> calledMethods = methodCallMap
                     .get(methodCall.getQualifiedSignature());
             if (calledMethods != null) {
                 methodCall.setMethodCalls(calledMethods);
@@ -118,20 +137,17 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     void solveClassRefs(ClassDef clazz) {
         log.debug("solving class {}" ,clazz.getName());
-        clazz.getFields().stream().forEach(field -> {
-            ClassDef refType = classDefMap.get(field.getType());
-            if (refType != null) {
-                field.setTypeRef(refType);
-            }
-        });
+        clazz.getFields().stream().map(FieldDef::getType).forEach(this::solveClassRef);
 
         if (clazz.isClass()) {
             clazz.getImplInterfaces().stream().forEach(ifName -> {
                 ClassDef refType = classDefMap.get(ifName);
                 if (refType != null) {
+                    refType.getKnownImplClasses().remove(clazz); //remove to replace classdef to newer
                     refType.getKnownImplClasses().add(clazz);
                     log.debug("{} is Known implementation of {}", clazz.getName(), ifName);
                 }
+
             });
         }
     }

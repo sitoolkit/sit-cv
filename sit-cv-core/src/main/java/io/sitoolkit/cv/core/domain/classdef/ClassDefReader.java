@@ -5,9 +5,11 @@ import java.util.Optional;
 
 public interface ClassDefReader {
 
-    void init(Path srcDir);
+    void init(Path projectDir, Path srcDir);
 
     void init(ClassDefRepositoryParam param);
+
+    void rebuild();
 
     void readDir(Path srcDir);
 

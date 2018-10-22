@@ -1,5 +1,7 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,4 +24,15 @@ public class ClassDiagram implements DiagramModel {
                 .distinct()
                 .collect(Collectors.toSet());
     }
+
+    @Override
+    public Map<String, String> getAllComments() {
+        return new HashMap<String, String>();
+    }
+
+    @Override
+    public Set<String> getAllSourceIds() {
+        return classes.stream().map(ClassDef::getSourceId).collect(Collectors.toSet());
+    }
+
 }

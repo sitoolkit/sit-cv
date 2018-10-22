@@ -1,0 +1,8 @@
+
+task listJarPaths {
+    doLast {
+      println 'SIT-CV: Started listing Jar paths'
+      configurations.compile.each { println it }
+      println 'SIT-CV: Finished listing Jar paths'
+    }
+}

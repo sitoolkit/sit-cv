@@ -1,0 +1,18 @@
+<div class="designdocContainer">
+  <div class="designdoc">
+    <div *ngFor="let key of objectKeys(currentDiagrams)" (click)="methodNameClick($event)" (mousemove)="methodNameMouseover($event)">
+      <div [innerHTML]="currentDiagrams[key]"></div>
+    </div>
+    <mat-spinner *ngIf="isDiagramLoading" [diameter]="50"></mat-spinner>
+  </div>
+  <div class="comments">
+    <mat-card class="comment" *ngFor="let signature of selectedMethodSignatures" [ngClass]="{active: signature == currentMethodSignature}">
+      <mat-card-header>
+        <mat-card-title>{{signature}}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        {{diagramComments[currentDesignDocId][signature]}}
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

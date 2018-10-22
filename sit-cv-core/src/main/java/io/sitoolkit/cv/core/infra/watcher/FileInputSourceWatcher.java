@@ -48,6 +48,8 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
     private final Map<String, InputSource> watchingFileMap = new HashMap<>();
     private final Map<WatchKey, Path> pathMap = new HashMap<>();
 
+
+
     /**
      * ファイルを監視対象に含めます。
      *
@@ -85,7 +87,8 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
                 // TODO ファイル監視方式の統一
                 watcher = FileSystems.getDefault().newWatchService();
             }
-            WatchKey watchKey = dirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+            WatchKey watchKey = dirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY,
+                    StandardWatchEventKinds.ENTRY_DELETE);
             pathMap.put(watchKey, dirPath);
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -113,7 +116,11 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
             File changedFile = dir.resolve((Path) event.context()).toFile();
 
             InputSource inputSource = watchingFileMap.get(changedFile.getAbsolutePath());
-            if (inputSource != null && inputSource.lastModified != changedFile.lastModified()) {
+            if (inputSource == null) {
+                inputSource = new InputSource(changedFile.getAbsolutePath(), 0);
+                watchingFileMap.put(changedFile.getAbsolutePath(), inputSource);
+            }
+            if (inputSource.lastModified != changedFile.lastModified()) {
                 inputSources.add(inputSource.name);
                 inputSource.lastModified = changedFile.lastModified();
             }
@@ -122,6 +129,9 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
 
         return inputSources;
     }
+
+
+
 
     @Override
     protected void end(ContinuousGeneratable cg) {
