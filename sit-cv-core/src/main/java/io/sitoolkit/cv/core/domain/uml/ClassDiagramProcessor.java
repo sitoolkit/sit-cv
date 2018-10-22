@@ -2,6 +2,7 @@ package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -94,13 +95,19 @@ public class ClassDiagramProcessor {
     }
 
     Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef) {
+        return getFieldClassesRecursively(classDef, new HashSet<>());
+    }
+
+    Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef, Set<ClassDef> visited) {
+        visited.add(classDef);
         return Stream.concat(Stream.of(classDef),
                 classDef.getFields().stream()
                         .map(FieldDef::getType)
                         .flatMap(TypeDef::getTypeParamsRecursively)
                         .map(TypeDef::getClassRef)
                         .filter(Objects::nonNull)
-                        .flatMap(this::getFieldClassesRecursively))
+                        .filter(field -> !visited.contains(field))
+                        .flatMap(field -> getFieldClassesRecursively(field, visited)))
                 .distinct();
     }
 
