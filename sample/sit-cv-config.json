@@ -1,6 +1,10 @@
 {
   "entryPointFilter": {
-    "include":[],
+    "include":[
+      {
+        "name": ".*Controller.*"
+      }
+    ],
     "exclude":[]
   },
   "sequenceDiagramFilter": {

@@ -28,7 +28,7 @@ public class DesignDocReportProcessor {
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
             detail.getDiagrams().put(diagram.getId(), data);
-            detail.getComments().put(diagram.getId(), diagram.getComments());
+            detail.getComments().putAll(diagram.getComments());
         });
 
         Path path = Paths.get(getDetailPath(designDoc));

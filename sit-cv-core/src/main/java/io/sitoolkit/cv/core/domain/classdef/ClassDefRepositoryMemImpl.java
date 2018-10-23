@@ -11,9 +11,14 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
+import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     private Map<String, ClassDef> classDefMap = new HashMap<>();
@@ -22,9 +27,12 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     private Map<String, List<MethodCallDef>> methodCallMap = new HashMap<>();
 
+    @NonNull
+    private SitCvConfig config;
+
     @Override
     public void save(ClassDef classDef) {
-        classDefMap.put(classDef.getPkg() + "." + classDef.getName(), classDef);
+        classDefMap.put(classDef.getFullyQualifiedName(), classDef);
 
         classDef.getMethods().stream().forEach(methodDef -> {
             methodDefMap.put(methodDef.getQualifiedSignature(), methodDef);
@@ -40,7 +48,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
                 .findFirst();
 
         removingClass.ifPresent(classDef ->{
-            classDefMap.remove(classDef.getPkg() + "." + classDef.getName());
+            classDefMap.remove(classDef.getFullyQualifiedName());
             classDef.getMethods().stream().forEach(methodDef -> {
                 methodDefMap.remove(methodDef.getQualifiedSignature());
                 methodCallMap.remove(methodDef.getQualifiedSignature());
@@ -116,7 +124,9 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     @Override
     public Set<String> getEntryPoints() {
-        return getAllClassDefs().stream().filter(clazz -> clazz.getName().endsWith("Controller"))
+        FilterConditionGroup entryPointFilter = config.getEntryPointFilter();
+        return getAllClassDefs().stream()
+                .filter(classDef -> ClassDefFilter.match(classDef, entryPointFilter))
                 .map(ClassDef::getMethods).flatMap(List::stream)
                 .map(MethodDef::getQualifiedSignature).collect(Collectors.toSet());
     }

@@ -47,7 +47,7 @@ public class ServiceFactory {
     }
 
     protected DesignDocService buildDesignDocService(SitCvConfig config) {
-        ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl();
+        ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
         ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
                 config);
         SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(

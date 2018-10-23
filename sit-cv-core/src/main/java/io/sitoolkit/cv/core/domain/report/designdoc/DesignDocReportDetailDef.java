@@ -9,6 +9,6 @@ import lombok.Data;
 public class DesignDocReportDetailDef {
 
     private Map<String, String> diagrams = new HashMap<>();
-    private Map<String, Map<String, String>> comments = new HashMap<>();
+    private Map<String, String> comments = new HashMap<>();
 
 }
