@@ -79,21 +79,18 @@ public class RunApplicationMojo
     }
 
     void startApp(Path executableJar) throws MojoExecutionException {
-        CvAppListener listener = new CvAppListener();
-                ProcessCommand sitCommand = new ProcessCommand()
-                        .currentDirectory(projectDir.toPath())
-                        .command("java")
-                        .args("-jar",
-                                executableJar.toAbsolutePath().toString())
-                        .stdout(listener);
 
+        CvAppListener listener = new CvAppListener();
+        ProcessCommand sitCommand = new ProcessCommand()
+                .currentDirectory(projectDir.toPath())
+                .command("java")
+                .args("-jar",
+                        executableJar.toAbsolutePath().toString())
+                .stdout(listener);
         sitCommand.getExitCallbacks().add(listener);
 
         getLog().info("Starting SIT-CV-App ...");
-
-        @SuppressWarnings("unused")
         ProcessConversation processConversation = sitCommand.executeAsync();
-
         Instant executedTime = Instant.now();
 
         while (listener.getAppState() == AppState.STARTING &&
@@ -111,14 +108,21 @@ public class RunApplicationMojo
             return;
 
         case STARTING:
-            getLog().error("SIT-CV-App start failed : timeout : " + APP_START_TIMEOUT_SEC + " seconds");
-            // TODO shuting down process by processConversation.destroy() or other method
+            getLog().error("SIT-CV-App start failed : timeout - " + APP_START_TIMEOUT_SEC + " seconds");
+            shutdown(processConversation);
             throw new MojoExecutionException("SIT-CV-App start failed : timeout");
 
         case EXITED:
             getLog().error("SIT-CV-App start failed : exit code = " + listener.exitCode);
             throw new MojoExecutionException("SIT-CV-App start failed");
         }
+    }
+
+    void shutdown(ProcessConversation processConversation) throws MojoExecutionException{
+        getLog().info("Shutting down SIT-CV-App ...");
+        processConversation.getProcess().destroyForcibly();
+        processConversation.destroy();
+        getLog().info("SIT-CV-App was shut down");
     }
 
     class CvAppListener implements StdoutListener, ProcessExitCallback {

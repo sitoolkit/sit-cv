@@ -35,20 +35,41 @@ public class RunApplicationMojoTest
      * @throws Exception if any
      */
     @Test()
-    public void testSomething()
+    public void testJarCopyFailure()
             throws Exception
     {
         expectedException.expect(MojoExecutionException.class);
-        expectedException.expectMessage("SIT-CV-App start failed");
+        expectedException.expectMessage("copying SIT-CV-App jar file failed");
 
         File pom = new File( "target/test-classes/project-to-test/" );
         assertNotNull( pom );
         assertTrue( pom.exists() );
 
         RunApplicationMojo mojo = ( RunApplicationMojo ) rule.lookupConfiguredMojo( pom, "run" );
+        mojo.cvAppArtifactId = "aaaaaaa";
         assertNotNull( mojo );
         mojo.execute();
 
+    }
+
+    /**
+     * @throws Exception if any
+     */
+    @Test()
+    public void testNormal()
+            throws Exception
+    {
+        File pom = new File( "target/test-classes/project-to-test/" );
+        assertNotNull( pom );
+        assertTrue( pom.exists() );
+
+        RunApplicationMojo mojo = ( RunApplicationMojo ) rule.lookupConfiguredMojo( pom, "run" );
+        assertNotNull( mojo );
+        try {
+            mojo.execute();
+        } catch (MojoExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     /** Do not need the MojoRule. */
