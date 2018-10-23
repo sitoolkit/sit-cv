@@ -56,6 +56,27 @@ public class RunApplicationMojoTest
      * @throws Exception if any
      */
     @Test()
+    public void testTimeOut()
+            throws Exception
+    {
+        expectedException.expect(MojoExecutionException.class);
+        expectedException.expectMessage("SIT-CV-App start failed : timeout");
+
+        File pom = new File( "target/test-classes/project-to-test/" );
+        assertNotNull( pom );
+        assertTrue( pom.exists() );
+
+        RunApplicationMojo mojo = ( RunApplicationMojo ) rule.lookupConfiguredMojo( pom, "run" );
+        mojo.cvAppStartWaitingSec = 1;
+        assertNotNull( mojo );
+        mojo.execute();
+
+    }
+
+    /**
+     * @throws Exception if any
+     */
+    @Test()
     public void testNormal()
             throws Exception
     {

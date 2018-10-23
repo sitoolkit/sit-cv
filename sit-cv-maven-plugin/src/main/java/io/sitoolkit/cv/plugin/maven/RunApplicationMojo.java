@@ -31,10 +31,12 @@ public class RunApplicationMojo
     @Parameter(defaultValue = "${plugin.version}")
     String cvAppVersion;
 
+    @Parameter(defaultValue = "30")
+    int cvAppStartWaitingSec;
+
     @Parameter(defaultValue = "${project.basedir}")
     File projectDir;
 
-    static final int APP_START_TIMEOUT_SEC = 30;
     static final int APP_START_LISTENING_INTERVAL_MILLI = 2000;
 
     @Override
@@ -94,7 +96,7 @@ public class RunApplicationMojo
         Instant executedTime = Instant.now();
 
         while (listener.getAppState() == AppState.STARTING &&
-                Instant.now().isBefore(executedTime.plusSeconds(APP_START_TIMEOUT_SEC))) {
+                Instant.now().isBefore(executedTime.plusSeconds(cvAppStartWaitingSec))) {
             try {
                 TimeUnit.MILLISECONDS.sleep(APP_START_LISTENING_INTERVAL_MILLI);
             } catch (InterruptedException e) {
@@ -108,7 +110,7 @@ public class RunApplicationMojo
             return;
 
         case STARTING:
-            getLog().error("SIT-CV-App start failed : timeout - " + APP_START_TIMEOUT_SEC + " seconds");
+            getLog().error("SIT-CV-App start failed : timeout - " + cvAppStartWaitingSec + " seconds");
             shutdown(processConversation);
             throw new MojoExecutionException("SIT-CV-App start failed : timeout");
 
