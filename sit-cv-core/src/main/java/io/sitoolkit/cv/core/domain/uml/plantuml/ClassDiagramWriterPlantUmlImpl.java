@@ -5,8 +5,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
@@ -39,8 +37,11 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
                         .thenComparing(Comparator.comparing(MethodDef::getName)))
                 .map(this::method2str).collect(Collectors.joining("\n"));
 
-        String classStr = String.format("class %s {\n" + "%s\n" + "%s\n" + "}\n", clazz.getName(),
-                fieldsStr, methodsStr);
+        String classStr = String.format("%s %s {\n"
+                + "%s\n"
+                + "%s\n"
+                + "}\n"
+                , clazz.getType(), clazz.getName(), fieldsStr, methodsStr);
 
         return classStr;
     }

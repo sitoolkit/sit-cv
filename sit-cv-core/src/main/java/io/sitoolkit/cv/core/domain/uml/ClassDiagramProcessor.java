@@ -2,6 +2,7 @@ package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,7 +14,6 @@ import java.util.stream.Stream;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ClassDiagramProcessor {
+
+    ImplementDetector implementDetector = new ImplementDetector();
 
     public ClassDiagram process(MethodDef entryPoint) {
 
@@ -53,7 +55,8 @@ public class ClassDiagramProcessor {
 
     private Set<ClassDef> pickClasses(MethodDef entryPoint) {
 
-        Set<MethodDef> sequenceMethods = entryPoint.getMethodCallsRecursively().collect(Collectors.toSet());
+        Set<MethodDef> sequenceMethods = getSequenceMethodsRecursively(entryPoint)
+                .collect(Collectors.toSet());
 
         Set<ClassDef> paramClasses = sequenceMethods.stream()
                 .map(MethodDef::getParamTypes)
@@ -85,14 +88,26 @@ public class ClassDiagramProcessor {
         return ret;
     }
 
+    private Stream<MethodDef> getSequenceMethodsRecursively(MethodDef entryPoint) {
+        MethodDef methodImpl = implementDetector.detectImplMethod(entryPoint);
+        return Stream.concat(Stream.of(methodImpl),
+                methodImpl.getMethodCalls().stream().flatMap(this::getSequenceMethodsRecursively));
+    }
+
     Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef) {
+        return getFieldClassesRecursively(classDef, new HashSet<>());
+    }
+
+    Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef, Set<ClassDef> visited) {
+        visited.add(classDef);
         return Stream.concat(Stream.of(classDef),
                 classDef.getFields().stream()
                         .map(FieldDef::getType)
                         .flatMap(TypeDef::getTypeParamsRecursively)
                         .map(TypeDef::getClassRef)
                         .filter(Objects::nonNull)
-                        .flatMap(this::getFieldClassesRecursively))
+                        .filter(field -> !visited.contains(field))
+                        .flatMap(field -> getFieldClassesRecursively(field, visited)))
                 .distinct();
     }
 
@@ -102,7 +117,7 @@ public class ClassDiagramProcessor {
                 .filter(rel -> !rel.getSelf().equals(rel.getOther()));
     }
 
-    private RelationDef getDependency(MethodDef method, MethodCallDef call) {
+    private RelationDef getDependency(MethodDef method, MethodDef call) {
         return RelationDef.builder().self(method.getClassDef()).other(call.getClassDef())
                 .type(RelationType.DEPENDENCY).description("use").build();
     }

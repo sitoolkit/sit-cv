@@ -14,7 +14,7 @@ public class SequenceClass3 {
 
     public List<ResultOfSeqMethod1> sequence3(ParamOfSeqMethod1 param1, List<List<ParamOfSeqMethod2>> param2list) {
         if0.sequence3_0();
-        if1.sequence3_1();
+        if1.sequence3_1(null);
         if2.sequence3_2();
         return null;
     }
