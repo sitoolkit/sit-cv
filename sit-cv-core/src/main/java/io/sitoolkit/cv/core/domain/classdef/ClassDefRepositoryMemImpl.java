@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import h.list_t;
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import lombok.NonNull;
@@ -123,12 +124,13 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     }
 
     @Override
-    public Set<String> getEntryPoints() {
+    public List<String> getEntryPoints() {
         FilterConditionGroup entryPointFilter = config.getEntryPointFilter();
         return getAllClassDefs().stream()
                 .filter(classDef -> ClassDefFilter.match(classDef, entryPointFilter))
                 .map(ClassDef::getMethods).flatMap(List::stream)
-                .map(MethodDef::getQualifiedSignature).collect(Collectors.toSet());
+                .map(MethodDef::getQualifiedSignature)
+                .sorted().collect(Collectors.toList());
     }
 
     @Override

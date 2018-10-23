@@ -2,7 +2,7 @@ package io.sitoolkit.cv.core.domain.designdoc;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +19,7 @@ public class DesignDoc {
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    private Map<String, Diagram> map = new HashMap<>();
+    private Map<String, Diagram> map = new LinkedHashMap<>();
 
     public Diagram add(Diagram diagram) {
         return map.put(diagram.getId(), diagram);

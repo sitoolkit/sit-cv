@@ -111,7 +111,7 @@ public class DesignDocService {
         entryPoints.forEach(listener::onChange);
     }
 
-    public Set<String> getAllIds() {
+    public List<String> getAllIds() {
         return classDefRepository.getEntryPoints();
     }
 
