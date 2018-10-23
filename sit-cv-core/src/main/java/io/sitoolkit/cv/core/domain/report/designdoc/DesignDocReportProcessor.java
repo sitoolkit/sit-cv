@@ -2,7 +2,7 @@ package io.sitoolkit.cv.core.domain.report.designdoc;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +28,7 @@ public class DesignDocReportProcessor {
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
             detail.getDiagrams().put(diagram.getId(), data);
-            detail.getComments().put(diagram.getId(), diagram.getComments());
+            detail.getComments().putAll(diagram.getComments());
         });
 
         Path path = Paths.get(getDetailPath(designDoc));
@@ -39,7 +39,7 @@ public class DesignDocReportProcessor {
     }
 
     private Report processToIdListReport(List<DesignDoc> designDocs) {
-        Map<String, String> idList = new HashMap<>();
+        Map<String, String> idList = new LinkedHashMap<>();
         designDocs.stream().forEach((designDoc) -> {
             idList.put(designDoc.getId(), getDetailPath(designDoc));
         });
