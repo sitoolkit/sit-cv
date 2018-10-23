@@ -1,0 +1,4 @@
+rootProject.name = 'gradle-multi'
+include 'project-application'
+include 'project-library'
+include 'project-nonjava'

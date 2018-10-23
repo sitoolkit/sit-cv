@@ -1,0 +1,4 @@
+apply plugin: 'application'
+
+mainClassName = 'Main';
+

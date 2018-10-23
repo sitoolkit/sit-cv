@@ -9,6 +9,7 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -25,7 +26,31 @@ public class SitResourceUtils {
     private SitResourceUtils() {
     }
 
+    public static void res2file(Object owner, String resourceName, Path targetPath) {
+        URL resourceUrl = readResourc(owner.getClass(), resourceName);
+
+        try {
+            FileUtils.copyURLToFile(resourceUrl, targetPath.toFile());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static String res2str(Object owner, String resourceName) {
+        return res2str(owner.getClass(), resourceName);
+    }
+
     public static String res2str(Class<?> owner, String resourceName) {
+        URL resourceUrl = readResourc(owner, resourceName);
+
+        try {
+            return IOUtils.toString(resourceUrl, Charset.defaultCharset());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static URL readResourc(Class<?> owner, String resourceName) {
         URL resourceUrl = owner.getResource(resourceName);
 
         if (resourceUrl == null) {
@@ -34,11 +59,7 @@ public class SitResourceUtils {
 
         log.info("Read resource:{}", resourceUrl);
 
-        try {
-            return IOUtils.toString(resourceUrl, Charset.defaultCharset());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return resourceUrl;
     }
 
     public static void copy(Class<?> clazz, String source, File target) {
