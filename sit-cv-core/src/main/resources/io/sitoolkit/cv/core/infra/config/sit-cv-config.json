@@ -3,6 +3,12 @@
     "include":[
       {
         "name": ".*Controller.*"
+      },
+      {
+        "name": ".*Publisher.*"
+      },
+      {
+        "name": ".*Service.*"
       }
     ],
     "exclude":[]
