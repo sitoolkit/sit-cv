@@ -6,34 +6,38 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ResourceBundle;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.zeroturnaround.zip.ZipUtil;
 
 import io.sitoolkit.cv.core.infra.SitRepository;
 import lombok.extern.slf4j.Slf4j;
+import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 
 @Slf4j
 public class GraphvizManager {
-    private String winGraphvizDownloadUrl;
-    private String winGraphvizInstallFile;
+    private static String winGraphvizDownloadUrl;
+    private static String winGraphvizInstallFile;
+    private static GraphvizManager graphvizManager;
+
+    private GraphvizManager() {
+    }
+
+    public static void initialize() {
+        if (SystemUtils.IS_OS_WINDOWS && graphvizManager == null) {
+            graphvizManager = new GraphvizManager();
+            graphvizManager.loadProperties();
+            graphvizManager.checkBinary();
+            GraphvizUtils.setDotExecutable(graphvizManager.getBinaryPath().toAbsolutePath().toString());
+        }
+    }
 
     private Path getGraphvizPath() {
         return SitRepository.getRepositoryPath().resolve("graphviz");
     };
 
-    public Path getBinaryPath() {
+    private Path getBinaryPath() {
         return getGraphvizPath().resolve("release/bin/dot.exe");
-    }
-
-    @PostConstruct
-    public void init() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            loadProperties();
-            checkBinary();
-        }
     }
 
     private void loadProperties() {
