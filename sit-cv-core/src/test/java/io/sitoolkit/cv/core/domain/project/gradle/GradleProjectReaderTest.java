@@ -25,7 +25,7 @@ public class GradleProjectReaderTest {
 
         String classpath = project.getClasspaths().iterator().next().toString();
         assertThat(classpath, endsWith(
-                "org.apache.commons/commons-lang3/3.8.1/6505a72a097d9270f7a9e7bf42c4238283247755/commons-lang3-3.8.1.jar"));
+                "commons-lang3-3.8.1.jar"));
     }
 
 }
