@@ -63,12 +63,6 @@ public class DesignDocService {
     // key:classDef.sourceId, value:entrypoint
     private Map<String, Set<String>> entryPointMap = new HashMap<>();
 
-    public void loadDir(Path projDir, Path srcDir) {
-
-        classDefReader.init(projDir, srcDir);
-        classDefReader.readDir(srcDir);
-    }
-
     public void watchDir(Path srcDir, ClassDefChangeEventListener listener) {
 
         watcher.setContinue(true);
@@ -79,14 +73,14 @@ public class DesignDocService {
         }
 
         watcher.start(inputSources -> {
-            readSources(srcDir, listener, inputSources);
+            readSources(listener, inputSources);
         });
     }
 
-    private void readSources(Path srcDir, ClassDefChangeEventListener listener,
+    private void readSources(ClassDefChangeEventListener listener,
             Collection<String> inputSources) {
 
-        classDefReader.rebuild();
+        classDefReader.init();
 
         Set<ClassDef> readDefs = inputSources.stream().map(Paths::get)
                 .filter(path -> !Files.isDirectory(path)).filter(Files::isReadable)
@@ -152,10 +146,4 @@ public class DesignDocService {
         return designDocs;
     }
 
-    public List<DesignDoc> loadDesignDocs(Path projectDir) {
-        Path srcDir = projectDir.resolve("src/main/java");
-        loadDir(projectDir, srcDir);
-
-        return getAll();
-    }
 }

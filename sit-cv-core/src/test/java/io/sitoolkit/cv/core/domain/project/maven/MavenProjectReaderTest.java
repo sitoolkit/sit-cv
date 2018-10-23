@@ -19,8 +19,8 @@ public class MavenProjectReaderTest {
         Project project = reader.read(Paths.get("..")).get();
 
         assertThat(project.getSrcDirs(),
-                containsInAnyOrder(project.getDir().resolve("sit-cv-app/src/main/java").toString(),
-                        project.getDir().resolve("sit-cv-core/src/main/java").toString()));
+                containsInAnyOrder(project.getDir().resolve("sit-cv-app/src/main/java"),
+                        project.getDir().resolve("sit-cv-core/src/main/java")));
 
         System.out.println(project.getClasspaths());
     }

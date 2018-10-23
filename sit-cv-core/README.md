@@ -22,9 +22,9 @@ import io.sitoolkit.cv.core.app.config.ServiceFactory;
 public class Main {
 
   public static void main(String[] args) {
-    ServiceFactory factory = ServiceFactory.initialize();
+    ServiceFactory factory = ServiceFactory.initialize(Paths.get("/path/to/your-project"));
     ReportService reportService = factory.getReportService();
-    reportService.export(Paths.get("/path/to/your-project"));
+    reportService.export();
   }
 
 }

@@ -14,7 +14,7 @@ public class MavenProjectReader implements ProjectReader {
 
         MavenProject mvnPrj = MavenProject.load(projectDir);
 
-        if (mvnPrj == null) {
+        if (!mvnPrj.available()) {
             return Optional.empty();
         }
 

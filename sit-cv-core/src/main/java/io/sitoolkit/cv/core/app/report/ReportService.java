@@ -1,11 +1,10 @@
 package io.sitoolkit.cv.core.app.report;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
+import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.Report;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
 import io.sitoolkit.cv.core.domain.report.designdoc.DesignDocReportProcessor;
@@ -20,16 +19,14 @@ public class ReportService {
 
     private DesignDocService designDocService;
 
-    public void export() {
-        export(Paths.get("./"));
-    }
+    private ProjectManager projectManager;
 
-    public void export(Path projectDir) {
-        List<DesignDoc> designDocs = designDocService.loadDesignDocs(projectDir);
+    public void export() {
+        List<DesignDoc> designDocs = designDocService.getAll();
 
         List<Report> reports = designDocReportProcessor.process(designDocs);
 
-        reportWriter.write(projectDir, reports);
+        reportWriter.write(projectManager.getCurrentProject().getDir(), reports);
     }
 
 }

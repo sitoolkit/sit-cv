@@ -14,9 +14,9 @@ public class Project {
     @Setter(AccessLevel.NONE)
     private Path dir;
 
-    private Set<String> srcDirs = new HashSet<>();
+    private Set<Path> srcDirs = new HashSet<>();
 
-    private Set<String> classpaths = new HashSet<>();
+    private Set<Path> classpaths = new HashSet<>();
 
     public Project(Path dir) {
         super();

@@ -36,10 +36,9 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     public void remove(String sourceId) {
 
         Optional<ClassDef> removingClass = classDefMap.values().stream()
-                .filter(clazz -> StringUtils.equals(clazz.getSourceId(), sourceId))
-                .findFirst();
+                .filter(clazz -> StringUtils.equals(clazz.getSourceId(), sourceId)).findFirst();
 
-        removingClass.ifPresent(classDef ->{
+        removingClass.ifPresent(classDef -> {
             classDefMap.remove(classDef.getPkg() + "." + classDef.getName());
             classDef.getMethods().stream().forEach(methodDef -> {
                 methodDefMap.remove(methodDef.getQualifiedSignature());
@@ -116,7 +115,9 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     @Override
     public Set<String> getEntryPoints() {
-        return getAllClassDefs().stream().filter(clazz -> clazz.getName().endsWith("Controller"))
+        return getAllClassDefs().stream()
+                .filter(clazz -> StringUtils.endsWithAny(clazz.getName(), "Controller", "Publisher",
+                        "Service"))
                 .map(ClassDef::getMethods).flatMap(List::stream)
                 .map(MethodDef::getQualifiedSignature).collect(Collectors.toSet());
     }
@@ -136,14 +137,17 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     }
 
     void solveClassRefs(ClassDef clazz) {
-        log.debug("solving class {}" ,clazz.getName());
+        log.debug("solving class {}", clazz.getName());
         clazz.getFields().stream().map(FieldDef::getType).forEach(this::solveClassRef);
 
         if (clazz.isClass()) {
             clazz.getImplInterfaces().stream().forEach(ifName -> {
                 ClassDef refType = classDefMap.get(ifName);
                 if (refType != null) {
-                    refType.getKnownImplClasses().remove(clazz); //remove to replace classdef to newer
+                    refType.getKnownImplClasses().remove(clazz); // remove to
+                                                                 // replace
+                                                                 // classdef to
+                                                                 // newer
                     refType.getKnownImplClasses().add(clazz);
                     log.debug("{} is Known implementation of {}", clazz.getName(), ifName);
                 }

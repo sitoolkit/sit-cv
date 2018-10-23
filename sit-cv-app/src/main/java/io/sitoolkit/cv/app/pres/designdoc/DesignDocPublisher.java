@@ -1,8 +1,5 @@
 package io.sitoolkit.cv.app.pres.designdoc;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import io.sitoolkit.cv.app.infra.config.ApplicationConfig;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
+import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -30,19 +28,19 @@ public class DesignDocPublisher {
     @Autowired
     ApplicationConfig config;
 
+    @Autowired
+    ProjectManager projectManager;
+
     @PostConstruct
     public void init() {
-
-        Path projDir = Paths.get(config.getProject());
-        log.debug("loading project:{}", projDir);
-        Path srcDir = projDir.resolve("src/main/java");
-        service.loadDir(projDir, srcDir);
 
         ListResponse listResponse = buildDesingDocList();
         template.convertAndSend("/topic/designdoc/list", listResponse);
 
-        service.watchDir(srcDir, entryPoint -> {
-            publishDetail(entryPoint);
+        projectManager.getCurrentProject().getSrcDirs().stream().forEach(srcDir -> {
+            service.watchDir(srcDir, entryPoint -> {
+                publishDetail(entryPoint);
+            });
         });
     }
 

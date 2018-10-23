@@ -28,6 +28,6 @@ public class SitCvApplication {
         List<String> projects = appArgs.getOptionValues("project");
         Path projectDir = projects == null || projects.isEmpty() ? Paths.get(".")
                 : Paths.get(projects.get(0));
-        ServiceFactory.initialize(projectDir).getReportService().export(projectDir);
+        ServiceFactory.initialize(projectDir).getReportService().export();
     }
 }

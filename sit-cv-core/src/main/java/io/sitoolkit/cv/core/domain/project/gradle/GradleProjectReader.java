@@ -21,7 +21,7 @@ public class GradleProjectReader implements ProjectReader {
 
         GradleProject gradleProject = GradleProject.load(projectDir);
 
-        if (gradleProject == null) {
+        if (!gradleProject.available()) {
             return Optional.empty();
         }
 

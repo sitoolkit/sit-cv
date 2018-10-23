@@ -16,14 +16,14 @@ public class GradleProjectReaderTest {
 
     @Test
     public void testMultiProject() {
-        Project project = reader.read(Paths.get("../test-project/gradle-multi")).get();
+        Project project = reader
+                .read(Paths.get("../test-project/gradle-multi").toAbsolutePath().normalize()).get();
 
         assertThat(project.getSrcDirs(),
-                containsInAnyOrder(
-                        project.getDir().resolve("project-application/src/main/java").toString(),
-                        project.getDir().resolve("project-library/src/main/java").toString()));
+                containsInAnyOrder(project.getDir().resolve("project-application/src/main/java"),
+                        project.getDir().resolve("project-library/src/main/java")));
 
-        String classpath = project.getClasspaths().iterator().next();
+        String classpath = project.getClasspaths().iterator().next().toString();
         assertThat(classpath, endsWith(
                 "org.apache.commons/commons-lang3/3.8.1/6505a72a097d9270f7a9e7bf42c4238283247755/commons-lang3-3.8.1.jar"));
     }

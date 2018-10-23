@@ -5,13 +5,9 @@ import java.util.Optional;
 
 public interface ClassDefReader {
 
-    void init(Path projectDir, Path srcDir);
+    ClassDefReader init();
 
-    void init(ClassDefRepositoryParam param);
-
-    void rebuild();
-
-    void readDir(Path srcDir);
+    ClassDefReader readDir();
 
     Optional<ClassDef> readJava(Path javaFile);
 }

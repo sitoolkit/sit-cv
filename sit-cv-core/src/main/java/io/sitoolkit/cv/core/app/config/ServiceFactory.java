@@ -8,6 +8,7 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
+import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
 import io.sitoolkit.cv.core.domain.report.designdoc.DesignDocReportProcessor;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
@@ -32,24 +33,33 @@ public class ServiceFactory {
     @Getter
     private DesignDocService designDocService;
 
+    @Getter
+    private ProjectManager projectManager;
+
     private ServiceFactory() {
     }
 
     public static ServiceFactory initialize(Path projectDir) {
-        ServiceFactory factory = new ServiceFactory();
-
-        SitCvConfig cvConfig = SitCvConfig.load(projectDir);
-
-        factory.designDocService = factory.buildDesignDocService(cvConfig);
-        factory.reportService = factory.buildReportService(factory.designDocService);
-
-        return factory;
+        return new ServiceFactory().init(projectDir);
     }
 
-    protected DesignDocService buildDesignDocService(SitCvConfig config) {
+    protected ServiceFactory init(Path projectDir) {
+        SitCvConfig cvConfig = SitCvConfig.load(projectDir);
+
+        projectManager = new ProjectManager();
+        projectManager.load(projectDir);
+
+        designDocService = buildDesignDocService(cvConfig, projectManager);
+        reportService = buildReportService(designDocService, projectManager);
+
+        return this;
+    }
+
+    protected DesignDocService buildDesignDocService(SitCvConfig config,
+            ProjectManager projectManager) {
         ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl();
         ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
-                config);
+                projectManager, config).init().readDir();
         SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(
                 config.getSequenceDiagramFilter());
         ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
@@ -66,9 +76,11 @@ public class ServiceFactory {
 
     }
 
-    protected ReportService buildReportService(DesignDocService designDocService) {
+    protected ReportService buildReportService(DesignDocService designDocService,
+            ProjectManager projectManager) {
         DesignDocReportProcessor designDocReportProcessor = new DesignDocReportProcessor();
         ReportWriter reportWriter = new ReportWriter();
-        return new ReportService(designDocReportProcessor, reportWriter, designDocService);
+        return new ReportService(designDocReportProcessor, reportWriter, designDocService,
+                projectManager);
     }
 }

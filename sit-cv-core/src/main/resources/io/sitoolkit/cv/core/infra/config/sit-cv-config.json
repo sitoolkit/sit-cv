@@ -12,7 +12,19 @@
         "name": ".*Service.*"
       },
       {
+        "name": ".*Processor"
+      },
+      {
         "name": ".*Repository.*"
+      },
+      {
+        "name": ".*Reader"
+      },
+      {
+        "name": ".*Writer"
+      },
+      {
+        "name": ".*Manager"
       }
     ],
     "exclude": []

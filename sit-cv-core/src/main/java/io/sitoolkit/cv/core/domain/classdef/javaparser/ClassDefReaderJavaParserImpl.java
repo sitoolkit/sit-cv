@@ -3,9 +3,7 @@ package io.sitoolkit.cv.core.domain.classdef.javaparser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -39,10 +37,11 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
-import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryParam;
 import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -58,46 +57,49 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     @NonNull
     private ClassDefRepository reposiotry;
 
-    JarPathFinder jarPathFinder = new JarPathFinder();
-
-    ClassDefRepositoryParam paramOfBuiltParser;
+    @NonNull
+    private ProjectManager projectManager;
 
     @NonNull
     private SitCvConfig config;
 
     @Override
-    public void readDir(Path srcDir) {
+    public ClassDefReader readDir() {
 
         if (jpf == null) {
             throw new IllegalStateException("Reader has not been initialized yet");
         }
 
-        try {
-            Pattern p = Pattern.compile(config.getJavaFilePattern());
-            List<Path> files = Files.walk(srcDir)
-                    .filter(file -> p.matcher(file.toFile().getName()).matches())
-                    .collect(Collectors.toList());
+        Pattern p = Pattern.compile(config.getJavaFilePattern());
 
-            files.stream().forEach(javaFile -> {
-                readJava(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
+        projectManager.getCurrentProject().getSrcDirs().stream().forEach(srcDir -> {
+            try {
+                List<Path> files = Files.walk(srcDir)
+                        .filter(file -> p.matcher(file.toFile().getName()).matches())
+                        .collect(Collectors.toList());
 
-                int readCount = reposiotry.countClassDefs();
-                if (readCount % 10 == 0) {
-                    log.info("Processed java files : {} / {} ", readCount, files.size());
-                }
-            });
+                files.stream().forEach(javaFile -> {
+                    readJava(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
 
-            // JavaParserFacade seems to be NOT thread-safe
-            // files.stream().parallel().forEach(javaFile -> {
-            // readJava(javaFile).ifPresent(classDef ->
-            // dictionary.add(classDef));
-            // });
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+                    int readCount = reposiotry.countClassDefs();
+                    if (readCount % 10 == 0) {
+                        log.info("Processed java files : {} / {} ", readCount, files.size());
+                    }
+                });
+
+                // JavaParserFacade seems to be NOT thread-safe
+                // files.stream().parallel().forEach(javaFile -> {
+                // readJava(javaFile).ifPresent(classDef ->
+                // dictionary.add(classDef));
+                // });
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        });
 
         reposiotry.solveReferences();
 
+        return this;
     }
 
     @Override
@@ -305,46 +307,29 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     }
 
     @Override
-    public void init(Path projectDir, Path srcDir) {
-        ClassDefRepositoryParam param = ClassDefRepositoryParam.builder().projectDir(projectDir)
-                .srcDirs(Arrays.asList(srcDir)).jarList(Paths.get(config.getJarList())).build();
-        init(param);
-    }
+    public ClassDefReader init() {
+        Project project = projectManager.getCurrentProject();
 
-    @Override
-    public void init(ClassDefRepositoryParam param) {
-        ClassDefRepositoryParam jarSolvedParam = jarPathFinder.solveJarParams(param);
-        buildParserFacade(jarSolvedParam);
-        this.paramOfBuiltParser = jarSolvedParam;
-    }
-
-    @Override
-    public void rebuild() {
-        if (paramOfBuiltParser == null) {
-            throw new IllegalStateException("Reader has not been initialized yet");
-        } else {
-            buildParserFacade(paramOfBuiltParser);
-        }
-    }
-
-    void buildParserFacade(ClassDefRepositoryParam param) {
         CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
         combinedTypeSolver.add(new ReflectionTypeSolver());
-        param.getSrcDirs().stream().forEach(
+        project.getSrcDirs().stream().forEach(
                 srcDir -> combinedTypeSolver.add(new JavaParserTypeSolver(srcDir.toFile())));
-        param.getBinDirs().stream()
-                .forEach(binDir -> combinedTypeSolver.add(ClassDirTypeSolver.get(binDir)));
-        param.getJarPaths().stream().map(Path::toAbsolutePath).map(Path::toString).forEach(str -> {
-            try {
-                combinedTypeSolver.add(JarTypeSolver.getJarTypeSolver(str));
-                log.info("jar is added. {}", str);
-            } catch (IOException e) {
-                log.warn("warn ", e);
-            }
-        });
+        // project.getBinDirs().stream()
+        // .forEach(binDir ->
+        // combinedTypeSolver.add(ClassDirTypeSolver.get(binDir)));
+        project.getClasspaths().stream().map(Path::toAbsolutePath).map(Path::toString)
+                .forEach(str -> {
+                    try {
+                        combinedTypeSolver.add(JarTypeSolver.getJarTypeSolver(str));
+                        log.info("jar is added. {}", str);
+                    } catch (IOException e) {
+                        log.warn("warn ", e);
+                    }
+                });
 
         jpf = JavaParserFacade.get(combinedTypeSolver);
         methodCallVisitor = new MethodCallVisitor(jpf);
-    }
 
+        return this;
+    }
 }
