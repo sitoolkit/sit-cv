@@ -35,7 +35,7 @@ public class GradleProjectReader implements ProjectReader {
 
         try {
 
-            gradleProject.gradlew("--init-script", initScript.toString(), "projectInfo")
+            gradleProject.gradlew("--no-daemon", "--init-script", initScript.toString(), "projectInfo")
                     .stdout(listener).execute();
 
         } finally {
