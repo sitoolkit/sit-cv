@@ -4,20 +4,11 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Development server
 
-
-- Server mode
-
 ```sh
 ng serve
 ```
 
-- Report mode
-
-```sh
-ng serve --configuration=reportDev
-```
-
-Navigate to `http://localhost:4200/`.
+- Navigate to `http://localhost:4200/`.
 
 
 ## Build
@@ -25,3 +16,11 @@ Navigate to `http://localhost:4200/`.
 ```sh
 ng build --prod
 ```
+
+## Debug for report mode
+
+```sh
+ng build --watch --configuration=reportDev
+```
+
+- Open `dist/sit-cv-front/index.html` in a browser.
