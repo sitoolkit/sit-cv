@@ -6,14 +6,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
+import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     private Map<String, ClassDef> classDefMap = new HashMap<>();
@@ -22,9 +26,12 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     private Map<String, List<MethodCallDef>> methodCallMap = new HashMap<>();
 
+    @NonNull
+    private SitCvConfig config;
+
     @Override
     public void save(ClassDef classDef) {
-        classDefMap.put(classDef.getPkg() + "." + classDef.getName(), classDef);
+        classDefMap.put(classDef.getFullyQualifiedName(), classDef);
 
         classDef.getMethods().stream().forEach(methodDef -> {
             methodDefMap.put(methodDef.getQualifiedSignature(), methodDef);
@@ -38,8 +45,8 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         Optional<ClassDef> removingClass = classDefMap.values().stream()
                 .filter(clazz -> StringUtils.equals(clazz.getSourceId(), sourceId)).findFirst();
 
-        removingClass.ifPresent(classDef -> {
-            classDefMap.remove(classDef.getPkg() + "." + classDef.getName());
+        removingClass.ifPresent(classDef ->{
+            classDefMap.remove(classDef.getFullyQualifiedName());
             classDef.getMethods().stream().forEach(methodDef -> {
                 methodDefMap.remove(methodDef.getQualifiedSignature());
                 methodCallMap.remove(methodDef.getQualifiedSignature());
@@ -114,12 +121,13 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     }
 
     @Override
-    public Set<String> getEntryPoints() {
+    public List<String> getEntryPoints() {
+        FilterConditionGroup entryPointFilter = config.getEntryPointFilter();
         return getAllClassDefs().stream()
-                .filter(clazz -> StringUtils.endsWithAny(clazz.getName(), "Controller", "Publisher",
-                        "Service"))
+                .filter(classDef -> ClassDefFilter.match(classDef, entryPointFilter))
                 .map(ClassDef::getMethods).flatMap(List::stream)
-                .map(MethodDef::getQualifiedSignature).collect(Collectors.toSet());
+                .map(MethodDef::getQualifiedSignature)
+                .sorted().collect(Collectors.toList());
     }
 
     @Override

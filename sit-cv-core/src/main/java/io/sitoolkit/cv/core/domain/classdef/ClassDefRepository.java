@@ -1,7 +1,7 @@
 package io.sitoolkit.cv.core.domain.classdef;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 public interface ClassDefRepository {
 
@@ -15,7 +15,7 @@ public interface ClassDefRepository {
 
     void solveReferences();
 
-    Set<String> getEntryPoints();
+    List<String> getEntryPoints();
 
     ClassDef findClassByQualifiedName(String qalifiedName);
 
