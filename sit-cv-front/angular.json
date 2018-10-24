@@ -51,6 +51,15 @@
               "buildOptimizer": true,
               "outputPath": "../sit-cv-core/src/main/resources/static/",
               "deployUrl": "./"
+            },
+            "reportDev": {
+              "assets": [
+                {
+                  "glob": "**/*",
+                  "input": "../sample/docs/designdocs/",
+                  "output": "/"
+                }
+              ]
             }
           }
         },
@@ -62,6 +71,9 @@
           "configurations": {
             "production": {
               "browserTarget": "sit-cv-front:build:production"
+            },
+            "reportDev": {
+              "browserTarget": "sit-cv-front:build:reportDev"
             }
           }
         },
