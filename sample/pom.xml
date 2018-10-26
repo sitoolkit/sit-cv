@@ -8,7 +8,7 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>1.5.14.RELEASE</version>
-    <relativePath /> 
+    <relativePath />
   </parent>
 
   <properties>
@@ -32,6 +32,11 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>io.sitoolkit.cv</groupId>
+        <artifactId>sit-cv-maven-plugin</artifactId>
+        <version>1.0.0-beta.1-SNAPSHOT</version>
       </plugin>
     </plugins>
   </build>
