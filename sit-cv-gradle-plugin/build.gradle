@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
+	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
     implementation group: 'io.sitoolkit.cv', name: 'sit-cv-core', version: '1.0.0-beta.1-SNAPSHOT'
 }
 

@@ -1,0 +1,11 @@
+buildscript {
+  repositories {
+      maven { url "http://repo.maven.apache.org/maven2" }
+      mavenLocal()
+  }
+  dependencies {
+      classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'1.0.0-beta.1-SNAPSHOT'
+  }
+}
+
+apply plugin: 'sit-cv-gradle-plugin'
