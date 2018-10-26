@@ -1,18 +1,37 @@
 package io.sitoolkit.cv.plugin.gradle;
 
-import  org.gradle.api.tasks.TaskAction;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.options.Option;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.TaskAction;
 
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import org.gradle.api.DefaultTask;
-
 public class ReportTask extends DefaultTask {
+    private Path basePath = Paths.get(System.getProperty("user.dir"));
+
+    @Input
+    private List<Path> projectDirs;
+
+    @Option(option = "project", description = "Directories of target projects.")
+    void setProjectDir(final List<String> dirs) {
+        this.projectDirs = dirs.stream().map((dir) -> {
+            return basePath.resolve(dir).normalize();
+        }).collect(Collectors.toList());
+    }
+
     @TaskAction
     void export() {
-        Path projectDir = Paths.get(System.getProperty("user.dir"));
-        ServiceFactory.initialize(projectDir).getReportService().export();
+        if(projectDirs == null) {
+            projectDirs = Arrays.asList(basePath);
+        }
+
+        ServiceFactory.initialize(projectDirs.get(0)).getReportService().export();
     }
 }
