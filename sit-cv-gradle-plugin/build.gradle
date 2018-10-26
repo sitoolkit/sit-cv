@@ -18,7 +18,7 @@ gradlePlugin {
     plugins {
         reportPlugin {
             id = 'sit-cv-gradle-plugin'
-            implementationClass = 'io.sitoolkit.cv.plugin.gradle.ReportPlugin'
+            implementationClass = 'io.sitoolkit.cv.plugin.gradle.PluginManager'
         }
     }
 }
