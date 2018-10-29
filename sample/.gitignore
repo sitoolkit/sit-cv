@@ -3,3 +3,5 @@
 /.mvn/
 /mvnw
 /mvnw.cmd
+/.gradle/
+/build/
