@@ -19,7 +19,7 @@ public class ReportTaskTest {
 
     @Test
     public void testExport() {
-        File testDir = new File("../test-project/gradle-report");
+        File testDir = new File("../test-project/gradle-multi");
         File projectDir = null;
         try {
             projectDir = tempDir.newFolder("report");
