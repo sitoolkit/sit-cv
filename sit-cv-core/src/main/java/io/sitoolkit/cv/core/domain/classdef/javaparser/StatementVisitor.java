@@ -61,9 +61,7 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
         if (matchesQualifiedName(n, STREAM_METHOD_PATTERN)) {
             visitStream(n, statements);
         } else {
-            if (!inLoop(n)) {
-                methodCallVisitor.visit(n, statements);
-            }
+            methodCallVisitor.visit(n, statements);
         }
     }
 
@@ -78,7 +76,6 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
         statements.add(statement);
         statement.setBody(n.toString());
         n.getChildNodes().stream().forEach(child -> child.accept(this, statement.getChildren()));
-        n.accept(methodCallVisitor, statement.getChildren());
     }
 
     boolean matchesQualifiedName(MethodCallExpr n, Pattern pattern) {

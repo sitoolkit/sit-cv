@@ -9,4 +9,8 @@ public class BProcessor {
         return input;
     }
 
+    public String process2(String input) {
+        return input;
+    }
+
 }

@@ -42,6 +42,7 @@ public class LoopController {
             for (int j = 0; j < 1; j++) {
                 processor.process("");
             }
+            processor.process2("");
         }
     }
 
