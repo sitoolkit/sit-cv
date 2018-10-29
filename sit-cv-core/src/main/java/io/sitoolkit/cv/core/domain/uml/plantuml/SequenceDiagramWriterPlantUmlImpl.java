@@ -59,12 +59,12 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         return umlString;
     }
 
-    private List<String> lifeline2str(LifeLineDef lifeLine) {
+    protected List<String> lifeline2str(LifeLineDef lifeLine) {
         return lifeLine.getMessages().stream().map(message -> message2str(lifeLine, message))
                 .flatMap(List::stream).collect(Collectors.toList());
     }
 
-    private List<String> message2str(LifeLineDef lifeLine, MessageDef message) {
+    protected List<String> message2str(LifeLineDef lifeLine, MessageDef message) {
         LifeLineDef target = message.getTarget();
         List<String> list = lifeline2str(target);
 

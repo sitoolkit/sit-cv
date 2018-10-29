@@ -45,7 +45,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         Optional<ClassDef> removingClass = classDefMap.values().stream()
                 .filter(clazz -> StringUtils.equals(clazz.getSourceId(), sourceId)).findFirst();
 
-        removingClass.ifPresent(classDef ->{
+        removingClass.ifPresent(classDef -> {
             classDefMap.remove(classDef.getFullyQualifiedName());
             classDef.getMethods().stream().forEach(methodDef -> {
                 methodDefMap.remove(methodDef.getQualifiedSignature());
@@ -82,6 +82,20 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
             });
         });
 
+        // TODO statement feature replace above to bellow
+        classDef.getMethods().stream().forEach(methodDef -> {
+            solveMethodType(methodDef);
+            methodDef.getStatements().stream().forEach(this::solveMethodCall);
+        });
+
+    }
+
+    private void solveMethodCall(CvStatement statement) {
+        if (statement instanceof MethodCallDef) {
+            solveMethodCall((MethodCallDef) statement);
+        } else {
+            statement.getChildren().stream().forEach(this::solveMethodCall);
+        }
     }
 
     private void solveMethodCall(MethodCallDef methodCall) {
@@ -126,8 +140,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         return getAllClassDefs().stream()
                 .filter(classDef -> ClassDefFilter.match(classDef, entryPointFilter))
                 .map(ClassDef::getMethods).flatMap(List::stream)
-                .map(MethodDef::getQualifiedSignature)
-                .sorted().collect(Collectors.toList());
+                .map(MethodDef::getQualifiedSignature).sorted().collect(Collectors.toList());
     }
 
     @Override

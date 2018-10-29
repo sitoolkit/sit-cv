@@ -7,11 +7,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class MethodCallDef extends MethodDef {
-    private String className;
-    private String packageName;
+@ToString(callSuper = true)
+public class LoopStatement extends CvStatement {
 
     @Override
     public <T> Optional<T> process(StatementProcessor<T> processor) {

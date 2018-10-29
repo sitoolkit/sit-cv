@@ -15,6 +15,7 @@ public class LifeLineDef {
     private String entryMessage;
     private String sourceId;
     private List<MessageDef> messages = new ArrayList<>();
+    private List<SequenceElement> elements = new ArrayList<>();
     private String comment;
 
     public Set<String> getAllSourceIds() {
@@ -32,9 +33,9 @@ public class LifeLineDef {
 
     void getComments(Map<String, String> comments, List<MessageDef> messages) {
         messages.stream().forEach((message) -> {
-           LifeLineDef target = message.getTarget();
-           getComments(comments, target.getMessages());
-           comments.put(message.getRequestQualifiedSignature(), target.getComment());
+            LifeLineDef target = message.getTarget();
+            getComments(comments, target.getMessages());
+            comments.put(message.getRequestQualifiedSignature(), target.getComment());
         });
     }
 }

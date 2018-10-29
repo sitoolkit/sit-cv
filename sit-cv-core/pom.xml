@@ -30,11 +30,11 @@
       <artifactId>logback-classic</artifactId>
       <optional>true</optional>
     </dependency>
+    
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -46,6 +46,13 @@
       <version>1.10</version>
       <type>jar</type>
     </dependency>
+
+    <dependency>
+      <groupId>org.hashids</groupId>
+      <artifactId>hashids</artifactId>
+      <version>1.0.3</version>
+    </dependency>
+
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
@@ -100,7 +107,7 @@
   </dependencyManagement>
 
   <properties>
-    <javaparser.version>3.6.26</javaparser.version>
+    <javaparser.version>3.6.27</javaparser.version>
   </properties>
 
 </project>
