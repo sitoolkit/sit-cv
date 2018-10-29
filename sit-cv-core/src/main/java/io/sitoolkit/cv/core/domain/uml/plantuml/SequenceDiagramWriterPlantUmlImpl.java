@@ -14,13 +14,15 @@ import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.MessageDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
+import io.sitoolkit.cv.core.domain.uml.SequenceElementWriter;
+import io.sitoolkit.cv.core.domain.uml.SequenceGroup;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram> {
+public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram>, SequenceElementWriter {
 
     @NonNull
     PlantUmlWriter plantumlWriter;
@@ -60,7 +62,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
     }
 
     protected List<String> lifeline2str(LifeLineDef lifeLine) {
-        return lifeLine.getMessages().stream().map(message -> message2str(lifeLine, message))
+        return lifeLine.getElements().stream().map(element -> element.write(lifeLine, this))
                 .flatMap(List::stream).collect(Collectors.toList());
     }
 
@@ -87,6 +89,26 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, SequenceGroup group) {
+        List<String> list = new ArrayList<>();
+
+        list.add("loop");
+
+        list.addAll(
+                group.getElements().stream().map(childElement -> childElement.write(lifeLine, this))
+                        .flatMap(List::stream).collect(Collectors.toList()));
+
+        list.add("end");
+
+        return list;
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, MessageDef message) {
+        return message2str(lifeLine, message);
     }
 
 }

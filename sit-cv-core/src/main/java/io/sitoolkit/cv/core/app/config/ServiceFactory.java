@@ -18,7 +18,7 @@ import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
 import io.sitoolkit.cv.core.domain.uml.plantuml.ClassDiagramWriterPlantUmlImpl;
 import io.sitoolkit.cv.core.domain.uml.plantuml.PlantUmlWriter;
-import io.sitoolkit.cv.core.domain.uml.plantuml.SequenceDiagramWriterPlantUmlImpl2;
+import io.sitoolkit.cv.core.domain.uml.plantuml.SequenceDiagramWriterPlantUmlImpl;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import io.sitoolkit.cv.core.infra.graphviz.GraphvizManager;
 import io.sitoolkit.cv.core.infra.watcher.FileInputSourceWatcher;
@@ -65,7 +65,7 @@ public class ServiceFactory {
         ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
         GraphvizManager.initialize();
         PlantUmlWriter plantumlWriter = new PlantUmlWriter();
-        DiagramWriter<SequenceDiagram> sequenceWriter = new SequenceDiagramWriterPlantUmlImpl2(
+        DiagramWriter<SequenceDiagram> sequenceWriter = new SequenceDiagramWriterPlantUmlImpl(
                 plantumlWriter);
         DiagramWriter<ClassDiagram> classWriter = new ClassDiagramWriterPlantUmlImpl(
                 plantumlWriter);
