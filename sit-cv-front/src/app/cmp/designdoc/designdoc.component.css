@@ -7,9 +7,11 @@
     height: auto !important;
 }
 
-mat-spinner {
-  margin: 5em auto auto 5em;
+mat-progress-bar {
+  width: 30em;
+  max-width: 100%;
 }
+
 .comment mat-card-content {
   white-space: pre-line;
 }
