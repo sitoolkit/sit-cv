@@ -1,10 +1,33 @@
-.designdocContainer {
+.designdoc-container {
   padding: 1em;
 }
-.designdoc >>> img,
-.designdoc >>> svg {
-    max-width: 100% !important;
-    height: auto !important;
+.diagram >>> img,
+.diagram >>> svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.diagram-container {
+  display: inline-block;
+  position: relative;
+  max-width: 100%;
+}
+
+.diagram-spacer {
+  height: 100%;
+  max-width: 100%;
+}
+
+.spacer-inner {
+  display: block;
+}
+
+.diagram {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 mat-progress-bar {
