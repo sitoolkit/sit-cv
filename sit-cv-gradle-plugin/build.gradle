@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    implementation group: 'io.sitoolkit.cv', name: 'sit-cv-core', version: '1.0.0-beta.1-SNAPSHOT'
+    implementation group: 'io.sitoolkit.cv', name: 'sit-cv-core', version: version
 }
 
 gradlePlugin {
