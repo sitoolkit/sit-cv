@@ -13,7 +13,7 @@ tasks.withType(JavaCompile) {
 }
 
 repositories {
-    maven { url "http://repo.maven.apache.org/maven2" }
+    jcenter()
     mavenLocal()
 }
 dependencies {
@@ -25,7 +25,7 @@ dependencies {
 
 buildscript {
   repositories {
-      maven { url "http://repo.maven.apache.org/maven2" }
+      jcenter()
       mavenLocal()
   }
   dependencies {

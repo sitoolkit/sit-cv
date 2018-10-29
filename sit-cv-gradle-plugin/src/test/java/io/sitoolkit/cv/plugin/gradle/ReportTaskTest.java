@@ -19,8 +19,7 @@ public class ReportTaskTest {
 
     @Test
     public void testExport() {
-        URL testURL = getClass().getClassLoader().getResource("test-report-project");
-        File testDir = new File(testURL.getFile());
+        File testDir = new File("../test-project/gradle-report");
         File projectDir = null;
         try {
             projectDir = tempDir.newFolder("report");
