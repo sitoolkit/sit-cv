@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -68,13 +69,21 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     @Override
     public Optional<SequenceElement> process(LoopStatement statement) {
-        SequenceGroup group = new SequenceGroup();
 
-        group.getElements().addAll(statement.getChildren().stream()
-                .map(childStatement -> childStatement.process(this)).filter(Optional::isPresent)
-                .map(Optional::get).collect(Collectors.toList()));
+        List<SequenceElement> groupElements =  statement.getChildren().stream()
+                .map(childStatement -> childStatement.process(this))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
-        return Optional.of(group);
+        if (groupElements.isEmpty()) {
+            return Optional.empty();
+
+        } else {
+            SequenceGroup group = new SequenceGroup();
+            group.getElements().addAll(groupElements);
+            return Optional.of(group);
+        }
     }
 
     @Override

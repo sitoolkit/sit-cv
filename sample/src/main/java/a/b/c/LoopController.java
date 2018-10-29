@@ -18,6 +18,12 @@ public class LoopController {
             processor.process("");
         }
 
+        int sum = 0;
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 1; j++) {
+                sum += i * j;
+            }
+        }
     }
 
     public void forEach() {
@@ -28,6 +34,27 @@ public class LoopController {
             processor.process("");
         }
 
+    }
+
+    public void multiLoop() {
+
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 1; j++) {
+                processor.process("");
+            }
+        }
+    }
+
+    public void blankLoop() {
+
+        processor.process("");
+
+        int sum = 0;
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 1; j++) {
+                sum += i * j;
+            }
+        }
     }
 
     public void streamMethodRef() {
