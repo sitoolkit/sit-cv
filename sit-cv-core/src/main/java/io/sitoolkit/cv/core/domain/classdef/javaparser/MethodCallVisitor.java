@@ -2,24 +2,27 @@ package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
 import java.util.List;
 
+import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
 
+import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
 @Slf4j
-public class MethodCallVisitor extends VoidVisitorAdapter<List<MethodCallDef>> {
+@AllArgsConstructor
+public class MethodCallVisitor extends VoidVisitorAdapter<List<CvStatement>> {
 
-    JavaParserFacade jpf;
+    private JavaParserFacade jpf;
 
     @Override
-    public void visit(MethodCallExpr methodCallExpr, List<MethodCallDef> methodCalls) {
+    public void visit(MethodCallExpr methodCallExpr, List<CvStatement> statements) {
         try {
 
             SymbolReference<ResolvedMethodDeclaration> ref = jpf.solve(methodCallExpr);
@@ -35,7 +38,7 @@ public class MethodCallVisitor extends VoidVisitorAdapter<List<MethodCallDef>> {
                 methodCall.setReturnType(TypeParser.getTypeDef(rmd.getReturnType()));
                 methodCall.setParamTypes(TypeParser.getParamTypes(rmd));
                 log.debug("Add method call : {}", methodCall);
-                methodCalls.add(methodCall);
+                statements.add(methodCall);
             } else {
                 log.debug("Unsolved method call: {}", methodCallExpr);
             }
@@ -43,6 +46,14 @@ public class MethodCallVisitor extends VoidVisitorAdapter<List<MethodCallDef>> {
             log.debug("Unsolved method call: {}, {}", methodCallExpr, e.getMessage());
         }
 
+    }
+
+    @Override
+    public void visit(LambdaExpr lambdaExpr, List<CvStatement> statements) {
+    }
+
+    @Override
+    public void visit(MethodReferenceExpr methodRefExpr, List<CvStatement> statements) {
     }
 
 }

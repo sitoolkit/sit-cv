@@ -48,8 +48,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     private JavaParserFacade jpf;
 
-    private MethodCallVisitor methodCallVisitor;
-
     private StatementVisitor statementVisitor;
 
     @NonNull
@@ -199,7 +197,6 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         if (!typeDec.isInterface()) {
                             typeDec.getMethods().stream().forEach(method -> {
                                 if (equalMethods(declaredMethod, method)) {
-                                    method.accept(methodCallVisitor, methodDef.getMethodCalls());
                                     method.accept(statementVisitor, methodDef.getStatements());
                                     methodDef
                                             .setActionPath(classActionPath + getActionPath(method));
@@ -310,7 +307,6 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
         Project project = projectManager.getCurrentProject();
 
         jpf = JavaParserFacadeBuilder.build(project);
-        methodCallVisitor = new MethodCallVisitor(jpf);
         statementVisitor = StatementVisitor.build(jpf);
 
         return this;

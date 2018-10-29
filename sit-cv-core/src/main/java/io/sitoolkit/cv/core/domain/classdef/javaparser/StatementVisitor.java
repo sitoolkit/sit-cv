@@ -29,12 +29,12 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
             .compile("^java\\.util\\.stream\\.Stream\\..*");
 
     private JavaParserFacade jpf;
-    private MethodCallVisitor2 methodCallVisitor;
+    private MethodCallVisitor methodCallVisitor;
 
     public static StatementVisitor build(JavaParserFacade jpf) {
         StatementVisitor statementVisitor = new StatementVisitor();
         statementVisitor.jpf = jpf;
-        statementVisitor.methodCallVisitor = new MethodCallVisitor2(jpf);
+        statementVisitor.methodCallVisitor = new MethodCallVisitor(jpf);
 
         return statementVisitor;
     }
