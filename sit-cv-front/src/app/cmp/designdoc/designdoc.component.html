@@ -1,9 +1,14 @@
-<div class="designdocContainer">
-  <div class="designdoc">
-    <div *ngFor="let key of objectKeys(currentDiagrams)" (click)="methodNameClick($event)" (mousemove)="methodNameMouseover($event)">
-      <div [innerHTML]="currentDiagrams[key]"></div>
+<div class="designdoc-container">
+  <div class="diagrams">
+    <div *ngFor="let diagram of currentDiagrams" (click)="methodNameClick($event)" (mousemove)="methodNameMouseover($event)" class="diagram-row">
+      <div class="diagram-container">
+        <div class="diagram-spacer" [style.width]="diagram.width">
+          <div class="spacer-inner" [style.padding-top]="diagram.heightRatio"></div>
+        </div>
+        <div class="diagram" [innerHTML]="diagram.diagram"></div>
+      </div>
     </div>
-    <mat-spinner *ngIf="isDiagramLoading" [diameter]="50"></mat-spinner>
+    <mat-progress-bar *ngIf="isDiagramLoading" [mode]="'indeterminate'"></mat-progress-bar>
   </div>
   <div class="comments">
     <mat-card class="comment" *ngFor="let signature of selectedMethodSignatures" [ngClass]="{active: signature == currentMethodSignature}">

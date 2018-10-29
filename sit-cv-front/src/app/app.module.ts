@@ -12,7 +12,7 @@ import {
   MatSidenavModule,
   MatIconModule,
   MatListModule,
-  MatProgressSpinnerModule,
+  MatProgressBarModule,
   MatCardModule,
   MatSnackBarModule
 } from '@angular/material';
@@ -48,7 +48,7 @@ import { CommentComponent } from './cmp/designdoc/comment/comment.component';
     MatIconModule,
     MatListModule,
     MatTreeModule,
-    MatProgressSpinnerModule,
+    MatProgressBarModule,
     MatCardModule,
     MatSnackBarModule,
     MY_ROUTES,
