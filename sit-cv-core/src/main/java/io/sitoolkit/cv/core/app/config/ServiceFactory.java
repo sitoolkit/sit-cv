@@ -16,7 +16,6 @@ import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
-import io.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor2;
 import io.sitoolkit.cv.core.domain.uml.plantuml.ClassDiagramWriterPlantUmlImpl;
 import io.sitoolkit.cv.core.domain.uml.plantuml.PlantUmlWriter;
 import io.sitoolkit.cv.core.domain.uml.plantuml.SequenceDiagramWriterPlantUmlImpl2;
@@ -61,7 +60,7 @@ public class ServiceFactory {
         ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
         ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
                 projectManager, config).init().readDir();
-        SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor2(
+        SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(
                 config.getSequenceDiagramFilter());
         ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
         GraphvizManager.initialize();
