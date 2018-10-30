@@ -6,16 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AServiceImpl implements AService{
+public class AServiceImpl implements AService {
 
     @Autowired
     ARepository aRepository;
 
+    @Autowired
+    BProcessor processor;
+
     /**
-     * AServiceImpl search method
-     * 指定された条件で検索を行い結果を返却します。
-     *
-     * @param search condition
+     * Return search result of condition.
+     * 
+     * @param search
+     *            condition
      * @return list of XEntity
      */
     @Override
@@ -28,6 +31,7 @@ public class AServiceImpl implements AService{
 
     @Override
     public int save(XEntity entity) {
+
         return aRepository.save(entity);
     }
 }

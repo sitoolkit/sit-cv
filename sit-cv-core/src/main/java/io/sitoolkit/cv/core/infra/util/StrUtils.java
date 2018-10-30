@@ -20,9 +20,9 @@ public class StrUtils {
         compresser.setInput(dataByte);
         compresser.finish();
 
-        try(ByteArrayOutputStream baos = new ByteArrayOutputStream(dataByte.length)){
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(dataByte.length)) {
             byte[] buf = new byte[1024];
-            while(!compresser.finished()) {
+            while (!compresser.finished()) {
                 int compByte = compresser.deflate(buf);
                 baos.write(buf, 0, compByte);
             }
@@ -33,4 +33,5 @@ public class StrUtils {
         }
         return encoded;
     }
+
 }

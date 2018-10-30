@@ -30,10 +30,6 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
@@ -53,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     private JavaParserFacade jpf;
 
-    private MethodCallVisitor methodCallVisitor;
+    private StatementVisitor statementVisitor;
 
     @NonNull
     private ClassDefRepository reposiotry;
@@ -202,7 +198,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         if (!typeDec.isInterface()) {
                             typeDec.getMethods().stream().forEach(method -> {
                                 if (equalMethods(declaredMethod, method)) {
-                                    method.accept(methodCallVisitor, methodDef.getMethodCalls());
+                                    method.accept(statementVisitor, methodDef.getStatements());
                                     methodDef
                                             .setActionPath(classActionPath + getActionPath(method));
                                 }
@@ -326,25 +322,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     public ClassDefReader init() {
         Project project = projectManager.getCurrentProject();
 
-        CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
-        combinedTypeSolver.add(new ReflectionTypeSolver());
-        project.getSrcDirs().stream().forEach(
-                srcDir -> combinedTypeSolver.add(new JavaParserTypeSolver(srcDir.toFile())));
-        // project.getBinDirs().stream()
-        // .forEach(binDir ->
-        // combinedTypeSolver.add(ClassDirTypeSolver.get(binDir)));
-        project.getClasspaths().stream().map(Path::toAbsolutePath).map(Path::toString)
-                .forEach(str -> {
-                    try {
-                        combinedTypeSolver.add(JarTypeSolver.getJarTypeSolver(str));
-                        log.info("jar is added. {}", str);
-                    } catch (IOException e) {
-                        log.warn("warn ", e);
-                    }
-                });
-
-        jpf = JavaParserFacade.get(combinedTypeSolver);
-        methodCallVisitor = new MethodCallVisitor(jpf);
+        jpf = JavaParserFacadeBuilder.build(project);
+        statementVisitor = StatementVisitor.build(jpf);
 
         return this;
     }

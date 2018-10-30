@@ -22,6 +22,9 @@
         "name": ".*Service.*"
       },
       {
+        "name": ".*Processor"
+      },
+      {
         "name": ".*Repository.*"
       }
     ],
