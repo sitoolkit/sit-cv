@@ -1,10 +1,16 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import {MatSnackBar} from '@angular/material';
 import * as $ from 'jquery';
 import { DesignDocService } from '../../srv/designdoc/designdoc.service';
 import { CommentComponent } from './comment/comment.component';
+
+class Diagram {
+  diagram: SafeHtml;
+  width: string;
+  heightRatio: string;
+}
 
 @Component({
   selector: 'app-designdoc',
@@ -15,7 +21,7 @@ import { CommentComponent } from './comment/comment.component';
 export class DesignDocComponent implements OnInit {
   designDocIds = [];
   currentDesignDocId = '';
-  currentDiagrams = {};
+  currentDiagrams = [];
   objectKeys = Object.keys;
   diagramComments = {};
   selectedMethodSignatures = [];
@@ -37,16 +43,22 @@ export class DesignDocComponent implements OnInit {
     }
 
   renderDiagrams(diagrams: object) {
-    let trustDiagrams = {};
+    let trustDiagrams: Diagram[] = [];
     Object.keys(diagrams).forEach((key) => {
-      trustDiagrams[key] = this.sanitizer.bypassSecurityTrustHtml(diagrams[key]);
+      let diagram = this.sanitizer.bypassSecurityTrustHtml(diagrams[key]);
+      let svg = $(diagrams[key]).filter('svg');
+      trustDiagrams.push({
+        diagram: diagram,
+        width: svg.width() + 'px',
+        heightRatio: (svg.height() / svg.width() * 100) + '%',
+      });
     });
     this.currentDiagrams = trustDiagrams;
   }
 
   showDesignDocDetail(designDocId) {
     if (this.currentDesignDocId) {
-      this.currentDiagrams = {};
+      this.currentDiagrams = [];
       this.selectedMethodSignatures = [];
     }
     this.currentDesignDocId = designDocId;

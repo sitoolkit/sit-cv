@@ -22,6 +22,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -232,9 +233,24 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             if (!p1.getName().endsWith(p2.getNameAsString())) {
                 return false;
             }
+            if (!equalTypes(p1.getType(), p2.getType())) {
+                return false;
+            }
         }
 
         return true;
+    }
+
+    boolean equalTypes(ResolvedType t1, Type t2) {
+        String str1 = t1.describe();
+        String str2 = t2.asString();
+        boolean result = StringUtils.equals(removePackageName(str1), removePackageName(str2));
+        log.debug("t1.describe={}, t2.asString={}, t1.equals(t2)={}", str1, str2, result);
+        return result;
+    }
+
+    String removePackageName(String typeString) {
+        return typeString.replaceAll("[^.,<>]+\\.", "");
     }
 
     private static final String[] ACTION_ANNOTATION_NAMES = new String[] { "RequestMapping",

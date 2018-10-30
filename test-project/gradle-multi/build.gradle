@@ -5,3 +5,14 @@ allprojects {
   }
 }
 
+buildscript {
+  repositories {
+      jcenter()
+      mavenLocal()
+  }
+  dependencies {
+      classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'+'
+  }
+}
+
+apply plugin: 'sit-cv-gradle-plugin'

@@ -11,5 +11,8 @@ public abstract class CvStatement {
     private String body;
     private List<CvStatement> children = new ArrayList<>();
 
-    public abstract <T> Optional<T> process(StatementProcessor<T> processor);
+    public abstract <T, C> Optional<T> process(StatementProcessor<T, C> processor);
+
+    public abstract <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context);
+
 }

@@ -12,8 +12,12 @@ import lombok.ToString;
 public class LoopStatement extends CvStatement {
 
     @Override
-    public <T> Optional<T> process(StatementProcessor<T> processor) {
+    public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {
         return processor.process(this);
     }
 
+    @Override
+    public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
+        return processor.process(this, context);
+    }
 }

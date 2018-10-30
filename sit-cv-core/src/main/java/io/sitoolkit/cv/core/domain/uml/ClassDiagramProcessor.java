@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
+import io.sitoolkit.cv.core.domain.classdef.MethodCallStack;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
@@ -89,9 +90,19 @@ public class ClassDiagramProcessor {
     }
 
     private Stream<MethodDef> getSequenceMethodsRecursively(MethodDef entryPoint) {
+        return getSequenceMethodsRecursively(entryPoint, MethodCallStack.getBlank());
+    }
+
+    private Stream<MethodDef> getSequenceMethodsRecursively(MethodDef entryPoint, MethodCallStack callStack) {
         MethodDef methodImpl = implementDetector.detectImplMethod(entryPoint);
+        if (callStack.contains(methodImpl)) {
+            log.debug("method: {} is called recursively", methodImpl.getQualifiedSignature());
+            return Stream.empty();
+        }
+        MethodCallStack pushedStack = callStack.push(methodImpl);
         return Stream.concat(Stream.of(methodImpl),
-                methodImpl.getMethodCalls().stream().flatMap(this::getSequenceMethodsRecursively));
+                methodImpl.getMethodCalls().stream()
+                .flatMap(method -> getSequenceMethodsRecursively(method, pushedStack)));
     }
 
     Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef) {

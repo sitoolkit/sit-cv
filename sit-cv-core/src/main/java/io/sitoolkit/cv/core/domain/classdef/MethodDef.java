@@ -10,8 +10,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(exclude = "classDef", callSuper = true)
+@EqualsAndHashCode(of = "qualifiedSignature", callSuper = true)
+@ToString(exclude = { "classDef", "methodCalls" }, callSuper = true)
 public class MethodDef extends CvStatement {
 
     private String name;
@@ -32,8 +32,12 @@ public class MethodDef extends CvStatement {
     }
 
     @Override
-    public <T> Optional<T> process(StatementProcessor<T> processor) {
+    public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {
         return processor.process(this);
     }
 
+    @Override
+    public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
+        return processor.process(this, context);
+    }
 }
