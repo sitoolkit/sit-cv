@@ -17,13 +17,6 @@ public class LoopController {
         for (int i = 0; i < 1; i++) {
             processor.process("");
         }
-
-        int sum = 0;
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 1; j++) {
-                sum += i * j;
-            }
-        }
     }
 
     public void forEach() {
@@ -65,13 +58,14 @@ public class LoopController {
     }
 
     public void streamLambda() {
-
-        List<String> list = Arrays.asList("");
-
-        list.stream().map(str -> {
-            return processor.process("");
-        });
-
+        
+        processor.getList("").stream()
+            .filter(s -> processor.isNotNull(s))
+            .map(s -> processor.process(s))
+            .forEach(s -> {
+                processor.process2("");
+                processor.process3("");
+            });
     }
 
 }

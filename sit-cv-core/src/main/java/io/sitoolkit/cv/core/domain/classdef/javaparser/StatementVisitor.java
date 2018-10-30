@@ -1,10 +1,14 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
@@ -59,10 +63,12 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
     @Override
     public void visit(MethodCallExpr n, List<CvStatement> statements) {
 
-        if (matchesQualifiedName(n, STREAM_METHOD_PATTERN)) {
-            visitStream(n, statements);
-        } else {
-            methodCallVisitor.visit(n, statements);
+        findNonStreamMethod(n).ifPresent(nonStreamMethod -> {
+            methodCallVisitor.visit(nonStreamMethod, statements);
+        });
+
+        if (isStreamMethod(n)) {
+            findMethodCallInLoop(n, getStreamMethodParams(n), statements);
         }
     }
 
@@ -73,20 +79,26 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
     }
 
     void findMethodCallInLoop(Node n, List<CvStatement> statements) {
+        findMethodCallInLoop(n, n.getChildNodes(), statements);
+    }
+
+    void findMethodCallInLoop(Node n, List<? extends Node> childNodes, List<CvStatement> statements) {
         LoopStatement statement = new LoopStatement();
         statements.add(statement);
         statement.setBody(n.toString());
-        n.getChildNodes().stream().forEach(child -> child.accept(this, statement.getChildren()));
+        childNodes.stream().forEach(child -> child.accept(this, statement.getChildren()));
+    }
+
+    boolean isStreamMethod(MethodCallExpr n) {
+        return matchesQualifiedName(n, STREAM_METHOD_PATTERN);
     }
 
     boolean matchesQualifiedName(MethodCallExpr n, Pattern pattern) {
         try {
             SymbolReference<ResolvedMethodDeclaration> ref = jpf.solve(n);
-
             if (!ref.isSolved()) {
                 return false;
             }
-
             ResolvedMethodDeclaration rmd = ref.getCorrespondingDeclaration();
             return pattern.matcher(rmd.getQualifiedName()).matches();
 
@@ -96,11 +108,39 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
         }
     }
 
+    Optional<MethodCallExpr> findNonStreamMethod(MethodCallExpr n) {
+        if (isStreamMethod(n)) {
+            return n.getScope()
+                    .filter(scope -> scope instanceof MethodCallExpr)
+                    .map(scope -> (MethodCallExpr) scope)
+                    .flatMap(this::findNonStreamMethod);
+        } else {
+            return Optional.of(n);
+        }
+    }
+
+    List<Expression> getStreamMethodParams(MethodCallExpr n) {
+        if (isStreamMethod(n)) {
+            List<Expression> result = new ArrayList<>();
+            n.getScope().filter(scope -> scope instanceof MethodCallExpr)
+                    .map(scope -> (MethodCallExpr) scope)
+                    .map(this::getStreamMethodParams)
+                    .ifPresent(result::addAll);
+
+            result.addAll(n.getArguments());
+            return result;
+
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
     void visitStream(MethodCallExpr n, List<CvStatement> statements) {
 
         n.getChildNodes().stream().forEach(childNode -> {
             if (childNode instanceof LambdaExpr) {
-                System.out.println(jpf.solve((LambdaExpr) childNode));
+                    System.out.println(jpf.solve((LambdaExpr) childNode));
+
             } else if (childNode instanceof MethodReferenceExpr) {
                 MethodReferenceExpr m = (MethodReferenceExpr) childNode;
                 TypeExpr t = (TypeExpr) m.getScope();
