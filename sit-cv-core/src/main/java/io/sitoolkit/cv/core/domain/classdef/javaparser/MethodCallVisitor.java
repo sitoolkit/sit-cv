@@ -23,6 +23,9 @@ public class MethodCallVisitor extends VoidVisitorAdapter<List<CvStatement>> {
 
     @Override
     public void visit(MethodCallExpr methodCallExpr, List<CvStatement> statements) {
+
+        methodCallExpr.getScope().ifPresent(l -> l.accept(this, statements));
+        methodCallExpr.getArguments().forEach(p -> p.accept(this, statements));
         try {
 
             SymbolReference<ResolvedMethodDeclaration> ref = jpf.solve(methodCallExpr);
@@ -45,7 +48,6 @@ public class MethodCallVisitor extends VoidVisitorAdapter<List<CvStatement>> {
         } catch (Exception e) {
             log.debug("Unsolved method call: {}, {}", methodCallExpr, e.getMessage());
         }
-
     }
 
     @Override
