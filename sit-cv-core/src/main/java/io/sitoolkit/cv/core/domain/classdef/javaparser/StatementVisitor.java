@@ -14,6 +14,7 @@ import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
@@ -79,14 +80,20 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
     }
 
     boolean matchesQualifiedName(MethodCallExpr n, Pattern pattern) {
-        SymbolReference<ResolvedMethodDeclaration> ref = jpf.solve(n);
+        try {
+            SymbolReference<ResolvedMethodDeclaration> ref = jpf.solve(n);
 
-        if (!ref.isSolved()) {
+            if (!ref.isSolved()) {
+                return false;
+            }
+
+            ResolvedMethodDeclaration rmd = ref.getCorrespondingDeclaration();
+            return pattern.matcher(rmd.getQualifiedName()).matches();
+
+        } catch (UnsolvedSymbolException e) {
+            log.debug("Unsolved: '{}'", n);
             return false;
         }
-
-        ResolvedMethodDeclaration rmd = ref.getCorrespondingDeclaration();
-        return pattern.matcher(rmd.getQualifiedName()).matches();
     }
 
     void visitStream(MethodCallExpr n, List<CvStatement> statements) {
