@@ -29,6 +29,7 @@ export class ReportDataLoader {
     } else {
       let script = document.createElement("script");
       script.onload = () => {
+        this.loadedScripts.push(scriptPath);
         document.body.removeChild(script);
         callback();
       }
