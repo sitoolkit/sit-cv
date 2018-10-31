@@ -133,6 +133,7 @@ public class DesignDocService {
         DesignDoc doc = new DesignDoc();
         doc.setId(designDocId);
         doc.setPkg(entryPoint.getClassDef().getPkg());
+        doc.setClassName(entryPoint.getClassDef().getName());
         doc.add(sequenceDiagram);
         doc.add(classDiagram);
 
