@@ -111,8 +111,8 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
     Optional<MethodCallExpr> findNonStreamMethod(MethodCallExpr n) {
         if (isStreamMethod(n)) {
             return n.getScope()
-                    .filter(scope -> scope instanceof MethodCallExpr)
-                    .map(scope -> (MethodCallExpr) scope)
+                    .filter(MethodCallExpr.class::isInstance)
+                    .map(MethodCallExpr.class::cast)
                     .flatMap(this::findNonStreamMethod);
         } else {
             return Optional.of(n);
@@ -122,8 +122,8 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
     List<Expression> getStreamMethodParams(MethodCallExpr n) {
         if (isStreamMethod(n)) {
             List<Expression> result = new ArrayList<>();
-            n.getScope().filter(scope -> scope instanceof MethodCallExpr)
-                    .map(scope -> (MethodCallExpr) scope)
+            n.getScope().filter(MethodCallExpr.class::isInstance)
+                    .map(MethodCallExpr.class::cast)
                     .map(this::getStreamMethodParams)
                     .ifPresent(result::addAll);
 
