@@ -12,7 +12,9 @@ import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.report.Report;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DesignDocReportProcessor {
 
     public List<Report> process(List<DesignDoc> designDocs) {
@@ -30,14 +32,17 @@ public class DesignDocReportProcessor {
         DesignDocDetailReportsAndPathMap reportsAndPath = new DesignDocDetailReportsAndPathMap();
 
         designDocs.stream().forEach(designDoc -> {
+            try {
+                String path = buildDetailPath(designDoc);
+                reportsAndPath.getPathMap().put(designDoc.getId(), path);
 
-            String path = buildDetailPath(designDoc);
-            reportsAndPath.getPathMap().put(designDoc.getId(), path);
-
-            Report report = reportMap.computeIfAbsent(path,
-                    p -> Report.builder().path(Paths.get(p)).build());
-            String detailContent = buildDetailContent(designDoc);
-            report.setContent(report.getContent() + detailContent);
+                Report report = reportMap.computeIfAbsent(path,
+                        p -> Report.builder().path(Paths.get(p)).build());
+                String detailContent = buildDetailContent(designDoc);
+                report.setContent(report.getContent() + detailContent);
+            } catch (Throwable e) {
+                log.warn("Exception when build report: designDocId '{}'", designDoc.getId(), e);
+            }
 
         });
 

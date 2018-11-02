@@ -141,8 +141,14 @@ public class DesignDocService {
     }
 
     public List<DesignDoc> getAll() {
-        List<DesignDoc> designDocs = getAllIds().stream().map(this::get)
-                .collect(Collectors.toList());
+        List<DesignDoc> designDocs = getAllIds().stream().map((designDocId) -> {
+            try {
+                return get(designDocId);
+            } catch (Throwable e) {
+                log.warn("Exception when create diagram: designDocId '{}'", designDocId, e);
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         return designDocs;
     }
