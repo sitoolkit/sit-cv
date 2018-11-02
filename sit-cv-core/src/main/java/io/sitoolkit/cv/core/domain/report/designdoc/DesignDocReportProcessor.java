@@ -2,53 +2,58 @@ package io.sitoolkit.cv.core.domain.report.designdoc;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.report.Report;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
+import lombok.Data;
 
 public class DesignDocReportProcessor {
-    public List<Report> process(List<DesignDoc> designDocs) {
-        List<Report> reports = processToDetailReports(designDocs);
 
-        reports.add(processToIdListReport(designDocs));
+    public List<Report> process(List<DesignDoc> designDocs) {
+        List<Report> reports = new ArrayList<>();
+        DesignDocDetailReportsAndPathMap reportsAndPath = buildAndGroupingDetailReports(designDocs);
+        reports.addAll(reportsAndPath.getReports());
+
+        reports.add(buildIdListReport(reportsAndPath.getPathMap()));
 
         return reports;
     }
 
-    private List<Report> processToDetailReports(List<DesignDoc> designDocs) {
-        return designDocs.stream().collect(Collectors.groupingBy((d) -> getDetailPath(d)))
-                .entrySet().stream().map((e) -> {
-                    return processToDetailReport(e.getKey(), e.getValue());
-                }).collect(Collectors.toList());
+    private DesignDocDetailReportsAndPathMap buildAndGroupingDetailReports(List<DesignDoc> designDocs) {
+        Map<String, Report> reportMap = new HashMap<>();
+        DesignDocDetailReportsAndPathMap reportsAndPath = new DesignDocDetailReportsAndPathMap();
+
+        designDocs.stream().forEach(designDoc -> {
+
+            String path = buildDetailPath(designDoc);
+            reportsAndPath.getPathMap().put(designDoc.getId(), path);
+
+            Report report = reportMap.computeIfAbsent(path,
+                    p -> Report.builder().path(Paths.get(p)).build());
+            String detailContent = buildDetailContent(designDoc);
+            report.setContent(report.getContent() + detailContent);
+
+        });
+
+        reportsAndPath.getReports().addAll(reportMap.values());
+
+        return reportsAndPath;
     }
 
-    private Report processToDetailReport(String path, List<DesignDoc> designDocs) {
-        String content = designDocs.stream().map(this::getDetailContent)
-                .collect(Collectors.joining(";"));
-
-        return new Report(Paths.get(path), content);
-    }
-
-    private Report processToIdListReport(List<DesignDoc> designDocs) {
-        Path path = Paths.get("assets/designdoc-id-list.js");
-        String content = getIdListContent(designDocs);
-
-        return new Report(path, content);
-    }
-
-    private String getDetailPath(DesignDoc designDoc) {
+    private String buildDetailPath(DesignDoc designDoc) {
         String dirName = designDoc.getPkg().replaceAll("\\.", "/");
         String fileName = designDoc.getClassName() + ".js";
 
         return dirName + "/" + fileName;
     }
 
-    private String getDetailContent(DesignDoc designDoc) {
+    private String buildDetailContent(DesignDoc designDoc) {
         DesignDocReportDetailDef detail = new DesignDocReportDetailDef();
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
@@ -56,15 +61,19 @@ public class DesignDocReportProcessor {
             detail.getComments().putAll(diagram.getComments());
         });
         return "window.reportData.designDoc.detailList['" + designDoc.getId() + "'] = "
-                + JsonUtils.obj2str(detail);
+                + JsonUtils.obj2str(detail) + ";";
     }
 
-    private String getIdListContent(List<DesignDoc> designDocs) {
-        Map<String, String> idList = new LinkedHashMap<>();
-        designDocs.stream().forEach((designDoc) -> {
-            idList.put(designDoc.getId(), getDetailPath(designDoc));
-        });
+    private Report buildIdListReport(Map<String, String> detailPathMap) {
+        Path path = Paths.get("assets/designdoc-id-list.js");
+        String content = "window.reportData.designDoc.idList = " + JsonUtils.obj2str(detailPathMap);
 
-        return "window.reportData.designDoc.idList = " + JsonUtils.obj2str(idList);
+        return Report.builder().path(path).content(content).build();
+    }
+
+    @Data
+    class DesignDocDetailReportsAndPathMap {
+        private List<Report> reports = new ArrayList<>();
+        private Map<String, String> pathMap = new LinkedHashMap<>();
     }
 }
