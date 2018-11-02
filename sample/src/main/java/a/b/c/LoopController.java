@@ -58,6 +58,12 @@ public class LoopController {
         list.stream().map(processor::process);
     }
 
+    public void streamStaticMethodRef() {
+        List<String> list = Arrays.asList("");
+
+        list.stream().map(BProcessor::staticProcess);
+    }
+
     public void streamLambda() {
 
         List<String> list = Arrays.asList("");
