@@ -9,6 +9,7 @@ import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import io.sitoolkit.cv.core.app.config.ApplicationType;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
 @SpringBootApplication
@@ -28,6 +29,6 @@ public class SitCvApplication {
         List<String> projects = appArgs.getOptionValues("project");
         Path projectDir = projects == null || projects.isEmpty() ? Paths.get(".")
                 : Paths.get(projects.get(0));
-        ServiceFactory.initialize(projectDir).getReportService().export();
+        ServiceFactory.initialize(projectDir, ApplicationType.REPORT).getReportService().export();
     }
 }

@@ -1,6 +1,5 @@
 package io.sitoolkit.cv.core.app.report;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
@@ -22,15 +21,16 @@ public class ReportService {
 
     private ProjectManager projectManager;
 
-    public void export() {
-        Path projectDir = projectManager.getCurrentProject().getDir();
-        reportWriter.initDirectory(projectDir);
+    public void init() {
+        reportWriter.initDirectory(projectManager.getCurrentProject().getDir());
+    }
 
+    public void export() {
         List<DesignDoc> designDocs = designDocService.getAll();
 
         List<Report> reports = designDocReportProcessor.process(designDocs);
 
-        reportWriter.write(projectDir, reports);
+        reportWriter.write(projectManager.getCurrentProject().getDir(), reports);
     }
 
 }

@@ -63,6 +63,10 @@ public class DesignDocService {
     // key:classDef.sourceId, value:entrypoint
     private Map<String, Set<String>> entryPointMap = new HashMap<>();
 
+    public void init() {
+        classDefReader.init().readDir();
+    }
+
     public void watchDir(Path srcDir, ClassDefChangeEventListener listener) {
 
         watcher.setContinue(true);

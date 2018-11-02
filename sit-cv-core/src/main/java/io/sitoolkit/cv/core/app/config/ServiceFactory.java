@@ -39,18 +39,24 @@ public class ServiceFactory {
     private ServiceFactory() {
     }
 
-    public static ServiceFactory initialize(Path projectDir) {
-        return new ServiceFactory().init(projectDir);
+    public static ServiceFactory initialize(Path projectDir, ApplicationType appType) {
+        return new ServiceFactory().init(projectDir, appType);
     }
 
-    protected ServiceFactory init(Path projectDir) {
+    protected ServiceFactory init(Path projectDir, ApplicationType appType) {
         SitCvConfig cvConfig = SitCvConfig.load(projectDir);
 
         projectManager = new ProjectManager();
         projectManager.load(projectDir);
 
         designDocService = buildDesignDocService(cvConfig, projectManager);
-        reportService = buildReportService(designDocService, projectManager);
+
+        if (appType == ApplicationType.REPORT) {
+            reportService = buildReportService(designDocService, projectManager);
+            reportService.init();
+        }
+
+        designDocService.init();
 
         return this;
     }
@@ -59,7 +65,7 @@ public class ServiceFactory {
             ProjectManager projectManager) {
         ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
         ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
-                projectManager, config).init().readDir();
+                projectManager, config);
         SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(
                 config.getSequenceDiagramFilter());
         ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
@@ -80,6 +86,7 @@ public class ServiceFactory {
             ProjectManager projectManager) {
         DesignDocReportProcessor designDocReportProcessor = new DesignDocReportProcessor();
         ReportWriter reportWriter = new ReportWriter();
+
         return new ReportService(designDocReportProcessor, reportWriter, designDocService,
                 projectManager);
     }
