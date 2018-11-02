@@ -2,6 +2,7 @@ package a.b.c;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,13 +17,6 @@ public class LoopController {
 
         for (int i = 0; i < 1; i++) {
             processor.process("");
-        }
-
-        int sum = 0;
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 1; j++) {
-                sum += i * j;
-            }
         }
     }
 
@@ -72,6 +66,22 @@ public class LoopController {
             return processor.process("");
         });
 
+    }
+
+    public void streamLambda2() {
+
+        Optional<String> optional = Optional.ofNullable("");
+        optional.ifPresent(s -> {
+            processor.process2(s);
+        });
+
+        processor.getList("").stream()              // loop start
+            .filter(s -> processor.isNotNull(s))
+            .map(s -> processor.process(s))
+            .forEach(s -> {
+                processor.process2("");
+                processor.process3("");
+            });                                     // end loop
     }
 
 }
