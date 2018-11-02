@@ -2,10 +2,17 @@ package io.sitoolkit.cv.core.domain.report;
 
 import java.nio.file.Path;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Report {
     private Path path;
-    private String content;
+    @Builder.Default
+    private String content = "";
 }
