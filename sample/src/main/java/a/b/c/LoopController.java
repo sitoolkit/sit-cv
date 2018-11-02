@@ -2,6 +2,7 @@ package a.b.c;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -58,14 +59,29 @@ public class LoopController {
     }
 
     public void streamLambda() {
-        
-        processor.getList("").stream()
+
+        List<String> list = Arrays.asList("");
+
+        list.stream().map(str -> {
+            return processor.process("");
+        });
+
+    }
+
+    public void streamLambda2() {
+
+        Optional<String> optional = Optional.ofNullable("");
+        optional.ifPresent(s -> {
+            processor.process2(s);
+        });
+
+        processor.getList("").stream()              // loop start
             .filter(s -> processor.isNotNull(s))
             .map(s -> processor.process(s))
             .forEach(s -> {
                 processor.process2("");
                 processor.process3("");
-            });
+            });                                     // end loop
     }
 
 }
