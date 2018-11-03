@@ -1,11 +1,11 @@
 package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.Data;
 
@@ -25,17 +25,17 @@ public class LifeLineDef {
         return tags;
     }
 
-    public Map<String, String> getAllComments() {
-        Map<String, String> comments = new HashMap<>();
-        getComments(comments, messages);
-        return comments;
+    public Map<String, String> getCommentsRecursively() {
+        return getLifeLinesRecursively(this.elements)
+                .collect(Collectors.toMap(LifeLineDef::getEntryMessage, LifeLineDef::getComment));
     }
 
-    void getComments(Map<String, String> comments, List<MessageDef> messages) {
-        messages.stream().forEach((message) -> {
-            LifeLineDef target = message.getTarget();
-            getComments(comments, target.getMessages());
-            comments.put(message.getRequestQualifiedSignature(), target.getComment());
-        });
+    private Stream<LifeLineDef> getLifeLinesRecursively(List<SequenceElement> elements) {
+        return elements.stream().filter(MessageDef.class::isInstance).map(MessageDef.class::cast)
+                .flatMap((message) -> {
+                    LifeLineDef target = message.getTarget();
+                    return Stream.concat(getLifeLinesRecursively(target.getElements()),
+                            Stream.of(target));
+                });
     }
 }

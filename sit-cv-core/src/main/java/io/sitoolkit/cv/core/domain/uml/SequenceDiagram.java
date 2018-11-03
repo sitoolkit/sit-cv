@@ -27,7 +27,7 @@ public class SequenceDiagram implements DiagramModel{
 
     @Override
     public Map<String, String> getAllComments() {
-        return entryLifeLine.getAllComments();
+        return entryLifeLine.getCommentsRecursively();
     }
 
     @Override
