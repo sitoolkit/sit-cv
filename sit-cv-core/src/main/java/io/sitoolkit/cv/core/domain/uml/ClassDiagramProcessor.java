@@ -27,9 +27,20 @@ public class ClassDiagramProcessor {
     ImplementDetector implementDetector = new ImplementDetector();
 
     public ClassDiagram process(MethodDef entryPoint) {
+        return process(entryPoint.getQualifiedSignature(),
+                getSequenceMethodsRecursively(entryPoint).collect(Collectors.toSet()));
+    }
 
-        Set<ClassDef> pickedClasses = pickClasses(entryPoint);
-        return process(entryPoint.getQualifiedSignature() + "(classDiagram)", pickedClasses,
+    public ClassDiagram process(LifeLineDef lifeLine) {
+        return process(lifeLine.getEntryMessage(),
+                getSequenceMethodsRecursively(lifeLine).collect(Collectors.toSet()));
+    }
+
+    public ClassDiagram process(String signature, Set<MethodDef> sequenceMethods) {
+
+        Set<ClassDef> pickedClasses = pickClasses(sequenceMethods);
+
+        return process(signature + "(classDiagram)", pickedClasses,
                 relation -> pickedClasses.contains(relation.getOther()));
     }
 
@@ -54,10 +65,7 @@ public class ClassDiagramProcessor {
                 .distinct();
     }
 
-    private Set<ClassDef> pickClasses(MethodDef entryPoint) {
-
-        Set<MethodDef> sequenceMethods = getSequenceMethodsRecursively(entryPoint)
-                .collect(Collectors.toSet());
+    private Set<ClassDef> pickClasses(Set<MethodDef> sequenceMethods) {
 
         Set<ClassDef> paramClasses = sequenceMethods.stream()
                 .map(MethodDef::getParamTypes)
@@ -103,6 +111,16 @@ public class ClassDiagramProcessor {
         return Stream.concat(Stream.of(methodImpl),
                 methodImpl.getMethodCalls().stream()
                 .flatMap(method -> getSequenceMethodsRecursively(method, pushedStack)));
+    }
+
+    private Stream<MethodDef> getSequenceMethodsRecursively(LifeLineDef lifeLine) {
+        return lifeLine.getElements().stream()
+                .filter(MessageDef.class::isInstance)
+                .map(MessageDef.class::cast)
+                .flatMap(message -> {
+                    return Stream.concat(getSequenceMethodsRecursively(message.getTarget()),
+                            Stream.of(message.getMethodCall()));
+                });
     }
 
     Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef) {
