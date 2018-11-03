@@ -21,6 +21,10 @@ public class ReportService {
 
     private ProjectManager projectManager;
 
+    public void init() {
+        reportWriter.initDirectory(projectManager.getCurrentProject().getDir());
+    }
+
     public void export() {
         List<DesignDoc> designDocs = designDocService.getAll();
 

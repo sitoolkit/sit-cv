@@ -63,6 +63,10 @@ public class DesignDocService {
     // key:classDef.sourceId, value:entrypoint
     private Map<String, Set<String>> entryPointMap = new HashMap<>();
 
+    public void init() {
+        classDefReader.init().readDir();
+    }
+
     public void watchDir(Path srcDir, ClassDefChangeEventListener listener) {
 
         watcher.setContinue(true);
@@ -141,8 +145,14 @@ public class DesignDocService {
     }
 
     public List<DesignDoc> getAll() {
-        List<DesignDoc> designDocs = getAllIds().stream().map(this::get)
-                .collect(Collectors.toList());
+        List<DesignDoc> designDocs = getAllIds().stream().map((designDocId) -> {
+            try {
+                return get(designDocId);
+            } catch (Exception e) {
+                log.warn("Exception when create diagram: designDocId '{}'", designDocId, e);
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         return designDocs;
     }

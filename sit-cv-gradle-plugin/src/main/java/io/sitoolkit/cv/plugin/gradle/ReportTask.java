@@ -10,6 +10,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
 
+import io.sitoolkit.cv.core.app.config.ApplicationMode;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
 public class ReportTask extends DefaultTask {
@@ -31,6 +32,6 @@ public class ReportTask extends DefaultTask {
             projectDirs = Arrays.asList(basePath);
         }
 
-        ServiceFactory.initialize(projectDirs.get(0)).getReportService().export();
+        ServiceFactory.initialize(projectDirs.get(0), ApplicationMode.REPORT).getReportService().export();
     }
 }
