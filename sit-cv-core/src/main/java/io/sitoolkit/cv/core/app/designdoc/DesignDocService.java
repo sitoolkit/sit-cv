@@ -63,7 +63,7 @@ public class DesignDocService {
     // key:classDef.sourceId, value:entrypoint
     private Map<String, Set<String>> entryPointMap = new HashMap<>();
 
-    public void init() {
+    public void analyze() {
         classDefReader.init().readDir();
     }
 

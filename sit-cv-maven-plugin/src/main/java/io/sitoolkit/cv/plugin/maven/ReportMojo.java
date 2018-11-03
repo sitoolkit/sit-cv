@@ -7,7 +7,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import io.sitoolkit.cv.core.app.config.ApplicationMode;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
 @Mojo(name = "report")
@@ -19,7 +18,7 @@ public class ReportMojo extends AbstractMojo {
     @Override
     public void execute() {
         Path projectDir = Paths.get(projects[0]);
-        ServiceFactory.initialize(projectDir, ApplicationMode.REPORT).getReportService().export();
+        ServiceFactory.createAndInitialize(projectDir).getReportService().export();
     }
 
 }

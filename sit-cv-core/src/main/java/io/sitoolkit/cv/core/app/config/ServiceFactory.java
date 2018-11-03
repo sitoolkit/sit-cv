@@ -24,7 +24,9 @@ import io.sitoolkit.cv.core.infra.graphviz.GraphvizManager;
 import io.sitoolkit.cv.core.infra.watcher.FileInputSourceWatcher;
 import io.sitoolkit.cv.core.infra.watcher.InputSourceWatcher;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ServiceFactory {
 
     @Getter
@@ -39,29 +41,37 @@ public class ServiceFactory {
     private ServiceFactory() {
     }
 
-    public static ServiceFactory initialize(Path projectDir, ApplicationMode appType) {
-        return new ServiceFactory().init(projectDir, appType);
+    public static ServiceFactory create(Path projectDir) {
+        return new ServiceFactory().createServices(projectDir);
     }
 
-    protected ServiceFactory init(Path projectDir, ApplicationMode appType) {
+    public static ServiceFactory createAndInitialize(Path projectDir) {
+        return new ServiceFactory().createServices(projectDir).initialize();
+    }
+
+    public ServiceFactory initialize() {
+        try {
+            designDocService.analyze();
+        } catch (Exception e) {
+            log.error("Exception initializing Code Visualizer", e);
+        }
+        return this;
+    }
+
+    protected ServiceFactory createServices(Path projectDir) {
         SitCvConfig cvConfig = SitCvConfig.load(projectDir);
 
         projectManager = new ProjectManager();
         projectManager.load(projectDir);
 
-        designDocService = buildDesignDocService(cvConfig, projectManager);
+        designDocService = createDesignDocService(cvConfig, projectManager);
 
-        if (appType == ApplicationMode.REPORT) {
-            reportService = buildReportService(designDocService, projectManager);
-            reportService.init();
-        }
-
-        designDocService.init();
+        reportService = createReportService(designDocService, projectManager);
 
         return this;
     }
 
-    protected DesignDocService buildDesignDocService(SitCvConfig config,
+    protected DesignDocService createDesignDocService(SitCvConfig config,
             ProjectManager projectManager) {
         ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
         ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
@@ -82,7 +92,7 @@ public class ServiceFactory {
 
     }
 
-    protected ReportService buildReportService(DesignDocService designDocService,
+    protected ReportService createReportService(DesignDocService designDocService,
             ProjectManager projectManager) {
         DesignDocReportProcessor designDocReportProcessor = new DesignDocReportProcessor();
         ReportWriter reportWriter = new ReportWriter();

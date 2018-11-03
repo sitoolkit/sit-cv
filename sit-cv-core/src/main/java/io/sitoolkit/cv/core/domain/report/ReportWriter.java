@@ -2,6 +2,7 @@ package io.sitoolkit.cv.core.domain.report;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -26,7 +27,7 @@ public class ReportWriter {
         try {
             FileUtils.deleteDirectory(outputDir);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
         SitResourceUtils.copy(getClass(), RESOURCE_NAME, outputDir);
         setReportConfig(outputDir.toPath());
@@ -37,8 +38,7 @@ public class ReportWriter {
 
         writeReports(outputDirPath, reports);
 
-        log.info("completed write to: {}",
-                outputDirPath.toAbsolutePath().normalize());
+        log.info("completed write to: {}", outputDirPath.toAbsolutePath().normalize());
     }
 
     void writeReports(Path outputDirPath, List<Report> reports) {
@@ -46,7 +46,7 @@ public class ReportWriter {
             try {
                 writeToFile(outputDirPath.resolve(report.getPath()).toFile(), report.getContent());
             } catch (Exception e) {
-                log.warn("Exception when write report: file '{}'", report.getPath(), e);
+                log.warn("Exception writing report: file '{}'", report.getPath(), e);
             }
         });
     }
@@ -61,11 +61,8 @@ public class ReportWriter {
 
     void setReportConfig(Path outputDirPath) {
         try {
-            Files.copy(
-                outputDirPath.resolve("assets/config-report.js"),
-                outputDirPath.resolve("assets/config.js"),
-                StandardCopyOption.REPLACE_EXISTING
-            );
+            Files.copy(outputDirPath.resolve("assets/config-report.js"),
+                    outputDirPath.resolve("assets/config.js"), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

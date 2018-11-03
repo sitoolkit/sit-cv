@@ -8,8 +8,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
-import io.sitoolkit.cv.core.app.config.ApplicationMode;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
 @SpringBootApplication
@@ -21,7 +21,8 @@ public class SitCvApplication {
         if (appArgs.containsOption("report")) {
             executeReportMode(appArgs);
         } else {
-            SpringApplication.run(SitCvApplication.class, args);
+            ApplicationContext appCtx = SpringApplication.run(SitCvApplication.class, args);
+            appCtx.getBean(ServiceFactory.class).initialize();
         }
     }
 
@@ -29,6 +30,6 @@ public class SitCvApplication {
         List<String> projects = appArgs.getOptionValues("project");
         Path projectDir = projects == null || projects.isEmpty() ? Paths.get(".")
                 : Paths.get(projects.get(0));
-        ServiceFactory.initialize(projectDir, ApplicationMode.REPORT).getReportService().export();
+        ServiceFactory.createAndInitialize(projectDir).getReportService().export();
     }
 }
