@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>sit-cv-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <name>sit-cv-maven-plugin Maven Plugin</name>
+  <name>sit-cv-maven-plugin</name>
   <url>http://sitoolkit.org</url>
 
   <prerequisites>
@@ -77,7 +77,7 @@
   <parent>
     <groupId>io.sitoolkit.cv</groupId>
     <artifactId>sit-cv</artifactId>
-    <version>1.0.0-beta.1-SNAPSHOT</version>
+    <version>1.0.0-beta.1</version>
   </parent>
   <build>
     <plugins>
