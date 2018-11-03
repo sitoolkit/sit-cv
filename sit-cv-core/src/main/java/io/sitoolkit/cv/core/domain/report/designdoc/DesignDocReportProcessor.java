@@ -40,7 +40,7 @@ public class DesignDocReportProcessor {
                         p -> Report.builder().path(Paths.get(p)).build());
                 String detailContent = buildDetailContent(designDoc);
                 report.setContent(report.getContent() + detailContent);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 log.warn("Exception when build report: designDocId '{}'", designDoc.getId(), e);
             }
 

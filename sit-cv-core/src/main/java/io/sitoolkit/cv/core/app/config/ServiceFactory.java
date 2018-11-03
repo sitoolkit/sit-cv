@@ -39,11 +39,11 @@ public class ServiceFactory {
     private ServiceFactory() {
     }
 
-    public static ServiceFactory initialize(Path projectDir, ApplicationType appType) {
+    public static ServiceFactory initialize(Path projectDir, ApplicationMode appType) {
         return new ServiceFactory().init(projectDir, appType);
     }
 
-    protected ServiceFactory init(Path projectDir, ApplicationType appType) {
+    protected ServiceFactory init(Path projectDir, ApplicationMode appType) {
         SitCvConfig cvConfig = SitCvConfig.load(projectDir);
 
         projectManager = new ProjectManager();
@@ -51,7 +51,7 @@ public class ServiceFactory {
 
         designDocService = buildDesignDocService(cvConfig, projectManager);
 
-        if (appType == ApplicationType.REPORT) {
+        if (appType == ApplicationMode.REPORT) {
             reportService = buildReportService(designDocService, projectManager);
             reportService.init();
         }

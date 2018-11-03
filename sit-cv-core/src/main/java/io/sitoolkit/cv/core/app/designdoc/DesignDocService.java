@@ -148,7 +148,7 @@ public class DesignDocService {
         List<DesignDoc> designDocs = getAllIds().stream().map((designDocId) -> {
             try {
                 return get(designDocId);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 log.warn("Exception when create diagram: designDocId '{}'", designDocId, e);
                 return null;
             }

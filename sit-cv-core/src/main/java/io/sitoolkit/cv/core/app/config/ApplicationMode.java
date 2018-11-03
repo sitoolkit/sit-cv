@@ -1,5 +1,5 @@
 package io.sitoolkit.cv.core.app.config;
 
-public enum ApplicationType {
+public enum ApplicationMode {
     SERVER, REPORT
 }

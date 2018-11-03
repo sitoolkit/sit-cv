@@ -45,7 +45,7 @@ public class ReportWriter {
         reports.stream().forEach((report) -> {
             try {
                 writeToFile(outputDirPath.resolve(report.getPath()).toFile(), report.getContent());
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 log.warn("Exception when write report: file '{}'", report.getPath(), e);
             }
         });
