@@ -63,8 +63,9 @@ public class LoopController {
 
         list.stream().map(BProcessor::staticProcess)
                 .forEach(this::process);
+        list.stream().forEach(System.out::println);
     }
-    
+
     private void process(String s){
         processor.process(s);
     }
