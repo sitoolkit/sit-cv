@@ -63,6 +63,7 @@ public class DesignDocPublisher {
             String data = new String(diagram.getData());
             response.getDiagrams().put(diagram.getId(), data);
             response.getComments().putAll(diagram.getComments());
+            response.getJavadocs().putAll(diagram.getJavadocs());
         });
         template.convertAndSend("/topic/designdoc/detail/" + designDocId, response);
     }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import io.sitoolkit.cv.core.domain.classdef.javadoc.CvJavadoc;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -25,6 +26,7 @@ public class MethodDef extends CvStatement {
     private List<MethodCallDef> methodCalls = new ArrayList<>();
     private List<CvStatement> statements = new ArrayList<>();
     private String comment = "";
+    private CvJavadoc javadoc;
 
     public Stream<MethodDef> getMethodCallsRecursively() {
         return Stream.concat(Stream.of(this),

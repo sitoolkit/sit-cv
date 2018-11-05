@@ -12,4 +12,5 @@ public interface AService {
      */
     public List<XEntity> search(SearchConditioner condition);
     public int save(XEntity entity);
+    public SearchConditioner deprecatedMethod(XEntity entity, String str);
 }

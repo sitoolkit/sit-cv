@@ -37,6 +37,7 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import io.sitoolkit.cv.core.domain.classdef.javadoc.CvJavadoc;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
@@ -190,6 +191,14 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         methodDef.setReturnType(
                                 TypeParser.getTypeDef(declaredMethod.getReturnType()));
                         methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
+
+                        jpDeclaredMethod.getWrappedNode().getJavadoc().ifPresent((javadoc) -> {
+                            CvJavadoc cvJavadoc = CvJavadoc.parse(
+                                    declaredMethod.getPackageName() + "."
+                                            + declaredMethod.getClassName(),
+                                    declaredMethod.getName(), javadoc);
+                            methodDef.setJavadoc(cvJavadoc);
+                        });
                         jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
                             methodDef.setComment(comment.toString());
                         });

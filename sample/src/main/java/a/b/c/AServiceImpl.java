@@ -16,7 +16,7 @@ public class AServiceImpl implements AService {
 
     /**
      * Return search result of condition.
-     * 
+     *
      * @param search
      *            condition
      * @return list of XEntity
@@ -34,4 +34,29 @@ public class AServiceImpl implements AService {
 
         return aRepository.save(entity);
     }
+
+    /**
+     * sample comment
+     *   multiline and indented
+     * See the <a href="{@docRoot}/copyright.html">Copyright</a>.
+     * {@link other/link}
+     * @since 123.123
+     * @param entity
+     *      param1 is XEntity object
+     *      param multiline comment
+     * @param str param2 is String
+     * @return return sample
+     *         return multiline comment
+     * @exception RuntimeException exception1 description
+     * @exception NullPointerException
+     *      exception2 description
+     *      exception multiline comment
+     * @deprecated this method is deprecated.
+     */
+    @Deprecated
+    @Override
+    public SearchConditioner deprecatedMethod(XEntity entity, String str) {
+        return new SearchConditioner();
+    }
+
 }

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
+import io.sitoolkit.cv.core.domain.classdef.javadoc.CvJavadoc;
 import lombok.Builder;
 import lombok.Value;
 
@@ -35,4 +36,8 @@ public class ClassDiagram implements DiagramModel {
         return classes.stream().map(ClassDef::getSourceId).collect(Collectors.toSet());
     }
 
+    @Override
+    public Map<String, CvJavadoc> getAllJavadocs() {
+        return new HashMap<String, CvJavadoc>();
+    }
 }

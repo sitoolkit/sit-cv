@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.sitoolkit.cv.core.domain.classdef.javadoc.CvJavadoc;
 import lombok.Data;
 
 @Data
@@ -17,6 +18,7 @@ public class LifeLineDef {
     private List<MessageDef> messages = new ArrayList<>();
     private List<SequenceElement> elements = new ArrayList<>();
     private String comment;
+    private CvJavadoc javadoc;
 
     public Set<String> getAllSourceIds() {
         Set<String> tags = messages.stream().map(MessageDef::getTarget)
@@ -37,5 +39,10 @@ public class LifeLineDef {
                     return Stream.concat(getLifeLinesRecursively(target.getElements()),
                             Stream.of(target));
                 });
+    }
+
+    public Map<String, CvJavadoc> getJavadocsRecursively() {
+        return getLifeLinesRecursively(this.elements)
+                .collect(Collectors.toMap(LifeLineDef::getEntryMessage, LifeLineDef::getJavadoc));
     }
 }
