@@ -2,8 +2,26 @@
 
 Code Visualizer is a development support tool to generate sequence diagram and class diagram from java source code.
 Sequence diagrams are generated for each public method which belong to specified class.
-Class diagrams are generated for each sequence diagram and include classes which appeare in it as parameter and return types.
+Class diagrams are generated for each sequence diagram and include classes which appeare in it as parameters and return types.
 
+This (https://sitoolkit.github.io/sit-cv/designdocs/) is generated diagrams from this project.
+
+Diagrams are provided as static web contents so you can see them with web browser.
+You can generate diagrams with two ways.
+
+1. Server mode
+1. Report mode
+
+## Server mode
+
+Code Visualizer can be run as an application server.
+In this mode, you can see diagrams via http://localhost:8080/ and the diagram will be automatically re-generated after source code modification.
+
+## Report mode
+
+Code Visualizer can be run as an batch application.
+After execution of report mode, diagrams are generated in project_root/docs/designdocs directory.
+These report files can be accessed with browser as local files and also published with web server or GitHub Pages.
 
 ## Demo
 
