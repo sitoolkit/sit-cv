@@ -7,12 +7,9 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
-import com.github.javaparser.ast.expr.TypeExpr;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
@@ -139,37 +136,4 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
             return Collections.emptyList();
         }
     }
-
-    void visitStream(MethodCallExpr n, List<CvStatement> statements) {
-
-        n.getChildNodes().stream().forEach(childNode -> {
-            if (childNode instanceof LambdaExpr) {
-                    System.out.println(jpf.solve((LambdaExpr) childNode));
-
-            } else if (childNode instanceof MethodReferenceExpr) {
-                MethodReferenceExpr m = (MethodReferenceExpr) childNode;
-                TypeExpr t = (TypeExpr) m.getScope();
-                System.out.println(jpf.convertToUsage(t.getType()));
-                ;
-            }
-        });
-    }
-
-    boolean inLoop(Node node) {
-        if (!node.getParentNode().isPresent()) {
-            return false;
-        }
-        Node parent = node.getParentNode().get();
-
-        if (parent instanceof ForStmt || parent instanceof ForeachStmt) {
-            return true;
-        } else if (parent instanceof MethodCallExpr) {
-            return matchesQualifiedName((MethodCallExpr) parent, STREAM_METHOD_PATTERN);
-        } else if (parent instanceof MethodDeclaration) {
-            return false;
-        } else {
-            return inLoop(parent);
-        }
-    }
-
 }
