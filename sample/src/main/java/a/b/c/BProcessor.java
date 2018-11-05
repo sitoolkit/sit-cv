@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class BProcessor {
 
+    public static String staticProcess(String input) {
+        return input;
+    }
+
     public String process(String input) {
         return input;
     }

@@ -78,6 +78,11 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
         super.visit(n, arg);
     }
 
+    @Override
+    public void visit(MethodReferenceExpr methodRefExpr, List<CvStatement> statements) {
+        methodCallVisitor.visit(methodRefExpr, statements);
+    }
+
     void findMethodCallInLoop(Node n, List<CvStatement> statements) {
         findMethodCallInLoop(n, n.getChildNodes(), statements);
     }

@@ -1,7 +1,7 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -61,7 +61,7 @@ public class StatementVisitorTest {
 
     @Test
     public void streamMethodRef() throws IOException {
-//        testFlatLoop(testName.getMethodName());
+        testFlatLoop(testName.getMethodName());
     }
 
     @Test

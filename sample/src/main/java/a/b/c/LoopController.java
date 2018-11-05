@@ -58,6 +58,18 @@ public class LoopController {
         list.stream().map(processor::process);
     }
 
+    public void streamMethodRef2() {
+        List<String> list = Arrays.asList("");
+
+        list.stream().map(BProcessor::staticProcess)
+                .forEach(this::process);
+        list.stream().forEach(System.out::println);
+    }
+
+    private void process(String s){
+        processor.process(s);
+    }
+
     public void streamLambda() {
 
         List<String> list = Arrays.asList("");
@@ -75,13 +87,13 @@ public class LoopController {
             processor.process2(s);
         });
 
-        processor.getList("").stream()              // loop start
-            .filter(s -> processor.isNotNull(s))
-            .map(s -> processor.process(s))
-            .forEach(s -> {
-                processor.process2("");
-                processor.process3("");
-            });                                     // end loop
-    }
+            processor.getList("").stream() // loop start
+                    .filter(s -> processor.isNotNull(s))
+                    .map(s -> processor.process(s))
+                    .forEach(s -> {
+                        processor.process2("");
+                            processor.process3("");
+                    }); // end loop
+        }
 
 }
