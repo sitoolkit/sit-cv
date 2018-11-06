@@ -196,7 +196,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                             CvJavadoc cvJavadoc = CvJavadoc.parse(
                                     declaredMethod.getPackageName() + "."
                                             + declaredMethod.getClassName(),
-                                    declaredMethod.getName(), javadoc);
+                                    jpDeclaredMethod.getWrappedNode().getDeclarationAsString(),
+                                    javadoc);
                             methodDef.setJavadoc(cvJavadoc);
                         });
                         jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {

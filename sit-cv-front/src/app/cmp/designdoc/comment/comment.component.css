@@ -1,9 +1,35 @@
+.mat-snack-bar-container {
+   max-width: 100vw;
+}
+
 .comment-header {
   overflow-wrap: break-word;
+  background: rgba(0,0,0,.03);
+  padding: 1rem;
 }
 
 .comment-body {
   overflow-wrap: break-word;
+  white-space: pre-wrap;
+  padding: 1rem;
+}
+
+.comment-method-declaration, .comment-description, .comment-tag {
+  padding-bottom: 0.5rem;
+}
+
+.comment-method-declaration {
+  font-weight: bold;
+  padding-left: 4rem;
+  text-indent: -4rem;
+}
+
+.comment-tag-label {
+  font-weight: bold;
+}
+
+.comment-tag-content {
+  padding-left: 1rem;
 }
 
 .comment-footer {

@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class CvJavadocTagNameTextPairContent implements CvJavadocTagContent {
-    private String name;
-    private String text;
+    private String content;
 
     @Override
     public CvJavadocTagNameTextPairContent parse(JavadocBlockTag blockTag) {
-        return builder().name(blockTag.getName().orElse("")).text(blockTag.getContent().toText())
+        return builder().content(blockTag.getName().orElse("") + " - " + blockTag.getContent().toText())
                 .build();
     }
+
 }

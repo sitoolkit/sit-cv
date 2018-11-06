@@ -1,10 +1,11 @@
 package io.sitoolkit.cv.core.domain.classdef.javadoc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.github.javaparser.javadoc.Javadoc;
-import com.github.javaparser.utils.Log;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,15 +20,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CvJavadoc {
     private String qualifiedClassName;
-    private String methodSignature;
+    private String methodDeclaration;
     private String description;
     private CvJavadocTag deprecated;
-    private Map<String, CvJavadocTag> tags;
+    private List<CvJavadocTag> tags;
 
-    public static CvJavadoc parse(String qualifiedClassName, String methodSignature,
-            Javadoc javadoc) {
+    public static CvJavadoc parse(String qualifiedClassName, String methodDeclaration, Javadoc javadoc) {
         CvJavadocBuilder builder = builder();
-        builder = builder.qualifiedClassName(qualifiedClassName).methodSignature(methodSignature)
+        builder = builder.qualifiedClassName(qualifiedClassName)
+                .methodDeclaration(methodDeclaration)
                 .description(javadoc.getDescription().toText());
 
         Map<String, CvJavadocTag> tags = new HashMap<>();
@@ -55,6 +56,6 @@ public class CvJavadoc {
                 }
             }
         });
-        return builder.tags(tags).build();
+        return builder.tags(new ArrayList<CvJavadocTag>(tags.values())).build();
     }
 }

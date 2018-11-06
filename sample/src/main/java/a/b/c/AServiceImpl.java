@@ -55,7 +55,9 @@ public class AServiceImpl implements AService {
      */
     @Deprecated
     @Override
-    public SearchConditioner deprecatedMethod(XEntity entity, String str) {
+    public SearchConditioner deprecatedMethod(XEntity entity, String str) throws NullPointerException {
+        SearchConditioner conditioner = null;
+        conditioner.equals("");
         return new SearchConditioner();
     }
 

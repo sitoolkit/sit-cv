@@ -1,9 +1,17 @@
-<p class="comment-header">
-  {{commentId}}
-</p>
-<p class="comment-body">
-  {{comment}}
-</p>
-<p class="comment-footer">
+<div class="comment-header">
+  {{comment.qualifiedClassName}}
+</div>
+<div class="comment-body">
+  <div class="comment-method-declaration">{{comment.methodDeclaration}}</div>
+  <div>{{comment.deprecated}}</div>
+  <div class="comment-description">{{comment.description}}</div>
+  <div class="comment-tag" *ngFor="let tag of comment.tags">
+    <div class="comment-tag-label">{{tag.label}}</div>
+    <div class="comment-tag-content" *ngFor="let content of tag.contents">
+      <div>{{content.content}}</div>
+    </div>
+  </div>
+</div>
+<div class="comment-footer">
   <button mat-raised-button color="primary" (click)="close()">Close</button>
-</p>
+</div>

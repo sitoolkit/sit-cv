@@ -24,6 +24,7 @@ export class DesignDocComponent implements OnInit {
   currentDiagrams = [];
   objectKeys = Object.keys;
   diagramComments = {};
+  diagramJavadocs = {};
   selectedMethodSignatures = [];
   currentMethodSignature = "";
   isDiagramLoading = false;
@@ -67,6 +68,7 @@ export class DesignDocComponent implements OnInit {
       this.isDiagramLoading = false;
       this.renderDiagrams(detail.diagrams);
       this.diagramComments = detail.comments;
+      this.diagramJavadocs = detail.javadocs;
     })
     return false;
   }
@@ -77,7 +79,7 @@ export class DesignDocComponent implements OnInit {
       this.snackBar.openFromComponent(CommentComponent, {
             data: {
                 commentId: link.attr('xlink:title'),
-                comments: this.diagramComments
+                comments: this.diagramJavadocs
             }
         });
     }
