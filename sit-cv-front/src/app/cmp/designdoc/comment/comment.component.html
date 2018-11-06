@@ -1,8 +1,13 @@
 <div class="comment-header">
   {{comment.qualifiedClassName}}
+    <div class="comment-method-declaration">
+      <div *ngFor="let annotation of comment.annotations">
+        <div>{{annotation}}</div>
+      </div>
+      <div>{{comment.methodDeclaration}}</div>
+    </div>
 </div>
 <div class="comment-body">
-  <div class="comment-method-declaration">{{comment.methodDeclaration}}</div>
   <div>{{comment.deprecated}}</div>
   <div class="comment-description">{{comment.description}}</div>
   <div class="comment-tag" *ngFor="let tag of comment.tags">

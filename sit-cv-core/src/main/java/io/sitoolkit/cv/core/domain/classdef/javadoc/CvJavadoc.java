@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.javadoc.Javadoc;
 
 import lombok.AllArgsConstructor;
@@ -20,14 +23,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CvJavadoc {
     private String qualifiedClassName;
+    private List<String> annotations;
     private String methodDeclaration;
     private String description;
     private CvJavadocTag deprecated;
     private List<CvJavadocTag> tags;
 
-    public static CvJavadoc parse(String qualifiedClassName, String methodDeclaration, Javadoc javadoc) {
+    public static CvJavadoc parse(String qualifiedClassName, NodeList<AnnotationExpr> annotations,
+            String methodDeclaration, Javadoc javadoc) {
         CvJavadocBuilder builder = builder();
         builder = builder.qualifiedClassName(qualifiedClassName)
+                .annotations(annotations.stream().map(AnnotationExpr::toString)
+                        .collect(Collectors.toList()))
                 .methodDeclaration(methodDeclaration)
                 .description(javadoc.getDescription().toText());
 
@@ -46,10 +53,11 @@ public class CvJavadoc {
                     return null;
                 }
             });
-            if(cvTag != null) {
+            if (cvTag != null) {
                 cvTag.setLabel(tagType.getLabel());
                 try {
-                    CvJavadocTagContent content = tagType.getContentClazz().getDeclaredConstructor().newInstance();
+                    CvJavadocTagContent content = tagType.getContentClazz().getDeclaredConstructor()
+                            .newInstance();
                     cvTag.getContents().add(content.parse(tag));
                 } catch (Exception e) {
                     throw new RuntimeException(e);

@@ -5,6 +5,7 @@ class DesignDocJavadocTag {
 
 export class DesignDocJavadoc {
   qualifiedClassName: string;
+  annotations: Array<string>;
   methodDeclaration: string;
   deprecated: DesignDocJavadocTag;
   description: string;

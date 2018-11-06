@@ -14,7 +14,7 @@
   padding: 1rem;
 }
 
-.comment-method-declaration, .comment-description, .comment-tag {
+.comment-description, .comment-tag {
   padding-bottom: 0.5rem;
 }
 
