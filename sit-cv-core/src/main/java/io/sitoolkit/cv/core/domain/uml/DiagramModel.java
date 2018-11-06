@@ -8,7 +8,6 @@ import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocDef;
 public interface DiagramModel {
     public String getId();
     public Set<String> getAllTags();
-    public Map<String, String> getAllComments();
     public Map<String, JavadocDef> getAllJavadocs();
     public Set<String> getAllSourceIds();
 }

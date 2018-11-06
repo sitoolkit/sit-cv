@@ -25,7 +25,6 @@ public class MethodDef extends CvStatement {
     private TypeDef returnType;
     private List<MethodCallDef> methodCalls = new ArrayList<>();
     private List<CvStatement> statements = new ArrayList<>();
-    private String comment = "";
     private JavadocDef javadoc;
 
     public Stream<MethodDef> getMethodCallsRecursively() {

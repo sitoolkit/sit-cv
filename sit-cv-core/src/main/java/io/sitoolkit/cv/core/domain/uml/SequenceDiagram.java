@@ -27,11 +27,6 @@ public class SequenceDiagram implements DiagramModel{
     }
 
     @Override
-    public Map<String, String> getAllComments() {
-        return entryLifeLine.getCommentsRecursively();
-    }
-
-    @Override
     public Map<String, JavadocDef> getAllJavadocs() {
         return entryLifeLine.getJavadocsRecursively();
     }

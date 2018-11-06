@@ -17,7 +17,6 @@ public class LifeLineDef {
     private String sourceId;
     private List<MessageDef> messages = new ArrayList<>();
     private List<SequenceElement> elements = new ArrayList<>();
-    private String comment;
     private JavadocDef javadoc;
 
     public Set<String> getAllSourceIds() {
@@ -25,11 +24,6 @@ public class LifeLineDef {
                 .map(LifeLineDef::getSourceId).collect(Collectors.toSet());
         tags.add(sourceId);
         return tags;
-    }
-
-    public Map<String, String> getCommentsRecursively() {
-        return getLifeLinesRecursively(this.elements)
-                .collect(Collectors.toMap(LifeLineDef::getEntryMessage, LifeLineDef::getComment));
     }
 
     private Stream<LifeLineDef> getLifeLinesRecursively(List<SequenceElement> elements) {
@@ -43,7 +37,6 @@ public class LifeLineDef {
 
     public Map<String, JavadocDef> getJavadocsRecursively() {
         return getLifeLinesRecursively(this.elements)
-//                .filter((l) -> l.getJavadoc() != null)
                 .collect(Collectors.toMap(LifeLineDef::getEntryMessage, LifeLineDef::getJavadoc));
     }
 }

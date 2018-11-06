@@ -54,6 +54,8 @@ public class AServiceImpl implements AService {
      *      exception2 description
      *      exception multiline comment
      * @deprecated this method is deprecated.
+     * @see Sample#see
+     * @see ARepositoryImpl
      * @undefined unresolve test
      */
     @Deprecated

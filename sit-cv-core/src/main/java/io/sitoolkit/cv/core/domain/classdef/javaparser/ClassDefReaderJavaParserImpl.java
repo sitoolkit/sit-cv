@@ -43,6 +43,7 @@ import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocDef;
 import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocMultipleContentTag;
+import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocSeeTag;
 import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocSingleContentTag;
 import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocTagDef;
 import io.sitoolkit.cv.core.domain.project.Project;
@@ -199,10 +200,6 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                                 TypeParser.getTypeDef(declaredMethod.getReturnType()));
                         methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
                         methodDef.setJavadoc(readJavaDocDef(jpDeclaredMethod));
-
-                        jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
-                            methodDef.setComment(comment.toString());
-                        });
                         methodDefs.add(methodDef);
 
                         if (!typeDec.isInterface()) {
@@ -354,7 +351,6 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 case PARAM:
                 case EXCEPTION:
                 case THROWS:
-                case SEE:
                     JavadocMultipleContentTag cvTag = (JavadocMultipleContentTag) tags
                             .computeIfAbsent(blockTagType, (name) -> {
                                 return new JavadocMultipleContentTag();
@@ -362,6 +358,15 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                     cvTag.setName(tag.getTagName());
                     cvTag.setLabel(tag.getTagName());
                     cvTag.addContent(tag.getName().orElse(""), tag.getContent().toText());
+                    break;
+                case SEE:
+                    JavadocSeeTag seeTag = (JavadocSeeTag) tags
+                            .computeIfAbsent(blockTagType, (name) -> {
+                                return new JavadocSeeTag();
+                            });
+                    seeTag.setName(tag.getTagName());
+                    seeTag.setLabel(tag.getTagName());
+                    seeTag.addContent(tag.getContent().toText());
                     break;
                 case VERSION:
                 case AUTHOR:
