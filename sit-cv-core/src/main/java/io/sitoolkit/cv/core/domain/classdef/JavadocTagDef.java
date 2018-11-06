@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.classdef.javadoc;
+package io.sitoolkit.cv.core.domain.classdef;
 
 import java.util.ArrayList;
 import java.util.List;

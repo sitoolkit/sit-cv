@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocDef;
+import io.sitoolkit.cv.core.domain.classdef.JavadocDef;
 import lombok.Data;
 
 @Data

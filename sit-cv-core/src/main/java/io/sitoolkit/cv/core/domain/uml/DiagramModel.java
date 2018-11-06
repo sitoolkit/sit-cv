@@ -3,7 +3,7 @@ package io.sitoolkit.cv.core.domain.uml;
 import java.util.Map;
 import java.util.Set;
 
-import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocDef;
+import io.sitoolkit.cv.core.domain.classdef.JavadocDef;
 
 public interface DiagramModel {
     public String getId();

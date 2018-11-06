@@ -3,7 +3,7 @@ package io.sitoolkit.cv.app.pres.designdoc;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocDef;
+import io.sitoolkit.cv.core.domain.classdef.JavadocDef;
 import lombok.Data;
 
 @Data

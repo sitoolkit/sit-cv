@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
-import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocDef;
+import io.sitoolkit.cv.core.domain.classdef.JavadocDef;
 import lombok.Builder;
 import lombok.Value;
 
