@@ -47,11 +47,14 @@ public class AServiceImpl implements AService {
      * @param str param2 is String
      * @return return sample
      *         return multiline comment
+     * @return return sample2
+     *         return multiline comment
      * @exception RuntimeException exception1 description
-     * @exception NullPointerException
+     * @throws NullPointerException
      *      exception2 description
      *      exception multiline comment
      * @deprecated this method is deprecated.
+     * @undefined unresolve test
      */
     @Deprecated
     @Override

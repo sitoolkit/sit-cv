@@ -51,6 +51,7 @@ export class DesignDocServerService implements DesignDocService {
     this.connectionSource.subscribe(() => {
       let subscriber: any = this.stompClient.subscribe(subscribeUrl, (response: any) => {
         let detail = (<DesignDocDetail>JSON.parse(response.body));
+        console.log(detail)
         callback(detail);
         subscriber.unsubscribe();
       });

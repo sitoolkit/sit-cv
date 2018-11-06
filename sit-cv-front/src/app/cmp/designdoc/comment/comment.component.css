@@ -1,5 +1,12 @@
+app-comment {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .mat-snack-bar-container {
    max-width: 100vw;
+   max-height: 50vh;
 }
 
 .comment-header {
@@ -9,13 +16,18 @@
 }
 
 .comment-body {
+  overflow-y: auto;
   overflow-wrap: break-word;
   white-space: pre-wrap;
   padding: 1rem;
 }
 
-.comment-description, .comment-tag {
+.comment-deprecated, .comment-description, .comment-tag {
   padding-bottom: 0.5rem;
+}
+
+.comment-deprecated {
+  font-weight: bold;
 }
 
 .comment-method-declaration {

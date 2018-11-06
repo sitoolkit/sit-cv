@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -23,6 +25,8 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.javadoc.Javadoc;
+import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -37,7 +41,10 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.domain.classdef.javadoc.CvJavadoc;
+import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocDef;
+import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocMultipleContentTag;
+import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocSingleContentTag;
+import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocTagDef;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
@@ -191,16 +198,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         methodDef.setReturnType(
                                 TypeParser.getTypeDef(declaredMethod.getReturnType()));
                         methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
+                        methodDef.setJavadoc(readJavaDocDef(jpDeclaredMethod));
 
-                        jpDeclaredMethod.getWrappedNode().getJavadoc().ifPresent((javadoc) -> {
-                            CvJavadoc cvJavadoc = CvJavadoc.parse(
-                                    declaredMethod.getPackageName() + "."
-                                            + declaredMethod.getClassName(),
-                                    jpDeclaredMethod.getWrappedNode().getAnnotations(),
-                                    jpDeclaredMethod.getWrappedNode().getDeclarationAsString(),
-                                    javadoc);
-                            methodDef.setJavadoc(cvJavadoc);
-                        });
                         jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
                             methodDef.setComment(comment.toString());
                         });
@@ -327,6 +326,68 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             }
 
         }).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    JavadocDef readJavaDocDef(JavaParserMethodDeclaration declaredMethod) {
+        String qualifiedClassName = declaredMethod.getPackageName() + "."
+                + declaredMethod.getClassName();
+
+        Optional<Javadoc> javadoc = declaredMethod.getWrappedNode().getJavadoc();
+        Map<JavadocBlockTag.Type, JavadocTagDef> tags = new HashMap<>();
+        String description = null;
+        if (javadoc.isPresent()) {
+            description = javadoc.get().getDescription().toText();
+            javadoc.get().getBlockTags().stream().forEach((tag) -> {
+                JavadocBlockTag.Type blockTagType = tag.getType();
+                switch (blockTagType) {
+                case RETURN:
+                case DEPRECATED:
+                case SINCE:
+                    tags.computeIfAbsent(blockTagType, (name) -> {
+                        JavadocSingleContentTag cvTag = new JavadocSingleContentTag();
+                        cvTag.setName(tag.getTagName());
+                        cvTag.setLabel(tag.getTagName());
+                        cvTag.addContent(tag.getContent().toText());
+                        return cvTag;
+                    });
+                    break;
+                case PARAM:
+                case EXCEPTION:
+                case THROWS:
+                case SEE:
+                    JavadocMultipleContentTag cvTag = (JavadocMultipleContentTag) tags
+                            .computeIfAbsent(blockTagType, (name) -> {
+                                return new JavadocMultipleContentTag();
+                            });
+                    cvTag.setName(tag.getTagName());
+                    cvTag.setLabel(tag.getTagName());
+                    cvTag.addContent(tag.getName().orElse(""), tag.getContent().toText());
+                    break;
+                case VERSION:
+                case AUTHOR:
+                case SERIAL:
+                case SERIAL_DATA:
+                case SERIAL_FIELD:
+                    log.info("Invalid method blockTag: '{}' of method {}", tag.toText(),
+                            declaredMethod.getQualifiedSignature());
+                    break;
+                case UNKNOWN:
+                    log.info("Unknown javadoc blockTag: '{}' of method {}", tag.toText(),
+                            declaredMethod.getQualifiedSignature());
+                    break;
+                }
+            });
+        }
+
+        JavadocTagDef deprecatedTag = tags.remove(JavadocBlockTag.Type.DEPRECATED);
+
+        return JavadocDef.builder().qualifiedClassName(qualifiedClassName)
+                .annotations(declaredMethod.getWrappedNode().getAnnotations().stream()
+                        .map(AnnotationExpr::toString).collect(Collectors.toList()))
+                .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString())
+                .deprecated(deprecatedTag)
+                .description(description)
+                .tags(new ArrayList<JavadocTagDef>(tags.values())).build();
     }
 
     @Override

@@ -8,12 +8,12 @@
     </div>
 </div>
 <div class="comment-body">
-  <div>{{comment.deprecated}}</div>
+  <div class="comment-deprecated" *ngIf="comment.deprecated">{{comment.deprecated.label + " " + comment.deprecated.contents[0]}}</div>
   <div class="comment-description">{{comment.description}}</div>
   <div class="comment-tag" *ngFor="let tag of comment.tags">
     <div class="comment-tag-label">{{tag.label}}</div>
     <div class="comment-tag-content" *ngFor="let content of tag.contents">
-      <div>{{content.content}}</div>
+      <div>{{content}}</div>
     </div>
   </div>
 </div>

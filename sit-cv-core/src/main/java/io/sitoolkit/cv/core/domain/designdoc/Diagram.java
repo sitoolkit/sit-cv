@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import io.sitoolkit.cv.core.domain.classdef.javadoc.CvJavadoc;
+import io.sitoolkit.cv.core.domain.classdef.javadoc.JavadocDef;
 import lombok.Data;
 
 @Data
@@ -15,5 +15,5 @@ public class Diagram {
     private DiagramType type;
     private Set<String> tags = new HashSet<>();
     private Map<String, String> comments = new HashMap<>();
-    private Map<String, CvJavadoc> javadocs = new HashMap<>();
+    private Map<String, JavadocDef> javadocs = new HashMap<>();
 }
