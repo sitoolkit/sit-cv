@@ -15,13 +15,11 @@ import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.resolution.UnsolvedSymbolException;
-import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
-import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
 
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
+import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -30,84 +28,76 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
     private static final Pattern STREAM_METHOD_PATTERN = Pattern
             .compile("^java\\.util\\.stream\\.Stream\\..*");
 
-    private JavaParserFacade jpf;
-    private MethodCallVisitor methodCallVisitor;
+    private MethodResolver methodResolver;
 
     public static StatementVisitor build(JavaParserFacade jpf) {
         StatementVisitor statementVisitor = new StatementVisitor();
-        statementVisitor.jpf = jpf;
-        statementVisitor.methodCallVisitor = new MethodCallVisitor(jpf);
-
+        statementVisitor.methodResolver = new MethodResolver(jpf);
         return statementVisitor;
     }
 
     @Override
     public void visit(ForeachStmt n, List<CvStatement> statements) {
-        findMethodCallInLoop(n, statements);
+        LoopStatement loop = addLoopStatement(n, statements);
+        super.visit(n, loop.getChildren());
     }
 
     @Override
     public void visit(ForStmt n, List<CvStatement> statements) {
-        findMethodCallInLoop(n, statements);
+        LoopStatement loop = addLoopStatement(n, statements);
+        super.visit(n, loop.getChildren());
     }
 
     @Override
     public void visit(IfStmt n, List<CvStatement> arg) {
-        // TODO Auto-generated method stub
+        super.visit(n, arg);
+    }
+
+    @Override
+    public void visit(WhileStmt n, List<CvStatement> arg) {
         super.visit(n, arg);
     }
 
     @Override
     public void visit(MethodCallExpr n, List<CvStatement> statements) {
 
-        findNonStreamMethod(n).ifPresent(nonStreamMethod -> {
-            methodCallVisitor.visit(nonStreamMethod, statements);
-        });
-
         if (isStreamMethod(n)) {
-            findMethodCallInLoop(n, getStreamMethodParams(n), statements);
+            findNonStreamMethod(n).ifPresent(l -> l.accept(this, statements));
+            LoopStatement loop = addLoopStatement(n, statements);
+            collectStreamMethodParams(n).forEach(child -> child.accept(this, loop.getChildren()));
+
+        } else {
+            n.getScope().ifPresent(l -> l.accept(this, statements));
+            n.getArguments().forEach(p -> p.accept(this, statements));
+            addMethodCall(n, statements);
         }
     }
 
     @Override
-    public void visit(WhileStmt n, List<CvStatement> arg) {
-        // TODO Auto-generated method stub
-        super.visit(n, arg);
+    public void visit(MethodReferenceExpr n, List<CvStatement> statements) {
+        super.visit(n, statements);
+        addMethodCall(n, statements);
     }
 
-    @Override
-    public void visit(MethodReferenceExpr methodRefExpr, List<CvStatement> statements) {
-        methodCallVisitor.visit(methodRefExpr, statements);
+    LoopStatement addLoopStatement(Node n, List<CvStatement> statements) {
+        LoopStatement loop = DeclationProcessor.getLoopStatement(n);
+        statements.add(loop);
+        return loop;
     }
 
-    void findMethodCallInLoop(Node n, List<CvStatement> statements) {
-        findMethodCallInLoop(n, n.getChildNodes(), statements);
-    }
-
-    void findMethodCallInLoop(Node n, List<? extends Node> childNodes, List<CvStatement> statements) {
-        LoopStatement statement = new LoopStatement();
-        statements.add(statement);
-        statement.setBody(n.toString());
-        childNodes.stream().forEach(child -> child.accept(this, statement.getChildren()));
+    Optional<MethodCallDef> addMethodCall(Node n, List<CvStatement> statements) {
+        Optional<MethodCallDef> result = methodResolver.resolve(n).map(DeclationProcessor::getMethodCall);
+        result.ifPresent(methodCall -> {
+            log.debug("Add method call : {}", methodCall);
+            statements.add(methodCall);
+        });
+        return result;
     }
 
     boolean isStreamMethod(MethodCallExpr n) {
-        return matchesQualifiedName(n, STREAM_METHOD_PATTERN);
-    }
-
-    boolean matchesQualifiedName(MethodCallExpr n, Pattern pattern) {
-        try {
-            SymbolReference<ResolvedMethodDeclaration> ref = jpf.solve(n);
-            if (!ref.isSolved()) {
-                return false;
-            }
-            ResolvedMethodDeclaration rmd = ref.getCorrespondingDeclaration();
-            return pattern.matcher(rmd.getQualifiedName()).matches();
-
-        } catch (UnsolvedSymbolException e) {
-            log.debug("Unsolved: '{}'", n);
-            return false;
-        }
+        return methodResolver.resolve(n)
+                .map(method -> STREAM_METHOD_PATTERN.matcher(method.getQualifiedName()).matches())
+                .orElse(false);
     }
 
     Optional<MethodCallExpr> findNonStreamMethod(MethodCallExpr n) {
@@ -121,12 +111,12 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
         }
     }
 
-    List<Expression> getStreamMethodParams(MethodCallExpr n) {
+    List<Expression> collectStreamMethodParams(MethodCallExpr n) {
         if (isStreamMethod(n)) {
             List<Expression> result = new ArrayList<>();
             n.getScope().filter(MethodCallExpr.class::isInstance)
                     .map(MethodCallExpr.class::cast)
-                    .map(this::getStreamMethodParams)
+                    .map(this::collectStreamMethodParams)
                     .ifPresent(result::addAll);
 
             result.addAll(n.getArguments());

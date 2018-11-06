@@ -26,11 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AllArgsConstructor
-public class MethodReferenceSolver {
+class MethodReferenceResolver {
 
-    private JavaParserFacade jpf;
+    private final JavaParserFacade jpf;
 
-    public Optional<ResolvedMethodDeclaration> solve(MethodReferenceExpr methodRefExpr) {
+    public Optional<ResolvedMethodDeclaration> resolve(MethodReferenceExpr methodRefExpr) {
         Expression scope = methodRefExpr.getScope();
         String identifier = methodRefExpr.getIdentifier();
         Optional<ResolvedMethodDeclaration> result = findMethodDeclation(getMethodDeclations(scope), identifier);

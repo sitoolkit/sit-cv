@@ -188,8 +188,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         methodDef.setSignature(declaredMethod.getSignature());
                         methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
                         methodDef.setReturnType(
-                                TypeParser.getTypeDef(declaredMethod.getReturnType()));
-                        methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
+                                TypeProcessor.getTypeDef(declaredMethod.getReturnType()));
+                        methodDef.setParamTypes(TypeProcessor.getParamTypes(declaredMethod));
                         jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
                             methodDef.setComment(comment.toString());
                         });
@@ -306,7 +306,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 fieldDef.setName(declaredField.getName());
 
                 ResolvedType type = declaredField.getType();
-                fieldDef.setType(TypeParser.getTypeDef(type));
+                fieldDef.setType(TypeProcessor.getTypeDef(type));
                 return fieldDef;
 
             } catch (Exception e) {
