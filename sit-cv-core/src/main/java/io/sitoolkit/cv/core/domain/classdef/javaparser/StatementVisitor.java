@@ -64,7 +64,7 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
         if (isStreamMethod(n)) {
             findNonStreamMethod(n).ifPresent(l -> l.accept(this, statements));
             LoopStatement loop = addLoopStatement(n, statements);
-            collectStreamMethodParams(n).forEach(child -> child.accept(this, loop.getChildren()));
+            getStreamMethodArguments(n).forEach(p -> p.accept(this, loop.getChildren()));
 
         } else {
             n.getScope().ifPresent(l -> l.accept(this, statements));
@@ -111,12 +111,12 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
         }
     }
 
-    List<Expression> collectStreamMethodParams(MethodCallExpr n) {
+    List<Expression> getStreamMethodArguments(MethodCallExpr n) {
         if (isStreamMethod(n)) {
             List<Expression> result = new ArrayList<>();
             n.getScope().filter(MethodCallExpr.class::isInstance)
                     .map(MethodCallExpr.class::cast)
-                    .map(this::collectStreamMethodParams)
+                    .map(this::getStreamMethodArguments)
                     .ifPresent(result::addAll);
 
             result.addAll(n.getArguments());
