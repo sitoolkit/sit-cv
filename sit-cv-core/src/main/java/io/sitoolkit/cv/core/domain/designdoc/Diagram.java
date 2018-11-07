@@ -14,6 +14,5 @@ public class Diagram {
     private byte[] data;
     private DiagramType type;
     private Set<String> tags = new HashSet<>();
-    private Map<String, String> comments = new HashMap<>();
     private Map<String, ApiDocDef> apiDocs = new HashMap<>();
 }

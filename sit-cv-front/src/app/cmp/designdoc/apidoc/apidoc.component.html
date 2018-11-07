@@ -1,0 +1,22 @@
+<div class="apidoc-header">
+  <div>{{apiDoc.qualifiedClassName}}</div>
+  <div class="apidoc-method-declaration">
+    <div *ngFor="let annotation of apiDoc.annotations">
+      <div>{{annotation}}</div>
+    </div>
+    <div>{{apiDoc.methodDeclaration}}</div>
+  </div>
+</div>
+<div class="apidoc-body">
+  <div class="apidoc-deprecated" *ngIf="apiDoc.deprecated">{{apiDoc.deprecated.label + " " + apiDoc.deprecated.items[0]}}</div>
+  <div class="apidoc-description">{{apiDoc.description}}</div>
+  <div class="apidoc-content" *ngFor="let content of apiDoc.contents">
+    <div class="apidoc-content-label">{{content.label}}</div>
+    <div class="apidoc-content-item" *ngFor="let item of content.items">
+      <div>{{item}}</div>
+    </div>
+  </div>
+</div>
+<div class="apidoc-footer">
+  <button mat-raised-button color="primary" (click)="close()">Close</button>
+</div>

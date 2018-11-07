@@ -1,4 +1,4 @@
-app-comment {
+app-apidoc {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -9,41 +9,41 @@ app-comment {
    max-height: 50vh;
 }
 
-.comment-header {
+.apidoc-header {
   overflow-wrap: break-word;
   background: rgba(0,0,0,.03);
   padding: 1rem;
 }
 
-.comment-body {
+.apidoc-body {
   overflow-y: auto;
   overflow-wrap: break-word;
   white-space: pre-wrap;
   padding: 1rem;
 }
 
-.comment-deprecated, .comment-description, .comment-tag {
+.apidoc-deprecated, .apidoc-description, .apidoc-content {
   padding-bottom: 0.5rem;
 }
 
-.comment-deprecated {
+.apidoc-deprecated {
   font-weight: bold;
 }
 
-.comment-method-declaration {
+.apidoc-method-declaration {
   font-weight: bold;
   padding-left: 4rem;
   text-indent: -4rem;
 }
 
-.comment-tag-label {
+.apidoc-content-label {
   font-weight: bold;
 }
 
-.comment-tag-content {
+.apidoc-content-item {
   padding-left: 1rem;
 }
 
-.comment-footer {
+.apidoc-footer {
   text-align: right;
 }

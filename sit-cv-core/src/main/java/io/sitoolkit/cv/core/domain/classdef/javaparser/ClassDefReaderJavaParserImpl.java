@@ -332,7 +332,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
         if (javadoc.isPresent()) {
             description = javadoc.get().getDescription().toText();
             javadoc.get().getBlockTags().stream().forEach((tag) -> {
-                ApiDocContentType tagType = JavadocParser.getTagType(tag.getType());
+                ApiDocContentType tagType = ApiDocParser.getTagType(tag.getType());
                 if (tagType == null) {
                     log.info("Invalid blockTag: '{}' of method {}", tag.toText(),
                             declaredMethod.getQualifiedSignature());
@@ -340,8 +340,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 }
 
                 ApiDocContentDef tagDef = contentMap.computeIfAbsent(tagType,
-                        (key) -> JavadocParser.buildApiDocContent(tag));
-                tagDef.addItem(JavadocParser.buildApiDocItem(tag));
+                        (key) -> ApiDocParser.buildApiDocContent(tag));
+                tagDef.addItem(ApiDocParser.buildApiDocItem(tag));
             });
         }
 

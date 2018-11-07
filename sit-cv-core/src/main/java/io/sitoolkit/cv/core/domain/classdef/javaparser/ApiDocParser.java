@@ -10,7 +10,7 @@ import io.sitoolkit.cv.core.domain.classdef.ApiDocContentDef;
 import io.sitoolkit.cv.core.domain.classdef.ApiDocContentType;
 
 @Slf4j
-public class JavadocParser {
+public class ApiDocParser {
     public static ApiDocContentType getTagType(JavadocBlockTag.Type tagType) {
         switch (tagType) {
         case RETURN:
@@ -78,7 +78,7 @@ public class JavadocParser {
             item = tag.getContent().toText();
             break;
         case PARAM:
-            item = tag.getName().orElse("") + " - " + tag.getContent();
+            item = tag.getName().orElse("") + " - " + tag.getContent().toText();
             break;
         case EXCEPTION:
         case THROWS:

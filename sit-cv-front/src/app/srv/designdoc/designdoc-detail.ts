@@ -1,11 +1,12 @@
-import { DesignDocJavadoc } from "./designdoc-javadoc";
+import { DesignDocApiDoc } from "./designdoc-apidoc";
+
 
 export class DesignDocDetail {
   diagrams: { [diagramId: string]: string };
   comments: {
     [diagramId: string]: { [methodSignature: string]: string }
   };
-  javadocs: {
-    [methodSignature: string]: DesignDocJavadoc,
+  apiDocs: {
+    [methodSignature: string]: DesignDocApiDoc,
   };
 }

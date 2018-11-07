@@ -1,15 +1,15 @@
-class DesignDocJavadocTag {
+class DesignDocApiDocContent {
   label: string;
   contents: Array<string>;
 }
 
-export class DesignDocJavadoc {
+export class DesignDocApiDoc {
   qualifiedClassName: string;
   annotations: Array<string>;
   methodDeclaration: string;
-  deprecated: DesignDocJavadocTag;
+  deprecated: DesignDocApiDocContent;
   description: string;
-  tags: {
-    [name: string]: DesignDocJavadocTag
+  contents: {
+    [name: string]: DesignDocApiDocContent
   };
 }
