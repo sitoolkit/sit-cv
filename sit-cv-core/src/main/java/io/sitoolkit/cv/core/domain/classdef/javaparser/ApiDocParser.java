@@ -64,7 +64,7 @@ public class ApiDocParser {
             break;
         }
         contentDef.setName(tag.getTagName());
-        contentDef.setLabel(tag.getTagName().toUpperCase());
+        contentDef.setLabel(getTagType(tag.getType()).getLabel());
 
         return contentDef;
     }
