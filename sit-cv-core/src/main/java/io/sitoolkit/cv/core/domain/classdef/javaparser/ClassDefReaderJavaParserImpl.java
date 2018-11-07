@@ -40,6 +40,7 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocContentBuilder;
 import io.sitoolkit.cv.core.domain.classdef.ApiDocContentDef;
 import io.sitoolkit.cv.core.domain.classdef.ApiDocContentType;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
@@ -66,6 +67,12 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     @NonNull
     private SitCvConfig config;
+
+    @NonNull
+    private JavadocParser javadocParser;
+
+    @NonNull
+    private ApiDocContentBuilder apiDocContentBuilder;
 
     @Override
     public ClassDefReader readDir() {
@@ -334,19 +341,19 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
         if (javadoc.isPresent()) {
             description = javadoc.get().getDescription().toText();
             javadoc.get().getBlockTags().stream().forEach((tag) -> {
-                ApiDocContentType tagType = ApiDocParser.getContentType(tag.getType());
-                if (tagType == null) {
+                ApiDocContentType contentType = javadocParser.getApiDocContentType(tag.getType());
+                if (contentType == null) {
                     log.info("Invalid blockTag: '{}' of method {}", tag.toText(),
                             declaredMethod.getQualifiedSignature());
                     return;
                 }
 
-                ApiDocContentDef tagDef = contentMap.computeIfAbsent(tagType,
-                        (key) -> ApiDocParser.buildApiDocContent(tag));
-                tagDef.addItem(ApiDocParser.buildApiDocItem(tag));
+                ApiDocContentDef cotentDef = contentMap.computeIfAbsent(contentType,
+                        (key) -> apiDocContentBuilder.build(key));
+                cotentDef.addItem(javadocParser.buildApiDocContentItem(tag));
             });
 
-            contentMap.remove(ApiDocContentType.DEPRECATED);
+            deprecated = contentMap.remove(ApiDocContentType.DEPRECATED);
         } else {
             description = MessageManager.getMessage("classdef.apidoc.empty");
         }
