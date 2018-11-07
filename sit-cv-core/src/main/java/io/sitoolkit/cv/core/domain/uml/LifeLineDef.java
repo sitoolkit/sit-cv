@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.sitoolkit.cv.core.domain.classdef.JavadocDef;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import lombok.Data;
 
 @Data
@@ -17,7 +17,7 @@ public class LifeLineDef {
     private String sourceId;
     private List<MessageDef> messages = new ArrayList<>();
     private List<SequenceElement> elements = new ArrayList<>();
-    private JavadocDef javadoc;
+    private ApiDocDef apiDoc;
 
     public Set<String> getAllSourceIds() {
         Set<String> tags = messages.stream().map(MessageDef::getTarget)
@@ -35,8 +35,8 @@ public class LifeLineDef {
                 });
     }
 
-    public Map<String, JavadocDef> getJavadocsRecursively() {
+    public Map<String, ApiDocDef> getApiDocsRecursively() {
         return getLifeLinesRecursively(this.elements)
-                .collect(Collectors.toMap(LifeLineDef::getEntryMessage, LifeLineDef::getJavadoc));
+                .collect(Collectors.toMap(LifeLineDef::getEntryMessage, LifeLineDef::getApiDoc));
     }
 }

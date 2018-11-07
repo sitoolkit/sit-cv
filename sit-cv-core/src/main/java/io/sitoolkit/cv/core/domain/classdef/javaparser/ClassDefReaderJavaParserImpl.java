@@ -39,8 +39,9 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
-import io.sitoolkit.cv.core.domain.classdef.JavadocDef;
-import io.sitoolkit.cv.core.domain.classdef.JavadocTagDef;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocContentDef;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocContentType;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
@@ -195,7 +196,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         methodDef.setReturnType(
                                 TypeParser.getTypeDef(declaredMethod.getReturnType()));
                         methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
-                        methodDef.setJavadoc(readJavaDocDef(jpDeclaredMethod));
+                        methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
                         methodDefs.add(methodDef);
 
                         if (!typeDec.isInterface()) {
@@ -321,39 +322,38 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    JavadocDef readJavaDocDef(JavaParserMethodDeclaration declaredMethod) {
+    ApiDocDef readApiDocDef(JavaParserMethodDeclaration declaredMethod) {
         String qualifiedClassName = declaredMethod.getPackageName() + "."
                 + declaredMethod.getClassName();
 
         Optional<Javadoc> javadoc = declaredMethod.getWrappedNode().getJavadoc();
-        Map<JavadocTagType, JavadocTagDef> tags = new TreeMap<>();
+        Map<ApiDocContentType, ApiDocContentDef> contentMap = new TreeMap<>();
         String description = null;
         if (javadoc.isPresent()) {
             description = javadoc.get().getDescription().toText();
             javadoc.get().getBlockTags().stream().forEach((tag) -> {
-                JavadocTagType tagType = JavadocParser.getTagType(tag);
+                ApiDocContentType tagType = JavadocParser.getTagType(tag.getType());
                 if (tagType == null) {
-                    log.info("Invalid method blockTag: '{}' of method {}", tag.toText(),
+                    log.info("Invalid blockTag: '{}' of method {}", tag.toText(),
                             declaredMethod.getQualifiedSignature());
                     return;
                 }
 
-                JavadocTagDef tagDef = tags.computeIfAbsent(tagType, (key) -> {
-                    return JavadocParser.build(tag);
-                });
-                tagDef.addContent(JavadocParser.getContent(tag));
+                ApiDocContentDef tagDef = contentMap.computeIfAbsent(tagType,
+                        (key) -> JavadocParser.buildApiDocContent(tag));
+                tagDef.addItem(JavadocParser.buildApiDocItem(tag));
             });
         }
 
-        JavadocTagDef deprecatedTag = tags.remove(JavadocTagType.DEPRECATED);
+        ApiDocContentDef deprecated = contentMap.remove(ApiDocContentType.DEPRECATED);
 
-        return JavadocDef.builder().qualifiedClassName(qualifiedClassName)
+        return ApiDocDef.builder().qualifiedClassName(qualifiedClassName)
                 .annotations(declaredMethod.getWrappedNode().getAnnotations().stream()
                         .map(AnnotationExpr::toString).collect(Collectors.toList()))
                 .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString())
-                .deprecated(deprecatedTag)
+                .deprecated(deprecated)
                 .description(description)
-                .tags(new ArrayList<JavadocTagDef>(tags.values())).build();
+                .contents(new ArrayList<ApiDocContentDef>(contentMap.values())).build();
     }
 
     @Override

@@ -2,27 +2,30 @@ package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
 import com.github.javaparser.javadoc.JavadocBlockTag;
 
-import io.sitoolkit.cv.core.domain.classdef.JavadocMultipleContentTag;
-import io.sitoolkit.cv.core.domain.classdef.JavadocSeeTag;
-import io.sitoolkit.cv.core.domain.classdef.JavadocSingleContentTag;
-import io.sitoolkit.cv.core.domain.classdef.JavadocTagDef;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocMultipleItemContent;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocSingleSeparatedItemContent;
+import lombok.extern.slf4j.Slf4j;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocSingleItemContent;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocContentDef;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocContentType;
 
+@Slf4j
 public class JavadocParser {
-    public static JavadocTagType getTagType(JavadocBlockTag tag) {
-        switch (tag.getType()) {
+    public static ApiDocContentType getTagType(JavadocBlockTag.Type tagType) {
+        switch (tagType) {
         case RETURN:
-            return JavadocTagType.RETURN;
+            return ApiDocContentType.RETURN;
         case DEPRECATED:
-            return JavadocTagType.DEPRECATED;
+            return ApiDocContentType.DEPRECATED;
         case SINCE:
-            return JavadocTagType.SINCE;
+            return ApiDocContentType.SINCE;
         case PARAM:
-            return JavadocTagType.PARAM;
+            return ApiDocContentType.PARAM;
         case EXCEPTION:
         case THROWS:
-            return JavadocTagType.THROWS;
+            return ApiDocContentType.THROWS;
         case SEE:
-            return JavadocTagType.SEE;
+            return ApiDocContentType.SEE;
         case VERSION:
         case AUTHOR:
         case SERIAL:
@@ -34,21 +37,21 @@ public class JavadocParser {
         return null;
     }
 
-    public static JavadocTagDef build(JavadocBlockTag tag) {
-        JavadocTagDef tagDef = null;
+    public static ApiDocContentDef buildApiDocContent(JavadocBlockTag tag) {
+        ApiDocContentDef contentDef = null;
         switch (tag.getType()) {
         case RETURN:
         case DEPRECATED:
         case SINCE:
-            tagDef = new JavadocSingleContentTag();
+            contentDef = new ApiDocSingleItemContent();
             break;
         case PARAM:
         case EXCEPTION:
         case THROWS:
-            tagDef = new JavadocMultipleContentTag();
+            contentDef = new ApiDocMultipleItemContent();
             break;
         case SEE:
-            tagDef = new JavadocSeeTag();
+            contentDef = new ApiDocSingleSeparatedItemContent();
             break;
         case VERSION:
         case AUTHOR:
@@ -56,32 +59,34 @@ public class JavadocParser {
         case SERIAL_DATA:
         case SERIAL_FIELD:
         case UNKNOWN:
-            return null;
+            log.warn("Build invalid apidoc: '{}'", tag.toText());
+            contentDef = new ApiDocSingleItemContent();
+            break;
         }
-        tagDef.setName(tag.getTagName());
-        tagDef.setLabel(tag.getTagName().toUpperCase());
+        contentDef.setName(tag.getTagName());
+        contentDef.setLabel(tag.getTagName().toUpperCase());
 
-        return tagDef;
+        return contentDef;
     }
 
-    public static String getContent(JavadocBlockTag tag) {
-        String content = "";
+    public static String buildApiDocItem(JavadocBlockTag tag) {
+        String item = "";
         switch (tag.getType()) {
         case RETURN:
         case DEPRECATED:
         case SINCE:
-            content = tag.getContent().toText();
+            item = tag.getContent().toText();
             break;
         case PARAM:
-            content = tag.getName().orElse("") + " - " + tag.getContent();
+            item = tag.getName().orElse("") + " - " + tag.getContent();
             break;
         case EXCEPTION:
         case THROWS:
             String[] splitted = tag.getContent().toText().split("\\s", 2);
-            content = String.join(" - ", splitted);
+            item = String.join(" - ", splitted);
             break;
         case SEE:
-            content = tag.getContent().toText();
+            item = tag.getContent().toText();
             break;
         case VERSION:
         case AUTHOR:
@@ -89,9 +94,11 @@ public class JavadocParser {
         case SERIAL_DATA:
         case SERIAL_FIELD:
         case UNKNOWN:
-            return null;
+            log.warn("Build invalid apidoc item: '{}'", tag.toText());
+            item = "";
+            break;
         }
 
-        return content;
+        return item;
     }
 }

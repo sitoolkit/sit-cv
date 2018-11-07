@@ -6,10 +6,10 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public abstract class JavadocTagDef {
+public abstract class ApiDocContentDef {
     String name;
     String label;
-    List<String> contents = new ArrayList<>();
+    List<String> items = new ArrayList<>();
 
-    public abstract void addContent(String content);
+    public abstract void addItem(String item);
 }

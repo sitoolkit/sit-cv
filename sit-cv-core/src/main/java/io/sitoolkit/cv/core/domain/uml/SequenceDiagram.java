@@ -3,7 +3,7 @@ package io.sitoolkit.cv.core.domain.uml;
 import java.util.Map;
 import java.util.Set;
 
-import io.sitoolkit.cv.core.domain.classdef.JavadocDef;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,8 +27,8 @@ public class SequenceDiagram implements DiagramModel{
     }
 
     @Override
-    public Map<String, JavadocDef> getAllJavadocs() {
-        return entryLifeLine.getJavadocsRecursively();
+    public Map<String, ApiDocDef> getAllApiDocs() {
+        return entryLifeLine.getApiDocsRecursively();
     }
 
     @Override

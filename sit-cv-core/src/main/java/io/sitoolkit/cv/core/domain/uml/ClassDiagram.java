@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
-import io.sitoolkit.cv.core.domain.classdef.JavadocDef;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import lombok.Builder;
 import lombok.Value;
 
@@ -32,7 +32,7 @@ public class ClassDiagram implements DiagramModel {
     }
 
     @Override
-    public Map<String, JavadocDef> getAllJavadocs() {
-        return new HashMap<String, JavadocDef>();
+    public Map<String, ApiDocDef> getAllApiDocs() {
+        return new HashMap<String, ApiDocDef>();
     }
 }

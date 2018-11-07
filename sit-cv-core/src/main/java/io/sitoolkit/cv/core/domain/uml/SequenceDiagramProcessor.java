@@ -40,7 +40,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()));
-        lifeLine.setJavadoc(method.getJavadoc());
+        lifeLine.setApiDoc(method.getApiDoc());
 
         log.debug("Add lifeline {} -> {}", clazz.getName(), lifeLine);
 

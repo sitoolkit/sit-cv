@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class JavadocDef {
+public class ApiDocDef {
     private String qualifiedClassName;
     private List<String> annotations;
     private String methodDeclaration;
-    private JavadocTagDef deprecated;
+    private ApiDocContentDef deprecated;
     private String description;
-    private List<JavadocTagDef> tags;
+    private List<ApiDocContentDef> contents;
 }
