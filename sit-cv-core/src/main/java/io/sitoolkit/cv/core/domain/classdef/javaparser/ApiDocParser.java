@@ -11,7 +11,7 @@ import io.sitoolkit.cv.core.domain.classdef.ApiDocContentType;
 
 @Slf4j
 public class ApiDocParser {
-    public static ApiDocContentType getTagType(JavadocBlockTag.Type tagType) {
+    public static ApiDocContentType getContentType(JavadocBlockTag.Type tagType) {
         switch (tagType) {
         case RETURN:
             return ApiDocContentType.RETURN;
@@ -64,7 +64,7 @@ public class ApiDocParser {
             break;
         }
         contentDef.setName(tag.getTagName());
-        contentDef.setLabel(getTagType(tag.getType()).getLabel());
+        contentDef.setLabel(getContentType(tag.getType()).getLabel());
 
         return contentDef;
     }

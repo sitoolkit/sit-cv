@@ -46,6 +46,7 @@ import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.infra.resource.MessageManager;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -329,10 +330,11 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
         Optional<Javadoc> javadoc = declaredMethod.getWrappedNode().getJavadoc();
         Map<ApiDocContentType, ApiDocContentDef> contentMap = new TreeMap<>();
         String description = null;
+        ApiDocContentDef deprecated = null;
         if (javadoc.isPresent()) {
             description = javadoc.get().getDescription().toText();
             javadoc.get().getBlockTags().stream().forEach((tag) -> {
-                ApiDocContentType tagType = ApiDocParser.getTagType(tag.getType());
+                ApiDocContentType tagType = ApiDocParser.getContentType(tag.getType());
                 if (tagType == null) {
                     log.info("Invalid blockTag: '{}' of method {}", tag.toText(),
                             declaredMethod.getQualifiedSignature());
@@ -343,17 +345,19 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         (key) -> ApiDocParser.buildApiDocContent(tag));
                 tagDef.addItem(ApiDocParser.buildApiDocItem(tag));
             });
-        }
 
-        ApiDocContentDef deprecated = contentMap.remove(ApiDocContentType.DEPRECATED);
+            contentMap.remove(ApiDocContentType.DEPRECATED);
+        } else {
+            description = MessageManager.getMessage("classdef.apidoc.empty");
+        }
 
         return ApiDocDef.builder().qualifiedClassName(qualifiedClassName)
                 .annotations(declaredMethod.getWrappedNode().getAnnotations().stream()
                         .map(AnnotationExpr::toString).collect(Collectors.toList()))
                 .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString())
-                .deprecated(deprecated)
-                .description(description)
-                .contents(new ArrayList<ApiDocContentDef>(contentMap.values())).build();
+                .deprecated(deprecated).description(description)
+                .contents(new ArrayList<ApiDocContentDef>(contentMap.values()))
+                .build();
     }
 
     @Override
