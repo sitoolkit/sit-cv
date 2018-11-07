@@ -2,11 +2,12 @@ package io.sitoolkit.cv.core.domain.classdef;
 
 public class JavadocSeeTag extends JavadocTagDef {
 
-    public void addContent(String source) {
+    @Override
+    public void addContent(String content) {
         if (getContents().size() == 0) {
-            getContents().add(source);
+            getContents().add(content);
         } else {
-            getContents().set(0, getContents().get(0) + ", " + source);
+            getContents().set(0, getContents().get(0) + ", " + content);
         }
     }
 

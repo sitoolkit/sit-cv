@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -26,7 +26,6 @@ import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.javadoc.Javadoc;
-import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -40,12 +39,9 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.JavadocDef;
-import io.sitoolkit.cv.core.domain.classdef.JavadocMultipleContentTag;
-import io.sitoolkit.cv.core.domain.classdef.JavadocSeeTag;
-import io.sitoolkit.cv.core.domain.classdef.JavadocSingleContentTag;
 import io.sitoolkit.cv.core.domain.classdef.JavadocTagDef;
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
@@ -330,61 +326,26 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 + declaredMethod.getClassName();
 
         Optional<Javadoc> javadoc = declaredMethod.getWrappedNode().getJavadoc();
-        Map<JavadocBlockTag.Type, JavadocTagDef> tags = new HashMap<>();
+        Map<JavadocTagType, JavadocTagDef> tags = new TreeMap<>();
         String description = null;
         if (javadoc.isPresent()) {
             description = javadoc.get().getDescription().toText();
             javadoc.get().getBlockTags().stream().forEach((tag) -> {
-                JavadocBlockTag.Type blockTagType = tag.getType();
-                switch (blockTagType) {
-                case RETURN:
-                case DEPRECATED:
-                case SINCE:
-                    tags.computeIfAbsent(blockTagType, (name) -> {
-                        JavadocSingleContentTag cvTag = new JavadocSingleContentTag();
-                        cvTag.setName(tag.getTagName());
-                        cvTag.setLabel(tag.getTagName());
-                        cvTag.addContent(tag.getContent().toText());
-                        return cvTag;
-                    });
-                    break;
-                case PARAM:
-                case EXCEPTION:
-                case THROWS:
-                    JavadocMultipleContentTag cvTag = (JavadocMultipleContentTag) tags
-                            .computeIfAbsent(blockTagType, (name) -> {
-                                return new JavadocMultipleContentTag();
-                            });
-                    cvTag.setName(tag.getTagName());
-                    cvTag.setLabel(tag.getTagName());
-                    cvTag.addContent(tag.getName().orElse(""), tag.getContent().toText());
-                    break;
-                case SEE:
-                    JavadocSeeTag seeTag = (JavadocSeeTag) tags
-                            .computeIfAbsent(blockTagType, (name) -> {
-                                return new JavadocSeeTag();
-                            });
-                    seeTag.setName(tag.getTagName());
-                    seeTag.setLabel(tag.getTagName());
-                    seeTag.addContent(tag.getContent().toText());
-                    break;
-                case VERSION:
-                case AUTHOR:
-                case SERIAL:
-                case SERIAL_DATA:
-                case SERIAL_FIELD:
+                JavadocTagType tagType = JavadocParser.getTagType(tag);
+                if (tagType == null) {
                     log.info("Invalid method blockTag: '{}' of method {}", tag.toText(),
                             declaredMethod.getQualifiedSignature());
-                    break;
-                case UNKNOWN:
-                    log.info("Unknown javadoc blockTag: '{}' of method {}", tag.toText(),
-                            declaredMethod.getQualifiedSignature());
-                    break;
+                    return;
                 }
+
+                JavadocTagDef tagDef = tags.computeIfAbsent(tagType, (key) -> {
+                    return JavadocParser.build(tag);
+                });
+                tagDef.addContent(JavadocParser.getContent(tag));
             });
         }
 
-        JavadocTagDef deprecatedTag = tags.remove(JavadocBlockTag.Type.DEPRECATED);
+        JavadocTagDef deprecatedTag = tags.remove(JavadocTagType.DEPRECATED);
 
         return JavadocDef.builder().qualifiedClassName(qualifiedClassName)
                 .annotations(declaredMethod.getWrappedNode().getAnnotations().stream()

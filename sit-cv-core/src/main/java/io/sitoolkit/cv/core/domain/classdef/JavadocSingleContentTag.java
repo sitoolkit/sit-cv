@@ -2,9 +2,10 @@ package io.sitoolkit.cv.core.domain.classdef;
 
 public class JavadocSingleContentTag extends JavadocTagDef {
 
-    public void addContent(String source) {
+    @Override
+    public void addContent(String content) {
         if (getContents().size() == 0) {
-            getContents().add(source);
+            getContents().add(content);
         }
     }
 

@@ -10,4 +10,6 @@ public abstract class JavadocTagDef {
     String name;
     String label;
     List<String> contents = new ArrayList<>();
+
+    public abstract void addContent(String content);
 }
