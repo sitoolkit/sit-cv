@@ -1,6 +1,5 @@
 snack-bar-container {
   overflow-wrap: break-word;
-  max-width: 100vw;
   max-height: 50vh;
 }
 
@@ -27,7 +26,6 @@ app-apidoc .mat-card.apidoc-container {
 
 .apidoc-container .mat-list .mat-list-item {
   height: auto;
-  white-space: pre-wrap;
   margin-bottom: 0.5rem;
   font-size: inherit;
 }
