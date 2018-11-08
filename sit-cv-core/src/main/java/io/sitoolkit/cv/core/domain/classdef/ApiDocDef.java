@@ -15,7 +15,5 @@ public class ApiDocDef {
     private String qualifiedClassName;
     private List<String> annotations;
     private String methodDeclaration;
-    private ApiDocContentDef deprecated;
-    private String description;
-    private List<ApiDocContentDef> contents;
+    private List<String> contents;
 }

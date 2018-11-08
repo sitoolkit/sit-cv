@@ -29,41 +29,24 @@ public class AServiceImpl implements AService {
         return aRepository.searchBy(condition);
     }
 
+    /**
+     * save XEntity object.
+     * multiline comment.
+     * See the <a href="{@docRoot}/copyright.html">Copyright</a>.
+     * {@link other/link}
+     *
+     * @since 1.1.0.sample
+     * @param entity XEntity object
+     * @return return saved status(int)
+     * @exception RuntimeException exception description
+     * @throws NullPointerException
+     *      throws description
+     *      multiline comment
+     * @see Sample#see
+     */
     @Override
     public int save(XEntity entity) {
 
         return aRepository.save(entity);
     }
-
-    /**
-     * sample comment
-     *   multiline and indented
-     * See the <a href="{@docRoot}/copyright.html">Copyright</a>.
-     * {@link other/link}
-     * @since 123.123
-     * @param entity
-     *      param1 is XEntity object
-     *      param multiline comment
-     * @param str param2 is String
-     * @return return sample
-     *         return multiline comment
-     * @return return sample2
-     *         return multiline comment
-     * @exception RuntimeException exception1 description
-     * @throws NullPointerException
-     *      exception2 description
-     *      exception multiline comment
-     * @deprecated this method is deprecated.
-     * @see Sample#see
-     * @see ARepositoryImpl
-     * @undefined unresolve test
-     */
-    @Deprecated
-    @Override
-    public SearchConditioner deprecatedMethod(XEntity entity, String str) throws NullPointerException {
-        SearchConditioner conditioner = null;
-        conditioner.equals("");
-        return new SearchConditioner();
-    }
-
 }

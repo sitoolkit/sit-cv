@@ -6,12 +6,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +25,7 @@ import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.javadoc.Javadoc;
+import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -34,20 +34,17 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
 
+import io.sitoolkit.cv.core.domain.classdef.ApiDocContentDef;
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
-import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
-import io.sitoolkit.cv.core.domain.classdef.ApiDocContentBuilder;
-import io.sitoolkit.cv.core.domain.classdef.ApiDocContentDef;
-import io.sitoolkit.cv.core.domain.classdef.ApiDocContentType;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
-import io.sitoolkit.cv.core.infra.resource.MessageManager;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,12 +64,6 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     @NonNull
     private SitCvConfig config;
-
-    @NonNull
-    private JavadocParser javadocParser;
-
-    @NonNull
-    private ApiDocContentBuilder apiDocContentBuilder;
 
     @Override
     public ClassDefReader readDir() {
@@ -335,36 +326,21 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 + declaredMethod.getClassName();
 
         Optional<Javadoc> javadoc = declaredMethod.getWrappedNode().getJavadoc();
-        Map<ApiDocContentType, ApiDocContentDef> contentMap = new TreeMap<>();
-        String description = null;
-        ApiDocContentDef deprecated = null;
+        List<String> contents = new ArrayList<>();
         if (javadoc.isPresent()) {
-            description = javadoc.get().getDescription().toText();
-            javadoc.get().getBlockTags().stream().forEach((tag) -> {
-                ApiDocContentType contentType = javadocParser.getApiDocContentType(tag.getType());
-                if (contentType == null) {
-                    log.info("Invalid blockTag: '{}' of method {}", tag.toText(),
-                            declaredMethod.getQualifiedSignature());
-                    return;
-                }
-
-                ApiDocContentDef cotentDef = contentMap.computeIfAbsent(contentType,
-                        (key) -> apiDocContentBuilder.build(key));
-                cotentDef.addItem(javadocParser.buildApiDocContentItem(tag));
-            });
-
-            deprecated = contentMap.remove(ApiDocContentType.DEPRECATED);
+            contents.add(javadoc.get().getDescription().toText());
+            List<String> tagContents = javadoc.get().getBlockTags().stream()
+                    .map(JavadocBlockTag::toText).collect(Collectors.toList());
+            contents.addAll(tagContents);
         } else {
-            description = MessageManager.getMessage("classdef.apidoc.empty");
+            contents.add("No API Document.");
         }
 
         return ApiDocDef.builder().qualifiedClassName(qualifiedClassName)
                 .annotations(declaredMethod.getWrappedNode().getAnnotations().stream()
                         .map(AnnotationExpr::toString).collect(Collectors.toList()))
                 .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString())
-                .deprecated(deprecated).description(description)
-                .contents(new ArrayList<ApiDocContentDef>(contentMap.values()))
-                .build();
+                .contents(contents).build();
     }
 
     @Override

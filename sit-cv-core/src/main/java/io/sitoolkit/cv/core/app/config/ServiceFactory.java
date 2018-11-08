@@ -4,11 +4,9 @@ import java.nio.file.Path;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.app.report.ReportService;
-import io.sitoolkit.cv.core.domain.classdef.ApiDocContentBuilder;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
-import io.sitoolkit.cv.core.domain.classdef.javaparser.JavadocParser;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
@@ -77,7 +75,7 @@ public class ServiceFactory {
             ProjectManager projectManager) {
         ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
         ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
-                projectManager, config, new JavadocParser(), new ApiDocContentBuilder());
+                projectManager, config);
         SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(
                 config.getSequenceDiagramFilter());
         ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();

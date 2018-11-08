@@ -14,9 +14,6 @@ public class AController {
 
     /**
      * AController search method
-     * multi line comment.
-     *   indented comment.
-     *     multi indented comment.
      *
      * @return list of XEntity
      */
@@ -28,9 +25,5 @@ public class AController {
 
     public int save(XEntity entity) {
         return aService.save(entity);
-    }
-
-    public SearchConditioner deprecatedMethod() {
-        return aService.deprecatedMethod(new XEntity(), "sample");
     }
 }

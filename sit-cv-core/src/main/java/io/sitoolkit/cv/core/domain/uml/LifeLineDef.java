@@ -32,7 +32,7 @@ public class LifeLineDef {
                     LifeLineDef target = message.getTarget();
                     return Stream.concat(getLifeLinesRecursively(target.getElements()),
                             Stream.of(target));
-                });
+                }).distinct();
     }
 
     public Map<String, ApiDocDef> getApiDocsRecursively() {

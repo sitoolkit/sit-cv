@@ -1,41 +1,12 @@
-snack-bar-container {
-  overflow-wrap: break-word;
-  max-height: 50vh;
-}
-
 app-apidoc .mat-card.apidoc-container {
+  overflow-wrap: break-word;
   padding: 0;
   box-shadow: none;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-}
-
-.apidoc-container .mat-card-header {
-  display: block;
-}
-
-.apidoc-container .mat-card-header {
-  display: block;
-}
-
-.mat-card-content {
-  overflow-y: auto;
 }
 
 .apidoc-container .mat-list .mat-list-item {
   height: auto;
   margin-bottom: 0.5rem;
-  font-size: inherit;
-}
-
-.apidoc-container .mat-list .mat-list-item .mat-list-item-content {
-  display: block;
-}
-
-.apidoc-deprecated {
-  font-weight: bold;
 }
 
 .apidoc-method-declaration {
@@ -43,15 +14,7 @@ app-apidoc .mat-card.apidoc-container {
   text-indent: -4rem;
 }
 
-.apidoc-content-label {
-  font-weight: bold;
-}
-
-.apidoc-content-item {
-  padding-left: 0.5rem;
-}
-
-.apidoc-container .mat-card-footer {
+.apidoc-container .mat-card-actions {
   text-align: right;
-  margin: 0;
+  margin: 0 !important;
 }

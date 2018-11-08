@@ -6,10 +6,8 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public abstract class ApiDocContentDef {
+public class ApiDocContentDef {
     String name;
     String label;
     List<String> items = new ArrayList<>();
-
-    public abstract void addItem(String item);
 }
