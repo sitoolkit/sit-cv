@@ -1,7 +1,12 @@
 app-apidoc .mat-card.apidoc-container {
+  word-wrap: break-word;
   overflow-wrap: break-word;
   padding: 0;
   box-shadow: none;
+}
+
+.apidoc-container .mat-card-header-text {
+  width: 100%;
 }
 
 .apidoc-container .mat-list .mat-list-item {
