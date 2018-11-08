@@ -34,9 +34,6 @@ mat-progress-bar {
   max-width: 100%;
 }
 
-.comment mat-card-content {
-  white-space: pre-line;
-}
 .active {
   background: #E8EAF6;
 }

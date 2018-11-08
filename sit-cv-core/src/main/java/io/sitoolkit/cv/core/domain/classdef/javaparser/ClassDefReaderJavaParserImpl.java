@@ -23,6 +23,8 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.javadoc.Javadoc;
+import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -31,6 +33,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
 
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
@@ -190,9 +193,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         methodDef.setReturnType(
                                 TypeParser.getTypeDef(declaredMethod.getReturnType()));
                         methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
-                        jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
-                            methodDef.setComment(comment.toString());
-                        });
+                        methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
                         methodDefs.add(methodDef);
 
                         if (!typeDec.isInterface()) {
@@ -316,6 +317,28 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             }
 
         }).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    ApiDocDef readApiDocDef(JavaParserMethodDeclaration declaredMethod) {
+        String qualifiedClassName = declaredMethod.getPackageName() + "."
+                + declaredMethod.getClassName();
+
+        Optional<Javadoc> javadoc = declaredMethod.getWrappedNode().getJavadoc();
+        List<String> contents = new ArrayList<>();
+        if (javadoc.isPresent()) {
+            contents.add(javadoc.get().getDescription().toText());
+            List<String> tagContents = javadoc.get().getBlockTags().stream()
+                    .map(JavadocBlockTag::toText).collect(Collectors.toList());
+            contents.addAll(tagContents);
+        } else {
+            contents.add("No API Document.");
+        }
+
+        return ApiDocDef.builder().qualifiedClassName(qualifiedClassName)
+                .annotations(declaredMethod.getWrappedNode().getAnnotations().stream()
+                        .map(AnnotationExpr::toString).collect(Collectors.toList()))
+                .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString())
+                .contents(contents).build();
     }
 
     @Override

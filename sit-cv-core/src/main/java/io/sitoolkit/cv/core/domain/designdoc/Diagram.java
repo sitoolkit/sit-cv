@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import lombok.Data;
 
 @Data
@@ -13,5 +14,5 @@ public class Diagram {
     private byte[] data;
     private DiagramType type;
     private Set<String> tags = new HashSet<>();
-    private Map<String, String> comments = new HashMap<>();
+    private Map<String, ApiDocDef> apiDocs = new HashMap<>();
 }

@@ -1,0 +1,20 @@
+app-apidoc .mat-card.apidoc-container {
+  overflow-wrap: break-word;
+  padding: 0;
+  box-shadow: none;
+}
+
+.apidoc-container .mat-list .mat-list-item {
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.apidoc-method-declaration {
+  padding-left: 4rem;
+  text-indent: -4rem;
+}
+
+.apidoc-container .mat-card-actions {
+  text-align: right;
+  margin: 0 !important;
+}
