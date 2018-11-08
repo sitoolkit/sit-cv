@@ -16,7 +16,7 @@ public class PlantUmlWriter {
         Diagram diagram = new Diagram();
         diagram.setId(model.getId());
         diagram.setTags(model.getAllTags());
-        diagram.setComments(model.getAllComments());
+        diagram.setApiDocs(model.getAllApiDocs());
 
         SourceStringReader reader = new SourceStringReader(serializer.apply(model));
 
