@@ -70,6 +70,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl, pushedStack));
         message.setResponseName(methodCall.getReturnType().toString());
+        message.setMethodCall(methodCall);
 
         return Optional.of(message);
 

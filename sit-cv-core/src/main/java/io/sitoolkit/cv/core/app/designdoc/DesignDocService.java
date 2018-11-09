@@ -120,7 +120,7 @@ public class DesignDocService {
 
         LifeLineDef lifeLine = sequenceProcessor.process(entryPoint.getClassDef(), entryPoint);
         SequenceDiagram sequenceModel = SequenceDiagram.builder().entryLifeLine(lifeLine).build();
-        ClassDiagram classModel = classProcessor.process(entryPoint);
+        ClassDiagram classModel = classProcessor.process(lifeLine);
 
         Stream<String> allSourceIds = Stream.of(sequenceModel, classModel)
                 .map(DiagramModel::getAllSourceIds).flatMap(Set::stream).distinct();
