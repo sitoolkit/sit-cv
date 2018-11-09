@@ -22,6 +22,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.project.Project;
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,14 +72,15 @@ public class StatementVisitorTest {
 
     public void testFlatLoop(String method) {
         List<CvStatement> statements = new ArrayList<>();
+        MethodDef methodDef = new MethodDef();
 
         compilationUnit.getClassByName("LoopController").ifPresent(clazz -> {
 
-            clazz.getMethodsByName(method).get(0).accept(statementVisitor, statements);
+            clazz.getMethodsByName(method).get(0).accept(statementVisitor, VisitContext.statementsOf(methodDef));
 
         });
 
-        List<CvStatement> loopStatements = statements.stream()
+        List<CvStatement> loopStatements = methodDef.getStatements().stream()
                 .filter(LoopStatement.class::isInstance).collect(Collectors.toList());
 
         assertThat(loopStatements.size(), is(1));

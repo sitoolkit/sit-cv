@@ -26,14 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AllArgsConstructor
-public class MethodReferenceSolver {
+class MethodReferenceResolver {
 
-    private JavaParserFacade jpf;
+    private final JavaParserFacade jpf;
 
-    public Optional<ResolvedMethodDeclaration> solve(MethodReferenceExpr methodRefExpr) {
+    public Optional<ResolvedMethodDeclaration> resolve(MethodReferenceExpr methodRefExpr) {
         Expression scope = methodRefExpr.getScope();
         String identifier = methodRefExpr.getIdentifier();
-        Optional<ResolvedMethodDeclaration> result = findMethodDeclation(getMethodDeclations(scope), identifier);
+        Optional<ResolvedMethodDeclaration> result = findMethodDeclation(resolveMethodsFromTypeOf(scope), identifier);
 
         if (result.isPresent()) {
             log.debug("method reference solved: '{}' -> {} ", methodRefExpr, result.get());
@@ -43,16 +43,18 @@ public class MethodReferenceSolver {
         return result;
     }
 
-    List<ResolvedMethodDeclaration> getMethodDeclations(Expression exp) {
+    List<ResolvedMethodDeclaration> resolveMethodsFromTypeOf(Expression exp) {
 
         if (exp instanceof TypeExpr) {
             return resolveType((TypeExpr) exp)
-                    .map(this::getResolvedMethods)
+                    .map(ResolvedReferenceType::getAllMethods)
                     .orElse(Collections.emptyList());
 
         } else if (exp instanceof ThisExpr) {
             return resolveTypeDeclaration((ThisExpr) exp)
-                    .map(this::getResolvedMethods)
+                    .map(declatrion -> declatrion.getAllMethods().stream()
+                            .map(MethodUsage::getDeclaration)
+                            .collect(Collectors.toList()))
                     .orElse(Collections.emptyList());
 
         } else if (exp instanceof ClassExpr) {
@@ -123,16 +125,6 @@ public class MethodReferenceSolver {
         }
         return Optional.empty();
 
-    }
-
-    List<ResolvedMethodDeclaration> getResolvedMethods(ResolvedReferenceType rrt) {
-        return rrt.getAllMethods();
-    }
-
-    List<ResolvedMethodDeclaration> getResolvedMethods(ResolvedReferenceTypeDeclaration rrtd) {
-        return rrtd.getAllMethods().stream()
-                .map(MethodUsage::getDeclaration)
-                .collect(Collectors.toList());
     }
 
     Optional<ResolvedMethodDeclaration> findMethodDeclation(List<ResolvedMethodDeclaration> methods,
