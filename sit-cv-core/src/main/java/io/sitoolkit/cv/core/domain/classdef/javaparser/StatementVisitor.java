@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
@@ -18,80 +17,72 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
-import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
-import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
     private static final Pattern STREAM_METHOD_PATTERN = Pattern
             .compile("^java\\.util\\.stream\\.Stream\\..*");
 
-    private MethodResolver methodResolver;
+    private final MethodResolver methodResolver;
 
     public static StatementVisitor build(JavaParserFacade jpf) {
-        StatementVisitor statementVisitor = new StatementVisitor();
-        statementVisitor.methodResolver = new MethodResolver(jpf);
-        return statementVisitor;
+        MethodResolver methodResolver = new MethodResolver(jpf);
+        return new StatementVisitor(methodResolver);
     }
 
     @Override
-    public void visit(ForeachStmt n, List<CvStatement> statements) {
-        LoopStatement loop = addLoopStatement(n, statements);
-        super.visit(n, loop.getChildren());
+    public void visit(ForeachStmt n, VisitContext context) {
+        CvStatement statement = DeclationProcessor.createLoopStatement(n);
+        context.addStatement(statement);
+        super.visit(n, VisitContext.childrenOf(statement));
     }
 
     @Override
-    public void visit(ForStmt n, List<CvStatement> statements) {
-        LoopStatement loop = addLoopStatement(n, statements);
-        super.visit(n, loop.getChildren());
+    public void visit(ForStmt n, VisitContext context) {
+        CvStatement statement = DeclationProcessor.createLoopStatement(n);
+        context.addStatement(statement);
+        super.visit(n, VisitContext.childrenOf(statement));
     }
 
     @Override
-    public void visit(IfStmt n, List<CvStatement> arg) {
-        super.visit(n, arg);
+    public void visit(IfStmt n, VisitContext context) {
+        super.visit(n, context);
     }
 
     @Override
-    public void visit(WhileStmt n, List<CvStatement> arg) {
-        super.visit(n, arg);
+    public void visit(WhileStmt n, VisitContext context) {
+        super.visit(n, context);
     }
 
     @Override
-    public void visit(MethodCallExpr n, List<CvStatement> statements) {
+    public void visit(MethodCallExpr n, VisitContext context) {
 
         if (isStreamMethod(n)) {
-            findNonStreamMethod(n).ifPresent(l -> l.accept(this, statements));
-            LoopStatement loop = addLoopStatement(n, statements);
-            getStreamMethodArguments(n).forEach(p -> p.accept(this, loop.getChildren()));
+            findNonStreamMethod(n).ifPresent(l -> l.accept(this, context));
+            CvStatement statement = DeclationProcessor.createLoopStatement(n);
+            context.addStatement(statement);
+            collectStreamMethodArguments(n).forEach(p -> p.accept(this, VisitContext.childrenOf(statement)));
 
         } else {
-            n.getScope().ifPresent(l -> l.accept(this, statements));
-            n.getArguments().forEach(p -> p.accept(this, statements));
-            addMethodCall(n, statements);
+            n.getScope().ifPresent(l -> l.accept(this, context));
+            n.getArguments().forEach(p -> p.accept(this, context));
+            methodResolver.resolve(n)
+                    .map(DeclationProcessor::createMethodCall)
+                    .ifPresent(context::addStatement);
         }
     }
 
     @Override
-    public void visit(MethodReferenceExpr n, List<CvStatement> statements) {
-        super.visit(n, statements);
-        addMethodCall(n, statements);
-    }
-
-    LoopStatement addLoopStatement(Node n, List<CvStatement> statements) {
-        LoopStatement loop = DeclationProcessor.getLoopStatement(n);
-        statements.add(loop);
-        return loop;
-    }
-
-    Optional<MethodCallDef> addMethodCall(Node n, List<CvStatement> statements) {
-        Optional<MethodCallDef> result = methodResolver.resolve(n).map(DeclationProcessor::getMethodCall);
-        result.ifPresent(methodCall -> {
-            log.debug("Add method call : {}", methodCall);
-            statements.add(methodCall);
-        });
-        return result;
+    public void visit(MethodReferenceExpr n, VisitContext context) {
+        super.visit(n, context);
+        methodResolver.resolve(n)
+                .map(DeclationProcessor::createMethodCall)
+                .ifPresent(context::addStatement);
     }
 
     boolean isStreamMethod(MethodCallExpr n) {
@@ -111,12 +102,12 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
         }
     }
 
-    List<Expression> getStreamMethodArguments(MethodCallExpr n) {
+    List<Expression> collectStreamMethodArguments(MethodCallExpr n) {
         if (isStreamMethod(n)) {
             List<Expression> result = new ArrayList<>();
             n.getScope().filter(MethodCallExpr.class::isInstance)
                     .map(MethodCallExpr.class::cast)
-                    .map(this::getStreamMethodArguments)
+                    .map(this::collectStreamMethodArguments)
                     .ifPresent(result::addAll);
 
             result.addAll(n.getArguments());

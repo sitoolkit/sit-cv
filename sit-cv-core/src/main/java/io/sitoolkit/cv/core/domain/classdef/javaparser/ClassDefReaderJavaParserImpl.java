@@ -188,8 +188,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         methodDef.setSignature(declaredMethod.getSignature());
                         methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
                         methodDef.setReturnType(
-                                TypeProcessor.getTypeDef(declaredMethod.getReturnType()));
-                        methodDef.setParamTypes(TypeProcessor.getParamTypes(declaredMethod));
+                                TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
+                        methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
                         jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
                             methodDef.setComment(comment.toString());
                         });
@@ -198,9 +198,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         if (!typeDec.isInterface()) {
                             typeDec.getMethods().stream().forEach(method -> {
                                 if (equalMethods(declaredMethod, method)) {
-                                    method.accept(statementVisitor, methodDef.getStatements());
-                                    methodDef
-                                            .setActionPath(classActionPath + getActionPath(method));
+                                    method.accept(statementVisitor, VisitContext.statementsOf(methodDef));
+                                    methodDef.setActionPath(classActionPath + getActionPath(method));
                                 }
                             });
                         }
@@ -306,7 +305,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 fieldDef.setName(declaredField.getName());
 
                 ResolvedType type = declaredField.getType();
-                fieldDef.setType(TypeProcessor.getTypeDef(type));
+                fieldDef.setType(TypeProcessor.createTypeDef(type));
                 return fieldDef;
 
             } catch (Exception e) {
