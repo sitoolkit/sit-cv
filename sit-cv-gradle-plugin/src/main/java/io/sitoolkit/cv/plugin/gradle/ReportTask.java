@@ -32,6 +32,6 @@ public class ReportTask extends DefaultTask {
             projectDirs = Arrays.asList(basePath);
         }
 
-        ServiceFactory.initialize(projectDirs.get(0), ApplicationMode.REPORT).getReportService().export();
+        ServiceFactory.createAndInitialize(projectDirs.get(0)).getReportService().export();
     }
 }

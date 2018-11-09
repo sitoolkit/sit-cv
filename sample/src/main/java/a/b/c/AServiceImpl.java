@@ -16,7 +16,7 @@ public class AServiceImpl implements AService {
 
     /**
      * Return search result of condition.
-     * 
+     *
      * @param search
      *            condition
      * @return list of XEntity
@@ -29,6 +29,21 @@ public class AServiceImpl implements AService {
         return aRepository.searchBy(condition);
     }
 
+    /**
+     * save XEntity object.
+     * multiline comment.
+     * See the <a href="{@docRoot}/copyright.html">Copyright</a>.
+     * {@link other/link}
+     *
+     * @since 1.1.0.sample
+     * @param entity XEntity object
+     * @return return saved status(int)
+     * @exception RuntimeException exception description
+     * @throws NullPointerException
+     *      throws description
+     *      multiline comment
+     * @see Sample#see
+     */
     @Override
     public int save(XEntity entity) {
 

@@ -63,7 +63,7 @@ public class DesignDocReportProcessor {
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
             detail.getDiagrams().put(diagram.getId(), data);
-            detail.getComments().putAll(diagram.getComments());
+            detail.getApiDocs().putAll(diagram.getApiDocs());
         });
         return "window.reportData.designDoc.detailList['" + designDoc.getId() + "'] = "
                 + JsonUtils.obj2str(detail) + ";";

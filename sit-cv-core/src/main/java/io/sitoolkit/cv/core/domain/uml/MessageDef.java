@@ -1,6 +1,8 @@
 package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import lombok.Data;
 
@@ -15,5 +17,10 @@ public class MessageDef extends SequenceElement {
     @Override
     public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
         return writer.write(lifeLine, this);
+    }
+
+    @Override
+    public Stream<LifeLineDef> getLifeLinesRecursively() {
+        return getTarget().getLifeLinesRecursively().filter(Objects::nonNull).distinct();
     }
 }
