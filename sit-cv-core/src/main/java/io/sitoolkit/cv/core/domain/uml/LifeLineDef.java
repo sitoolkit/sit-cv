@@ -3,6 +3,7 @@ package io.sitoolkit.cv.core.domain.uml;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,17 +27,14 @@ public class LifeLineDef {
         return tags;
     }
 
-    private Stream<LifeLineDef> getLifeLinesRecursively(List<SequenceElement> elements) {
-        return elements.stream().filter(MessageDef.class::isInstance).map(MessageDef.class::cast)
-                .flatMap((message) -> {
-                    LifeLineDef target = message.getTarget();
-                    return Stream.concat(getLifeLinesRecursively(target.getElements()),
-                            Stream.of(target));
-                }).distinct();
+    public Stream<LifeLineDef> getLifeLinesRecursively() {
+        Stream<LifeLineDef> stream = getElements().stream()
+                .flatMap(SequenceElement::getLifeLinesRecursively).filter(Objects::nonNull);
+        return Stream.concat(Stream.of(this), stream).distinct();
     }
 
     public Map<String, ApiDocDef> getApiDocsRecursively() {
-        return getLifeLinesRecursively(this.elements)
+        return getLifeLinesRecursively()
                 .collect(Collectors.toMap(LifeLineDef::getEntryMessage, LifeLineDef::getApiDoc));
     }
 }
