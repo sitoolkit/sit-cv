@@ -1,7 +1,6 @@
 package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
@@ -22,7 +21,8 @@ public class MessageDef extends SequenceElement {
     }
 
     @Override
-    public Stream<LifeLineDef> getLifeLinesRecursively() {
-        return getTarget().getLifeLinesRecursively().filter(Objects::nonNull).distinct();
+    public Stream<MessageDef> getMessagesRecursively() {
+        Stream<MessageDef> messages = getTarget().getMessagesRecursively();
+        return Stream.concat(Stream.of(this), messages);
     }
 }

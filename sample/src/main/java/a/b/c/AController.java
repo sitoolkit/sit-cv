@@ -12,6 +12,9 @@ public class AController {
     @Autowired
     AService aService;
 
+    @Autowired
+    BService bService;
+
     /**
      * AController search method
      *
@@ -25,5 +28,12 @@ public class AController {
 
     public int save(XEntity entity) {
         return aService.save(entity);
+    }
+
+    public void loopSave(XEntity entity) {
+        for(int i = 0; i < 10; i++) {
+            bService.search(new SearchConditioner());
+        }
+        aService.save(entity);
     }
 }

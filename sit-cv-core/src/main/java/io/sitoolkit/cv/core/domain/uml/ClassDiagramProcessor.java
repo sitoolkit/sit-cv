@@ -33,7 +33,7 @@ public class ClassDiagramProcessor {
 
     public ClassDiagram process(LifeLineDef lifeLine) {
         return process(lifeLine.getEntryMessage(),
-                getSequenceMethodsRecursively(lifeLine).collect(Collectors.toSet()));
+                lifeLine.getSequenceMethodsRecursively().collect(Collectors.toSet()));
     }
 
     public ClassDiagram process(String signature, Set<MethodDef> sequenceMethods) {
@@ -111,16 +111,6 @@ public class ClassDiagramProcessor {
         return Stream.concat(Stream.of(methodImpl),
                 methodImpl.getMethodCalls().stream()
                 .flatMap(method -> getSequenceMethodsRecursively(method, pushedStack)));
-    }
-
-    private Stream<MethodDef> getSequenceMethodsRecursively(LifeLineDef lifeLine) {
-        return lifeLine.getElements().stream()
-                .filter(MessageDef.class::isInstance)
-                .map(MessageDef.class::cast)
-                .flatMap(message -> {
-                    return Stream.concat(getSequenceMethodsRecursively(message.getTarget()),
-                            Stream.of(message.getMethodCall()));
-                });
     }
 
     Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef) {
