@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.stmt.ForStmt;
@@ -78,11 +79,19 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     }
 
     @Override
+    public void visit(LambdaExpr n, VisitContext context) {
+        if (context.isInLoop()) {
+            super.visit(n, context);
+        }
+    }
+    @Override
     public void visit(MethodReferenceExpr n, VisitContext context) {
-        super.visit(n, context);
-        methodResolver.resolve(n)
-                .map(DeclationProcessor::createMethodCall)
-                .ifPresent(context::addStatement);
+        if (context.isInLoop()) {
+            super.visit(n, context);
+            methodResolver.resolve(n)
+                    .map(DeclationProcessor::createMethodCall)
+                    .ifPresent(context::addStatement);
+        }
     }
 
     boolean isStreamMethod(MethodCallExpr n) {
@@ -117,4 +126,5 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
             return Collections.emptyList();
         }
     }
+
 }

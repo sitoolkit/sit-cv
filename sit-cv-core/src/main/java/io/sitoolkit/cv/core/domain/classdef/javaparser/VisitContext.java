@@ -29,7 +29,7 @@ public class VisitContext {
         statements.add(statement);
     }
 
-    boolean isLoop() {
+    boolean isInLoop() {
         return parent instanceof LoopStatement;
     }
 }
