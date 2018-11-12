@@ -100,7 +100,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         if (type.getVariable() == null) {
             return type.toString();
         } else {
-            return type.toString() + " " + type.getVariable();
+            return type.getVariable() + ": " + type.toString();
         }
     }
 
