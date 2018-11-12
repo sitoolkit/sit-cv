@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import lombok.Data;
 
 @Data
@@ -27,14 +28,22 @@ public class LifeLineDef {
         return tags;
     }
 
+    public Stream<MessageDef> getMessagesRecursively() {
+        return getElements().stream().flatMap(SequenceElement::getMessagesRecursively)
+                .filter(Objects::nonNull).distinct();
+    }
+
     public Stream<LifeLineDef> getLifeLinesRecursively() {
-        Stream<LifeLineDef> stream = getElements().stream()
-                .flatMap(SequenceElement::getLifeLinesRecursively).filter(Objects::nonNull);
-        return Stream.concat(Stream.of(this), stream).distinct();
+        Stream<LifeLineDef> stream = getMessagesRecursively().map(MessageDef::getTarget);
+        return Stream.concat(Stream.of(this), stream);
     }
 
     public Map<String, ApiDocDef> getApiDocsRecursively() {
         return getLifeLinesRecursively()
                 .collect(Collectors.toMap(LifeLineDef::getEntryMessage, LifeLineDef::getApiDoc));
+    }
+
+    public Stream<MethodDef> getSequenceMethodsRecursively() {
+        return getMessagesRecursively().map(MessageDef::getMethodCall);
     }
 }
