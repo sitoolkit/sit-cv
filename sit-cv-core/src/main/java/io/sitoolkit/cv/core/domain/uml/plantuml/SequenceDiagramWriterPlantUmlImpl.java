@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram>, SequenceElementWriter {
+    private final String PARAM_INDENT = "  ";
 
     @NonNull
     PlantUmlWriter plantumlWriter;
@@ -73,7 +74,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         list.add(0,
                 lifeLine.getObjectName() + " -> " + target.getObjectName() + " :" + "[[#{"
                         + message.getRequestQualifiedSignature() + "} "
-                        + idFormatter.format(message.getRequestName()) + "]]");
+                        + idFormatter.format(buildRequestName(message)) + "]]");
 
         if (!StringUtils.equals(message.getResponseName(), "void")) {
             list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
@@ -81,6 +82,16 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         }
 
         return list;
+    }
+
+    protected String buildRequestName(MessageDef message) {
+        String paramNames = "";
+        if (message.getRequestParamNames().size() > 0) {
+            String separator = plantumlWriter.LINE_SEPARATOR + PARAM_INDENT;
+            paramNames = separator + message.getRequestParamNames()
+                    .stream().collect(Collectors.joining("," + separator));
+        }
+        return message.getRequestName() + "(" + paramNames + ")";
     }
 
     public void writeToFile(List<SequenceDiagram> diagrams, Path filePath) {

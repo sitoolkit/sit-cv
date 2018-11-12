@@ -33,7 +33,7 @@ public class AServiceImpl implements AService {
     @Override
     public List<XEntity> searchByDoubleCondition(SearchConditioner conditionFirst,
             SearchConditioner conditionSecond) {
-        return aRepository.searchByDoubleCondition(conditionFirst, conditionSecond);
+        return aRepository.searchBy(conditionFirst);
     }
 
     /**

@@ -12,6 +12,7 @@ import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallStack;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.StatementProcessor;
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,7 +67,9 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         MethodCallStack pushedStack = callStack.push(methodImpl);
 
         MessageDef message = new MessageDef();
-        message.setRequestName(buildMethodSignatureWithVariable(methodImpl));
+        message.setRequestName(methodImpl.getName());
+        message.setRequestParamNames(methodImpl.getParamTypes().stream()
+                .map(TypeDef::toStringWithVariable).collect(Collectors.toList()));
         message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl, pushedStack));
         message.setResponseName(methodCall.getReturnType().toStringWithVariable());
@@ -74,14 +77,6 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
         return Optional.of(message);
 
-    }
-
-    String buildMethodSignatureWithVariable(MethodDef method) {
-        return method.getName() + "("
-                + method.getParamTypes().stream()
-                        .map((type) -> "  " + type.toStringWithVariable())
-                        .collect(Collectors.joining(",\\n\\\n", "\\n\\\n", "\\n\\\n"))
-                + ")";
     }
 
     @Override

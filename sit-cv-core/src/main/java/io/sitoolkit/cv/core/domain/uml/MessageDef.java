@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -10,6 +11,7 @@ import lombok.Data;
 public class MessageDef extends SequenceElement {
     private MessageType type = MessageType.SYNC;
     private String requestName;
+    private List<String> requestParamNames = new ArrayList<>();
     private String requestQualifiedSignature;
     private LifeLineDef target;
     private String responseName;
