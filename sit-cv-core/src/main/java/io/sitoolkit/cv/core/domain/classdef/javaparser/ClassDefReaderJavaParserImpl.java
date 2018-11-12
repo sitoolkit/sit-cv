@@ -40,6 +40,8 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess.DelombokProcessor;
+import io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess.PreProcessingProject;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
@@ -51,6 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     private JavaParserFacade jpf;
+    private PreProcessingProject ppProject;
 
     private StatementVisitor statementVisitor;
 
@@ -79,7 +82,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         .collect(Collectors.toList());
 
                 files.stream().forEach(javaFile -> {
-                    readSourceFile(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
+                    readJava(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
 
                     int readCount = reposiotry.countClassDefs();
                     if (readCount % 10 == 0) {
@@ -104,10 +107,10 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     @Override
     public Optional<ClassDef> readJava(Path javaFile) {
-        return readSourceFile(projectManager.getCurrentProject().getSrcFile(javaFile));
+        return readParseTargetSourceFile(ppProject.getParseTargetSrc(javaFile));
     }
 
-    public Optional<ClassDef> readSourceFile(Path javaFile) {
+    public Optional<ClassDef> readParseTargetSourceFile(Path javaFile) {
         log.debug("Read java : {}", javaFile);
 
         try {
@@ -349,8 +352,9 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     public ClassDefReader init() {
         Project project = projectManager.getCurrentProject();
 
-        project.refresh();
-        jpf = JavaParserFacadeBuilder.build(project);
+        ppProject = new PreProcessingProject(project, new DelombokProcessor(project));
+        ppProject.execPreProcess();
+        jpf = JavaParserFacadeBuilder.build(ppProject);
         statementVisitor = StatementVisitor.build(jpf);
 
         return this;

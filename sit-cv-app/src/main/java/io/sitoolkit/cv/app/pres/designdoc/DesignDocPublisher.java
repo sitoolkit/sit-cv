@@ -35,7 +35,7 @@ public class DesignDocPublisher {
         ListResponse listResponse = buildDesingDocList();
         template.convertAndSend("/topic/designdoc/list", listResponse);
 
-        projectManager.getCurrentProject().getWatchDirs().stream().forEach(srcDir -> {
+        projectManager.getCurrentProject().getSrcDirs().stream().forEach(srcDir -> {
             service.watchDir(srcDir, entryPoint -> {
                 publishDetail(entryPoint);
             });

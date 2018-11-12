@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import io.sitoolkit.cv.core.domain.project.gradle.GradleProjectReader;
-import io.sitoolkit.cv.core.domain.project.lombok.LombokProject;
 import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
 import lombok.Getter;
 
@@ -24,7 +23,7 @@ public class ProjectManager {
                 .filter(Optional::isPresent).map(Optional::get).findFirst();
 
         if (project.isPresent()) {
-            currentProject = new LombokProject(project.get());
+            currentProject = project.get();
         } else {
             throw new IllegalArgumentException("Project is not supported " + projectDir);
         }

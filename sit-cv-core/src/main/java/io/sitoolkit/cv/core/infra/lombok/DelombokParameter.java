@@ -6,7 +6,7 @@ import java.util.Set;
 import lombok.Builder;
 
 @Builder
-public class DelombokParametar {
+public class DelombokParameter {
     Path src;
     Path target;
     String encoding;

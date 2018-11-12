@@ -20,7 +20,7 @@ public class Delomboker {
         }
     };
 
-    public void execute(DelombokParametar param) {
+    public void execute(DelombokParameter param) {
         ProcessCommand command = new ProcessCommand()
                 .currentDirectory(param.src)
                 .command("java")
@@ -32,7 +32,7 @@ public class Delomboker {
         log.info("Delomboked {}", param.src.toAbsolutePath());
     }
 
-    String[] delombokCommandArgs(DelombokParametar param) {
+    String[] delombokCommandArgs(DelombokParameter param) {
 
         List<String> args = new ArrayList<>();
         args.add("-jar");
