@@ -39,8 +39,8 @@ public class LifeLineDef {
     }
 
     public Map<String, ApiDocDef> getApiDocsRecursively() {
-        return getLifeLinesRecursively()
-                .collect(Collectors.toMap(LifeLineDef::getEntryMessage, LifeLineDef::getApiDoc));
+        return getLifeLinesRecursively().collect(Collectors.toMap(LifeLineDef::getEntryMessage,
+                LifeLineDef::getApiDoc, (doc1, doc2) -> doc1));
     }
 
     public Stream<MethodDef> getSequenceMethodsRecursively() {
