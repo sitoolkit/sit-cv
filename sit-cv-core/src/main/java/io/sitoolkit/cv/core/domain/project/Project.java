@@ -22,4 +22,15 @@ public class Project {
         super();
         this.dir = dir.toAbsolutePath().normalize();
     }
+
+    public Set<Path> getWatchDirs() {
+        return srcDirs;
+    }
+
+    public void refresh() {}
+
+    public Path getSrcFile(Path inputFile) {
+        return inputFile;
+    }
+
 }

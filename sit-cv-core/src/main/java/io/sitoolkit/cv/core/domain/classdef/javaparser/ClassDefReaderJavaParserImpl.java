@@ -79,7 +79,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         .collect(Collectors.toList());
 
                 files.stream().forEach(javaFile -> {
-                    readJava(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
+                    readSourceFile(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
 
                     int readCount = reposiotry.countClassDefs();
                     if (readCount % 10 == 0) {
@@ -104,6 +104,10 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     @Override
     public Optional<ClassDef> readJava(Path javaFile) {
+        return readSourceFile(projectManager.getCurrentProject().getSrcFile(javaFile));
+    }
+
+    public Optional<ClassDef> readSourceFile(Path javaFile) {
         log.debug("Read java : {}", javaFile);
 
         try {
@@ -345,6 +349,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     public ClassDefReader init() {
         Project project = projectManager.getCurrentProject();
 
+        project.refresh();
         jpf = JavaParserFacadeBuilder.build(project);
         statementVisitor = StatementVisitor.build(jpf);
 
