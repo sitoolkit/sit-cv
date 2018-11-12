@@ -1,5 +1,6 @@
 package a.b.c;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -25,6 +26,12 @@ public class ARepositoryImpl implements ARepository{
 
     private List<XEntity> searchRecursivelyB(SearchConditioner condition) {
         return searchRecursivelyA(condition);
+    }
+
+    @Override
+    public List<XEntity> searchByDoubleCondition(SearchConditioner conditionFirst,
+            SearchConditioner conditionSecond) {
+        return new ArrayList<>();
     }
 
     @Override

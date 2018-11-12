@@ -11,5 +11,9 @@ public interface AService {
      * @return list of XEntity
      */
     public List<XEntity> search(SearchConditioner condition);
+
+    public List<XEntity> searchByDoubleCondition(SearchConditioner conditionFirst,
+            SearchConditioner conditionSecond);
+
     public int save(XEntity entity);
 }

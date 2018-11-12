@@ -73,7 +73,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
             n.getScope().ifPresent(l -> l.accept(this, context));
             n.getArguments().forEach(p -> p.accept(this, context));
             methodResolver.resolve(n)
-                    .map(DeclationProcessor::createMethodCall)
+                    .map((m) -> DeclationProcessor.createMethodCall(m, n.getParentNode()))
                     .ifPresent(context::addStatement);
         }
     }
@@ -89,7 +89,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
         if (context.isInLoop()) {
             super.visit(n, context);
             methodResolver.resolve(n)
-                    .map(DeclationProcessor::createMethodCall)
+                    .map((m) -> DeclationProcessor.createMethodCall(m, Optional.empty()))
                     .ifPresent(context::addStatement);
         }
     }

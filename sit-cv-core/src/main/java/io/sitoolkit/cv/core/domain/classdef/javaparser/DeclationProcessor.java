@@ -1,10 +1,14 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
+import java.util.Optional;
+
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 
 import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 
 public class DeclationProcessor {
 
@@ -14,14 +18,20 @@ public class DeclationProcessor {
         return statement;
     }
 
-    public static MethodCallDef createMethodCall(ResolvedMethodDeclaration rmd) {
+    public static MethodCallDef createMethodCall(ResolvedMethodDeclaration rmd, Optional<Node> parentNode) {
         MethodCallDef methodCall = new MethodCallDef();
         methodCall.setSignature(rmd.getSignature());
         methodCall.setQualifiedSignature(rmd.getQualifiedSignature());
         methodCall.setName(rmd.getName());
         methodCall.setClassName(rmd.getClassName());
         methodCall.setPackageName(rmd.getPackageName());
-        methodCall.setReturnType(TypeProcessor.createTypeDef(rmd.getReturnType()));
+        TypeDef returnType = TypeProcessor.createTypeDef(rmd.getReturnType());
+
+        if(parentNode.isPresent() && parentNode.get() instanceof VariableDeclarator) {
+            String variable = ((VariableDeclarator)parentNode.get()).getNameAsString();
+            returnType.setVariable(variable);
+        }
+        methodCall.setReturnType(returnType);
         methodCall.setParamTypes(TypeProcessor.collectParamTypes(rmd));
         return methodCall;
     }

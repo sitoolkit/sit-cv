@@ -12,6 +12,7 @@ public class TypeDef {
     private String name;
     private List<TypeDef> typeParamList = new ArrayList<>();
     private ClassDef classRef;
+    private String variable;
 
     public Stream<TypeDef> getTypeParamsRecursively(){
         return Stream.concat(Stream.of(this),
@@ -28,5 +29,13 @@ public class TypeDef {
                             .map(TypeDef::toString)
                             .collect(Collectors.joining(",", "<", ">"));
         }
+    }
+
+    public String toStringWithVariable() {
+        String str = toString();
+        if (getVariable() != null) {
+            str = str + " " + getVariable();
+        }
+        return str;
     }
 }

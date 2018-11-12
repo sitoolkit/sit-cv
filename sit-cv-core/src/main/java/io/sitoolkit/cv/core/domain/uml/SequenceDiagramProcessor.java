@@ -66,14 +66,22 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         MethodCallStack pushedStack = callStack.push(methodImpl);
 
         MessageDef message = new MessageDef();
-        message.setRequestName(methodImpl.getSignature());
+        message.setRequestName(buildMethodSignatureWithVariable(methodImpl));
         message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl, pushedStack));
-        message.setResponseName(methodCall.getReturnType().toString());
+        message.setResponseName(methodCall.getReturnType().toStringWithVariable());
         message.setMethodCall(methodCall);
 
         return Optional.of(message);
 
+    }
+
+    String buildMethodSignatureWithVariable(MethodDef method) {
+        return method.getName() + "("
+                + method.getParamTypes().stream()
+                        .map((type) -> "  " + type.toStringWithVariable())
+                        .collect(Collectors.joining(",\\n\\\n", "\\n\\\n", "\\n\\\n"))
+                + ")";
     }
 
     @Override
