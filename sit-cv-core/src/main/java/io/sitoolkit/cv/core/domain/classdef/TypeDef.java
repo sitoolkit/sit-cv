@@ -30,12 +30,4 @@ public class TypeDef {
                             .collect(Collectors.joining(",", "<", ">"));
         }
     }
-
-    public String toStringWithVariable() {
-        String str = toString();
-        if (getVariable() != null) {
-            str = str + " " + getVariable();
-        }
-        return str;
-    }
 }

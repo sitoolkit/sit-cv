@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
@@ -76,9 +77,10 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
                         + message.getRequestQualifiedSignature() + "} "
                         + idFormatter.format(buildRequestName(message)) + "]]");
 
-        if (!StringUtils.equals(message.getResponseName(), "void")) {
+        String responseName = type2Str(message.getResponseType());
+        if (!StringUtils.equals(responseName, "void")) {
             list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
-                    + idFormatter.format(message.getResponseName()));
+                    + idFormatter.format(responseName));
         }
 
         return list;
@@ -86,12 +88,20 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
     protected String buildRequestName(MessageDef message) {
         String paramNames = "";
-        if (message.getRequestParamNames().size() > 0) {
+        if (message.getRequestParamTypes().size() > 0) {
             String separator = plantumlWriter.LINE_SEPARATOR + PARAM_INDENT;
-            paramNames = separator + message.getRequestParamNames()
-                    .stream().collect(Collectors.joining("," + separator));
+            paramNames = separator + message.getRequestParamTypes().stream().map(this::type2Str)
+                    .collect(Collectors.joining("," + separator));
         }
         return message.getRequestName() + "(" + paramNames + ")";
+    }
+
+    protected String type2Str(TypeDef type) {
+        if (type.getVariable() == null) {
+            return type.toString();
+        } else {
+            return type.toString() + " " + type.getVariable();
+        }
     }
 
     public void writeToFile(List<SequenceDiagram> diagrams, Path filePath) {

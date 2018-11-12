@@ -12,7 +12,6 @@ import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallStack;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.StatementProcessor;
-import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,11 +67,10 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
         MessageDef message = new MessageDef();
         message.setRequestName(methodImpl.getName());
-        message.setRequestParamNames(methodImpl.getParamTypes().stream()
-                .map(TypeDef::toStringWithVariable).collect(Collectors.toList()));
+        message.setRequestParamTypes(methodImpl.getParamTypes());
         message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl, pushedStack));
-        message.setResponseName(methodCall.getReturnType().toStringWithVariable());
+        message.setResponseType(methodImpl.getReturnType());
         message.setMethodCall(methodCall);
 
         return Optional.of(message);

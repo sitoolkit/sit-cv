@@ -26,7 +26,6 @@ public class DeclationProcessor {
         methodCall.setClassName(rmd.getClassName());
         methodCall.setPackageName(rmd.getPackageName());
         TypeDef returnType = TypeProcessor.createTypeDef(rmd.getReturnType());
-
         if(parentNode.isPresent() && parentNode.get() instanceof VariableDeclarator) {
             String variable = ((VariableDeclarator)parentNode.get()).getNameAsString();
             returnType.setVariable(variable);
