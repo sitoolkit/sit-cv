@@ -12,5 +12,4 @@ public class DelombokParameter {
     String encoding;
     Set<Path> classpath;
     Set<Path> sourcepath;
-    boolean onlyChanged;
 }
