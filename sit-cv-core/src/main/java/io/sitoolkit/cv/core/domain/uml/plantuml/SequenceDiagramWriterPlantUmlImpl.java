@@ -64,8 +64,12 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
     }
 
     protected List<String> lifeline2str(LifeLineDef lifeLine) {
-        return lifeLine.getElements().stream().map(element -> element.write(lifeLine, this))
-                .flatMap(List::stream).collect(Collectors.toList());
+        List<String> lifeLineStrings = lifeLine.getElements().stream()
+                .map(element -> element.write(lifeLine, this)).flatMap(List::stream)
+                .collect(Collectors.toList());
+        lifeLineStrings.add(0 , "activate " + lifeLine.getObjectName());
+        lifeLineStrings.add("deactivate " + lifeLine.getObjectName());
+        return lifeLineStrings;
     }
 
     protected List<String> message2str(LifeLineDef lifeLine, MessageDef message) {
@@ -79,7 +83,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
         String responseName = type2Str(message.getResponseType());
         if (!StringUtils.equals(responseName, "void")) {
-            list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
+            list.add(list.size() - 1, lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
                     + idFormatter.format(responseName));
         }
 
