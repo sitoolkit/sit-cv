@@ -1,28 +1,58 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.infra.lombok.DelombokParameter;
 import io.sitoolkit.cv.core.infra.lombok.Delomboker;
+import lombok.extern.slf4j.Slf4j;
 
-public class DelombokProcessor implements PreProcessor{
+@Slf4j
+public class DelombokProcessor implements PreProcessor {
 
-    final Project original;
-    final Delomboker delomboker;
+    private static final Path delombokTargetDir = Paths.get(SystemUtils.JAVA_IO_TMPDIR, "sitoolkit/sit-cv/delomboked");
+    private static DelombokProcessor current;
 
-    public DelombokProcessor(Project project) {
-        this.original = project;
-        this.delomboker = new Delomboker();
+    final Project project;
+    final Delomboker delomboker = new Delomboker();
+
+    public static DelombokProcessor getDelombokProcessor(Project project) {
+        if (current == null) {
+            init();
+            current = new DelombokProcessor(project);
+            return current;
+
+        } else if (current.project == project) {
+            return current;
+
+        } else {
+            throw new IllegalStateException("multiple projects is not supported");
+        }
+    }
+
+    public static void init() {
+        log.info("Delombok temp directory is : {}", delombokTargetDir);
+        try {
+            FileUtils.deleteDirectory(delombokTargetDir.toFile());
+            log.info("Delombok temp directory cleaned.");
+        } catch (IOException e) {
+            log.info("Delombok temp directory cleaning failed.", e);
+        }
+    }
+
+    private DelombokProcessor(Project project) {
+        this.project = project;
     }
 
     @Override
     public Path getTargetSrcPath(Path srcDir) {
-        Path relativized = original.getDir().relativize(srcDir);
-
-        //TODO Confirm delombok-ed directory's Specifications
-        Path delomboked = original.getDir().resolve("_delomboked").resolve(relativized.toString());
-
+        Path relativized = project.getDir().relativize(srcDir);
+        Path delomboked = delombokTargetDir.resolve(relativized.toString());
         return delomboked;
     }
 
@@ -32,11 +62,10 @@ public class DelombokProcessor implements PreProcessor{
                 .src(srcDir)
                 .target(targetDir)
                 .encoding("UTF-8")
-                .classpath(original.getClasspaths())
-                .sourcepath(original.getSrcDirs())
+                .classpath(project.getClasspaths())
+                .sourcepath(project.getSrcDirs())
                 .build();
 
         delomboker.execute(param);
     }
-
 }

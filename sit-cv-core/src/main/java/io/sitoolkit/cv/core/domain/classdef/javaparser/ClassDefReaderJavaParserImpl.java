@@ -352,7 +352,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     public ClassDefReader init() {
         Project project = projectManager.getCurrentProject();
 
-        ppProject = new PreProcessingProject(project, new DelombokProcessor(project));
+        ppProject = new PreProcessingProject(project, DelombokProcessor.getDelombokProcessor(project));
         ppProject.execPreProcess();
         jpf = JavaParserFacadeBuilder.build(ppProject);
         statementVisitor = StatementVisitor.build(jpf);
