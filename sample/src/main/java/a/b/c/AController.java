@@ -26,6 +26,12 @@ public class AController {
         return aService.search(new SearchConditioner());
     }
 
+    public List<XEntity> searchByDoubleCondition() {
+        List<XEntity> xEntities = aService.searchByDoubleCondition(new SearchConditioner(),
+                new SearchConditioner());
+        return xEntities;
+    }
+
     public int save(XEntity entity) {
         return aService.save(entity);
     }

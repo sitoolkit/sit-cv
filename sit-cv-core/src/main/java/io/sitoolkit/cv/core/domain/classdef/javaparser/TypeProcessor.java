@@ -17,8 +17,14 @@ public class TypeProcessor {
 
     public static List<TypeDef> collectParamTypes(ResolvedMethodDeclaration declaredMethod) {
         return IntStream.range(0, declaredMethod.getNumberOfParams())
-                .mapToObj(declaredMethod::getParam).map(ResolvedParameterDeclaration::getType)
+                .mapToObj(declaredMethod::getParam)
                 .map(TypeProcessor::createTypeDef).collect(Collectors.toList());
+    }
+
+    public static TypeDef createTypeDef(ResolvedParameterDeclaration param) {
+        TypeDef typeDef = createTypeDef(param.getType());
+        typeDef.setVariable(param.getName());
+        return typeDef;
     }
 
     public static TypeDef createTypeDef(ResolvedType type) {

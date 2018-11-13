@@ -26,7 +26,14 @@ public class AServiceImpl implements AService {
 
         //
         //
-        return aRepository.searchBy(condition);
+        List<XEntity> result = aRepository.searchBy(condition);
+        return result;
+    }
+
+    @Override
+    public List<XEntity> searchByDoubleCondition(SearchConditioner conditionFirst,
+            SearchConditioner conditionSecond) {
+        return aRepository.searchBy(conditionFirst);
     }
 
     /**

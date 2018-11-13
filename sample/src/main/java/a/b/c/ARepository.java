@@ -10,5 +10,9 @@ public interface ARepository {
      * @return list of XEntity
      */
     public List<XEntity> searchBy(SearchConditioner condition);
+
+    public List<XEntity> searchByDoubleCondition(SearchConditioner conditionFirst,
+            SearchConditioner conditionSecond);
+
     public int save(XEntity entity);
 }

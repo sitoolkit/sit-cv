@@ -1,18 +1,21 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import lombok.Data;
 
 @Data
 public class MessageDef extends SequenceElement {
     private MessageType type = MessageType.SYNC;
     private String requestName;
+    private List<TypeDef> requestParamTypes = new ArrayList<>();
     private String requestQualifiedSignature;
     private LifeLineDef target;
-    private String responseName;
+    private TypeDef responseType;
     private MethodCallDef methodCall;
 
     @Override

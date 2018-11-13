@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram>, SequenceElementWriter {
+    private final String PARAM_INDENT = "  ";
 
     @NonNull
     PlantUmlWriter plantumlWriter;
@@ -73,14 +75,33 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         list.add(0,
                 lifeLine.getObjectName() + " -> " + target.getObjectName() + " :" + "[[#{"
                         + message.getRequestQualifiedSignature() + "} "
-                        + idFormatter.format(message.getRequestName()) + "]]");
+                        + idFormatter.format(buildRequestName(message)) + "]]");
 
-        if (!StringUtils.equals(message.getResponseName(), "void")) {
+        String responseName = type2Str(message.getResponseType());
+        if (!StringUtils.equals(responseName, "void")) {
             list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
-                    + idFormatter.format(message.getResponseName()));
+                    + idFormatter.format(responseName));
         }
 
         return list;
+    }
+
+    protected String buildRequestName(MessageDef message) {
+        String paramNames = "";
+        if (message.getRequestParamTypes().size() > 0) {
+            String separator = plantumlWriter.LINE_SEPARATOR + PARAM_INDENT;
+            paramNames = separator + message.getRequestParamTypes().stream().map(this::type2Str)
+                    .collect(Collectors.joining("," + separator));
+        }
+        return message.getRequestName() + "(" + paramNames + ")";
+    }
+
+    protected String type2Str(TypeDef type) {
+        if (type.getVariable() == null) {
+            return type.toString();
+        } else {
+            return type.getVariable() + ": " + type.toString();
+        }
     }
 
     public void writeToFile(List<SequenceDiagram> diagrams, Path filePath) {
