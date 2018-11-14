@@ -35,6 +35,8 @@ public class TypeProcessor {
             typeDef.setName("void");
         } else if (type.isArray()) {
             typeDef.setName(type.asArrayType().describe());
+        } else if (type.isTypeVariable()) {
+            typeDef.setName(type.asTypeVariable().qualifiedName());
         } else if (type.isReference()) {
             try {
                 ResolvedReferenceType rType = type.asReferenceType();
