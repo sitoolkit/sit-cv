@@ -1,9 +1,10 @@
-<mat-toolbar color="primary">
+<mat-toolbar class="docs-navbar-header" color="primary">
   <button type="button" aria-label="Toggle sidenav"
     mat-icon-button (click)="drawer.toggle()">
     <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
   </button>
-  <span>{{dd.currentDesignDocId | hidePackage: 'PARAM_TYPE_ONLY' }}</span>
+  <span class="header-title">Code Visualizer</span>
+  <span class="designdoc-id mat-subheading-2">{{dd.currentDesignDocId | hidePackage: 'PARAM_TYPE_ONLY' }}</span>
 </mat-toolbar>
 <mat-sidenav-container class="sidenav-container" autosize>
   <mat-sidenav
