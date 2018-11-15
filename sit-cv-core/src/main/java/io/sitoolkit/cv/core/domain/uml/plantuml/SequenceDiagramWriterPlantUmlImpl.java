@@ -11,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
+import io.sitoolkit.cv.core.domain.uml.BranchSequenceGroup;
+import io.sitoolkit.cv.core.domain.uml.ConditionalSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.MessageDef;
@@ -121,6 +123,34 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         List<String> list = new ArrayList<>();
 
         list.add("loop");
+
+        list.addAll(
+                group.getElements().stream().map(childElement -> childElement.write(lifeLine, this))
+                        .flatMap(List::stream).collect(Collectors.toList()));
+
+        list.add("end");
+
+        return list;
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, ConditionalSequenceGroup group) {
+        List<String> list = new ArrayList<>();
+
+        String altType = group.isStart() ? "alt" : "else";
+
+        list.add(altType +  " " + group.getCondition());
+
+        list.addAll(
+                group.getElements().stream().map(childElement -> childElement.write(lifeLine, this))
+                        .flatMap(List::stream).collect(Collectors.toList()));
+
+        return list;
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, BranchSequenceGroup group) {
+        List<String> list = new ArrayList<>();
 
         list.addAll(
                 group.getElements().stream().map(childElement -> childElement.write(lifeLine, this))

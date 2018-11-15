@@ -6,5 +6,9 @@ public interface SequenceElementWriter {
 
     List<String> write(LifeLineDef lifeLine, SequenceGroup group);
 
+    List<String> write(LifeLineDef lifeLine, ConditionalSequenceGroup group);
+
+    List<String> write(LifeLineDef lifeLine, BranchSequenceGroup group);
+
     List<String> write(LifeLineDef lifeLine, MessageDef message);
 }
