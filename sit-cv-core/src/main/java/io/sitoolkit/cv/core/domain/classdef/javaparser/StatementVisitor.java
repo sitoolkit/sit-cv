@@ -10,7 +10,6 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
-import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
@@ -18,7 +17,6 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 
-import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
 import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import lombok.AccessLevel;
@@ -55,33 +53,28 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
     @Override
     public void visit(IfStmt n, VisitContext context) {
-        VisitContext childContext;
-        if (context.parent instanceof BranchStatement) {
-            childContext = context;
-        } else {
-            CvStatement statement = DeclationProcessor.createBranchStatement(n);
-            context.addStatement(statement);
-            childContext = VisitContext.childrenOf(statement);
-        }
-        visitIfStmt(n, childContext);
+        CvStatement statement = DeclationProcessor.createBranchStatement(n);
+        context.addStatement(statement);
+        visitIfStmt(n, VisitContext.childrenOf(statement));
     }
 
-    public void visitIfStmt(IfStmt n, VisitContext context) {
-        ConditionalStatement statement = DeclationProcessor.createConditionalStatement(n);
-        if (context.statements.size() == 0) {
-            statement.setStart(true);
+    private void visitIfStmt(IfStmt n, VisitContext context) {
+        ConditionalStatement thenStatement = DeclationProcessor.createConditionalStatement(n,
+                n.getCondition().toString());
+        if (context.statements.isEmpty()) {
+            thenStatement.setFirst(true);
         }
-        context.addStatement(statement);
-        VisitContext childContext = VisitContext.childrenOf(statement);
-        n.getThenStmt().accept(this, childContext);
+        context.addStatement(thenStatement);
+
+        n.getThenStmt().accept(this, VisitContext.childrenOf(thenStatement));
         n.getElseStmt().ifPresent(l -> {
-            if (l instanceof IfStmt) {
-                l.accept(this, context);
+            if (l.isIfStmt()) {
+                visitIfStmt((IfStmt)l, context);
             } else {
-                ConditionalStatement elseStatement = DeclationProcessor.createConditionalStatement(l);
+                ConditionalStatement elseStatement = DeclationProcessor
+                        .createConditionalStatement(l, "else");
                 context.addStatement(elseStatement);
-                VisitContext elseContext = VisitContext.childrenOf(elseStatement);
-                l.accept(this, elseContext);
+                l.accept(this, VisitContext.childrenOf(elseStatement));
             }
         });
     }

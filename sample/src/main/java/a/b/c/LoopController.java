@@ -96,20 +96,4 @@ public class LoopController {
                     }); // end loop
         }
 
-
-    public void ifStatement(int i) {
-        if (i == 0) {
-            processor.process("");
-        } else if (i < 10) {
-            processor.process2("");
-        } else {
-            for (int j = 0; j < 1; j++) {
-                processor.process3("");
-            }
-        }
-
-        String result = i == 2 ? processor.process("") :
-                        i < 20 ? processor.process2("") :
-                        processor.process("");
-    }
 }

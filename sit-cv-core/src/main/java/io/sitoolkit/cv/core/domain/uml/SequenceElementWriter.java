@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface SequenceElementWriter {
 
-    List<String> write(LifeLineDef lifeLine, SequenceGroup group);
+    List<String> write(LifeLineDef lifeLine, LoopSequenceGroup group);
 
     List<String> write(LifeLineDef lifeLine, ConditionalSequenceGroup group);
 

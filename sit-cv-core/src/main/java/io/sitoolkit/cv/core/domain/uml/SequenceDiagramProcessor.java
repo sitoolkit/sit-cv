@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Function;
+
 import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefFilter;
@@ -79,6 +81,16 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     }
 
+    Optional<SequenceElement> processChildren(CvStatement statement, MethodCallStack callStack,
+            Function<List<SequenceElement>, SequenceElement> f) {
+
+        List<SequenceElement> groupElements = statement.getChildren().stream()
+                .map(childStatement -> childStatement.process(this, callStack))
+                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+
+        return Optional.of(f.apply(groupElements));
+    }
+
     @Override
     public Optional<SequenceElement> process(CvStatement statement, MethodCallStack context) {
         return Optional.empty();
@@ -86,61 +98,32 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     @Override
     public Optional<SequenceElement> process(LoopStatement statement, MethodCallStack callStack) {
-
-        List<SequenceElement> groupElements =  statement.getChildren().stream()
-                .map(childStatement -> childStatement.process(this, callStack))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-
-        if (groupElements.isEmpty()) {
-            return Optional.empty();
-
-        } else {
-            SequenceGroup group = new SequenceGroup();
+        return processChildren(statement, callStack, (groupElements) -> {
+            SequenceGroup group = new LoopSequenceGroup();
             group.getElements().addAll(groupElements);
-            return Optional.of(group);
-        }
+            return group;
+        });
     }
 
     @Override
     public Optional<SequenceElement> process(BranchStatement statement, MethodCallStack callStack) {
-
-        List<SequenceElement> groupElements =  statement.getChildren().stream()
-                .map(childStatement -> childStatement.process(this, callStack))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-
-        if (groupElements.isEmpty()) {
-            return Optional.empty();
-
-        } else {
+        return processChildren(statement, callStack, (groupElements) -> {
             BranchSequenceGroup group = new BranchSequenceGroup();
             group.getElements().addAll(groupElements);
-            return Optional.of(group);
-        }
+            return group;
+        });
     }
 
     @Override
     public Optional<SequenceElement> process(ConditionalStatement statement,
             MethodCallStack callStack) {
-        List<SequenceElement> groupElements =  statement.getChildren().stream()
-                .map(childStatement -> childStatement.process(this, callStack))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-
-        if (groupElements.isEmpty()) {
-            return Optional.empty();
-
-        } else {
+        return processChildren(statement, callStack, (groupElements) -> {
             ConditionalSequenceGroup group = new ConditionalSequenceGroup();
             group.getElements().addAll(groupElements);
             group.setCondition(statement.getCondition());
-            group.setStart(statement.isStart());
-            return Optional.of(group);
-        }
+            group.setFirst(statement.isFirst());
+            return group;
+        });
     }
 
     @Override

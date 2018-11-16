@@ -22,6 +22,19 @@ public class DeclationProcessor {
         return statement;
     }
 
+    public static BranchStatement createBranchStatement(IfStmt n) {
+        BranchStatement statement = new BranchStatement();
+        statement.setBody(n.toString());
+        return statement;
+    }
+
+    public static ConditionalStatement createConditionalStatement(Statement n, String condition) {
+        ConditionalStatement statement = new ConditionalStatement();
+        statement.setBody(n.toString());
+        statement.setCondition(condition);
+        return statement;
+    }
+
     public static MethodCallDef createMethodCall(ResolvedMethodDeclaration rmd, Optional<Node> parentNode) {
         MethodCallDef methodCall = new MethodCallDef();
         methodCall.setSignature(rmd.getSignature());
@@ -37,21 +50,6 @@ public class DeclationProcessor {
         methodCall.setReturnType(returnType);
         methodCall.setParamTypes(TypeProcessor.collectParamTypes(rmd));
         return methodCall;
-    }
-
-    public static BranchStatement createBranchStatement(IfStmt n) {
-        BranchStatement statement = new BranchStatement();
-        statement.setBody(n.toString());
-        return statement;
-    }
-
-    public static ConditionalStatement createConditionalStatement(Statement n) {
-        ConditionalStatement statement = new ConditionalStatement();
-        statement.setBody(n.toString());
-        if (n instanceof IfStmt) {
-            statement.setCondition(((IfStmt)n).getCondition().toString());
-        }
-        return statement;
     }
 
 }

@@ -10,9 +10,9 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ConditionalStatement extends CvStatement {
-    private String condition = "else";
 
-    private boolean isStart = false;
+    private String condition;
+    private boolean isFirst = false;
 
     @Override
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {

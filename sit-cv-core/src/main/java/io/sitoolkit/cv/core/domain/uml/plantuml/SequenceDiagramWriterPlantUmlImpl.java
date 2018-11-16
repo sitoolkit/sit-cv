@@ -15,6 +15,7 @@ import io.sitoolkit.cv.core.domain.uml.BranchSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.ConditionalSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
+import io.sitoolkit.cv.core.domain.uml.LoopSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.MessageDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import io.sitoolkit.cv.core.domain.uml.SequenceElementWriter;
@@ -118,15 +119,18 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         }
     }
 
+    private List<String> group2str(LifeLineDef lifeLine, SequenceGroup group) {
+        return group.getElements().stream().map(childElement -> childElement.write(lifeLine, this))
+                .flatMap(List::stream).collect(Collectors.toList());
+    }
+
     @Override
-    public List<String> write(LifeLineDef lifeLine, SequenceGroup group) {
+    public List<String> write(LifeLineDef lifeLine, LoopSequenceGroup group) {
         List<String> list = new ArrayList<>();
 
         list.add("loop");
 
-        list.addAll(
-                group.getElements().stream().map(childElement -> childElement.write(lifeLine, this))
-                        .flatMap(List::stream).collect(Collectors.toList()));
+        list.addAll(group2str(lifeLine, group));
 
         list.add("end");
 
@@ -137,13 +141,11 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
     public List<String> write(LifeLineDef lifeLine, ConditionalSequenceGroup group) {
         List<String> list = new ArrayList<>();
 
-        String altType = group.isStart() ? "alt" : "else";
+        String altType = group.isFirst() ? "alt" : "else";
 
-        list.add(altType +  " " + group.getCondition());
+        list.add(altType + " " + group.getCondition());
 
-        list.addAll(
-                group.getElements().stream().map(childElement -> childElement.write(lifeLine, this))
-                        .flatMap(List::stream).collect(Collectors.toList()));
+        list.addAll(group2str(lifeLine, group));
 
         return list;
     }
@@ -152,9 +154,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
     public List<String> write(LifeLineDef lifeLine, BranchSequenceGroup group) {
         List<String> list = new ArrayList<>();
 
-        list.addAll(
-                group.getElements().stream().map(childElement -> childElement.write(lifeLine, this))
-                        .flatMap(List::stream).collect(Collectors.toList()));
+        list.addAll(group2str(lifeLine, group));
 
         list.add("end");
 
