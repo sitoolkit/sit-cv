@@ -3,6 +3,7 @@ package io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -21,18 +22,36 @@ public class DelombokProcessor implements PreProcessor {
     final Project project;
     final Delomboker delomboker = new Delomboker();
 
-    public static DelombokProcessor getDelombokProcessor(Project project) {
+    public static Optional<PreProcessor> getDelombokProcessor(Project project) {
+        if (!isDelombokProject(project)) {
+            return Optional.empty();
+        }
         if (current == null) {
             init();
             current = new DelombokProcessor(project);
-            return current;
+            return Optional.of(current);
 
         } else if (current.project == project) {
-            return current;
+            return Optional.of(current);
 
         } else {
             throw new IllegalStateException("multiple projects is not supported");
         }
+    }
+
+    static boolean isDelombokProject(Project project) {
+        Optional<Path> delombokClasspath = project.getClasspaths().stream()
+                .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-"))
+                .findFirst();
+
+        if (delombokClasspath.isPresent()) {
+            log.debug("Lombok dependency found in {} : {}", project.getDir(), delombokClasspath.get());
+
+        } else {
+            log.debug("Lombok dependency not found in {}", project.getDir());
+        }
+
+        return delombokClasspath.isPresent();
     }
 
     public static void init() {

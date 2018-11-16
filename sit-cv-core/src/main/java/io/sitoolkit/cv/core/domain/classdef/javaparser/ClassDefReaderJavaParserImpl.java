@@ -42,6 +42,7 @@ import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess.DelombokProcessor;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess.PreProcessingProject;
+import io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess.PreProcessor;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
@@ -352,7 +353,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     public ClassDefReader init() {
         Project project = projectManager.getCurrentProject();
 
-        ppProject = new PreProcessingProject(project, DelombokProcessor.getDelombokProcessor(project));
+        ppProject = new PreProcessingProject(project,
+                DelombokProcessor.getDelombokProcessor(project).orElse(PreProcessor.DO_NOTHING));
         ppProject.execPreProcess();
         jpf = JavaParserFacadeBuilder.build(ppProject);
         statementVisitor = StatementVisitor.build(jpf);
