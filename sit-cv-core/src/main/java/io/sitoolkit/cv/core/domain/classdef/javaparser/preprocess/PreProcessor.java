@@ -6,7 +6,7 @@ public interface PreProcessor {
 
     Path getTargetSrcPath(Path srcDir);
 
-    void execute(Path srcDir, Path targetDir);
+    void execute();
 
     static final PreProcessor DO_NOTHING = new PreProcessor() {
 
@@ -16,7 +16,7 @@ public interface PreProcessor {
         }
 
         @Override
-        public void execute(Path srcDir, Path targetDir) {
+        public void execute() {
         }
     };
 

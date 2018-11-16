@@ -18,13 +18,23 @@ public class MavenProjectReader implements ProjectReader {
             return Optional.empty();
         }
 
-        Project project = new Project(projectDir);
         MavenProjectInfoListener listener = new MavenProjectInfoListener();
 
         mvnPrj.mvnw("compile", "-X").stdout(listener).execute();
 
-        project.setClasspaths(listener.getClasspaths());
-        project.setSrcDirs(listener.getJavaSrcDirs());
+        Project project = new Project(projectDir);
+
+        for (Project listenedProj : listener.getProjects()) {
+
+            if (listenedProj.getDir().equals(projectDir)) {
+                project.setClasspaths(listenedProj.getClasspaths());
+                project.setSrcDirs(listenedProj.getSrcDirs());
+                project.setBuildDir(listenedProj.getBuildDir());
+
+            } else {
+                project.getSubProjects().add(listenedProj);
+            }
+        }
 
         return Optional.of(project);
     }

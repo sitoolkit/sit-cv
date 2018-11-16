@@ -40,9 +40,6 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassType;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess.DelombokProcessor;
-import io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess.PreProcessingProject;
-import io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess.PreProcessor;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
@@ -54,7 +51,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     private JavaParserFacade jpf;
-    private PreProcessingProject ppProject;
 
     private StatementVisitor statementVisitor;
 
@@ -76,7 +72,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
         Pattern p = Pattern.compile(config.getJavaFilePattern());
 
-        projectManager.getCurrentProject().getSrcDirs().stream().forEach(srcDir -> {
+        projectManager.getCurrentProject().getSrcDirsIncludeSubs().stream().forEach(srcDir -> {
             try {
                 List<Path> files = Files.walk(srcDir)
                         .filter(file -> p.matcher(file.toFile().getName()).matches())
@@ -108,7 +104,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     @Override
     public Optional<ClassDef> readJava(Path javaFile) {
-        return readParseTargetSourceFile(ppProject.getParseTargetSrc(javaFile));
+        return projectManager.getCurrentProject().findParseTargetSrc(javaFile)
+                .flatMap(file -> readParseTargetSourceFile(file));
     }
 
     public Optional<ClassDef> readParseTargetSourceFile(Path javaFile) {
@@ -352,11 +349,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     @Override
     public ClassDefReader init() {
         Project project = projectManager.getCurrentProject();
-
-        ppProject = new PreProcessingProject(project,
-                DelombokProcessor.getDelombokProcessor(project).orElse(PreProcessor.DO_NOTHING));
-        ppProject.execPreProcess();
-        jpf = JavaParserFacadeBuilder.build(ppProject);
+        project.refresh();
+        jpf = JavaParserFacadeBuilder.build(project);
         statementVisitor = StatementVisitor.build(jpf);
 
         return this;

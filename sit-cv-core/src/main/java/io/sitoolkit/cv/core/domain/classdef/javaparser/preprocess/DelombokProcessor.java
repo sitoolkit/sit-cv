@@ -16,26 +16,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
 
-    private static final Path delombokTargetDir = Paths.get(SystemUtils.JAVA_IO_TMPDIR, "sitoolkit/sit-cv/delomboked");
-    private static DelombokProcessor current;
-
+    private static final Path tempDelombokDir = Paths.get(SystemUtils.JAVA_IO_TMPDIR, "sitoolkit/sit-cv/delomboked");
+    
     final Project project;
     final Delomboker delomboker = new Delomboker();
+    final Path delombokTargetDir;
+    static {
+        init();
+    }
 
     public static Optional<PreProcessor> getDelombokProcessor(Project project) {
-        if (!isDelombokProject(project)) {
-            return Optional.empty();
-        }
-        if (current == null) {
-            init();
-            current = new DelombokProcessor(project);
-            return Optional.of(current);
 
-        } else if (current.project == project) {
-            return Optional.of(current);
+        if (isDelombokProject(project)) {
+            return Optional.of(new DelombokProcessor(project));
 
         } else {
-            throw new IllegalStateException("multiple projects is not supported");
+            return Optional.empty();
         }
     }
 
@@ -55,9 +51,9 @@ public class DelombokProcessor implements PreProcessor {
     }
 
     public static void init() {
-        log.info("Delombok temp directory is : {}", delombokTargetDir);
+        log.info("Delombok temp directory is : {}", tempDelombokDir);
         try {
-            FileUtils.deleteDirectory(delombokTargetDir.toFile());
+            FileUtils.deleteDirectory(tempDelombokDir.toFile());
             log.info("Delombok temp directory cleaned.");
         } catch (IOException e) {
             log.info("Delombok temp directory cleaning failed.", e);
@@ -66,20 +62,34 @@ public class DelombokProcessor implements PreProcessor {
 
     private DelombokProcessor(Project project) {
         this.project = project;
+        if (project.getBuildDir() != null) {
+            this.delombokTargetDir = project.getBuildDir().resolve("generated-sources/sit-cv/delombok");
+        } else {
+            this.delombokTargetDir = tempDelombokDir;
+        }
     }
 
     @Override
     public Path getTargetSrcPath(Path srcDir) {
-        Path relativized = project.getDir().relativize(srcDir);
-        Path delomboked = delombokTargetDir.resolve(relativized.toString());
-        return delomboked;
+        Optional<Path> sDir = project.getSrcDirs().stream().filter(dir -> srcDir.startsWith(srcDir)).findFirst();
+        if (sDir.isPresent()) {
+            Path relativized = sDir.get().relativize(srcDir);
+            Path delomboked = delombokTargetDir.resolve(relativized.toString());
+            return delomboked;
+        } else {
+            throw new IllegalArgumentException(srcDir.toAbsolutePath() + " is not_in source directory");
+        }
     }
 
     @Override
-    public void execute(Path srcDir, Path targetDir) {
+    public void execute() {
+        project.getSrcDirs().forEach(this::execute);
+    }
+
+    public void execute(Path srcDir) {
         DelombokParameter param = DelombokParameter.builder()
                 .src(srcDir)
-                .target(targetDir)
+                .target(delombokTargetDir)
                 .encoding("UTF-8")
                 .classpath(project.getClasspaths())
                 .sourcepath(project.getSrcDirs())
