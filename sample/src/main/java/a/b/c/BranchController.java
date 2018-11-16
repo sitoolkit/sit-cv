@@ -13,15 +13,17 @@ public class BranchController {
         } else if (num < 10 || isTrue()) {
             processor.process2("");
         } else {
-            for (int j = 0; j < 1; j++) {
+            if (num > 1000) {
                 processor.process3("");
+            } else {
+                // nothing
             }
+
+            processor.process3("");
         }
+    }
 
-        String result = num == 2 ? processor.process("") :
-                        num < 20 ? processor.process2("") :
-                        processor.process3("");
-
+    public void switchStatement(String str) {
         switch(str) {
         case "ABC":
             processor.process("");
@@ -34,6 +36,12 @@ public class BranchController {
             processor.process3("");
             break;
         }
+    }
+
+    public void ternaryOperatorStatement(int num) {
+        String result = num == 2 ? processor.process("") :
+            num < 20 ? processor.process2("") :
+            processor.process3("");
     }
 
     private boolean isTrue() {

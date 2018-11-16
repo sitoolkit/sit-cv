@@ -88,7 +88,11 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
                 .map(childStatement -> childStatement.process(this, callStack))
                 .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 
-        return Optional.of(f.apply(groupElements));
+        if (groupElements.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(f.apply(groupElements));
+        }
     }
 
     @Override

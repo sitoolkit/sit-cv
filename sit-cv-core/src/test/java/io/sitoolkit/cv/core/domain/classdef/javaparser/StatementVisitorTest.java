@@ -19,6 +19,8 @@ import org.junit.rules.TestName;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 
+import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
+import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
@@ -29,7 +31,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class StatementVisitorTest {
 
-    static CompilationUnit compilationUnit;
+    static CompilationUnit loopCompilationUnit;
+
+    static CompilationUnit branchCompilationUnit;
 
     static StatementVisitor statementVisitor;
 
@@ -46,8 +50,11 @@ public class StatementVisitorTest {
 
         statementVisitor = StatementVisitor.build(JavaParserFacadeBuilder.build(project));
 
-        compilationUnit = JavaParser
+        loopCompilationUnit = JavaParser
                 .parse(projectDir.resolve("src/main/java/a/b/c/LoopController.java"));
+
+        branchCompilationUnit = JavaParser
+                .parse(projectDir.resolve("src/main/java/a/b/c/BranchController.java"));
     }
 
     @Test
@@ -70,11 +77,16 @@ public class StatementVisitorTest {
         testFlatLoop(testName.getMethodName());
     }
 
+    @Test
+    public void ifStatement() throws IOException {
+        testBranch(testName.getMethodName());
+    }
+
     public void testFlatLoop(String method) {
         List<CvStatement> statements = new ArrayList<>();
         MethodDef methodDef = new MethodDef();
 
-        compilationUnit.getClassByName("LoopController").ifPresent(clazz -> {
+        loopCompilationUnit.getClassByName("LoopController").ifPresent(clazz -> {
 
             clazz.getMethodsByName(method).get(0).accept(statementVisitor, VisitContext.statementsOf(methodDef));
 
@@ -93,4 +105,32 @@ public class StatementVisitorTest {
         assertThat(methodCall.getName(), is("process"));
     }
 
+    public void testBranch(String method) throws IOException {
+        MethodDef methodDef = new MethodDef();
+
+        branchCompilationUnit.getClassByName("BranchController").ifPresent(clazz -> {
+
+            clazz.getMethodsByName(method).get(0).accept(statementVisitor,
+                    VisitContext.statementsOf(methodDef));
+
+        });
+
+        List<CvStatement> branchStatements = methodDef.getStatements().stream()
+                .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
+        assertThat(branchStatements.size(), is(1));
+
+        List<CvStatement> conditionalStatements = branchStatements.get(0).getChildren();
+        assertThat(conditionalStatements.size(), is(3));
+
+        ConditionalStatement conditionalStatement = (ConditionalStatement) conditionalStatements.get(0);
+        assertThat(conditionalStatement.getCondition(), is("num == 0 || isTrue()"));
+
+        MethodCallDef methodCall = (MethodCallDef) conditionalStatement.getChildren().get(0);
+        assertThat(methodCall.getName(), is("process"));
+
+        List<CvStatement> nestedStatements = conditionalStatements.get(2).getChildren().stream()
+                .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
+        assertThat(nestedStatements.size(), is(1));
+
+    }
 }
