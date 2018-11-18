@@ -23,7 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram>, SequenceElementWriter {
+public class SequenceDiagramWriterPlantUmlImpl
+        implements DiagramWriter<SequenceDiagram>, SequenceElementWriter {
     private final String PARAM_INDENT = "  ";
 
     @NonNull
@@ -58,7 +59,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
         String umlString = lines.stream().collect(Collectors.joining(System.lineSeparator()));
 
-        log.info("Serialized Diagram :{}", umlString);
+        log.info("Serialized Diagram :\n{}", umlString);
 
         return umlString;
     }
@@ -67,7 +68,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         List<String> lifeLineStrings = lifeLine.getElements().stream()
                 .map(element -> element.write(lifeLine, this)).flatMap(List::stream)
                 .collect(Collectors.toList());
-        lifeLineStrings.add(0 , "activate " + lifeLine.getObjectName());
+        lifeLineStrings.add(0, "activate " + lifeLine.getObjectName());
         lifeLineStrings.add("deactivate " + lifeLine.getObjectName());
         return lifeLineStrings;
     }
@@ -83,8 +84,8 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
         String responseName = type2Str(message.getResponseType());
         if (!StringUtils.equals(responseName, "void")) {
-            list.add(list.size() - 1, lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
-                    + idFormatter.format(responseName));
+            list.add(list.size() - 1, lifeLine.getObjectName() + " <-- " + target.getObjectName()
+                    + " :" + idFormatter.format(responseName));
         }
 
         return list;
