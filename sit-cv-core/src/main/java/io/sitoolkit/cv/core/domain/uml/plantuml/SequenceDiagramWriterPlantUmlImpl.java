@@ -58,7 +58,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
         String umlString = lines.stream().collect(Collectors.joining(System.lineSeparator()));
 
-        log.debug(umlString);
+        log.info("Serialized Diagram :{}", umlString);
 
         return umlString;
     }

@@ -90,7 +90,7 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
                         Stream.of("@enduml"))
                 .flatMap(Function.identity()).collect(Collectors.joining(System.lineSeparator()));
 
-        log.debug("serializedDiagram -> {}", umlString);
+        log.info("Serialized Diagram :{}", umlString);
 
         return umlString;
     }

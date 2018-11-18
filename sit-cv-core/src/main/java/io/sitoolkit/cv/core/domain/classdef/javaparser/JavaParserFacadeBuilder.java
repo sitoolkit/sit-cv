@@ -26,13 +26,13 @@ public class JavaParserFacadeBuilder {
         // project.getBinDirs().stream()
         // .forEach(binDir ->
         // combinedTypeSolver.add(ClassDirTypeSolver.get(binDir)));
+        log.info("Adding classpaths for JavaParser:{}", project.getClasspaths());
         project.getClasspaths().stream().map(Path::toAbsolutePath).map(Path::toString)
                 .forEach(str -> {
                     try {
                         combinedTypeSolver.add(JarTypeSolver.getJarTypeSolver(str));
-                        log.info("jar is added. {}", str);
                     } catch (IOException e) {
-                        log.warn("warn ", e);
+                        log.warn(e.getMessage(), e);
                     }
                 });
 
