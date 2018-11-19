@@ -22,6 +22,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
 import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
+import io.sitoolkit.cv.core.domain.classdef.CvStatementDefaultImpl;
 import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
@@ -97,7 +98,8 @@ public class StatementVisitorTest {
 
         assertThat(loopStatements.size(), is(1));
 
-        List<CvStatement> statementsInLoop = loopStatements.get(0).getChildren();
+        List<CvStatement> statementsInLoop = ((CvStatementDefaultImpl) loopStatements.get(0))
+                .getChildren();
 
         assertThat(statementsInLoop.size(), is(1));
 
@@ -119,10 +121,11 @@ public class StatementVisitorTest {
                 .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
         assertThat(branchStatements.size(), is(1));
 
-        List<CvStatement> conditionalStatements = branchStatements.get(0).getChildren();
+        List<ConditionalStatement> conditionalStatements = ((BranchStatement) branchStatements
+                .get(0)).getConditions();
         assertThat(conditionalStatements.size(), is(3));
 
-        ConditionalStatement conditionalStatement = (ConditionalStatement) conditionalStatements.get(0);
+        ConditionalStatement conditionalStatement = conditionalStatements.get(0);
         assertThat(conditionalStatement.getCondition(), is("num == 0 || isTrue()"));
 
         MethodCallDef methodCall = (MethodCallDef) conditionalStatement.getChildren().get(0);
