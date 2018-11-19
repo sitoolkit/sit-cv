@@ -33,9 +33,9 @@ public class Project {
         this.dir = dir.toAbsolutePath().normalize();
     }
 
-    public void executePreProcess() {
+    public void executeAllPreProcess() {
         preProcessor.execute();
-        subProjects.forEach(Project::executePreProcess);
+        subProjects.forEach(Project::executeAllPreProcess);
     }
 
     public Set<Project> getAllProjects() {
@@ -50,17 +50,17 @@ public class Project {
         return getAllProjectsStream().flatMap(proj -> proj.srcDirs.stream()).collect(Collectors.toSet());
     }
 
-    public Set<Path> getAllPreProcessedDirs() {
-        return getAllProjectsStream().flatMap(proj -> proj.getPreProcessedDirs().stream())
+    public Set<Path> getAllParseTargetDirs() {
+        return getAllProjectsStream().flatMap(proj -> proj.getParseTargetDirs().stream())
                 .collect(Collectors.toSet());
     }
 
-    public Optional<Path> findPreProcessed(Path inputFile) {
+    public Optional<Path> findParseTarget(Path inputFile) {
         return findProjectFromSrc(inputFile)
                 .map(proj -> proj.getPreProcessor().getPreProcessedPath(inputFile));
     }
 
-    Set<Path> getPreProcessedDirs() {
+    Set<Path> getParseTargetDirs() {
         return getSrcDirs().stream()
                 .map(srcDir -> preProcessor.getPreProcessedPath(srcDir))
                 .collect(Collectors.toSet());

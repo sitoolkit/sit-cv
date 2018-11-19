@@ -22,7 +22,7 @@ public class JavaParserFacadeBuilder {
     public static JavaParserFacade build(Project project) {
         CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
         combinedTypeSolver.add(new ReflectionTypeSolver());
-        project.getAllPreProcessedDirs().stream().forEach(
+        project.getAllParseTargetDirs().stream().forEach(
                 srcDir -> combinedTypeSolver.add(new JavaParserTypeSolver(srcDir.toFile())));
         // project.getBinDirs().stream()
         // .forEach(binDir ->
