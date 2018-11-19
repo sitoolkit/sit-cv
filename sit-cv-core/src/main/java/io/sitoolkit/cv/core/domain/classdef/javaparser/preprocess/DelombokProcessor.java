@@ -1,12 +1,7 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.infra.lombok.DelombokParameter;
@@ -16,14 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
 
-    private static final Path tempDelombokDir = Paths.get(SystemUtils.JAVA_IO_TMPDIR, "sitoolkit/sit-cv/delomboked");
-    
-    final Project project;
     final Delomboker delomboker = new Delomboker();
+    final Project project;
     final Path delombokTargetDir;
-    static {
-        init();
-    }
 
     public static Optional<PreProcessor> of(Project project) {
 
@@ -40,6 +30,11 @@ public class DelombokProcessor implements PreProcessor {
                 .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-"))
                 .findFirst();
 
+        if (project.getBuildDir() == null) {
+            log.debug("build directory not found in {}", project.getDir());
+            return false;
+        }
+
         if (delombokClasspath.isPresent()) {
             log.debug("Lombok dependency found in {} : {}", project.getDir(), delombokClasspath.get());
 
@@ -50,23 +45,9 @@ public class DelombokProcessor implements PreProcessor {
         return delombokClasspath.isPresent();
     }
 
-    public static void init() {
-        log.info("Delombok temp directory is : {}", tempDelombokDir);
-        try {
-            FileUtils.deleteDirectory(tempDelombokDir.toFile());
-            log.info("Delombok temp directory cleaned.");
-        } catch (IOException e) {
-            log.info("Delombok temp directory cleaning failed.", e);
-        }
-    }
-
     private DelombokProcessor(Project project) {
         this.project = project;
-        if (project.getBuildDir() != null) {
-            this.delombokTargetDir = project.getBuildDir().resolve("generated-sources/sit-cv/delombok");
-        } else {
-            this.delombokTargetDir = tempDelombokDir;
-        }
+        this.delombokTargetDir = project.getBuildDir().resolve("generated-sources/sit-cv/delombok");
     }
 
     @Override
