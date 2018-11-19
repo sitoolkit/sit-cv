@@ -195,18 +195,16 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         methodDef.setName(declaredMethod.getName());
                         methodDef.setSignature(declaredMethod.getSignature());
                         methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
-                        methodDef.setReturnType(
-                                TypeParser.getTypeDef(declaredMethod.getReturnType()));
-                        methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
+                        methodDef.setReturnType(TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
+                        methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
                         methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
                         methodDefs.add(methodDef);
 
                         if (!typeDec.isInterface()) {
                             typeDec.getMethods().stream().forEach(method -> {
                                 if (equalMethods(declaredMethod, method)) {
-                                    method.accept(statementVisitor, methodDef.getStatements());
-                                    methodDef
-                                            .setActionPath(classActionPath + getActionPath(method));
+                                    method.accept(statementVisitor, VisitContext.statementsOf(methodDef));
+                                    methodDef.setActionPath(classActionPath + getActionPath(method));
                                 }
                             });
                         }
@@ -312,7 +310,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 fieldDef.setName(declaredField.getName());
 
                 ResolvedType type = declaredField.getType();
-                fieldDef.setType(TypeParser.getTypeDef(type));
+                fieldDef.setType(TypeProcessor.createTypeDef(type));
                 return fieldDef;
 
             } catch (Exception e) {

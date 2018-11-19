@@ -1,18 +1,22 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
+import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import lombok.Data;
 
 @Data
 public class MessageDef extends SequenceElement {
     private MessageType type = MessageType.SYNC;
     private String requestName;
+    private List<TypeDef> requestParamTypes = new ArrayList<>();
     private String requestQualifiedSignature;
     private LifeLineDef target;
-    private String responseName;
+    private TypeDef responseType;
+    private MethodCallDef methodCall;
 
     @Override
     public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
@@ -20,7 +24,8 @@ public class MessageDef extends SequenceElement {
     }
 
     @Override
-    public Stream<LifeLineDef> getLifeLinesRecursively() {
-        return getTarget().getLifeLinesRecursively().filter(Objects::nonNull).distinct();
+    public Stream<MessageDef> getMessagesRecursively() {
+        Stream<MessageDef> messages = getTarget().getMessagesRecursively();
+        return Stream.concat(Stream.of(this), messages);
     }
 }

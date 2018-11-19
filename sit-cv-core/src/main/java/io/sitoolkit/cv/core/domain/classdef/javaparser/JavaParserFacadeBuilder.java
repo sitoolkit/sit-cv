@@ -2,6 +2,7 @@ package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Set;
 
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -26,13 +27,14 @@ public class JavaParserFacadeBuilder {
         // project.getBinDirs().stream()
         // .forEach(binDir ->
         // combinedTypeSolver.add(ClassDirTypeSolver.get(binDir)));
-        project.getAllClasspaths().stream().map(Path::toAbsolutePath).map(Path::toString)
+        Set<Path> classpaths = project.getAllClasspaths();
+        log.info("Adding classpaths for JavaParser:{}", classpaths);
+        classpaths.stream().map(Path::toAbsolutePath).map(Path::toString)
                 .forEach(str -> {
                     try {
                         combinedTypeSolver.add(JarTypeSolver.getJarTypeSolver(str));
-                        log.info("jar is added. {}", str);
                     } catch (IOException e) {
-                        log.warn("warn ", e);
+                        log.warn(e.getMessage(), e);
                     }
                 });
 

@@ -18,9 +18,8 @@ public class SequenceGroup extends SequenceElement {
     }
 
     @Override
-    public Stream<LifeLineDef> getLifeLinesRecursively() {
-        return getElements().stream().flatMap(SequenceElement::getLifeLinesRecursively)
+    public Stream<MessageDef> getMessagesRecursively() {
+        return getElements().stream().flatMap(SequenceElement::getMessagesRecursively)
                 .filter(Objects::nonNull).distinct();
     }
-
 }

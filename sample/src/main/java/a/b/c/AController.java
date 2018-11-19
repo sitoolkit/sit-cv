@@ -12,6 +12,9 @@ public class AController {
     @Autowired
     AService aService;
 
+    @Autowired
+    BService bService;
+
     /**
      * AController search method
      *
@@ -23,7 +26,20 @@ public class AController {
         return aService.search(new SearchConditioner());
     }
 
+    public List<XEntity> searchByDoubleCondition() {
+        List<XEntity> xEntities = aService.searchByDoubleCondition(new SearchConditioner(),
+                new SearchConditioner());
+        return xEntities;
+    }
+
     public int save(XEntity entity) {
         return aService.save(entity);
+    }
+
+    public void loopSave(XEntity entity) {
+        for(int i = 0; i < 10; i++) {
+            bService.search(new SearchConditioner());
+        }
+        aService.save(entity);
     }
 }

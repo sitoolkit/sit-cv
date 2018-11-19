@@ -12,6 +12,7 @@ public class TypeDef {
     private String name;
     private List<TypeDef> typeParamList = new ArrayList<>();
     private ClassDef classRef;
+    private String variable;
 
     public Stream<TypeDef> getTypeParamsRecursively(){
         return Stream.concat(Stream.of(this),

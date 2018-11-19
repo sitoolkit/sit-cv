@@ -92,13 +92,13 @@ public class DesignDocService {
                 .collect(Collectors.toSet());
 
         readDefs.forEach(classDefRepository::save);
-        readDefs.forEach(clazz -> log.info("Read {}", clazz));
+        readDefs.forEach(clazz -> log.debug("Read {}", clazz));
 
         Set<String> deletedIds = inputSources.stream().filter(s -> !Files.isDirectory(Paths.get(s)))
                 .filter(sId -> !readDefs.stream()
                         .anyMatch(clazz -> StringUtils.equals(sId, clazz.getSourceId())))
                 .collect(Collectors.toSet());
-        deletedIds.forEach(clazz -> log.info("Remove {}", clazz));
+        deletedIds.forEach(clazz -> log.debug("Remove {}", clazz));
         deletedIds.forEach(classDefRepository::remove);
 
         classDefRepository.solveReferences();
@@ -120,7 +120,7 @@ public class DesignDocService {
 
         LifeLineDef lifeLine = sequenceProcessor.process(entryPoint.getClassDef(), entryPoint);
         SequenceDiagram sequenceModel = SequenceDiagram.builder().entryLifeLine(lifeLine).build();
-        ClassDiagram classModel = classProcessor.process(entryPoint);
+        ClassDiagram classModel = classProcessor.process(lifeLine);
 
         Stream<String> allSourceIds = Stream.of(sequenceModel, classModel)
                 .map(DiagramModel::getAllSourceIds).flatMap(Set::stream).distinct();

@@ -6,111 +6,98 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
-import com.github.javaparser.ast.expr.TypeExpr;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.resolution.UnsolvedSymbolException;
-import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
-import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
 
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
-import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
     private static final Pattern STREAM_METHOD_PATTERN = Pattern
             .compile("^java\\.util\\.stream\\.Stream\\..*");
 
-    private JavaParserFacade jpf;
-    private MethodCallVisitor methodCallVisitor;
+    private final MethodResolver methodResolver;
 
     public static StatementVisitor build(JavaParserFacade jpf) {
-        StatementVisitor statementVisitor = new StatementVisitor();
-        statementVisitor.jpf = jpf;
-        statementVisitor.methodCallVisitor = new MethodCallVisitor(jpf);
-
-        return statementVisitor;
+        MethodResolver methodResolver = new MethodResolver(jpf);
+        return new StatementVisitor(methodResolver);
     }
 
     @Override
-    public void visit(ForeachStmt n, List<CvStatement> statements) {
-        findMethodCallInLoop(n, statements);
+    public void visit(ForeachStmt n, VisitContext context) {
+        CvStatement statement = DeclationProcessor.createLoopStatement(n);
+        context.addStatement(statement);
+        super.visit(n, VisitContext.childrenOf(statement));
     }
 
     @Override
-    public void visit(ForStmt n, List<CvStatement> statements) {
-        findMethodCallInLoop(n, statements);
+    public void visit(ForStmt n, VisitContext context) {
+        CvStatement statement = DeclationProcessor.createLoopStatement(n);
+        context.addStatement(statement);
+        super.visit(n, VisitContext.childrenOf(statement));
     }
 
     @Override
-    public void visit(IfStmt n, List<CvStatement> arg) {
-        // TODO Auto-generated method stub
-        super.visit(n, arg);
+    public void visit(IfStmt n, VisitContext context) {
+        super.visit(n, context);
     }
 
     @Override
-    public void visit(MethodCallExpr n, List<CvStatement> statements) {
+    public void visit(WhileStmt n, VisitContext context) {
+        super.visit(n, context);
+    }
 
-        findNonStreamMethod(n).ifPresent(nonStreamMethod -> {
-            methodCallVisitor.visit(nonStreamMethod, statements);
-        });
+    @Override
+    public void visit(MethodCallExpr n, VisitContext context) {
 
         if (isStreamMethod(n)) {
-            findMethodCallInLoop(n, getStreamMethodParams(n), statements);
+            findNonStreamMethod(n).ifPresent(l -> l.accept(this, context));
+            CvStatement statement = DeclationProcessor.createLoopStatement(n);
+            context.addStatement(statement);
+            collectStreamMethodArguments(n).forEach(p -> p.accept(this, VisitContext.childrenOf(statement)));
+
+        } else {
+            n.getScope().ifPresent(l -> l.accept(this, context));
+            n.getArguments().forEach(p -> p.accept(this, context));
+            methodResolver.resolve(n)
+                    .map((m) -> DeclationProcessor.createMethodCall(m, n.getParentNode()))
+                    .ifPresent(context::addStatement);
         }
     }
 
     @Override
-    public void visit(WhileStmt n, List<CvStatement> arg) {
-        // TODO Auto-generated method stub
-        super.visit(n, arg);
+    public void visit(LambdaExpr n, VisitContext context) {
+        if (context.isInLoop()) {
+            super.visit(n, context);
+        }
     }
-
     @Override
-    public void visit(MethodReferenceExpr methodRefExpr, List<CvStatement> statements) {
-        methodCallVisitor.visit(methodRefExpr, statements);
-    }
-
-    void findMethodCallInLoop(Node n, List<CvStatement> statements) {
-        findMethodCallInLoop(n, n.getChildNodes(), statements);
-    }
-
-    void findMethodCallInLoop(Node n, List<? extends Node> childNodes, List<CvStatement> statements) {
-        LoopStatement statement = new LoopStatement();
-        statements.add(statement);
-        statement.setBody(n.toString());
-        childNodes.stream().forEach(child -> child.accept(this, statement.getChildren()));
+    public void visit(MethodReferenceExpr n, VisitContext context) {
+        if (context.isInLoop()) {
+            super.visit(n, context);
+            methodResolver.resolve(n)
+                    .map((m) -> DeclationProcessor.createMethodCall(m, Optional.empty()))
+                    .ifPresent(context::addStatement);
+        }
     }
 
     boolean isStreamMethod(MethodCallExpr n) {
-        return matchesQualifiedName(n, STREAM_METHOD_PATTERN);
-    }
-
-    boolean matchesQualifiedName(MethodCallExpr n, Pattern pattern) {
-        try {
-            SymbolReference<ResolvedMethodDeclaration> ref = jpf.solve(n);
-            if (!ref.isSolved()) {
-                return false;
-            }
-            ResolvedMethodDeclaration rmd = ref.getCorrespondingDeclaration();
-            return pattern.matcher(rmd.getQualifiedName()).matches();
-
-        } catch (UnsolvedSymbolException e) {
-            log.debug("Unsolved: '{}'", n);
-            return false;
-        }
+        return methodResolver.resolve(n)
+                .map(method -> STREAM_METHOD_PATTERN.matcher(method.getQualifiedName()).matches())
+                .orElse(false);
     }
 
     Optional<MethodCallExpr> findNonStreamMethod(MethodCallExpr n) {
@@ -124,12 +111,12 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
         }
     }
 
-    List<Expression> getStreamMethodParams(MethodCallExpr n) {
+    List<Expression> collectStreamMethodArguments(MethodCallExpr n) {
         if (isStreamMethod(n)) {
             List<Expression> result = new ArrayList<>();
             n.getScope().filter(MethodCallExpr.class::isInstance)
                     .map(MethodCallExpr.class::cast)
-                    .map(this::getStreamMethodParams)
+                    .map(this::collectStreamMethodArguments)
                     .ifPresent(result::addAll);
 
             result.addAll(n.getArguments());
@@ -137,38 +124,6 @@ public class StatementVisitor extends VoidVisitorAdapter<List<CvStatement>> {
 
         } else {
             return Collections.emptyList();
-        }
-    }
-
-    void visitStream(MethodCallExpr n, List<CvStatement> statements) {
-
-        n.getChildNodes().stream().forEach(childNode -> {
-            if (childNode instanceof LambdaExpr) {
-                    System.out.println(jpf.solve((LambdaExpr) childNode));
-
-            } else if (childNode instanceof MethodReferenceExpr) {
-                MethodReferenceExpr m = (MethodReferenceExpr) childNode;
-                TypeExpr t = (TypeExpr) m.getScope();
-                System.out.println(jpf.convertToUsage(t.getType()));
-                ;
-            }
-        });
-    }
-
-    boolean inLoop(Node node) {
-        if (!node.getParentNode().isPresent()) {
-            return false;
-        }
-        Node parent = node.getParentNode().get();
-
-        if (parent instanceof ForStmt || parent instanceof ForeachStmt) {
-            return true;
-        } else if (parent instanceof MethodCallExpr) {
-            return matchesQualifiedName((MethodCallExpr) parent, STREAM_METHOD_PATTERN);
-        } else if (parent instanceof MethodDeclaration) {
-            return false;
-        } else {
-            return inLoop(parent);
         }
     }
 

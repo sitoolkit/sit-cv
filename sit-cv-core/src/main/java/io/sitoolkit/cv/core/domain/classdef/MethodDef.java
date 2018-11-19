@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

@@ -9,6 +9,6 @@ public class IdentiferFormatter {
     }
 
     private String hidePackageName(String identifer) {
-        return identifer.replaceAll("[^ .()<>,]+\\.", "");
+        return identifer.replaceAll("[0-9A-za-z_]+\\.", "");
     }
 }
