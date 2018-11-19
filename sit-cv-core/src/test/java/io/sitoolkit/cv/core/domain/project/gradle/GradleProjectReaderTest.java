@@ -22,11 +22,11 @@ public class GradleProjectReaderTest {
         Project project = reader
                 .read(Paths.get("../test-project/gradle-multi").toAbsolutePath().normalize()).get();
 
-        assertThat(project.getSrcDirsIncludeSubs(),
+        assertThat(project.getAllSrcDirs(),
                 containsInAnyOrder(project.getDir().resolve("project-application/src/main/java"),
                         project.getDir().resolve("project-library/src/main/java")));
 
-        Set<String> classpaths = project.getClasspathsIncludeSubs().stream()
+        Set<String> classpaths = project.getAllClasspaths().stream()
                 .map(Path::toString)
                 .collect(Collectors.toSet());
 

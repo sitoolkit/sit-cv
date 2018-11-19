@@ -18,13 +18,13 @@ public class MavenProjectReaderTest {
         // TODO we need to test using test-project/maven-multi
         Project project = reader.read(Paths.get("..")).get();
 
-        assertThat(project.getSrcDirsIncludeSubs(), containsInAnyOrder(
+        assertThat(project.getAllSrcDirs(), containsInAnyOrder(
                 project.getDir().resolve("sit-cv-app/src/main/java"),
                 project.getDir().resolve("sit-cv-core/src/main/java"),
                 project.getDir().resolve("sit-cv-maven-plugin/src/main/java"),
                 project.getDir().resolve("sit-cv-maven-plugin/target/generated-sources/plugin")));
 
-        System.out.println(project.getClasspathsIncludeSubs());
+        System.out.println(project.getAllClasspaths());
     }
 
 }

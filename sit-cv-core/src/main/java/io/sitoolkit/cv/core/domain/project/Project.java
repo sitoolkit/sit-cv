@@ -38,24 +38,24 @@ public class Project {
         subProjects.forEach(Project::refresh);
     }
 
-    public Set<Project> getProjectsIncludeSubs() {
-        return getProjectsStreamIncludeSubs().collect(Collectors.toSet());
+    public Set<Project> getAllProjects() {
+        return getAllProjectsStream().collect(Collectors.toSet());
     }
 
-    public Set<Path> getClasspathsIncludeSubs() {
-        return getProjectsStreamIncludeSubs().flatMap(proj -> proj.classpaths.stream()).collect(Collectors.toSet());
+    public Set<Path> getAllClasspaths() {
+        return getAllProjectsStream().flatMap(proj -> proj.classpaths.stream()).collect(Collectors.toSet());
     }
 
-    public Set<Path> getSrcDirsIncludeSubs() {
-        return getProjectsStreamIncludeSubs().flatMap(proj -> proj.srcDirs.stream()).collect(Collectors.toSet());
+    public Set<Path> getAllSrcDirs() {
+        return getAllProjectsStream().flatMap(proj -> proj.srcDirs.stream()).collect(Collectors.toSet());
     }
 
-    public Set<Path> getParseTargetDirsIncludeSubs() {
-        return getProjectsStreamIncludeSubs().flatMap(proj -> proj.getParseTargetSrcDirs().stream())
+    public Set<Path> getAllParseTargetDirs() {
+        return getAllProjectsStream().flatMap(proj -> proj.getParseTargetSrcDirs().stream())
                 .collect(Collectors.toSet());
     }
 
-    public Optional<Path> findParseTargetSrc(Path inputFile) {
+    public Optional<Path> findParseTarget(Path inputFile) {
         return findProjectFromSrc(inputFile)
                 .map(proj -> proj.getPreProcessor().getPreProcessedPath(inputFile));
     }
@@ -66,11 +66,11 @@ public class Project {
                 .collect(Collectors.toSet());
     }
 
-    Stream<Project> getProjectsStreamIncludeSubs() {
+    Stream<Project> getAllProjectsStream() {
         return Stream.concat(
                 Stream.of(this),
                 subProjects.stream()
-                        .flatMap(Project::getProjectsStreamIncludeSubs));
+                        .flatMap(Project::getAllProjectsStream));
     }
 
     Optional<Project> findProjectFromSrc(Path inputFile) {

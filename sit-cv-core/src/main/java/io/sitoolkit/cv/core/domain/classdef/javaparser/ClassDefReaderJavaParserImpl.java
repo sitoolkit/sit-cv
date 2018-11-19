@@ -72,7 +72,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
         Pattern p = Pattern.compile(config.getJavaFilePattern());
 
-        projectManager.getCurrentProject().getSrcDirsIncludeSubs().stream().forEach(srcDir -> {
+        projectManager.getCurrentProject().getAllSrcDirs().stream().forEach(srcDir -> {
             try {
                 List<Path> files = Files.walk(srcDir)
                         .filter(file -> p.matcher(file.toFile().getName()).matches())
@@ -104,11 +104,11 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     @Override
     public Optional<ClassDef> readJava(Path javaFile) {
-        return projectManager.getCurrentProject().findParseTargetSrc(javaFile)
-                .flatMap(file -> readParseTargetSourceFile(file));
+        return projectManager.getCurrentProject().findParseTarget(javaFile)
+                .flatMap(file -> readParseTargetSource(file));
     }
 
-    public Optional<ClassDef> readParseTargetSourceFile(Path javaFile) {
+    public Optional<ClassDef> readParseTargetSource(Path javaFile) {
         log.debug("Read java : {}", javaFile);
 
         try {
