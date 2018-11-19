@@ -1,15 +1,15 @@
 package io.sitoolkit.cv.core.domain.classdef;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class BranchStatement extends CvStatement {
+public class BranchStatement implements CvStatement {
+
+    private List<ConditionalStatement> conditions = new ArrayList<>();
 
     @Override
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {

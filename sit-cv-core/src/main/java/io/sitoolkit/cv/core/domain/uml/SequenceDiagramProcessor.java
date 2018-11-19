@@ -81,10 +81,10 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     }
 
-    Optional<SequenceElement> processChildren(CvStatement statement, MethodCallStack callStack,
+    Optional<SequenceElement> processChildren(List<? extends CvStatement> statements, MethodCallStack callStack,
             Function<List<SequenceElement>, SequenceElement> f) {
 
-        List<SequenceElement> groupElements = statement.getChildren().stream()
+        List<SequenceElement> groupElements = statements.stream()
                 .map(childStatement -> childStatement.process(this, callStack))
                 .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 
@@ -102,7 +102,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     @Override
     public Optional<SequenceElement> process(LoopStatement statement, MethodCallStack callStack) {
-        return processChildren(statement, callStack, (groupElements) -> {
+        return processChildren(statement.getChildren(), callStack, (groupElements) -> {
             SequenceGroup group = new LoopSequenceGroup();
             group.getElements().addAll(groupElements);
             return group;
@@ -111,7 +111,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     @Override
     public Optional<SequenceElement> process(BranchStatement statement, MethodCallStack callStack) {
-        return processChildren(statement, callStack, (groupElements) -> {
+        return processChildren(statement.getConditions(), callStack, (groupElements) -> {
             BranchSequenceGroup group = new BranchSequenceGroup();
             group.getElements().addAll(groupElements);
             return group;
@@ -121,7 +121,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
     @Override
     public Optional<SequenceElement> process(ConditionalStatement statement,
             MethodCallStack callStack) {
-        return processChildren(statement, callStack, (groupElements) -> {
+        return processChildren(statement.getChildren(), callStack, (groupElements) -> {
             ConditionalSequenceGroup group = new ConditionalSequenceGroup();
             group.getElements().addAll(groupElements);
             group.setCondition(statement.getCondition());

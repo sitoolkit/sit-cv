@@ -12,7 +12,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(of = "qualifiedSignature", callSuper = true)
 @ToString(exclude = { "classDef", "methodCalls" }, callSuper = true)
-public class MethodDef extends CvStatement {
+public class MethodDef extends CvStatementDefaultImpl {
 
     private String name;
     private String signature;

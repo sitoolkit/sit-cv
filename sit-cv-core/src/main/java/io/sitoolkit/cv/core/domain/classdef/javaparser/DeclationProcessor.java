@@ -24,7 +24,6 @@ public class DeclationProcessor {
 
     public static BranchStatement createBranchStatement(IfStmt n) {
         BranchStatement statement = new BranchStatement();
-        statement.setBody(n.toString());
         return statement;
     }
 

@@ -93,8 +93,11 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     private void solveMethodCall(CvStatement statement) {
         if (statement instanceof MethodCallDef) {
             solveMethodCall((MethodCallDef) statement);
+        } else if (statement instanceof BranchStatement) {
+            ((BranchStatement) statement).getConditions().stream().forEach(this::solveMethodCall);
         } else {
-            statement.getChildren().stream().forEach(this::solveMethodCall);
+            ((CvStatementDefaultImpl) statement).getChildren().stream()
+                    .forEach(this::solveMethodCall);
         }
     }
 
