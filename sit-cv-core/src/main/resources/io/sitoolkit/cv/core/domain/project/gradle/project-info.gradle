@@ -1,10 +1,13 @@
 allprojects {
- 
+
     task projectInfo {
       doLast {
         if (project.hasProperty('sourceSets') && project.sourceSets.main.hasProperty('java')) {
+          println "sitCvProjectDir:${project.projectDir}"
+          println "sitCvBuildDir:${project.buildDir}"
           project.sourceSets.main.java.srcDirs.each{println "sitCvJavaSrcDir:${it}"}
           configurations.compile.each { println "sitCvClasspath:${it}" }
+          configurations.compileOnly.each { println "sitCvClasspath:${it}" }
         }
       }
     }

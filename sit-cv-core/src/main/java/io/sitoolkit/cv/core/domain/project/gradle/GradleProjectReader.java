@@ -46,10 +46,18 @@ public class GradleProjectReader implements ProjectReader {
             }
         }
 
-        project.setSrcDirs(listener.getJavaSrcDirs());
-        project.setClasspaths(listener.getClasspaths());
-        // log.info("jarPaths got from gradle dependency - Paths: {}",
-        // gotPaths);
+        for (Project listenedProj : listener.getProjects()) {
+
+            if (listenedProj.getDir().equals(projectDir)) {
+                project.setClasspaths(listenedProj.getClasspaths());
+                project.setSrcDirs(listenedProj.getSrcDirs());
+                project.setBuildDir(listenedProj.getBuildDir());
+
+            } else {
+                project.getSubProjects().add(listenedProj);
+            }
+        }
+        
         return Optional.of(project);
     }
 

@@ -1,10 +1,13 @@
 package io.sitoolkit.cv.core.domain.project.gradle;
 
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.*;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -23,9 +26,12 @@ public class GradleProjectReaderTest {
                 containsInAnyOrder(project.getDir().resolve("project-application/src/main/java"),
                         project.getDir().resolve("project-library/src/main/java")));
 
-        String classpath = project.getClasspathsIncludeSubs().iterator().next().toString();
-        assertThat(classpath, endsWith(
-                "commons-lang3-3.8.1.jar"));
+        Set<String> classpaths = project.getClasspathsIncludeSubs().stream()
+                .map(Path::toString)
+                .collect(Collectors.toSet());
+
+        assertThat(classpaths, hasItem(endsWith("commons-lang3-3.8.1.jar")));
+        assertThat(classpaths, hasItem(containsString("lombok")));
     }
 
 }
