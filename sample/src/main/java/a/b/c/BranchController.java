@@ -15,12 +15,27 @@ public class BranchController {
         } else {
             if (num > 1000) {
                 processor.process3("");
-            } else {
+            } else if (num < 100) {
                 // nothing
+            } else {
+                processor.process("");
             }
 
             processor.process3("");
         }
+    }
+
+    public void blankIfStatement(int num, String str) {
+        int i;
+        if (num == 0 || isTrue()) {
+            i = 0;
+        } else if (num < 10 || isTrue()) {
+            i = 1;
+        } else {
+            i = 2;
+        }
+
+        processor.process("");
     }
 
     public void switchStatement(String str) {

@@ -23,9 +23,7 @@ import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatementDefaultImpl;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatement>> {
 

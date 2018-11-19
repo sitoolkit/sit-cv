@@ -10,13 +10,18 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public abstract class SequenceGroup extends SequenceElement {
+public class BranchSequenceElement extends SequenceElement {
 
-    private List<SequenceElement> elements = new ArrayList<>();
+    private List<ConditionalSequenceGroup> conditions = new ArrayList<>();
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
+        return writer.write(lifeLine, this);
+    }
 
     @Override
     public Stream<MessageDef> getMessagesRecursively() {
-        return getElements().stream().flatMap(SequenceElement::getMessagesRecursively)
+        return getConditions().stream().flatMap(SequenceElement::getMessagesRecursively)
                 .filter(Objects::nonNull).distinct();
     }
 }

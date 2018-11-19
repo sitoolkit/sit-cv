@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Function;
-
 import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefFilter;
@@ -81,20 +79,6 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     }
 
-    Optional<SequenceElement> processChildren(List<? extends CvStatement> statements, MethodCallStack callStack,
-            Function<List<SequenceElement>, SequenceElement> f) {
-
-        List<SequenceElement> groupElements = statements.stream()
-                .map(childStatement -> childStatement.process(this, callStack))
-                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
-
-        if (groupElements.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(f.apply(groupElements));
-        }
-    }
-
     @Override
     public Optional<SequenceElement> process(CvStatement statement, MethodCallStack context) {
         return Optional.empty();
@@ -102,18 +86,33 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     @Override
     public Optional<SequenceElement> process(LoopStatement statement, MethodCallStack callStack) {
-        return processChildren(statement.getChildren(), callStack, (groupElements) -> {
+
+        List<SequenceElement> groupElements = statement.getChildren().stream()
+                .map(childStatement -> childStatement.process(this, callStack))
+                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+
+        if (groupElements.isEmpty()) {
+            return Optional.empty();
+        } else {
             SequenceGroup group = new LoopSequenceGroup();
             group.getElements().addAll(groupElements);
-            return group;
-        });
+            return Optional.of(group);
+        }
     }
 
     @Override
     public Optional<SequenceElement> process(BranchStatement statement, MethodCallStack callStack) {
-        return processChildren(statement.getConditions(), callStack, (groupElements) -> {
-            BranchSequenceGroup group = new BranchSequenceGroup();
-            group.getElements().addAll(groupElements);
+
+        List<ConditionalSequenceGroup> conditions = statement.getConditions().stream()
+                .map(childStatement -> childStatement.process(this, callStack))
+                .filter(Optional::isPresent).map(Optional::get)
+                .map(ConditionalSequenceGroup.class::cast).collect(Collectors.toList());
+
+        Optional<ConditionalSequenceGroup> notEmptyCondition = conditions.stream()
+                .filter((c) -> !c.getElements().isEmpty()).findAny();
+        return notEmptyCondition.map((condition) -> {
+            BranchSequenceElement group = new BranchSequenceElement();
+            group.getConditions().addAll(conditions);
             return group;
         });
     }
@@ -121,13 +120,16 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
     @Override
     public Optional<SequenceElement> process(ConditionalStatement statement,
             MethodCallStack callStack) {
-        return processChildren(statement.getChildren(), callStack, (groupElements) -> {
-            ConditionalSequenceGroup group = new ConditionalSequenceGroup();
-            group.getElements().addAll(groupElements);
-            group.setCondition(statement.getCondition());
-            group.setFirst(statement.isFirst());
-            return group;
-        });
+
+        List<SequenceElement> groupElements = statement.getChildren().stream()
+                .map(child -> child.process(this, callStack)).filter(Optional::isPresent)
+                .map(Optional::get).collect(Collectors.toList());
+
+        ConditionalSequenceGroup group = new ConditionalSequenceGroup();
+        group.getElements().addAll(groupElements);
+        group.setCondition(statement.getCondition());
+        group.setFirst(statement.isFirst());
+        return Optional.of(group);
     }
 
     @Override
