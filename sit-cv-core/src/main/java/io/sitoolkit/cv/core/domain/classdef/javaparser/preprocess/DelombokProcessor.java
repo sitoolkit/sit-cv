@@ -13,7 +13,6 @@ public class DelombokProcessor implements PreProcessor {
 
     final Delomboker delomboker = new Delomboker();
     final Project project;
-    final Path delombokTargetDir;
 
     public static Optional<PreProcessor> of(Project project) {
 
@@ -37,40 +36,41 @@ public class DelombokProcessor implements PreProcessor {
 
         if (delombokClasspath.isPresent()) {
             log.debug("Lombok dependency found in {} : {}", project.getDir(), delombokClasspath.get());
-
         } else {
             log.debug("Lombok dependency not found in {}", project.getDir());
         }
-
         return delombokClasspath.isPresent();
     }
 
     private DelombokProcessor(Project project) {
         this.project = project;
-        this.delombokTargetDir = project.getBuildDir().resolve("generated-sources/sit-cv/delombok");
     }
 
     @Override
-    public Path getTargetSrcPath(Path srcDir) {
-        Optional<Path> sDir = project.getSrcDirs().stream().filter(dir -> srcDir.startsWith(srcDir)).findFirst();
-        if (sDir.isPresent()) {
-            Path relativized = sDir.get().relativize(srcDir);
-            Path delomboked = delombokTargetDir.resolve(relativized.toString());
-            return delomboked;
+    public Path getPreProcessedPath(Path original) {
+
+        Optional<Path> enclosingSrcDir = project.getSrcDirs().stream()
+                .filter(dir -> original.startsWith(original))
+                .findFirst();
+
+        if (enclosingSrcDir.isPresent()) {
+            Path relativized = enclosingSrcDir.get().relativize(original);
+            return getDelombokTargetDir().resolve(relativized.toString());
+
         } else {
-            throw new IllegalArgumentException(srcDir.toAbsolutePath() + " is not_in source directory");
+            throw new IllegalArgumentException(original.toAbsolutePath() + " is not_in source directory");
         }
     }
 
     @Override
     public void execute() {
-        project.getSrcDirs().forEach(this::execute);
+        project.getSrcDirs().forEach(this::executeDelombok);
     }
 
-    public void execute(Path srcDir) {
+    void executeDelombok(Path srcDir) {
         DelombokParameter param = DelombokParameter.builder()
                 .src(srcDir)
-                .target(delombokTargetDir)
+                .target(getDelombokTargetDir())
                 .encoding("UTF-8")
                 .classpath(project.getClasspaths())
                 .sourcepath(project.getSrcDirs())
@@ -78,4 +78,9 @@ public class DelombokProcessor implements PreProcessor {
 
         delomboker.execute(param);
     }
+
+    Path getDelombokTargetDir() {
+        return project.getBuildDir().resolve("generated-sources/sit-cv/delombok");
+    }
+
 }

@@ -4,14 +4,14 @@ import java.nio.file.Path;
 
 public interface PreProcessor {
 
-    Path getTargetSrcPath(Path srcDir);
+    Path getPreProcessedPath(Path originalSource);
 
     void execute();
 
     static final PreProcessor DO_NOTHING = new PreProcessor() {
 
         @Override
-        public Path getTargetSrcPath(Path srcDir) {
+        public Path getPreProcessedPath(Path srcDir) {
             return srcDir;
         }
 

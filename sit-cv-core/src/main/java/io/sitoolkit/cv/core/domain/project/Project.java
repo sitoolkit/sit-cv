@@ -57,12 +57,12 @@ public class Project {
 
     public Optional<Path> findParseTargetSrc(Path inputFile) {
         return findProjectFromSrc(inputFile)
-                .map(proj -> proj.getPreProcessor().getTargetSrcPath(inputFile));
+                .map(proj -> proj.getPreProcessor().getPreProcessedPath(inputFile));
     }
 
     Set<Path> getParseTargetSrcDirs() {
         return getSrcDirs().stream()
-                .map(srcDir -> preProcessor.getTargetSrcPath(srcDir))
+                .map(srcDir -> preProcessor.getPreProcessedPath(srcDir))
                 .collect(Collectors.toSet());
     }
 
