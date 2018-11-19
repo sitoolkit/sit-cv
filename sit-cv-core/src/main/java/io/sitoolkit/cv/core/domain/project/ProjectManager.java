@@ -28,7 +28,7 @@ public class ProjectManager {
             currentProject = project.get();
             currentProject.getProjectsIncludeSubs()
                     .forEach(proj -> {
-                        PreProcessor pp = DelombokProcessor.getDelombokProcessor(proj).orElse(PreProcessor.DO_NOTHING);
+                        PreProcessor pp = DelombokProcessor.of(proj).orElse(PreProcessor.DO_NOTHING);
                         proj.setPreProcessor(pp);
                     });
 

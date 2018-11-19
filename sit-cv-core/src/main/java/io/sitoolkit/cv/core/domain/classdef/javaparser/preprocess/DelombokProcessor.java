@@ -25,7 +25,7 @@ public class DelombokProcessor implements PreProcessor {
         init();
     }
 
-    public static Optional<PreProcessor> getDelombokProcessor(Project project) {
+    public static Optional<PreProcessor> of(Project project) {
 
         if (isDelombokProject(project)) {
             return Optional.of(new DelombokProcessor(project));
