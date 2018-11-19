@@ -104,7 +104,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     @Override
     public Optional<ClassDef> readJava(Path javaFile) {
-        return projectManager.getCurrentProject().findParseTarget(javaFile)
+        return projectManager.getCurrentProject().findPreProcessed(javaFile)
                 .flatMap(file -> readParseTargetSource(file));
     }
 
@@ -349,7 +349,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     @Override
     public ClassDefReader init() {
         Project project = projectManager.getCurrentProject();
-        project.refresh();
+        project.executePreProcess();
         jpf = JavaParserFacadeBuilder.build(project);
         statementVisitor = StatementVisitor.build(jpf);
 
