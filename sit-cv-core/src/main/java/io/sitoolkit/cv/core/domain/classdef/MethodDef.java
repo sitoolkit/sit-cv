@@ -10,9 +10,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@EqualsAndHashCode(of = "qualifiedSignature", callSuper = true)
-@ToString(exclude = { "classDef", "methodCalls" }, callSuper = true)
-public class MethodDef extends CvStatement {
+@EqualsAndHashCode(of = "qualifiedSignature")
+@ToString(exclude = { "classDef", "methodCalls" })
+public class MethodDef implements CvStatement {
 
     private String name;
     private String signature;

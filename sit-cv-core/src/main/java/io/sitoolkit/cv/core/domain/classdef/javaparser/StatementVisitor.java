@@ -17,14 +17,15 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 
+import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
+import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
+import io.sitoolkit.cv.core.domain.classdef.CvStatementDefaultImpl;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
+public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatement>> {
 
     private static final Pattern STREAM_METHOD_PATTERN = Pattern
             .compile("^java\\.util\\.stream\\.Stream\\..*");
@@ -37,35 +38,58 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     }
 
     @Override
-    public void visit(ForeachStmt n, VisitContext context) {
-        CvStatement statement = DeclationProcessor.createLoopStatement(n);
+    public void visit(ForeachStmt n, VisitContext<CvStatement> context) {
+        CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n);
         context.addStatement(statement);
         super.visit(n, VisitContext.childrenOf(statement));
     }
 
     @Override
-    public void visit(ForStmt n, VisitContext context) {
-        CvStatement statement = DeclationProcessor.createLoopStatement(n);
+    public void visit(ForStmt n, VisitContext<CvStatement> context) {
+        CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n);
         context.addStatement(statement);
         super.visit(n, VisitContext.childrenOf(statement));
     }
 
     @Override
-    public void visit(IfStmt n, VisitContext context) {
+    public void visit(IfStmt n, VisitContext<CvStatement> context) {
+        BranchStatement statement = DeclationProcessor.createBranchStatement(n);
+        context.addStatement(statement);
+        visitIfStmt(n, VisitContext.conditionsOf(statement));
+    }
+
+    private void visitIfStmt(IfStmt n, VisitContext<ConditionalStatement> context) {
+        ConditionalStatement thenStatement = DeclationProcessor.createConditionalStatement(n,
+                n.getCondition().toString());
+        if (context.statements.isEmpty()) {
+            thenStatement.setFirst(true);
+        }
+        context.addStatement(thenStatement);
+
+        n.getThenStmt().accept(this, VisitContext.childrenOf(thenStatement));
+        n.getElseStmt().ifPresent(l -> {
+            if (l.isIfStmt()) {
+                visitIfStmt((IfStmt)l, context);
+            } else {
+                ConditionalStatement elseStatement = DeclationProcessor
+                        .createConditionalStatement(l, "else");
+                context.addStatement(elseStatement);
+                l.accept(this, VisitContext.childrenOf(elseStatement));
+            }
+        });
+    }
+
+    @Override
+    public void visit(WhileStmt n, VisitContext<CvStatement> context) {
         super.visit(n, context);
     }
 
     @Override
-    public void visit(WhileStmt n, VisitContext context) {
-        super.visit(n, context);
-    }
-
-    @Override
-    public void visit(MethodCallExpr n, VisitContext context) {
+    public void visit(MethodCallExpr n, VisitContext<CvStatement> context) {
 
         if (isStreamMethod(n)) {
             findNonStreamMethod(n).ifPresent(l -> l.accept(this, context));
-            CvStatement statement = DeclationProcessor.createLoopStatement(n);
+            CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n);
             context.addStatement(statement);
             collectStreamMethodArguments(n).forEach(p -> p.accept(this, VisitContext.childrenOf(statement)));
 
@@ -79,13 +103,13 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     }
 
     @Override
-    public void visit(LambdaExpr n, VisitContext context) {
+    public void visit(LambdaExpr n, VisitContext<CvStatement> context) {
         if (context.isInLoop()) {
             super.visit(n, context);
         }
     }
     @Override
-    public void visit(MethodReferenceExpr n, VisitContext context) {
+    public void visit(MethodReferenceExpr n, VisitContext<CvStatement> context) {
         if (context.isInLoop()) {
             super.visit(n, context);
             methodResolver.resolve(n)

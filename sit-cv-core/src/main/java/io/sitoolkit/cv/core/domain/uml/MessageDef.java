@@ -7,8 +7,10 @@ import java.util.stream.Stream;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class MessageDef extends SequenceElement {
     private MessageType type = MessageType.SYNC;
     private String requestName;
