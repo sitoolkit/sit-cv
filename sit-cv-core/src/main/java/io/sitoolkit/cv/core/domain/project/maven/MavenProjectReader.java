@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
-import io.sitoolkit.util.buidtoolhelper.maven.MavenProject;
+import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
 
 public class MavenProjectReader implements ProjectReader {
 
