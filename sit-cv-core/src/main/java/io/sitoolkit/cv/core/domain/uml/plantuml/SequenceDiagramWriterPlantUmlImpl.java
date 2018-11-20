@@ -11,19 +11,23 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
+import io.sitoolkit.cv.core.domain.uml.BranchSequenceElement;
+import io.sitoolkit.cv.core.domain.uml.ConditionalSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
+import io.sitoolkit.cv.core.domain.uml.LoopSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.MessageDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
+import io.sitoolkit.cv.core.domain.uml.SequenceElement;
 import io.sitoolkit.cv.core.domain.uml.SequenceElementWriter;
-import io.sitoolkit.cv.core.domain.uml.SequenceGroup;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram>, SequenceElementWriter {
+public class SequenceDiagramWriterPlantUmlImpl
+        implements DiagramWriter<SequenceDiagram>, SequenceElementWriter {
     private final String PARAM_INDENT = "  ";
 
     @NonNull
@@ -58,7 +62,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
         String umlString = lines.stream().collect(Collectors.joining(System.lineSeparator()));
 
-        log.info("Serialized Diagram :{}", umlString);
+        log.info("Serialized Diagram :\n{}", umlString);
 
         return umlString;
     }
@@ -67,7 +71,7 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         List<String> lifeLineStrings = lifeLine.getElements().stream()
                 .map(element -> element.write(lifeLine, this)).flatMap(List::stream)
                 .collect(Collectors.toList());
-        lifeLineStrings.add(0 , "activate " + lifeLine.getObjectName());
+        lifeLineStrings.add(0, "activate " + lifeLine.getObjectName());
         lifeLineStrings.add("deactivate " + lifeLine.getObjectName());
         return lifeLineStrings;
     }
@@ -83,8 +87,8 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
         String responseName = type2Str(message.getResponseType());
         if (!StringUtils.equals(responseName, "void")) {
-            list.add(list.size() - 1, lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
-                    + idFormatter.format(responseName));
+            list.add(list.size() - 1, lifeLine.getObjectName() + " <-- " + target.getObjectName()
+                    + " :" + idFormatter.format(responseName));
         }
 
         return list;
@@ -116,15 +120,42 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         }
     }
 
+    private List<String> elements2str(LifeLineDef lifeLine, List<? extends SequenceElement> elements) {
+        return elements.stream().map(childElement -> childElement.write(lifeLine, this))
+                .flatMap(List::stream).collect(Collectors.toList());
+    }
+
     @Override
-    public List<String> write(LifeLineDef lifeLine, SequenceGroup group) {
+    public List<String> write(LifeLineDef lifeLine, LoopSequenceGroup group) {
         List<String> list = new ArrayList<>();
 
         list.add("loop");
 
-        list.addAll(
-                group.getElements().stream().map(childElement -> childElement.write(lifeLine, this))
-                        .flatMap(List::stream).collect(Collectors.toList()));
+        list.addAll(elements2str(lifeLine, group.getElements()));
+
+        list.add("end");
+
+        return list;
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, ConditionalSequenceGroup group) {
+        List<String> list = new ArrayList<>();
+
+        String altType = group.isFirst() ? "alt" : "else";
+
+        list.add(altType + " " + group.getCondition());
+
+        list.addAll(elements2str(lifeLine, group.getElements()));
+
+        return list;
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, BranchSequenceElement group) {
+        List<String> list = new ArrayList<>();
+
+        list.addAll(elements2str(lifeLine, group.getConditions()));
 
         list.add("end");
 

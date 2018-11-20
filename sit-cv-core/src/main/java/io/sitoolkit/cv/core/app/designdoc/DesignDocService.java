@@ -125,8 +125,8 @@ public class DesignDocService {
 
     public DesignDoc get(String designDocId) {
 
+        log.info("Build diagram for {}", designDocId);
         MethodDef entryPoint = classDefRepository.findMethodByQualifiedSignature(designDocId);
-        log.info("Build diagram for {}", entryPoint);
 
         LifeLineDef lifeLine = sequenceProcessor.process(entryPoint.getClassDef(), entryPoint);
         SequenceDiagram sequenceModel = SequenceDiagram.builder().entryLifeLine(lifeLine).build();
