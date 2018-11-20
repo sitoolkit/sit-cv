@@ -66,7 +66,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatemen
 
     private void visitIfStmt(IfStmt n, VisitContext<ConditionalStatement> context) {
         ConditionalStatement thenStatement = DeclationProcessor.createConditionalStatement(n,
-                n.getCondition().toString());
+                n.getCondition().getTokenRange().map(Object::toString).orElse(""));
         if (context.statements.isEmpty()) {
             thenStatement.setFirst(true);
         }

@@ -109,8 +109,8 @@ public class LoopController {
     }
 
     public void deepHierarchy() {
-        processor.getSelf().getSelf().getSelf().getSelf().getSelf().getList("").stream()
-                .forEach(s -> processor.process(""));
+        processor.getSelf().getSelf().getSelf().getSelf().getSelf().getSelf().getSelf().getSelf()
+                .getSelf().getList("").stream().forEach(s -> processor.process(""));
     }
 
     private Stream<String> createStream() {
