@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess;
+package io.sitoolkit.cv.core.domain.project.preprocess;
 
 import java.nio.file.Path;
 

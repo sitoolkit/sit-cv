@@ -1,9 +1,10 @@
-package io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess;
+package io.sitoolkit.cv.core.domain.project.lombok;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
 import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.cv.core.domain.project.preprocess.PreProcessor;
 import io.sitoolkit.cv.core.infra.lombok.DelombokParameter;
 import io.sitoolkit.cv.core.infra.lombok.Delomboker;
 import lombok.extern.slf4j.Slf4j;

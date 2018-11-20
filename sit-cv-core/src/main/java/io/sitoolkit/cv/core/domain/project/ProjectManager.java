@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import io.sitoolkit.cv.core.domain.classdef.javaparser.preprocess.DelombokProcessor;
 import io.sitoolkit.cv.core.domain.project.gradle.GradleProjectReader;
+import io.sitoolkit.cv.core.domain.project.lombok.DelombokProcessor;
 import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
 import lombok.Getter;
 
