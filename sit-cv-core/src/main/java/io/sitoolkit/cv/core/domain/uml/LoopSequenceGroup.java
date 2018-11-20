@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class LoopSequenceGroup extends SequenceGroup {
 
+    private String condition;
+
     @Override
     public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
         return writer.write(lifeLine, this);
