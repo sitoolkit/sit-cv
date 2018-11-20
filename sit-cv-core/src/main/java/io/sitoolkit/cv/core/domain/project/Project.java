@@ -50,8 +50,8 @@ public class Project {
         return getAllProjectsStream().flatMap(proj -> proj.srcDirs.stream()).collect(Collectors.toSet());
     }
 
-    public Set<Path> getAllParseTargetDirs() {
-        return getAllProjectsStream().flatMap(proj -> proj.getParseTargetDirs().stream())
+    public Set<Path> getAllPreProcessedDirs() {
+        return getAllProjectsStream().flatMap(proj -> proj.getPreProcessedDirs().stream())
                 .collect(Collectors.toSet());
     }
 
@@ -60,7 +60,7 @@ public class Project {
                 .map(proj -> proj.getPreProcessor().getPreProcessedPath(inputFile));
     }
 
-    Set<Path> getParseTargetDirs() {
+    Set<Path> getPreProcessedDirs() {
         return getSrcDirs().stream()
                 .map(srcDir -> preProcessor.getPreProcessedPath(srcDir))
                 .collect(Collectors.toSet());
