@@ -104,6 +104,15 @@ public class LoopController {
         createStream().forEach(this::process);
     }
 
+    public void streamOf() {
+        Stream.of("").forEach(this::process);
+    }
+
+    public void deepHierarchy() {
+        processor.getSelf().getSelf().getSelf().getSelf().getSelf().getList("").stream()
+                .forEach(s -> processor.process(""));
+    }
+
     private Stream<String> createStream() {
         return Stream.of("");
     }

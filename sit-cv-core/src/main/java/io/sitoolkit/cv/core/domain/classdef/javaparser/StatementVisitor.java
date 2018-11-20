@@ -164,7 +164,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatemen
                 if (isStreamMethod(n)) {
                     return getStreamLoopCondition((MethodCallExpr) scope);
                 } else {
-                    return methodCall2Str((MethodCallExpr) scope) + "." + methodCall2Str(n);
+                    return getStreamLoopCondition((MethodCallExpr) scope) + "." + methodCall2Str(n);
                 }
             } else {
                 return scope.toString() + "." + methodCall2Str(n);
