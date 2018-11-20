@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.project.preprocess;
+package io.sitoolkit.cv.core.domain.project;
 
 import java.nio.file.Path;
 

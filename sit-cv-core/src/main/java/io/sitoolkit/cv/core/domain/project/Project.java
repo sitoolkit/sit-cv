@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.sitoolkit.cv.core.domain.project.preprocess.PreProcessor;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
