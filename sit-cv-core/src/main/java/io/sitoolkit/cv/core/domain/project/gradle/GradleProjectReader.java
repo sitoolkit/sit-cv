@@ -25,8 +25,7 @@ public class GradleProjectReader implements ProjectReader {
             return Optional.empty();
         }
 
-        Project project = new Project(projectDir);
-        GradleProjectInfoListener listener = new GradleProjectInfoListener();
+        GradleProjectInfoListener listener = new GradleProjectInfoListener(projectDir);
 
         log.info("project: {} is a gradle project - finding depending jars... ", projectDir);
 
@@ -46,19 +45,7 @@ public class GradleProjectReader implements ProjectReader {
             }
         }
 
-        for (Project listenedProj : listener.getProjects()) {
-
-            if (listenedProj.getDir().equals(projectDir)) {
-                project.setClasspaths(listenedProj.getClasspaths());
-                project.setSrcDirs(listenedProj.getSrcDirs());
-                project.setBuildDir(listenedProj.getBuildDir());
-
-            } else {
-                project.getSubProjects().add(listenedProj);
-            }
-        }
-        
-        return Optional.of(project);
+        return Optional.of(listener.getProject());
     }
 
 }

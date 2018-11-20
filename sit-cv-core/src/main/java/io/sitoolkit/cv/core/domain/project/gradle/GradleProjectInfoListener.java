@@ -1,8 +1,7 @@
 package io.sitoolkit.cv.core.domain.project.gradle;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,8 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 public class GradleProjectInfoListener implements StdoutListener {
 
     @Getter
-    private List<Project> projects = new ArrayList<>();
-    private Project currentProject;
+    private final Project project;
+    private Project recordingProject;
+
+    public GradleProjectInfoListener(Path projectDir) {
+        this.project = new Project(projectDir);
+    }
 
     @Override
     public void nextLine(String line) {
@@ -25,26 +28,51 @@ public class GradleProjectInfoListener implements StdoutListener {
 
         String javaBaseDirStr = StringUtils.substringAfter(line, "sitCvProjectDir:");
         if (StringUtils.isNotEmpty(javaBaseDirStr)) {
-            currentProject = new Project(Paths.get(javaBaseDirStr));
-            projects.add(currentProject);
+            recordBaseDirStr(javaBaseDirStr);
         }
 
-        if (currentProject != null) {
-            String javaBuildDirStr = StringUtils.substringAfter(line, "sitCvBuildDir:");
-            if (StringUtils.isNotEmpty(javaBuildDirStr)) {
-                currentProject.setBuildDir(Paths.get(javaBuildDirStr));
-            }
+        String javaBuildDirStr = StringUtils.substringAfter(line, "sitCvBuildDir:");
+        if (StringUtils.isNotEmpty(javaBuildDirStr)) {
+            recordBuildDirStr(javaBuildDirStr);
+        }
 
-            String javaSrcDir = StringUtils.substringAfter(line, "sitCvJavaSrcDir:");
-            if (StringUtils.isNotEmpty(javaSrcDir)) {
-                currentProject.getSrcDirs().add(Paths.get(javaSrcDir));
-            }
+        String javaSrcDirStr = StringUtils.substringAfter(line, "sitCvJavaSrcDir:");
+        if (StringUtils.isNotEmpty(javaSrcDirStr)) {
+            recordSrcDirStr(javaSrcDirStr);
+        }
 
-            String classpath = StringUtils.substringAfter(line, "sitCvClasspath:");
-            if (StringUtils.isNotEmpty(classpath)) {
-                currentProject.getClasspaths().add(Paths.get(classpath));
-            }
+        String classpathStr = StringUtils.substringAfter(line, "sitCvClasspath:");
+        if (StringUtils.isNotEmpty(classpathStr)) {
+            recordClasspathStr(classpathStr);
         }
     }
 
+    void recordBaseDirStr(String javaBaseDirStr) {
+        Path javaBaseDir = Paths.get(javaBaseDirStr);
+        if (project.getDir().equals(javaBaseDir)) {
+            recordingProject = project;
+
+        } else {
+            recordingProject = new Project(javaBaseDir);
+            project.getSubProjects().add(recordingProject);
+        }
+    }
+
+    void recordBuildDirStr(String javaBuildDirStr) {
+        if (recordingProject != null) {
+            recordingProject.setBuildDir(Paths.get(javaBuildDirStr));
+        }
+    }
+
+    void recordSrcDirStr(String javaSrcDirStr) {
+        if (recordingProject != null) {
+            recordingProject.getSrcDirs().add(Paths.get(javaSrcDirStr));
+        }
+    }
+
+    void recordClasspathStr(String classpathStr) {
+        if (recordingProject != null) {
+            recordingProject.getClasspaths().add(Paths.get(classpathStr));
+        }
+    }
 }
