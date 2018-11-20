@@ -129,7 +129,7 @@ public class SequenceDiagramWriterPlantUmlImpl
     public List<String> write(LifeLineDef lifeLine, LoopSequenceGroup group) {
         List<String> list = new ArrayList<>();
 
-        list.add("loop " + group.getCondition());
+        list.add("loop " + group.getScope());
 
         list.addAll(elements2str(lifeLine, group.getElements()));
 

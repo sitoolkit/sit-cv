@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class LoopSequenceGroup extends SequenceGroup {
 
-    private String condition;
+    private String scope;
 
     @Override
     public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {

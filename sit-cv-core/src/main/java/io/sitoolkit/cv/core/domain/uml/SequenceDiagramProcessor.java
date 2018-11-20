@@ -96,7 +96,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         } else {
             LoopSequenceGroup group = new LoopSequenceGroup();
             group.getElements().addAll(groupElements);
-            group.setCondition(statement.getCondition());
+            group.setScope(statement.getScope());
             return Optional.of(group);
         }
     }
