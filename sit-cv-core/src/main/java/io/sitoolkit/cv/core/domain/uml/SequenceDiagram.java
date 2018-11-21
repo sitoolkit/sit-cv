@@ -18,7 +18,7 @@ public class SequenceDiagram implements DiagramModel{
 
     @Override
     public String getId() {
-        return entryLifeLine.getEntryMessage();
+        return entryLifeLine.getEntryMessage().getRequestQualifiedSignature();
     }
 
     @Override

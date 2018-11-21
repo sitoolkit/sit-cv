@@ -35,7 +35,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
     public LifeLineDef process(ClassDef clazz, MethodDef method, MethodCallStack callStack) {
         LifeLineDef lifeLine = new LifeLineDef();
         lifeLine.setSourceId(clazz.getSourceId());
-        lifeLine.setEntryMessage(method.getQualifiedSignature());
+        lifeLine.setEntryMessage(buildEntryMessage(lifeLine, method));
         lifeLine.setObjectName(clazz.getName());
         lifeLine.setElements(method.getStatements().stream()
                 .map(statement -> statement.process(this, callStack))
@@ -47,6 +47,17 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         log.debug("Add lifeline {} -> {}", clazz.getName(), lifeLine);
 
         return lifeLine;
+    }
+
+    MessageDef buildEntryMessage(LifeLineDef lifeLine, MethodDef method) {
+        MessageDef message = new MessageDef();
+        message.setRequestName(method.getName());
+        message.setRequestParamTypes(method.getParamTypes());
+        message.setRequestQualifiedSignature(method.getQualifiedSignature());
+        message.setTarget(lifeLine);
+        message.setResponseType(method.getReturnType());
+
+        return message;
     }
 
     Optional<MessageDef> methodCall2Message(MethodCallDef methodCall, MethodCallStack callStack) {
