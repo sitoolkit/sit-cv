@@ -1,36 +1,33 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 
-import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
-import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
-import io.sitoolkit.cv.core.domain.classdef.CvStatement;
-import io.sitoolkit.cv.core.domain.classdef.CvStatementDefaultImpl;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatement>> {
+public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
     private static final Pattern STREAM_METHOD_PATTERN = Pattern
-            .compile("^java\\.util\\.stream\\.Stream\\..*");
+            .compile("java\\.util\\.stream\\.Stream\\..*");
 
     private final MethodResolver methodResolver;
 
@@ -40,88 +37,111 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatemen
     }
 
     @Override
-    public void visit(ForeachStmt n, VisitContext<CvStatement> context) {
-        String scope = n.getChildNodes().stream().filter((c) -> !(c instanceof BlockStmt))
-                .map(Object::toString).collect(Collectors.joining(" : ", "for (", ")"));
-        CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n, scope);
-        context.addStatement(statement);
-        super.visit(n, VisitContext.childrenOf(statement));
+    public void visit(ForeachStmt foreachStmt, VisitContext context) {
+        String scope = buildForLoopScope(foreachStmt, " : ", "for (", ")");
+
+        context.startLoopContext(foreachStmt, scope);
+        super.visit(foreachStmt, context);
+        context.endContext();
     }
 
     @Override
-    public void visit(ForStmt n, VisitContext<CvStatement> context) {
-        String scope = n.getChildNodes().stream().filter((c) -> !(c instanceof BlockStmt))
-                .map(Object::toString).collect(Collectors.joining("; ", "for (", ")"));
-        CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n, scope);
-        context.addStatement(statement);
-        super.visit(n, VisitContext.childrenOf(statement));
+    public void visit(ForStmt forStmt, VisitContext context) {
+        String scope = buildForLoopScope(forStmt, "; ", "for (", ")");
+
+        context.startLoopContext(forStmt, scope);
+        super.visit(forStmt, context);
+        context.endContext();
     }
 
     @Override
-    public void visit(IfStmt n, VisitContext<CvStatement> context) {
-        BranchStatement statement = DeclationProcessor.createBranchStatement(n);
-        context.addStatement(statement);
-        visitIfStmt(n, VisitContext.conditionsOf(statement));
-    }
+    public void visit(IfStmt ifStmt, VisitContext context) {
+        log.trace("{}Visiting IfStmt:{}", context.getLogLeftPadding(), ifStmt);
 
-    private void visitIfStmt(IfStmt n, VisitContext<ConditionalStatement> context) {
-        ConditionalStatement thenStatement = DeclationProcessor.createConditionalStatement(n,
-                n.getCondition().getTokenRange().map(Object::toString).orElse(""));
-        if (context.statements.isEmpty()) {
-            thenStatement.setFirst(true);
+        if (context.isInBranch()) {
+            super.visit(ifStmt, context);
+        } else {
+            context.startBranchContext(ifStmt);
+            super.visit(ifStmt, context);
+            context.endContext();
         }
-        context.addStatement(thenStatement);
-
-        n.getThenStmt().accept(this, VisitContext.childrenOf(thenStatement));
-        n.getElseStmt().ifPresent(l -> {
-            if (l.isIfStmt()) {
-                visitIfStmt((IfStmt)l, context);
-            } else {
-                ConditionalStatement elseStatement = DeclationProcessor
-                        .createConditionalStatement(l, "else");
-                context.addStatement(elseStatement);
-                l.accept(this, VisitContext.childrenOf(elseStatement));
-            }
-        });
     }
 
     @Override
-    public void visit(WhileStmt n, VisitContext<CvStatement> context) {
+    public void visit(WhileStmt n, VisitContext context) {
         super.visit(n, context);
     }
 
     @Override
-    public void visit(MethodCallExpr n, VisitContext<CvStatement> context) {
+    public void visit(MethodCallExpr methodCallExpr, VisitContext context) {
 
-        if (isStreamMethod(n)) {
-            findNonStreamMethod(n).ifPresent(l -> l.accept(this, context));
-            String scope = getStreamLoopScope(n);
-            CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n, scope);
-            context.addStatement(statement);
-            collectStreamMethodArguments(n).forEach(p -> p.accept(this, VisitContext.childrenOf(statement)));
+        log.trace("{}Visiting MethodCallExpr:{}", context.getLogLeftPadding(), methodCallExpr);
+
+        if (context.isInBranch()) {
+            return;
+
+        } else if (isStreamMethod(methodCallExpr)) {
+            String scope = buildStreamLoopScope(methodCallExpr);
+            context.startLoopContext(methodCallExpr, scope);
+            super.visit(methodCallExpr, context);
+            context.endContext();
 
         } else {
-            n.getScope().ifPresent(l -> l.accept(this, context));
-            n.getArguments().forEach(p -> p.accept(this, context));
-            methodResolver.resolve(n)
-                    .map((m) -> DeclationProcessor.createMethodCall(m, n.getParentNode()))
-                    .ifPresent(context::addStatement);
+            super.visit(methodCallExpr, context);
+            if (!isStreamStartMethod(methodCallExpr)) {
+                methodResolver.resolve(methodCallExpr)
+                        .map(resolvedMethodDeclaration -> DeclationProcessor.createMethodCall(
+                                resolvedMethodDeclaration, methodCallExpr.getParentNode()))
+                        .ifPresent(context::addStatement);
+            }
         }
     }
 
     @Override
-    public void visit(LambdaExpr n, VisitContext<CvStatement> context) {
+    public void visit(LambdaExpr n, VisitContext context) {
         if (context.isInLoop()) {
             super.visit(n, context);
         }
     }
+
     @Override
-    public void visit(MethodReferenceExpr n, VisitContext<CvStatement> context) {
+    public void visit(MethodReferenceExpr n, VisitContext context) {
         if (context.isInLoop()) {
             super.visit(n, context);
             methodResolver.resolve(n)
                     .map((m) -> DeclationProcessor.createMethodCall(m, Optional.empty()))
                     .ifPresent(context::addStatement);
+        }
+    }
+
+    @Override
+    public void visit(BlockStmt n, VisitContext context) {
+        visitWithCheckPartOfIf(n, context, () -> super.visit(n, context));
+    }
+
+    @Override
+    public void visit(ExpressionStmt n, VisitContext context) {
+        visitWithCheckPartOfIf(n, context, () -> super.visit(n, context));
+    }
+
+    void visitWithCheckPartOfIf(Statement n, VisitContext context,
+            Runnable visitMethod) {
+        Optional<Node> parentIfOpt = n.getParentNode().filter(IfStmt.class::isInstance);
+
+        if (parentIfOpt.isPresent()) {
+            IfStmt parentIf = (IfStmt) parentIfOpt.get();
+            String condition = "";
+            if (n.equals(parentIf.getThenStmt())) {
+                condition = parentIf.getCondition().getTokenRange().map(Object::toString)
+                        .orElse("");
+            } else if (n.equals(parentIf.getElseStmt().get())) {
+                condition = "else";
+            }
+            context.addConditionalContext(n, condition);
+            visitMethod.run();
+            context.endContext();
+        } else {
+            visitMethod.run();
         }
     }
 
@@ -131,38 +151,22 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatemen
                 .orElse(false);
     }
 
-    Optional<MethodCallExpr> findNonStreamMethod(MethodCallExpr n) {
-        if (isStreamMethod(n)) {
-            return n.getScope()
-                    .filter(MethodCallExpr.class::isInstance)
-                    .map(MethodCallExpr.class::cast)
-                    .flatMap(this::findNonStreamMethod);
-        } else {
-            return Optional.of(n);
-        }
+    boolean isStreamStartMethod(MethodCallExpr n) {
+        return methodResolver.resolve(n)
+                .map(method -> "java.util.Collection.stream".equals(method.getQualifiedName()))
+                .orElse(false);
     }
 
-    List<Expression> collectStreamMethodArguments(MethodCallExpr n) {
-        if (isStreamMethod(n)) {
-            List<Expression> result = new ArrayList<>();
-            n.getScope().filter(MethodCallExpr.class::isInstance)
-                    .map(MethodCallExpr.class::cast)
-                    .map(this::collectStreamMethodArguments)
-                    .ifPresent(result::addAll);
-
-            result.addAll(n.getArguments());
-            return result;
-
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    String getStreamLoopScope(MethodCallExpr n) {
+    String buildStreamLoopScope(MethodCallExpr n) {
         return n.getScope().filter((s) -> s.isMethodCallExpr() && isStreamMethod(n))
                 .map((scope) -> {
-                    return getStreamLoopScope(scope.asMethodCallExpr());
+                    return buildStreamLoopScope(scope.asMethodCallExpr());
                 }).orElseGet(() -> n.getTokenRange().map(Object::toString).orElse(""));
     }
 
+    String buildForLoopScope(Node node, String delimiter, String prefix, String suffix) {
+        return node.getChildNodes().stream().filter((c) -> !(c instanceof BlockStmt))
+                .map(Object::toString).collect(Collectors.joining(delimiter, prefix, suffix));
+
+    }
 }
