@@ -12,6 +12,9 @@
   <logger name="io.sitoolkit" level="DEBUG">
   </logger>
 
+  <logger name="io.sitoolkit.cv.core.domain.classdef.javaparser" level="TRACE">
+  </logger>
+
   <root level="INFO">
     <appender-ref ref="CONSOLE" />
   </root>
