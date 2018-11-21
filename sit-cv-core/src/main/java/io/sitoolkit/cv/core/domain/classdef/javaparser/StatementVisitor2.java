@@ -9,9 +9,11 @@ import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
@@ -57,9 +59,7 @@ public class StatementVisitor2 extends VoidVisitorAdapter<VisitContext2> {
         log.trace("{}Visiting IfStmt:{}", context.getLogLeftPadding(), ifStmt);
 
         if (context.isInBranch()) {
-            context.addConditionalContext(ifStmt);
             super.visit(ifStmt, context);
-            context.endContext();
         } else {
             context.startBranchContext(ifStmt);
             super.visit(ifStmt, context);
@@ -77,7 +77,10 @@ public class StatementVisitor2 extends VoidVisitorAdapter<VisitContext2> {
 
         log.trace("{}Visiting MethodCallExpr:{}", context.getLogLeftPadding(), methodCallExpr);
 
-        if (isStreamMethod(methodCallExpr)) {
+        if (context.isInBranch()) {
+            return;
+
+        } else if (isStreamMethod(methodCallExpr)) {
             String scope = buildStreamLoopScope(methodCallExpr);
             context.startLoopContext(methodCallExpr, scope);
             super.visit(methodCallExpr, context);
@@ -108,6 +111,37 @@ public class StatementVisitor2 extends VoidVisitorAdapter<VisitContext2> {
             methodResolver.resolve(n)
                     .map((m) -> DeclationProcessor.createMethodCall(m, Optional.empty()))
                     .ifPresent(context::addStatement);
+        }
+    }
+
+    @Override
+    public void visit(BlockStmt n, VisitContext2 context) {
+        visitWithCheckPartOfIf(n, context, () -> super.visit(n, context));
+    }
+
+    @Override
+    public void visit(ExpressionStmt n, VisitContext2 context) {
+        visitWithCheckPartOfIf(n, context, () -> super.visit(n, context));
+    }
+
+    void visitWithCheckPartOfIf(Statement n, VisitContext2 context,
+            Runnable visitMethod) {
+        Optional<Node> parentIfOpt = n.getParentNode().filter(IfStmt.class::isInstance);
+
+        if (parentIfOpt.isPresent()) {
+            IfStmt parentIf = (IfStmt) parentIfOpt.get();
+            String condition = "";
+            if (n.equals(parentIf.getThenStmt())) {
+                condition = parentIf.getCondition().getTokenRange().map(Object::toString)
+                        .orElse("");
+            } else if (n.equals(parentIf.getElseStmt().get())) {
+                condition = "else";
+            }
+            context.addConditionalContext(n, condition);
+            visitMethod.run();
+            context.endContext();
+        } else {
+            visitMethod.run();
         }
     }
 

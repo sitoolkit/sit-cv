@@ -80,7 +80,59 @@ public class StatementVisitor2Test {
 
     @Test
     public void ifStatement() throws IOException {
-        testBranch(testName.getMethodName());
+        MethodDef result = getBranchVisitResult(testName.getMethodName());
+
+        List<CvStatement> branchStatements = result.getStatements().stream()
+                .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
+        assertThat(branchStatements.size(), is(1));
+
+        List<ConditionalStatement> conditionalStatements = ((BranchStatement) branchStatements
+                .get(0)).getConditions();
+        assertThat(conditionalStatements.size(), is(3));
+
+        ConditionalStatement conditionalStatement = conditionalStatements.get(0);
+        assertThat(conditionalStatement.getCondition(), is("num == 0 || isTrue()"));
+
+        MethodCallDef methodCall = (MethodCallDef) conditionalStatement.getChildren().get(0);
+        assertThat(methodCall.getName(), is("process"));
+    }
+
+    @Test
+    public void nestedIfStatement() throws IOException {
+        MethodDef result = getBranchVisitResult(testName.getMethodName());
+
+        List<ConditionalStatement> conditionalStatements = result.getStatements().stream()
+                .filter(BranchStatement.class::isInstance).map(BranchStatement.class::cast)
+                .collect(Collectors.toList()).get(0).getConditions();
+
+        List<BranchStatement> nestedBranches = conditionalStatements.get(2).getChildren().stream()
+                .filter(BranchStatement.class::isInstance).map(BranchStatement.class::cast)
+                .collect(Collectors.toList());
+        assertThat(nestedBranches.size(), is(1));
+
+        List<ConditionalStatement> nestedConditions = nestedBranches.get(0).getConditions();
+        assertThat(nestedConditions.size(), is(3));
+
+        assertThat(nestedConditions.get(1).getCondition(), is("num < 100"));
+    }
+
+    @Test
+    public void omittedIfStatement() throws IOException {
+        MethodDef result = getBranchVisitResult(testName.getMethodName());
+
+        List<CvStatement> branchStatements = result.getStatements().stream()
+                .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
+        assertThat(branchStatements.size(), is(1));
+
+        List<ConditionalStatement> conditionalStatements = ((BranchStatement) branchStatements
+                .get(0)).getConditions();
+        assertThat(conditionalStatements.size(), is(3));
+
+        ConditionalStatement conditionalStatement = conditionalStatements.get(0);
+        assertThat(conditionalStatement.getCondition(), is("num == 0 || isTrue()"));
+
+        MethodCallDef methodCall = (MethodCallDef) conditionalStatement.getChildren().get(0);
+        assertThat(methodCall.getName(), is("process"));
     }
 
     public void testFlatLoop(String method) {
@@ -108,7 +160,7 @@ public class StatementVisitor2Test {
         assertThat(methodCall.getName(), is("process"));
     }
 
-    public void testBranch(String method) throws IOException {
+    public MethodDef getBranchVisitResult(String method) throws IOException {
         MethodDef methodDef = new MethodDef();
 
         branchCompilationUnit.getClassByName("BranchController").ifPresent(clazz -> {
@@ -117,23 +169,6 @@ public class StatementVisitor2Test {
                     VisitContext2.of(methodDef));
         });
 
-        List<CvStatement> branchStatements = methodDef.getStatements().stream()
-                .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
-        assertThat(branchStatements.size(), is(1));
-
-        List<ConditionalStatement> conditionalStatements = ((BranchStatement) branchStatements
-                .get(0)).getConditions();
-        assertThat(conditionalStatements.size(), is(3));
-
-        ConditionalStatement conditionalStatement = conditionalStatements.get(0);
-        assertThat(conditionalStatement.getCondition(), is("num == 0 || isTrue()"));
-
-        MethodCallDef methodCall = (MethodCallDef) conditionalStatement.getChildren().get(0);
-        assertThat(methodCall.getName(), is("process"));
-
-        List<CvStatement> nestedStatements = conditionalStatements.get(2).getChildren().stream()
-                .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
-        assertThat(nestedStatements.size(), is(1));
-
+        return methodDef;
     }
 }
