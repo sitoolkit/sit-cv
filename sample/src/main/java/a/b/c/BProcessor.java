@@ -32,4 +32,8 @@ public class BProcessor {
         return Collections.emptyList();
     }
 
+    public BProcessor getSelf() {
+        return this;
+    }
+
 }

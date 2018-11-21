@@ -16,9 +16,10 @@ import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 
 public class DeclationProcessor {
 
-    public static LoopStatement createLoopStatement(Node n) {
+    public static LoopStatement createLoopStatement(Node n, String scope) {
         LoopStatement statement = new LoopStatement();
         statement.setBody(n.toString());
+        statement.setScope(scope);
         return statement;
     }
 

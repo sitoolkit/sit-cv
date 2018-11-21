@@ -94,8 +94,9 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         if (groupElements.isEmpty()) {
             return Optional.empty();
         } else {
-            SequenceGroup group = new LoopSequenceGroup();
+            LoopSequenceGroup group = new LoopSequenceGroup();
             group.getElements().addAll(groupElements);
+            group.setScope(statement.getScope());
             return Optional.of(group);
         }
     }

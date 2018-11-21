@@ -12,6 +12,7 @@ import net.sourceforge.plantuml.SourceStringReader;
 
 public class PlantUmlWriter {
     public final String LINE_SEPARATOR = "\\n\\\n";
+    public final String ESCAPED_LINE_SEPARATOR = "\\\\n\\\\\n";
 
     public <T extends DiagramModel> Diagram createDiagram(T model, Function<T, String> serializer) {
         Diagram diagram = new Diagram();

@@ -129,7 +129,7 @@ public class SequenceDiagramWriterPlantUmlImpl
     public List<String> write(LifeLineDef lifeLine, LoopSequenceGroup group) {
         List<String> list = new ArrayList<>();
 
-        list.add("loop");
+        list.add("loop " + escapeLineSeparator(group.getScope()));
 
         list.addAll(elements2str(lifeLine, group.getElements()));
 
@@ -144,7 +144,7 @@ public class SequenceDiagramWriterPlantUmlImpl
 
         String altType = group.isFirst() ? "alt" : "else";
 
-        list.add(altType + " " + group.getCondition());
+        list.add(altType + " " + escapeLineSeparator(group.getCondition()));
 
         list.addAll(elements2str(lifeLine, group.getElements()));
 
@@ -167,4 +167,7 @@ public class SequenceDiagramWriterPlantUmlImpl
         return message2str(lifeLine, message);
     }
 
+    private String escapeLineSeparator(String str) {
+        return str.replaceAll("(\r\n|\n)", plantumlWriter.ESCAPED_LINE_SEPARATOR);
+    }
 }

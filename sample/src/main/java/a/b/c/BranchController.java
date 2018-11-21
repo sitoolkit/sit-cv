@@ -8,7 +8,11 @@ public class BranchController {
     BProcessor processor;
 
     public void ifStatement(int num, String str) {
-        if (num == 0 || isTrue()) {
+        /**
+         * if comment
+         */
+        if (num == 0 || isTrue() // if comment
+                || false) {
             processor.process("");
         } else if (num < 10 || isTrue()) {
             processor.process2("");

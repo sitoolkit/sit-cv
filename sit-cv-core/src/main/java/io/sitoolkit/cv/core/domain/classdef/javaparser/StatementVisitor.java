@@ -5,11 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
@@ -39,14 +41,18 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatemen
 
     @Override
     public void visit(ForeachStmt n, VisitContext<CvStatement> context) {
-        CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n);
+        String scope = n.getChildNodes().stream().filter((c) -> !(c instanceof BlockStmt))
+                .map(Object::toString).collect(Collectors.joining(" : ", "for (", ")"));
+        CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n, scope);
         context.addStatement(statement);
         super.visit(n, VisitContext.childrenOf(statement));
     }
 
     @Override
     public void visit(ForStmt n, VisitContext<CvStatement> context) {
-        CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n);
+        String scope = n.getChildNodes().stream().filter((c) -> !(c instanceof BlockStmt))
+                .map(Object::toString).collect(Collectors.joining("; ", "for (", ")"));
+        CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n, scope);
         context.addStatement(statement);
         super.visit(n, VisitContext.childrenOf(statement));
     }
@@ -60,7 +66,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatemen
 
     private void visitIfStmt(IfStmt n, VisitContext<ConditionalStatement> context) {
         ConditionalStatement thenStatement = DeclationProcessor.createConditionalStatement(n,
-                n.getCondition().toString());
+                n.getCondition().getTokenRange().map(Object::toString).orElse(""));
         if (context.statements.isEmpty()) {
             thenStatement.setFirst(true);
         }
@@ -89,7 +95,8 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatemen
 
         if (isStreamMethod(n)) {
             findNonStreamMethod(n).ifPresent(l -> l.accept(this, context));
-            CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n);
+            String scope = getStreamLoopScope(n);
+            CvStatementDefaultImpl statement = DeclationProcessor.createLoopStatement(n, scope);
             context.addStatement(statement);
             collectStreamMethodArguments(n).forEach(p -> p.accept(this, VisitContext.childrenOf(statement)));
 
@@ -149,6 +156,13 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext<CvStatemen
         } else {
             return Collections.emptyList();
         }
+    }
+
+    String getStreamLoopScope(MethodCallExpr n) {
+        return n.getScope().filter((s) -> s.isMethodCallExpr() && isStreamMethod(n))
+                .map((scope) -> {
+                    return getStreamLoopScope(scope.asMethodCallExpr());
+                }).orElseGet(() -> n.getTokenRange().map(Object::toString).orElse(""));
     }
 
 }

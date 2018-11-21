@@ -3,6 +3,7 @@ package a.b.c;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,6 +33,9 @@ public class LoopController {
 
     public void multiLoop() {
 
+        /**
+         * loop comment
+         */
         for (int i = 0; i < 1; i++) {
             for (int j = 0; j < 1; j++) {
                 processor.process("");
@@ -96,4 +100,20 @@ public class LoopController {
                     }); // end loop
         }
 
+    public void streamLambda3() {
+        createStream().forEach(this::process);
+    }
+
+    public void streamOf() {
+        Stream.of("").forEach(this::process);
+    }
+
+    public void deepHierarchy() {
+        processor.getSelf().getSelf().getSelf().getSelf().getSelf().getSelf().getSelf().getSelf()
+                .getSelf().getList("").stream().forEach(s -> processor.process(""));
+    }
+
+    private Stream<String> createStream() {
+        return Stream.of("");
+    }
 }

@@ -11,6 +11,8 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class LoopStatement extends CvStatementDefaultImpl {
 
+    private String scope;
+
     @Override
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {
         return processor.process(this);
