@@ -78,7 +78,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
         log.trace("{}Visiting MethodCallExpr:{}", context.getLogLeftPadding(), methodCallExpr);
 
         if (context.isInBranch()) {
-            return;
+            super.visit(methodCallExpr, context);
 
         } else if (isStreamMethod(methodCallExpr)) {
             String scope = buildStreamLoopScope(methodCallExpr);
