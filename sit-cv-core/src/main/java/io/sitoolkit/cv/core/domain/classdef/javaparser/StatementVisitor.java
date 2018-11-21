@@ -68,8 +68,8 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     }
 
     @Override
-    public void visit(WhileStmt n, VisitContext context) {
-        super.visit(n, context);
+    public void visit(WhileStmt whileStmt, VisitContext context) {
+        super.visit(whileStmt, context);
     }
 
     @Override
@@ -98,46 +98,44 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     }
 
     @Override
-    public void visit(LambdaExpr n, VisitContext context) {
+    public void visit(LambdaExpr lambdaExpr, VisitContext context) {
         if (context.isInLoop()) {
-            super.visit(n, context);
+            super.visit(lambdaExpr, context);
         }
     }
 
     @Override
-    public void visit(MethodReferenceExpr n, VisitContext context) {
+    public void visit(MethodReferenceExpr methodReferenceExpr, VisitContext context) {
         if (context.isInLoop()) {
-            super.visit(n, context);
-            methodResolver.resolve(n)
+            super.visit(methodReferenceExpr, context);
+            methodResolver.resolve(methodReferenceExpr)
                     .map((m) -> DeclationProcessor.createMethodCall(m, Optional.empty()))
                     .ifPresent(context::addStatement);
         }
     }
 
     @Override
-    public void visit(BlockStmt n, VisitContext context) {
-        visitWithCheckPartOfIf(n, context, () -> super.visit(n, context));
+    public void visit(BlockStmt blockStmt, VisitContext context) {
+        visitWithCheckPartOfIf(blockStmt, context, () -> super.visit(blockStmt, context));
     }
 
     @Override
-    public void visit(ExpressionStmt n, VisitContext context) {
-        visitWithCheckPartOfIf(n, context, () -> super.visit(n, context));
+    public void visit(ExpressionStmt expressionStmt, VisitContext context) {
+        visitWithCheckPartOfIf(expressionStmt, context, () -> super.visit(expressionStmt, context));
     }
 
-    void visitWithCheckPartOfIf(Statement n, VisitContext context,
-            Runnable visitMethod) {
-        Optional<Node> parentIfOpt = n.getParentNode().filter(IfStmt.class::isInstance);
+    void visitWithCheckPartOfIf(Statement stmt, VisitContext context, Runnable visitMethod) {
 
-        if (parentIfOpt.isPresent()) {
-            IfStmt parentIf = (IfStmt) parentIfOpt.get();
+        if (context.isInBranch()) {
+            IfStmt parentIf = (IfStmt) stmt.getParentNode().get();
             String condition = "";
-            if (n.equals(parentIf.getThenStmt())) {
+            if (stmt.equals(parentIf.getThenStmt())) {
                 condition = parentIf.getCondition().getTokenRange().map(Object::toString)
                         .orElse("");
-            } else if (n.equals(parentIf.getElseStmt().get())) {
+            } else if (stmt.equals(parentIf.getElseStmt().get())) {
                 condition = "else";
             }
-            context.addConditionalContext(n, condition);
+            context.addConditionalContext(stmt, condition);
             visitMethod.run();
             context.endContext();
         } else {
