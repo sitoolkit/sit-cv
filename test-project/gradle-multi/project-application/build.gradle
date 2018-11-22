@@ -1,4 +1,5 @@
-apply plugin: 'application'
-
+plugins {
+    id 'application'
+    id 'io.franzbecker.gradle-lombok' version '1.14'
+}
 mainClassName = 'Main';
-

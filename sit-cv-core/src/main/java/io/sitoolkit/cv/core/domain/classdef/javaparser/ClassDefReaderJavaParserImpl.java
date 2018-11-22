@@ -72,7 +72,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
         Pattern p = Pattern.compile(config.getJavaFilePattern());
 
-        projectManager.getCurrentProject().getSrcDirs().stream().forEach(srcDir -> {
+        projectManager.getCurrentProject().getAllPreProcessedDirs().stream().forEach(srcDir -> {
             try {
                 List<Path> files = Files.walk(srcDir)
                         .filter(file -> p.matcher(file.toFile().getName()).matches())

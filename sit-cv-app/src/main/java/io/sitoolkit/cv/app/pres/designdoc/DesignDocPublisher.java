@@ -13,9 +13,7 @@ import io.sitoolkit.cv.app.infra.config.ApplicationConfig;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Controller
 public class DesignDocPublisher {
 
@@ -37,7 +35,7 @@ public class DesignDocPublisher {
         ListResponse listResponse = buildDesingDocList();
         template.convertAndSend("/topic/designdoc/list", listResponse);
 
-        projectManager.getCurrentProject().getSrcDirs().stream().forEach(srcDir -> {
+        projectManager.getCurrentProject().getAllSrcDirs().stream().forEach(srcDir -> {
             service.watchDir(srcDir, entryPoint -> {
                 publishDetail(entryPoint);
             });

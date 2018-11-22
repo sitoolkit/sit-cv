@@ -1,5 +1,3 @@
-package a.b.c;
-
 import lombok.Getter;
 
 @Getter
@@ -9,7 +7,6 @@ public class XEntity {
     int b;
 
     public XEntity() {
-        // TODO Auto-generated constructor stub
     }
 
 }

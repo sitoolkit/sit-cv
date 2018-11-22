@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.sitoolkit.cv.core.domain.project.gradle.GradleProjectReader;
+import io.sitoolkit.cv.core.domain.project.lombok.DelombokProcessor;
 import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
 import lombok.Getter;
 
@@ -24,6 +25,10 @@ public class ProjectManager {
 
         if (project.isPresent()) {
             currentProject = project.get();
+            currentProject.getAllProjects().forEach(proj -> {
+                DelombokProcessor.of(proj).ifPresent(proj::setPreProcessor);
+            });
+
         } else {
             throw new IllegalArgumentException("Project is not supported " + projectDir);
         }

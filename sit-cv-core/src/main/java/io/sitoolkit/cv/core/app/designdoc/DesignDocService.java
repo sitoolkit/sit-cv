@@ -23,6 +23,8 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
+import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
 import io.sitoolkit.cv.core.domain.uml.DiagramModel;
@@ -60,10 +62,14 @@ public class DesignDocService {
     @NonNull
     private InputSourceWatcher watcher;
 
+    @NonNull
+    private ProjectManager projectManager;
+
     // key:classDef.sourceId, value:entrypoint
     private Map<String, Set<String>> entryPointMap = new HashMap<>();
 
     public void analyze() {
+        projectManager.getCurrentProject().executeAllPreProcess();
         classDefReader.init().readDir();
     }
 
@@ -84,10 +90,14 @@ public class DesignDocService {
     private void readSources(ClassDefChangeEventListener listener,
             Collection<String> inputSources) {
 
+        Project currentProject = projectManager.getCurrentProject();
+        currentProject.executeAllPreProcess();
         classDefReader.init();
 
         Set<ClassDef> readDefs = inputSources.stream().map(Paths::get)
-                .filter(path -> !Files.isDirectory(path)).filter(Files::isReadable)
+                .filter(path -> !Files.isDirectory(path))
+                .filter(Files::isReadable)
+                .map(currentProject::findParseTarget).filter(Optional::isPresent).map(Optional::get)
                 .map(classDefReader::readJava).filter(Optional::isPresent).map(Optional::get)
                 .collect(Collectors.toSet());
 

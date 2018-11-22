@@ -3,12 +3,12 @@ package io.sitoolkit.cv.core.domain.project.maven;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,27 +17,70 @@ import lombok.extern.slf4j.Slf4j;
 public class MavenProjectInfoListener implements StdoutListener {
 
     @Getter
-    private Set<Path> javaSrcDirs = new HashSet<>();
-    @Getter
-    private Set<Path> classpaths = new HashSet<>();
+    private final Project project;
+    private Project recordingProject;
+
+    public MavenProjectInfoListener(Path projectDir) {
+        this.project = new Project(projectDir);
+    }
 
     @Override
     public void nextLine(String line) {
 
         log.debug(line);
 
-        String javaSrcDirStr = StringUtils.substringBetween(line,
+        String javaBaseDirStr = StringUtils.substringAfterLast(line,
+                "[DEBUG]   (f) basedir = ");
+        if (StringUtils.isNotEmpty(javaBaseDirStr)) {
+            recordBaseDirStr(javaBaseDirStr);
+        }
+
+        String javaBuildDirStr = StringUtils.substringAfterLast(line,
+                "[DEBUG]   (f) buildDirectory = ");
+        if (StringUtils.isNotEmpty(javaBuildDirStr)) {
+            recordBuildDirStr(javaBuildDirStr);
+        }
+
+        String javaSrcDirsStr = StringUtils.substringBetween(line,
                 "[DEBUG]   (f) compileSourceRoots = [", "]");
-        if (StringUtils.isNotEmpty(javaSrcDirStr)) {
-            javaSrcDirs.addAll(splitAndTrim(javaSrcDirStr, false));
+        if (StringUtils.isNotEmpty(javaSrcDirsStr)) {
+            recordSrcDirsStr(javaSrcDirsStr);
         }
 
-        String classpathStr = StringUtils.substringBetween(line,
+        String classpathsStr = StringUtils.substringBetween(line,
                 "[DEBUG]   (f) classpathElements = [", "]");
-        if (StringUtils.isNotEmpty(classpathStr)) {
-            classpaths.addAll(splitAndTrim(classpathStr, true));
+        if (StringUtils.isNotEmpty(classpathsStr)) {
+            recordClasspathsStr(classpathsStr);
         }
+    }
 
+    void recordBaseDirStr(String javaBaseDirStr) {
+        Path javaBaseDir = Paths.get(javaBaseDirStr);
+        if (project.getDir().equals(javaBaseDir)) {
+            recordingProject = project;
+
+        } else {
+            recordingProject = new Project(javaBaseDir);
+            project.getSubProjects().add(recordingProject);
+        }
+    }
+
+    void recordBuildDirStr(String javaBuildDirStr) {
+        if (recordingProject != null) {
+            recordingProject.setBuildDir(Paths.get(javaBuildDirStr));
+        }
+    }
+
+    void recordSrcDirsStr(String javaSrcDirsStr) {
+        if (recordingProject != null) {
+            recordingProject.setSrcDirs(splitAndTrim(javaSrcDirsStr, false));
+        }
+    }
+
+    void recordClasspathsStr(String classpathsStr) {
+        if (recordingProject != null) {
+            recordingProject.setClasspaths(splitAndTrim(classpathsStr, true));
+        }
     }
 
     private Set<Path> splitAndTrim(String line, boolean jarOnly) {

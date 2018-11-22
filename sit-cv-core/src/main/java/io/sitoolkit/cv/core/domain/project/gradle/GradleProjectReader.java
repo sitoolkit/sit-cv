@@ -25,8 +25,7 @@ public class GradleProjectReader implements ProjectReader {
             return Optional.empty();
         }
 
-        Project project = new Project(projectDir);
-        GradleProjectInfoListener listener = new GradleProjectInfoListener();
+        GradleProjectInfoListener listener = new GradleProjectInfoListener(projectDir);
 
         log.info("project: {} is a gradle project - finding depending jars... ", projectDir);
 
@@ -47,11 +46,7 @@ public class GradleProjectReader implements ProjectReader {
             }
         }
 
-        project.setSrcDirs(listener.getJavaSrcDirs());
-        project.setClasspaths(listener.getClasspaths());
-        // log.info("jarPaths got from gradle dependency - Paths: {}",
-        // gotPaths);
-        return Optional.of(project);
+        return Optional.of(listener.getProject());
     }
 
 }

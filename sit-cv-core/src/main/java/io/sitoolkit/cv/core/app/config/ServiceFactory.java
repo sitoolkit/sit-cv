@@ -88,7 +88,7 @@ public class ServiceFactory {
         InputSourceWatcher watcher = new FileInputSourceWatcher();
 
         return new DesignDocService(classDefReader, sequenceProcessor, classProcessor,
-                sequenceWriter, classWriter, classDefRepository, watcher);
+                sequenceWriter, classWriter, classDefRepository, watcher, projectManager);
 
     }
 
