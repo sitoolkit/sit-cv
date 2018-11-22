@@ -12,7 +12,7 @@ import lombok.ToString;
 public class ConditionalStatement extends CvStatementDefaultImpl {
 
     private String condition;
-    private boolean isFirst = false;
+    private int order;
 
     @Override
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {

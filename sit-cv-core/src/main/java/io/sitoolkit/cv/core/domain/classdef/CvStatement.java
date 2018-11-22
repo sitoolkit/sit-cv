@@ -7,4 +7,5 @@ public interface CvStatement {
 
     <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context);
 
+    void endStatement();
 }

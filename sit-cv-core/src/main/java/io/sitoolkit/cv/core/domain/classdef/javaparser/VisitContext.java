@@ -37,12 +37,9 @@ public class VisitContext {
         startContext(branchStatement);
     }
 
-    public void addConditionalContext(Statement statement, String condition) {
+    public void addConditionalContext(Statement statement, String condition, int order) {
         ConditionalStatement conditionalStatement = DeclationProcessor
-                .createConditionalStatement(statement, condition);
-        boolean isFirst = statement.getParentNode().filter((parent) -> parent.getParentNode()
-                .filter((grandparent) -> !(grandparent instanceof IfStmt)).isPresent()).isPresent();
-        conditionalStatement.setFirst(isFirst);
+                .createConditionalStatement(statement, condition, order);
         startContext(conditionalStatement);
     }
 
@@ -56,6 +53,7 @@ public class VisitContext {
 
     public void endContext() {
         CvStatement endingStatement = stack.pop();
+        endingStatement.endStatement();
         log.debug("{}End context : {}", getLogLeftPadding(), endingStatement);
     }
 
@@ -86,7 +84,7 @@ public class VisitContext {
         } else if (parent instanceof MethodDef) {
             ((MethodDef) parent).getStatements().add(child);
         } else if (parent instanceof BranchStatement && child instanceof ConditionalStatement) {
-            ((BranchStatement) parent).getConditions().add(0, (ConditionalStatement) child);
+            ((BranchStatement) parent).getConditions().add((ConditionalStatement) child);
         } else {
             log.warn("Illegal operation for {}", parent);
         }

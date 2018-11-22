@@ -40,4 +40,8 @@ public class MethodDef implements CvStatement {
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
         return processor.process(this, context);
     }
+
+    @Override
+    public void endStatement() {
+    }
 }
