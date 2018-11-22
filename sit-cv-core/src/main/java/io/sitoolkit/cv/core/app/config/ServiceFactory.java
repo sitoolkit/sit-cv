@@ -76,8 +76,7 @@ public class ServiceFactory {
         ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
         ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
                 projectManager, config);
-        SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(
-                config.getSequenceDiagramFilter());
+        SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(config);
         ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
         GraphvizManager.initialize();
         PlantUmlWriter plantumlWriter = new PlantUmlWriter();
@@ -86,6 +85,7 @@ public class ServiceFactory {
         DiagramWriter<ClassDiagram> classWriter = new ClassDiagramWriterPlantUmlImpl(
                 plantumlWriter);
         InputSourceWatcher watcher = new FileInputSourceWatcher();
+
 
         return new DesignDocService(classDefReader, sequenceProcessor, classProcessor,
                 sequenceWriter, classWriter, classDefRepository, watcher, projectManager);
