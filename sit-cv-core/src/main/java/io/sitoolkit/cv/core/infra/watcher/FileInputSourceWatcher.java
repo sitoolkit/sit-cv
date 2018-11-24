@@ -36,7 +36,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * ファイルの入力ソースに対する監視クラス実装です。
+ * A monitoring class implementation for the input source of the file.
  *
  * @author yuichi.kuwahara
  */
@@ -48,13 +48,11 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
     private final Map<String, InputSource> watchingFileMap = new HashMap<>();
     private final Map<WatchKey, Path> pathMap = new HashMap<>();
 
-
-
     /**
-     * ファイルを監視対象に含めます。
+     * Include the file for monitoring.
      *
      * @param inputSource
-     *            監視対象ファイル
+     *            input source
      */
     @Override
     public void watchInputSource(String inputSource) {
@@ -84,7 +82,6 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
 
         try {
             if (watcher == null) {
-                // TODO ファイル監視方式の統一
                 watcher = FileSystems.getDefault().newWatchService();
             }
             WatchKey watchKey = dirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY,
@@ -130,18 +127,15 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
         return inputSources;
     }
 
-
-
-
     @Override
-    protected void end(ContinuousGeneratable cg) {
+    protected void end(InputSourceEventListener cg) {
         try {
             watcher.close();
         } catch (IOException e) {
             log.warn("Exception when watcher close", e);
         }
 
-        cg.regenerate(watchingFileMap.values().stream().map(InputSource::getName)
+        cg.onChange(watchingFileMap.values().stream().map(InputSource::getName)
                 .collect(Collectors.toSet()));
     }
 
