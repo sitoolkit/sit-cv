@@ -73,7 +73,7 @@ public class DesignDocService {
         classDefReader.init().readDir();
     }
 
-    public void watchDir(Path srcDir, ClassDefChangeEventListener listener) {
+    public void watchDir(Path srcDir, DesignDocChangeEventListener listener) {
 
         watcher.setContinue(true);
         try {
@@ -83,20 +83,31 @@ public class DesignDocService {
         }
 
         watcher.start(inputSources -> {
-            readSources(listener, inputSources);
+            int entryPoitSizeBefore = classDefRepository.getEntryPoints().size();
+
+            readSources(inputSources).forEach(listener::onDesignDocChange);
+
+            if (classDefRepository.getEntryPoints().size() != entryPoitSizeBefore) {
+                listener.onDesignDocListChange();
+            }
+
         });
     }
 
-    private void readSources(ClassDefChangeEventListener listener,
-            Collection<String> inputSources) {
+    /**
+     * 
+     * @param sourcePaths
+     *            file paths of source code to read.
+     * @return stream of designDocIds which are effected by input source.
+     */
+    private Stream<String> readSources(Collection<String> sourcePaths) {
 
         Project currentProject = projectManager.getCurrentProject();
         currentProject.executeAllPreProcess();
         classDefReader.init();
 
-        Set<ClassDef> readDefs = inputSources.stream().map(Paths::get)
-                .filter(path -> !Files.isDirectory(path))
-                .filter(Files::isReadable)
+        Set<ClassDef> readDefs = sourcePaths.stream().map(Paths::get)
+                .filter(path -> !Files.isDirectory(path)).filter(Files::isReadable)
                 .map(currentProject::findParseTarget).filter(Optional::isPresent).map(Optional::get)
                 .map(classDefReader::readJava).filter(Optional::isPresent).map(Optional::get)
                 .collect(Collectors.toSet());
@@ -104,7 +115,7 @@ public class DesignDocService {
         readDefs.forEach(classDefRepository::save);
         readDefs.forEach(clazz -> log.debug("Read {}", clazz));
 
-        Set<String> deletedIds = inputSources.stream().filter(s -> !Files.isDirectory(Paths.get(s)))
+        Set<String> deletedIds = sourcePaths.stream().filter(s -> !Files.isDirectory(Paths.get(s)))
                 .filter(sId -> !readDefs.stream()
                         .anyMatch(clazz -> StringUtils.equals(sId, clazz.getSourceId())))
                 .collect(Collectors.toSet());
@@ -113,10 +124,9 @@ public class DesignDocService {
 
         classDefRepository.solveReferences();
 
-        Stream<String> entryPoints = readDefs.stream().map(ClassDef::getSourceId)
-                .map(entryPointMap::get).filter(Objects::nonNull).flatMap(Set::stream).distinct();
+        return readDefs.stream().map(ClassDef::getSourceId).map(entryPointMap::get)
+                .filter(Objects::nonNull).flatMap(Set::stream).distinct();
 
-        entryPoints.forEach(listener::onChange);
     }
 
     public List<String> getAllIds() {
