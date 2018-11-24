@@ -17,12 +17,11 @@ public class LifeLineDef {
     private String objectName;
     private String entryMessage;
     private String sourceId;
-    private List<MessageDef> messages = new ArrayList<>();
     private List<SequenceElement> elements = new ArrayList<>();
     private ApiDocDef apiDoc;
 
     public Set<String> getAllSourceIds() {
-        Set<String> tags = messages.stream().map(MessageDef::getTarget)
+        Set<String> tags = getLifeLinesRecursively()
                 .map(LifeLineDef::getSourceId).collect(Collectors.toSet());
         tags.add(sourceId);
         return tags;

@@ -10,7 +10,7 @@ public class BServiceImpl implements BService {
     AService aService;
 
     @Override
-    public void search(SearchConditioner condition) {
+    public void search(SearchCondition condition) {
 
     }
 }
