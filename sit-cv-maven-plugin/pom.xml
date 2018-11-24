@@ -21,6 +21,22 @@
   </properties>
 
   <dependencies>
+    
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.sitoolkit.cv</groupId>
+      <artifactId>sit-cv-app</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.sitoolkit.util.bth</groupId>
+      <artifactId>sit-util-bth</artifactId>
+      <version>1.0.0-alpha.6</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
@@ -51,16 +67,7 @@
       <version>3.5.1</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>io.sitoolkit.cv</groupId>
-      <artifactId>sit-cv-app</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.sitoolkit.util.bth</groupId>
-      <artifactId>sit-util-bth</artifactId>
-      <version>1.0.0-alpha.4</version>
-    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -74,6 +81,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
   <parent>
     <groupId>io.sitoolkit.cv</groupId>
     <artifactId>sit-cv</artifactId>
