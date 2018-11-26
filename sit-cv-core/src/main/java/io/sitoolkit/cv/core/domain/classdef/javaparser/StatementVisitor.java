@@ -58,15 +58,15 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     public void visit(IfStmt ifStmt, VisitContext context) {
         log.trace("{}Visiting IfStmt:{}", context.getLogLeftPadding(), ifStmt);
 
-        if (isFirstBranch(ifStmt)) {
+        if (isIfElse(ifStmt)) {
+            addConditionalStatement(ifStmt, context, false);
+            super.visit(ifStmt, context);
+            context.endContext();
+        } else {
             context.startBranchContext(ifStmt);
             addConditionalStatement(ifStmt, context, true);
             super.visit(ifStmt, context);
             context.endContext();
-            context.endContext();
-        } else {
-            addConditionalStatement(ifStmt, context, false);
-            super.visit(ifStmt, context);
             context.endContext();
         }
     }
@@ -147,10 +147,6 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
         } else {
             super.visit(expressionStmt, context);
         }
-    }
-
-    boolean isFirstBranch(IfStmt ifStmt) {
-        return !ifStmt.getParentNode().filter(IfStmt.class::isInstance).isPresent();
     }
 
     boolean isIfElse(Statement stmt) {
