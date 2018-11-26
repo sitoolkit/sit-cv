@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 public class ConditionalSequenceGroup extends SequenceGroup {
 
     private String condition;
-    private int order;
+    private boolean isFirst = false;
 
     @Override
     public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {

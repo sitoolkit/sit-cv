@@ -58,10 +58,14 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     public void visit(IfStmt ifStmt, VisitContext context) {
         log.trace("{}Visiting IfStmt:{}", context.getLogLeftPadding(), ifStmt);
 
-        if (context.isInBranch()) {
-            super.visit(ifStmt, context);
-        } else {
+        if (isFirstBranch(ifStmt)) {
             context.startBranchContext(ifStmt);
+            addConditionalStatement(ifStmt, context, true);
+            super.visit(ifStmt, context);
+            context.endContext();
+            context.endContext();
+        } else {
+            addConditionalStatement(ifStmt, context, false);
             super.visit(ifStmt, context);
             context.endContext();
         }
@@ -75,7 +79,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     @Override
     public void visit(MethodCallExpr methodCallExpr, VisitContext context) {
 
-        if (context.isInBranch()) {
+        if (isInIfCondition(methodCallExpr)) {
             log.warn("{}MethodCallExpr in branch condition is not currently supported: {}",
                     context.getLogLeftPadding(), methodCallExpr);
             log.warn(
@@ -124,8 +128,8 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
     @Override
     public void visit(BlockStmt blockStmt, VisitContext context) {
-        if (context.isInBranch()) {
-            addConditionalStatement(blockStmt, context);
+        if (isIfElse(blockStmt)) {
+            addElseConditionalStatement(blockStmt, context);
             super.visit(blockStmt, context);
             context.endContext();
         } else {
@@ -135,13 +139,40 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
     @Override
     public void visit(ExpressionStmt expressionStmt, VisitContext context) {
-        if (context.isInBranch()) {
-            addConditionalStatement(expressionStmt, context);
+        if (isIfElse(expressionStmt)) {
+            addElseConditionalStatement(expressionStmt, context);
             super.visit(expressionStmt, context);
             context.endContext();
         } else {
             super.visit(expressionStmt, context);
         }
+    }
+
+    boolean isFirstBranch(IfStmt ifStmt) {
+        return !ifStmt.getParentNode().filter(IfStmt.class::isInstance).isPresent();
+    }
+
+    boolean isIfElse(Statement stmt) {
+        Optional<IfStmt> parentIf = stmt.getParentNode().filter(IfStmt.class::isInstance)
+                .map(IfStmt.class::cast);
+        if (parentIf.isPresent()) {
+            Optional<Statement> elseStmt = parentIf.get().getElseStmt();
+            return elseStmt.isPresent() && elseStmt.get() == stmt;
+        }
+        return false;
+    }
+
+    boolean isInIfCondition(Node node) {
+        Optional<Node> parentNode = node.getParentNode();
+        if (parentNode.isPresent()) {
+            Node parent = parentNode.get();
+            if (parent instanceof IfStmt) {
+                return node == ((IfStmt) parent).getCondition();
+            } else {
+                return isInIfCondition(parent);
+            }
+        }
+        return false;
     }
 
     boolean isStreamMethod(MethodCallExpr n) {
@@ -169,39 +200,12 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
     }
 
-    void addConditionalStatement(Statement stmt, VisitContext context) {
-        String condition = buildBranchCondition(stmt);
-        int order = buildBranchConditionOrder(stmt);
-        context.addConditionalContext(stmt, condition, order);
+    void addConditionalStatement(IfStmt parentIf, VisitContext context, boolean isFirst) {
+        String condition = parentIf.getCondition().getTokenRange().map(Object::toString).orElse("");
+        context.addConditionalContext(parentIf, condition, isFirst);
     }
 
-    String buildBranchCondition(Statement stmt) {
-        IfStmt parentIf = (IfStmt) stmt.getParentNode().get();
-        String condition = "";
-        if (stmt == parentIf.getThenStmt()) {
-            condition = parentIf.getCondition().getTokenRange().map(Object::toString)
-                    .orElse("");
-        } else if (stmt == parentIf.getElseStmt().get()) {
-            condition = "else";
-        }
-
-        return condition;
-    }
-
-    int buildBranchConditionOrder(Statement stmt) {
-        return buildBranchConditionOrder(stmt, 0);
-    }
-
-    int buildBranchConditionOrder(Statement stmt, int order) {
-        Optional<Node> parent = stmt.getParentNode();
-        if (parent.isPresent() && parent.get() instanceof IfStmt) {
-            IfStmt parentIf = (IfStmt) parent.get();
-            if (stmt == parentIf.getThenStmt()) {
-                return buildBranchConditionOrder(parentIf, order);
-            } else if (stmt == parentIf.getElseStmt().get()) {
-                return buildBranchConditionOrder(parentIf, order) + 1;
-            }
-        }
-        return order;
+    void addElseConditionalStatement(Statement stmt, VisitContext context) {
+        context.addConditionalContext(stmt, "else", false);
     }
 }

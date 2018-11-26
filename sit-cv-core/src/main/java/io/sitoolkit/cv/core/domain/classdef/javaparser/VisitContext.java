@@ -29,36 +29,44 @@ public class VisitContext {
 
     public void startLoopContext(Node node, String scope) {
         LoopStatement loopStatement = DeclationProcessor.createLoopStatement(node, scope);
+        if (!stack.isEmpty()) {
+            addChild(getCurrent(), loopStatement);
+        }
         startContext(loopStatement);
     }
 
     public void startBranchContext(IfStmt ifStmt) {
         BranchStatement branchStatement = DeclationProcessor.createBranchStatement(ifStmt);
+        if (!stack.isEmpty()) {
+            addChild(getCurrent(), branchStatement);
+        }
         startContext(branchStatement);
     }
 
-    public void addConditionalContext(Statement statement, String condition, int order) {
+    public void addConditionalContext(Statement statement, String condition, boolean isFirst) {
         ConditionalStatement conditionalStatement = DeclationProcessor
-                .createConditionalStatement(statement, condition, order);
+                .createConditionalStatement(statement, condition, isFirst);
+        addChild(getCurrentBranch(), conditionalStatement);
         startContext(conditionalStatement);
     }
 
     public void startContext(CvStatement startingStatement) {
-        if (!stack.isEmpty()) {
-            addChild(getCurrent(), startingStatement);
-        }
         stack.push(startingStatement);
         log.debug("{}Start context : {}", getLogLeftPadding(), startingStatement);
     }
 
     public void endContext() {
         CvStatement endingStatement = stack.pop();
-        endingStatement.endStatement();
         log.debug("{}End context : {}", getLogLeftPadding(), endingStatement);
     }
 
     public CvStatement getCurrent() {
         return stack.peek();
+    }
+
+    public CvStatement getCurrentBranch() {
+        return stack.stream().filter(BranchStatement.class::isInstance)
+                .reduce((first, second) -> second).get();
     }
 
     public void addStatement(CvStatement statement) {

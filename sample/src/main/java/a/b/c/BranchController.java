@@ -11,7 +11,7 @@ public class BranchController {
         /**
          * if comment
          */
-        if (num == 0 || isTrue()) {
+        if ((num == 0 || (isTrue()))) {
             processor.process("");
         } else if (num < 10 || isTrue() // if comment
                 || false) {

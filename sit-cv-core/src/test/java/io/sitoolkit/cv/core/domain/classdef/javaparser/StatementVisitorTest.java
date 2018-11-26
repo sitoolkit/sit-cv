@@ -89,12 +89,12 @@ public class StatementVisitorTest {
                 .get(0)).getConditions();
         assertThat(conditionalStatements.size(), is(3));
 
-        assertThat(conditionalStatements.get(0).getOrder(), is(0));
-        assertThat(conditionalStatements.get(1).getOrder(), is(1));
-        assertThat(conditionalStatements.get(2).getOrder(), is(2));
+        assertThat(conditionalStatements.get(0).isFirst(), is(true));
+        assertThat(conditionalStatements.get(1).isFirst(), is(false));
+        assertThat(conditionalStatements.get(2).isFirst(), is(false));
 
         ConditionalStatement conditionalStatement = conditionalStatements.get(0);
-        assertThat(conditionalStatement.getCondition(), is("num == 0 || isTrue()"));
+        assertThat(conditionalStatement.getCondition(), is("(num == 0 || (isTrue()))"));
 
         MethodCallDef methodCall = (MethodCallDef) conditionalStatement.getChildren().get(0);
         assertThat(methodCall.getName(), is("process"));
@@ -118,9 +118,9 @@ public class StatementVisitorTest {
 
         assertThat(nestedConditions.get(1).getCondition(), is("num < 100"));
 
-        assertThat(nestedConditions.get(0).getOrder(), is(0));
-        assertThat(nestedConditions.get(1).getOrder(), is(1));
-        assertThat(nestedConditions.get(2).getOrder(), is(2));
+        assertThat(nestedConditions.get(0).isFirst(), is(true));
+        assertThat(nestedConditions.get(1).isFirst(), is(false));
+        assertThat(nestedConditions.get(2).isFirst(), is(false));
     }
 
     @Test

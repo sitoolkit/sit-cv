@@ -129,7 +129,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         ConditionalSequenceGroup group = new ConditionalSequenceGroup();
         group.getElements().addAll(groupElements);
         group.setCondition(statement.getCondition());
-        group.setOrder(statement.getOrder());
+        group.setFirst(statement.isFirst());
         return Optional.of(group);
     }
 

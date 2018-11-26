@@ -142,7 +142,7 @@ public class SequenceDiagramWriterPlantUmlImpl
     public List<String> write(LifeLineDef lifeLine, ConditionalSequenceGroup group) {
         List<String> list = new ArrayList<>();
 
-        String altType = group.getOrder() == 0 ? "alt" : "else";
+        String altType = group.isFirst() ? "alt" : "else";
 
         list.add(altType + " " + escapeLineSeparator(group.getCondition()));
 

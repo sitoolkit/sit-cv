@@ -10,7 +10,4 @@ public abstract class CvStatementDefaultImpl implements CvStatement{
     private String body;
     private List<CvStatement> children = new ArrayList<>();
 
-    @Override
-    public void endStatement() {
-    }
 }
