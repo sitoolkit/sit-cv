@@ -78,10 +78,6 @@ public class VisitContext {
         return getCurrent() instanceof LoopStatement;
     }
 
-    public boolean isInBranch() {
-        return getCurrent() instanceof BranchStatement;
-    }
-
     public String getLogLeftPadding() {
         return StringUtils.repeat("-", stack.size()) + " ";
     }
