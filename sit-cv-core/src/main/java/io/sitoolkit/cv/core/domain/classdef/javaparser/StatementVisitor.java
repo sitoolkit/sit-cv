@@ -80,11 +80,12 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     public void visit(MethodCallExpr methodCallExpr, VisitContext context) {
 
         if (isInIfCondition(methodCallExpr)) {
-            log.warn("{}MethodCallExpr in branch condition is not currently supported: {}",
+            log.warn(
+                    "{}Method calls in conditional statement are not currently supported. : \"{}\"",
                     context.getLogLeftPadding(), methodCallExpr);
             log.warn(
-                    "{}If you want to draw that sequence, for example, please change"
-                    +" \"if({})\\{}\" to \"boolean condition = {}; if(condition){}\".",
+                    "{}If you want to draw a sequence of this method, please replace"
+                            + " \"if({})\\{}\" with \"boolean condition = {}; if(condition){}\".",
                     context.getLogLeftPadding(), methodCallExpr, methodCallExpr);
             super.visit(methodCallExpr, context);
             return;
