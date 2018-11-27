@@ -4,6 +4,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.SpringApplication;
@@ -15,14 +18,16 @@ import io.sitoolkit.cv.core.app.config.ServiceFactory;
 @SpringBootApplication
 public class SitCvApplication {
 
+    @Autowired
+    private ApplicationContext appCtx;
+
     public static void main(String[] args) {
         ApplicationArguments appArgs = new DefaultApplicationArguments(args);
 
         if (appArgs.containsOption("report")) {
             executeReportMode(appArgs);
         } else {
-            ApplicationContext appCtx = SpringApplication.run(SitCvApplication.class, args);
-            appCtx.getBean(ServiceFactory.class).initialize();
+            SpringApplication.run(SitCvApplication.class, args);
         }
     }
 
@@ -32,4 +37,10 @@ public class SitCvApplication {
                 : Paths.get(projects.get(0));
         ServiceFactory.createAndInitialize(projectDir).getReportService().export();
     }
+
+    @PostConstruct
+    public void initialize() {
+        appCtx.getBean(ServiceFactory.class).initialize();
+    }
+
 }
