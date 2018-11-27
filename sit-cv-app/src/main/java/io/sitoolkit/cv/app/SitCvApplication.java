@@ -39,7 +39,7 @@ public class SitCvApplication {
     }
 
     @PostConstruct
-    public void initialize() {
+    public void onBeforeContextRefresh() {
         appCtx.getBean(ServiceFactory.class).initialize();
     }
 
