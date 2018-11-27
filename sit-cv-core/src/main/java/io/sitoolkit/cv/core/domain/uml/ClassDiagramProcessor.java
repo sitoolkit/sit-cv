@@ -32,7 +32,7 @@ public class ClassDiagramProcessor {
     }
 
     public ClassDiagram process(LifeLineDef lifeLine) {
-        return process(lifeLine.getEntryMessage(),
+        return process(lifeLine.getEntryMessage().getRequestQualifiedSignature(),
                 lifeLine.getSequenceMethodsRecursively().collect(Collectors.toSet()));
     }
 

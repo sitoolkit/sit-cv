@@ -11,11 +11,15 @@ import java.util.stream.Stream;
 import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
+@EqualsAndHashCode(exclude = { "entryMessage" })
+@ToString(exclude = { "entryMessage" })
 public class LifeLineDef {
     private String objectName;
-    private String entryMessage;
+    private MessageDef entryMessage;
     private String sourceId;
     private List<MessageDef> messages = new ArrayList<>();
     private List<SequenceElement> elements = new ArrayList<>();
@@ -39,8 +43,9 @@ public class LifeLineDef {
     }
 
     public Map<String, ApiDocDef> getApiDocsRecursively() {
-        return getLifeLinesRecursively().collect(Collectors.toMap(LifeLineDef::getEntryMessage,
-                LifeLineDef::getApiDoc, (doc1, doc2) -> doc1));
+        return getLifeLinesRecursively()
+                .collect(Collectors.toMap((l) -> l.getEntryMessage().getRequestQualifiedSignature(),
+                        LifeLineDef::getApiDoc, (doc1, doc2) -> doc1));
     }
 
     public Stream<MethodDef> getSequenceMethodsRecursively() {

@@ -56,7 +56,7 @@ public class SequenceDiagramWriterPlantUmlImpl
         List<String> lines = new ArrayList<>();
         lines.add("@startuml");
 
-        lines.addAll(lifeline2str(diagram.getEntryLifeLine()));
+        lines.addAll(message2str("[", diagram.getEntryLifeLine().getEntryMessage()));
 
         lines.add("@enduml");
 
@@ -76,19 +76,19 @@ public class SequenceDiagramWriterPlantUmlImpl
         return lifeLineStrings;
     }
 
-    protected List<String> message2str(LifeLineDef lifeLine, MessageDef message) {
+    protected List<String> message2str(String sourceName, MessageDef message) {
         LifeLineDef target = message.getTarget();
         List<String> list = lifeline2str(target);
 
         list.add(0,
-                lifeLine.getObjectName() + " -> " + target.getObjectName() + " :" + "[[#{"
+                sourceName + "-> " + target.getObjectName() + " :" + "[[#{"
                         + message.getRequestQualifiedSignature() + "} "
                         + idFormatter.format(buildRequestName(message)) + "]]");
 
         String responseName = type2Str(message.getResponseType());
         if (!StringUtils.equals(responseName, "void")) {
-            list.add(list.size() - 1, lifeLine.getObjectName() + " <-- " + target.getObjectName()
-                    + " :" + idFormatter.format(responseName));
+            list.add(list.size() - 1, sourceName + "<-- " + target.getObjectName() + " :"
+                    + idFormatter.format(responseName));
         }
 
         return list;
@@ -164,7 +164,7 @@ public class SequenceDiagramWriterPlantUmlImpl
 
     @Override
     public List<String> write(LifeLineDef lifeLine, MessageDef message) {
-        return message2str(lifeLine, message);
+        return message2str(lifeLine.getObjectName(), message);
     }
 
     private String escapeLineSeparator(String str) {
