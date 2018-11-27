@@ -28,10 +28,12 @@ public class DeclationProcessor {
         return statement;
     }
 
-    public static ConditionalStatement createConditionalStatement(Statement n, String condition) {
+    public static ConditionalStatement createConditionalStatement(Statement n, String condition,
+            boolean isFirst) {
         ConditionalStatement statement = new ConditionalStatement();
         statement.setBody(n.toString());
         statement.setCondition(condition);
+        statement.setFirst(isFirst);
         return statement;
     }
 
