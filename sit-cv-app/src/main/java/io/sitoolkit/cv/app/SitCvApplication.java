@@ -38,8 +38,13 @@ public class SitCvApplication {
         ServiceFactory.createAndInitialize(projectDir).getReportService().export();
     }
 
+    /**
+     * Initialize the service before the screen is reloaded by LiveReload of
+     * spring-boot-devtools. The screen reload process is triggered when
+     * ContextRefreshedEvent is notified.
+     */
     @PostConstruct
-    public void onBeforeContextRefresh() {
+    public void initialize() {
         appCtx.getBean(ServiceFactory.class).initialize();
     }
 
