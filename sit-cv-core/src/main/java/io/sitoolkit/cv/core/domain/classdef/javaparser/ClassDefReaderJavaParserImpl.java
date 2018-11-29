@@ -198,7 +198,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         if (!typeDec.isInterface()) {
                             typeDec.getMethods().stream().forEach(method -> {
                                 if (equalMethods(declaredMethod, method)) {
-                                    method.accept(statementVisitor, VisitContext.statementsOf(methodDef));
+                                    method.accept(statementVisitor, VisitContext.of(methodDef));
                                     methodDef.setActionPath(classActionPath + getActionPath(method));
                                 }
                             });

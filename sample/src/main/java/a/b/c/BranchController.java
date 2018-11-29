@@ -11,14 +11,30 @@ public class BranchController {
         /**
          * if comment
          */
-        if (num == 0 || isTrue() // if comment
-                || false) {
+        if ((num == 0 || (isTrue()))) {
             processor.process("");
-        } else if (num < 10 || isTrue()) {
+        } else if (num < 10 || isTrue() // if comment
+                || false) {
+            processor.process2("");
+        } else {
+            processor.process3("");
+        }
+    }
+
+    public void omittedIfStatement(int num, String str) {
+        if (num == 0 || isTrue()) processor.process("");
+        else if (num < 10 || isTrue() || false) processor.process2("");
+        else processor.process3("");
+    }
+
+    public void nestedIfStatement(int num, String str) {
+        if (num == 0 || isTrue()) {
+            processor.process("");
+        } else if (num < 10 || false) {
             processor.process2("");
         } else {
             if (num > 1000) {
-                processor.process3("");
+                processor.process2("");
             } else if (num < 100) {
                 // nothing
             } else {

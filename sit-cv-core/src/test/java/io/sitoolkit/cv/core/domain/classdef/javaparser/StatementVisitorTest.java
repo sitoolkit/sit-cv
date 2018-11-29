@@ -1,12 +1,11 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,16 +79,76 @@ public class StatementVisitorTest {
 
     @Test
     public void ifStatement() throws IOException {
-        testBranch(testName.getMethodName());
+        MethodDef result = getBranchVisitResult(testName.getMethodName());
+
+        List<CvStatement> branchStatements = result.getStatements().stream()
+                .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
+        assertThat(branchStatements.size(), is(1));
+
+        List<ConditionalStatement> conditionalStatements = ((BranchStatement) branchStatements
+                .get(0)).getConditions();
+        assertThat(conditionalStatements.size(), is(3));
+
+        assertThat(conditionalStatements.get(0).isFirst(), is(true));
+        assertThat(conditionalStatements.get(1).isFirst(), is(false));
+        assertThat(conditionalStatements.get(2).isFirst(), is(false));
+
+        ConditionalStatement conditionalStatement = conditionalStatements.get(0);
+        assertThat(conditionalStatement.getCondition(), is("(num == 0 || (isTrue()))"));
+
+        MethodCallDef methodCall = (MethodCallDef) conditionalStatement.getChildren().get(0);
+        assertThat(methodCall.getName(), is("process"));
+    }
+
+    @Test
+    public void nestedIfStatement() throws IOException {
+        MethodDef result = getBranchVisitResult(testName.getMethodName());
+
+        List<ConditionalStatement> conditionalStatements = result.getStatements().stream()
+                .filter(BranchStatement.class::isInstance).map(BranchStatement.class::cast)
+                .collect(Collectors.toList()).get(0).getConditions();
+
+        List<BranchStatement> nestedBranches = conditionalStatements.get(2).getChildren().stream()
+                .filter(BranchStatement.class::isInstance).map(BranchStatement.class::cast)
+                .collect(Collectors.toList());
+        assertThat(nestedBranches.size(), is(1));
+
+        List<ConditionalStatement> nestedConditions = nestedBranches.get(0).getConditions();
+        assertThat(nestedConditions.size(), is(3));
+
+        assertThat(nestedConditions.get(1).getCondition(), is("num < 100"));
+
+        assertThat(nestedConditions.get(0).isFirst(), is(true));
+        assertThat(nestedConditions.get(1).isFirst(), is(false));
+        assertThat(nestedConditions.get(2).isFirst(), is(false));
+    }
+
+    @Test
+    public void omittedIfStatement() throws IOException {
+        MethodDef result = getBranchVisitResult(testName.getMethodName());
+
+        List<CvStatement> branchStatements = result.getStatements().stream()
+                .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
+        assertThat(branchStatements.size(), is(1));
+
+        List<ConditionalStatement> conditionalStatements = ((BranchStatement) branchStatements
+                .get(0)).getConditions();
+        assertThat(conditionalStatements.size(), is(3));
+
+        ConditionalStatement conditionalStatement = conditionalStatements.get(0);
+        assertThat(conditionalStatement.getCondition(), is("num == 0 || isTrue()"));
+
+        MethodCallDef methodCall = (MethodCallDef) conditionalStatement.getChildren().get(0);
+        assertThat(methodCall.getName(), is("process"));
     }
 
     public void testFlatLoop(String method) {
-        List<CvStatement> statements = new ArrayList<>();
         MethodDef methodDef = new MethodDef();
 
         loopCompilationUnit.getClassByName("LoopController").ifPresent(clazz -> {
 
-            clazz.getMethodsByName(method).get(0).accept(statementVisitor, VisitContext.statementsOf(methodDef));
+            clazz.getMethodsByName(method).get(0).accept(statementVisitor,
+                    VisitContext.of(methodDef));
 
         });
 
@@ -107,33 +166,15 @@ public class StatementVisitorTest {
         assertThat(methodCall.getName(), is("process"));
     }
 
-    public void testBranch(String method) throws IOException {
+    public MethodDef getBranchVisitResult(String method) throws IOException {
         MethodDef methodDef = new MethodDef();
 
         branchCompilationUnit.getClassByName("BranchController").ifPresent(clazz -> {
 
             clazz.getMethodsByName(method).get(0).accept(statementVisitor,
-                    VisitContext.statementsOf(methodDef));
-
+                    VisitContext.of(methodDef));
         });
 
-        List<CvStatement> branchStatements = methodDef.getStatements().stream()
-                .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
-        assertThat(branchStatements.size(), is(1));
-
-        List<ConditionalStatement> conditionalStatements = ((BranchStatement) branchStatements
-                .get(0)).getConditions();
-        assertThat(conditionalStatements.size(), is(3));
-
-        ConditionalStatement conditionalStatement = conditionalStatements.get(0);
-        assertThat(conditionalStatement.getCondition(), is("num == 0 || isTrue()"));
-
-        MethodCallDef methodCall = (MethodCallDef) conditionalStatement.getChildren().get(0);
-        assertThat(methodCall.getName(), is("process"));
-
-        List<CvStatement> nestedStatements = conditionalStatements.get(2).getChildren().stream()
-                .filter(BranchStatement.class::isInstance).collect(Collectors.toList());
-        assertThat(nestedStatements.size(), is(1));
-
+        return methodDef;
     }
 }
