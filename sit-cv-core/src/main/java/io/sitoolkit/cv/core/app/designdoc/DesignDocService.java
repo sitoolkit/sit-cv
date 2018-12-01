@@ -1,6 +1,5 @@
 package io.sitoolkit.cv.core.app.designdoc;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
@@ -69,19 +69,16 @@ public class DesignDocService {
     private Map<String, Set<String>> entryPointMap = new HashMap<>();
 
     public void analyze() {
+        StopWatch stopWatch = StopWatch.createStarted();
         projectManager.getCurrentProject().executeAllPreProcess();
         classDefReader.init().readDir();
+        log.info("Analysis finished in {}", stopWatch);
     }
 
     public void watchDir(Path srcDir, DesignDocChangeEventListener listener) {
 
         watcher.setContinue(true);
-        try {
-            Files.walk(srcDir).forEach(path -> watcher.watch(path.toFile().getAbsolutePath()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        watcher.watch(srcDir.toString());
         watcher.start(inputSources -> {
             int entryPoitSizeBefore = classDefRepository.getEntryPoints().size();
 

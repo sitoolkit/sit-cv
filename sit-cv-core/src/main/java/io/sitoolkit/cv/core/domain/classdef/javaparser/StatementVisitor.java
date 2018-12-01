@@ -80,13 +80,9 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     public void visit(MethodCallExpr methodCallExpr, VisitContext context) {
 
         if (isInIfCondition(methodCallExpr)) {
-            log.warn(
-                    "{}Method calls in conditional statement are not currently supported. : \"{}\"",
+            log.debug(
+                    "{}Method calls in if (...) are not supported (not drawn in sequence diagram) : \"{}\"",
                     context.getLogLeftPadding(), methodCallExpr);
-            log.warn(
-                    "{}If you want to draw a sequence of this method, please replace"
-                            + " \"if({})\\{}\" with \"boolean condition = {}; if(condition){}\".",
-                    context.getLogLeftPadding(), methodCallExpr, methodCallExpr);
             super.visit(methodCallExpr, context);
             return;
         }

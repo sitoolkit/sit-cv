@@ -78,14 +78,17 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         .filter(file -> p.matcher(file.toFile().getName()).matches())
                         .collect(Collectors.toList());
 
-                files.stream().forEach(javaFile -> {
+                int readCount = 0;
+                for (Path javaFile : files) {
+
                     readJava(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
 
-                    int readCount = reposiotry.countClassDefs();
-                    if (readCount % 10 == 0) {
-                        log.info("Processed java files : {} / {} ", readCount, files.size());
+                    readCount++;
+                    if (readCount % 10 == 0 || readCount == files.size()) {
+                        log.info("Processed java files : {} / {} in {}", readCount, files.size(),
+                                srcDir);
                     }
-                });
+                }
 
                 // JavaParserFacade seems to be NOT thread-safe
                 // files.stream().parallel().forEach(javaFile -> {
@@ -190,7 +193,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         methodDef.setName(declaredMethod.getName());
                         methodDef.setSignature(declaredMethod.getSignature());
                         methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
-                        methodDef.setReturnType(TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
+                        methodDef.setReturnType(
+                                TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
                         methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
                         methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
                         methodDefs.add(methodDef);
@@ -199,7 +203,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                             typeDec.getMethods().stream().forEach(method -> {
                                 if (equalMethods(declaredMethod, method)) {
                                     method.accept(statementVisitor, VisitContext.of(methodDef));
-                                    methodDef.setActionPath(classActionPath + getActionPath(method));
+                                    methodDef
+                                            .setActionPath(classActionPath + getActionPath(method));
                                 }
                             });
                         }
