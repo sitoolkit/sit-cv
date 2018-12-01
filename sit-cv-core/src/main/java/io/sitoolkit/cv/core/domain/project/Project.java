@@ -42,11 +42,13 @@ public class Project {
     }
 
     public Set<Path> getAllClasspaths() {
-        return getAllProjectsStream().flatMap(proj -> proj.classpaths.stream()).collect(Collectors.toSet());
+        return getAllProjectsStream().flatMap(proj -> proj.classpaths.stream())
+                .collect(Collectors.toSet());
     }
 
     public Set<Path> getAllSrcDirs() {
-        return getAllProjectsStream().flatMap(proj -> proj.srcDirs.stream()).collect(Collectors.toSet());
+        return getAllProjectsStream().flatMap(proj -> proj.srcDirs.stream())
+                .collect(Collectors.toSet());
     }
 
     public Set<Path> getAllPreProcessedDirs() {
@@ -60,16 +62,13 @@ public class Project {
     }
 
     Set<Path> getPreProcessedDirs() {
-        return getSrcDirs().stream()
-                .map(srcDir -> preProcessor.getPreProcessedPath(srcDir))
-                .collect(Collectors.toSet());
+        return getSrcDirs().stream().map(srcDir -> preProcessor.getPreProcessedPath(srcDir))
+                .filter(srcDir -> srcDir.toFile().exists()).collect(Collectors.toSet());
     }
 
     Stream<Project> getAllProjectsStream() {
-        return Stream.concat(
-                Stream.of(this),
-                subProjects.stream()
-                        .flatMap(Project::getAllProjectsStream));
+        return Stream.concat(Stream.of(this),
+                subProjects.stream().flatMap(Project::getAllProjectsStream));
     }
 
     Optional<Project> findProjectFromSrc(Path inputFile) {
@@ -77,11 +76,8 @@ public class Project {
             return Optional.of(this);
 
         } else {
-            return subProjects.stream()
-                    .map(subProject -> subProject.findProjectFromSrc(inputFile))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .findFirst();
+            return subProjects.stream().map(subProject -> subProject.findProjectFromSrc(inputFile))
+                    .filter(Optional::isPresent).map(Optional::get).findFirst();
         }
     }
 }

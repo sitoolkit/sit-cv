@@ -30,7 +30,7 @@ public class JavaParserFacadeBuilder {
         Set<Path> classpaths = project.getAllClasspaths();
         log.info("Adding classpaths for JavaParser:{}", classpaths);
         classpaths.stream().map(Path::toAbsolutePath).map(Path::toString)
-                .forEach(str -> {
+                .filter(path -> path.endsWith(".jar")).forEach(str -> {
                     try {
                         combinedTypeSolver.add(JarTypeSolver.getJarTypeSolver(str));
                     } catch (IOException e) {

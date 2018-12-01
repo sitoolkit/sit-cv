@@ -29,8 +29,7 @@ public class MavenProjectInfoListener implements StdoutListener {
 
         log.debug(line);
 
-        String javaBaseDirStr = StringUtils.substringAfterLast(line,
-                "[DEBUG]   (f) basedir = ");
+        String javaBaseDirStr = StringUtils.substringAfterLast(line, "[DEBUG]   (f) basedir = ");
         if (StringUtils.isNotEmpty(javaBaseDirStr)) {
             recordBaseDirStr(javaBaseDirStr);
         }
@@ -73,19 +72,18 @@ public class MavenProjectInfoListener implements StdoutListener {
 
     void recordSrcDirsStr(String javaSrcDirsStr) {
         if (recordingProject != null) {
-            recordingProject.setSrcDirs(splitAndTrim(javaSrcDirsStr, false));
+            recordingProject.setSrcDirs(splitAndTrim(javaSrcDirsStr));
         }
     }
 
     void recordClasspathsStr(String classpathsStr) {
         if (recordingProject != null) {
-            recordingProject.setClasspaths(splitAndTrim(classpathsStr, true));
+            recordingProject.setClasspaths(splitAndTrim(classpathsStr));
         }
     }
 
-    private Set<Path> splitAndTrim(String line, boolean jarOnly) {
-        return Arrays.asList(line.split(",")).stream().map(String::trim)
-                .filter(element -> jarOnly ? element.endsWith(".jar") : true).map(Paths::get)
+    private Set<Path> splitAndTrim(String line) {
+        return Arrays.asList(line.split(",")).stream().map(String::trim).map(Paths::get)
                 .collect(Collectors.toSet());
     }
 }

@@ -29,7 +29,7 @@ buildscript {
       mavenLocal()
   }
   dependencies {
-      classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'1.0.0-beta.1-SNAPSHOT'
+      classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'1.0.0-beta.2-SNAPSHOT'
   }
 }
 

@@ -13,8 +13,7 @@ import lombok.launch.Delombok;
 public class Delomboker {
 
     public void execute(DelombokParameter param) {
-
-        log.info("Delomboking {} ...", param.src.toAbsolutePath());
+        log.debug("Delomboking {} ...", param.src.toAbsolutePath());
 
         try {
             Delombok delombok = new Delombok();
@@ -26,23 +25,22 @@ public class Delomboker {
                 delombok.setCharset(param.encoding);
             }
             if (param.classpath != null) {
-                delombok.setClasspath( param.classpath.stream().map(Path::toAbsolutePath)
-                .map(Path::toString).collect(Collectors.joining(File.pathSeparator)));
+                delombok.setClasspath(param.classpath.stream().map(Path::toAbsolutePath)
+                        .map(Path::toString).collect(Collectors.joining(File.pathSeparator)));
             }
             if (param.sourcepath != null) {
-                delombok.setSourcepath( param.sourcepath.stream().map(Path::toAbsolutePath)
-                .map(Path::toString).collect(Collectors.joining(File.pathSeparator)));
+                delombok.setSourcepath(param.sourcepath.stream().map(Path::toAbsolutePath)
+                        .map(Path::toString).collect(Collectors.joining(File.pathSeparator)));
             }
 
             delombok.delombok();
 
-            log.info("Delomboked {}", param.src.toAbsolutePath());
+            log.info("Delomboked in {} to {}", param.src, param.target);
 
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException
-                | InvocationTargetException | IOException e) {
-            log.info("Delombok failed : {}", param.src.toAbsolutePath(), e);
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException
+                | NoSuchMethodException | InvocationTargetException | IOException e) {
+            log.warn("Delombok failed : {}", param.src.toAbsolutePath(), e);
         }
     }
+
 }
-
-
