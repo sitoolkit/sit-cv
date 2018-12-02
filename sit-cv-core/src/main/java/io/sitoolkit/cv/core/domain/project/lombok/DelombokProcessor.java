@@ -49,7 +49,16 @@ public class DelombokProcessor implements PreProcessor {
         if (JdkUtils.isJdkToolsJarLoaded()) {
             return true;
         }
-        return JdkUtils.loadJdkToosJar();
+        boolean jdkToolsJarLoaded = JdkUtils.loadJdkToosJar();
+
+        if (jdkToolsJarLoaded) {
+            log.warn("The project using Lombok needs to be executed with JDK (not JRE)");
+        }
+        return jdkToolsJarLoaded;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(System.getProperties());
     }
 
     private DelombokProcessor(Project project) {
