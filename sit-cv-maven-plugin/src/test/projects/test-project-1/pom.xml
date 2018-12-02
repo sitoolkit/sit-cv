@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.sitoolkit.cv</groupId>
-  <artifactId>sit-cv-maven-plugin</artifactId>
+  <artifactId>sit-cv-maven-plugin-test</artifactId>
   <version>1.0.0-beta.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Test Mojo</name>
@@ -15,7 +15,7 @@
       <plugin>
         <groupId>io.sitoolkit.cv</groupId>
         <artifactId>sit-cv-maven-plugin</artifactId>
-        <version>1.0.0-beta.2-SNAPSHOT</version>
+        <version>${project.version}</version>
         <configuration>
           <stopKey></stopKey>
         </configuration>
