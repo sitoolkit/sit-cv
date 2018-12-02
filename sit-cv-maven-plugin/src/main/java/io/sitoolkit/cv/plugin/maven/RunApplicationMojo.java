@@ -1,8 +1,5 @@
 package io.sitoolkit.cv.plugin.maven;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,21 +13,16 @@ import io.sitoolkit.cv.app.SitCvApplication;
 @Mojo(name = "run")
 public class RunApplicationMojo extends AbstractMojo {
 
-    @Parameter(defaultValue = "${project.basedir}")
-    File projectDir;
+    @Parameter
+    private String cvArgs;
 
     @Parameter(defaultValue = "x")
-    String stopKey;
+    private String stopKey;
 
     @Override
     public void execute() throws MojoExecutionException {
 
-        List<String> args = new ArrayList<>();
-        if (projectDir != null) {
-            args.add("--project");
-            args.add(projectDir.getAbsolutePath());
-        }
-        SitCvApplication.main(args.toArray(new String[args.size()]));
+        SitCvApplication.main(getCvArgsAsArray());
 
         getLog().info("Press " + stopKey + " and enter to stop server");
 
@@ -43,6 +35,10 @@ public class RunApplicationMojo extends AbstractMojo {
                 }
             }
         }
+    }
+
+    private String[] getCvArgsAsArray() {
+        return StringUtils.isEmpty(cvArgs) ? new String[0] : cvArgs.split(" ");
     }
 
 }

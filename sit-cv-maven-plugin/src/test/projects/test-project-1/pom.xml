@@ -18,6 +18,7 @@
         <version>${project.version}</version>
         <configuration>
           <stopKey></stopKey>
+          <cvArgs>--server.port=8086</cvArgs>
         </configuration>
       </plugin>
     </plugins>

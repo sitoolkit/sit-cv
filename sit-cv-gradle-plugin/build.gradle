@@ -11,7 +11,9 @@ repositories {
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    implementation group: 'io.sitoolkit.cv', name: 'sit-cv-core', version: version
+    implementation (group: 'io.sitoolkit.cv', name: 'sit-cv-app', version: version) {
+        exclude(module: 'logback-classic')
+    }
 }
 
 gradlePlugin {
@@ -19,6 +21,7 @@ gradlePlugin {
         sitCvPlugin {
             id = 'io.sitoolkit.cv.sit-cv-gradle-plugin'
             displayName = 'Code Visualizer Gradle Plugin'
+            description = 'Code Visualizer is a development support tool to generate sequence diagram and class diagram from java source code'
             implementationClass = 'io.sitoolkit.cv.plugin.gradle.SitCvPlugin'
         }
     }

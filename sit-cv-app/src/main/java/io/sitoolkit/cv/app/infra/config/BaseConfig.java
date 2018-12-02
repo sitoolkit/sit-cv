@@ -14,7 +14,7 @@ import io.sitoolkit.cv.core.domain.project.ProjectManager;
 public class BaseConfig {
 
     @Bean
-    @ConfigurationProperties(prefix = "cv")
+    @ConfigurationProperties(prefix = SitCvApplicationOption.PREFIX)
     public ApplicationConfig applicationConfig() {
         return new ApplicationConfig();
     }
