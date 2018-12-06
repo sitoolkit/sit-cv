@@ -1,15 +1,18 @@
 package io.sitoolkit.cv.plugin.gradle;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import org.apache.commons.lang3.StringUtils;
-import org.gradle.api.DefaultTask;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
 
-import io.sitoolkit.cv.app.SitCvApplication;
-
-public class RunTask extends DefaultTask {
+public class RunTask extends JavaExec {
 
     private String stopKey = "x";
 
@@ -26,13 +29,29 @@ public class RunTask extends DefaultTask {
         this.cvArgs = cvArgs;
     }
 
-    private String[] getCvArgsAsArray() {
-        return StringUtils.isEmpty(cvArgs) ? new String[0] : cvArgs.split(" ");
+    private List<String> getCvArgsAsList() {
+        return StringUtils.isEmpty(cvArgs) ? Collections.emptyList()
+                : Arrays.asList(cvArgs.split(" "));
     }
 
-    @TaskAction
-    public void run() {
-        SitCvApplication.main(getCvArgsAsArray());
+    @Override
+    public void exec() {
+        setMain("io.sitoolkit.cv.app.SitCvApplication");
+        FileCollection classpath = getProject().getBuildscript().getConfigurations()
+                .findByName("classpath");
+        setClasspath(classpath);
+        setArgs(getCvArgsAsList());
+        getConventionMapping().map("jvmArgs", new Callable<Iterable<String>>() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public Iterable<String> call() throws Exception {
+                if (getProject().hasProperty("applicationDefaultJvmArgs")) {
+                    return (Iterable<String>) getProject().property("applicationDefaultJvmArgs");
+                }
+                return Collections.emptyList();
+            }
+        });
+        super.exec();
     }
 
 }
