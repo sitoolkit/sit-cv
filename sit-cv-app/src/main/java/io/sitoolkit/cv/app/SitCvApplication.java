@@ -42,6 +42,8 @@ public class SitCvApplication {
      * Initialize the service before the screen is reloaded by LiveReload of
      * spring-boot-devtools. The screen reload process is triggered when
      * ContextRefreshedEvent is notified.
+     *
+     * @see org.springframework.boot.devtools.autoconfigure.LocalDevToolsAutoConfiguration
      */
     @PostConstruct
     public void initialize() {
