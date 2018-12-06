@@ -34,8 +34,7 @@ public class RunTask extends JavaExec {
                 : Arrays.asList(cvArgs.split(" "));
     }
 
-    @Override
-    public void exec() {
+    public void configure() {
         setMain("io.sitoolkit.cv.app.SitCvApplication");
         FileCollection classpath = getProject().getBuildscript().getConfigurations()
                 .findByName("classpath");
@@ -51,7 +50,6 @@ public class RunTask extends JavaExec {
                 return Collections.emptyList();
             }
         });
-        super.exec();
     }
 
 }
