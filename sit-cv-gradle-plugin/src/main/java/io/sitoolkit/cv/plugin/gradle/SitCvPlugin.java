@@ -13,6 +13,7 @@ public class SitCvPlugin implements Plugin<Project> {
             task.setDescription("Export designdocs from source code");
         });
         project.getTasks().create("cvRun", RunTask.class, (task) -> {
+            task.configure();
             task.setGroup(GROUP_NAME);
             task.setDescription("Run Code Visualizer server");
         });
