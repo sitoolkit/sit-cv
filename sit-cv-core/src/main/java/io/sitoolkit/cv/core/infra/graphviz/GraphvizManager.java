@@ -11,6 +11,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.zeroturnaround.zip.ZipUtil;
 
 import io.sitoolkit.cv.core.infra.SitRepository;
+import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 
@@ -85,7 +86,9 @@ public class GraphvizManager {
         if (Files.exists(zipFile)) {
             log.info("zipFile exists :{}", zipFile.toString());
         } else {
-            // TODO proxy対応
+
+            ProxySettingService.getInstance().loadProxy();
+
             try {
                 URL url = new URL(winGraphvizDownloadUrl);
                 log.info("downloading zipFile from '{}' ... ", url);
