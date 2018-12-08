@@ -3,12 +3,6 @@
     "include":[
       {
         "name": ".*Controller.*"
-      },
-      {
-        "name": ".*Publisher.*"
-      },
-      {
-        "name": ".*Service.*"
       }
     ],
     "exclude":[]
@@ -22,19 +16,13 @@
         "name": ".*Service.*"
       },
       {
-        "name": ".*Processor"
+        "name": ".*Processor.*"
+      },
+      {
+        "name": ".*Validator.*"
       },
       {
         "name": ".*Repository.*"
-      },
-      {
-        "name": ".*Reader"
-      },
-      {
-        "name": ".*Writer"
-      },
-      {
-        "name": ".*Manager"
       }
     ],
     "exclude": []

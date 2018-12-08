@@ -1,8 +1,8 @@
-apply plugin: 'maven'
-apply plugin: 'java-gradle-plugin'
-
-group = "io.sitoolkit.cv"
-version = "1.0.0-beta.1-SNAPSHOT"
+plugins {
+    id 'java-gradle-plugin' 
+    id 'com.gradle.plugin-publish' version '0.10.0'
+    id 'maven'
+}
 
 repositories {
     jcenter()
@@ -11,14 +11,22 @@ repositories {
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    implementation group: 'io.sitoolkit.cv', name: 'sit-cv-core', version: version
+    implementation group: 'io.sitoolkit.cv', name: 'sit-cv-app', version: version
 }
 
 gradlePlugin {
     plugins {
         sitCvPlugin {
-            id = 'sit-cv-gradle-plugin'
+            id = 'io.sitoolkit.cv.sit-cv-gradle-plugin'
+            displayName = 'Code Visualizer Gradle Plugin'
+            description = 'Code Visualizer is a development support tool to generate sequence diagram and class diagram from java source code'
             implementationClass = 'io.sitoolkit.cv.plugin.gradle.SitCvPlugin'
         }
     }
+}
+
+pluginBundle {
+    website = 'https://github.com/sitoolkit/sit-cv' 
+    vcsUrl = 'https://github.com/sitoolkit/sit-cv' 
+    tags = ['java', 'uml', 'SI-Toolkit'] 
 }

@@ -13,6 +13,7 @@ export class DesignDocServerService implements DesignDocService {
   private socket: SockJS;
   private stompClient: Stomp.Client;
   private connectionSource: AsyncSubject<Stomp.Frame> = new AsyncSubject();
+  private detailSubscriber: Stomp.StompSubscription;
 
   constructor(private config: Config) {
     this.connect();
@@ -47,12 +48,15 @@ export class DesignDocServerService implements DesignDocService {
     designDocId: string,
     callback: (detail: DesignDocDetail) => void
   ): void {
+    if (this.detailSubscriber != null) {
+      this.detailSubscriber.unsubscribe();
+      this.detailSubscriber = null;
+    }
     let subscribeUrl: string = '/topic/designdoc/detail/' + designDocId;
     this.connectionSource.subscribe(() => {
-      let subscriber: any = this.stompClient.subscribe(subscribeUrl, (response: any) => {
+      this.detailSubscriber = this.stompClient.subscribe(subscribeUrl, (response: any) => {
         let detail = (<DesignDocDetail>JSON.parse(response.body));
         callback(detail);
-        subscriber.unsubscribe();
       });
       this.stompClient.send('/app/designdoc/detail', {}, designDocId);
     })

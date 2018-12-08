@@ -13,15 +13,21 @@ import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TypeParser {
+public class TypeProcessor {
 
-    public static List<TypeDef> getParamTypes(ResolvedMethodDeclaration declaredMethod) {
+    public static List<TypeDef> collectParamTypes(ResolvedMethodDeclaration declaredMethod) {
         return IntStream.range(0, declaredMethod.getNumberOfParams())
-                .mapToObj(declaredMethod::getParam).map(ResolvedParameterDeclaration::getType)
-                .map(TypeParser::getTypeDef).collect(Collectors.toList());
+                .mapToObj(declaredMethod::getParam)
+                .map(TypeProcessor::createTypeDef).collect(Collectors.toList());
     }
 
-    public static TypeDef getTypeDef(ResolvedType type) {
+    public static TypeDef createTypeDef(ResolvedParameterDeclaration param) {
+        TypeDef typeDef = createTypeDef(param.getType());
+        typeDef.setVariable(param.getName());
+        return typeDef;
+    }
+
+    public static TypeDef createTypeDef(ResolvedType type) {
         TypeDef typeDef = new TypeDef();
         if (type.isPrimitive()) {
             typeDef.setName(type.asPrimitive().name().toLowerCase());
@@ -29,12 +35,14 @@ public class TypeParser {
             typeDef.setName("void");
         } else if (type.isArray()) {
             typeDef.setName(type.asArrayType().describe());
+        } else if (type.isTypeVariable()) {
+            typeDef.setName(type.asTypeVariable().qualifiedName());
         } else if (type.isReference()) {
             try {
                 ResolvedReferenceType rType = type.asReferenceType();
                 typeDef.setName(rType.getQualifiedName());
                 List<TypeDef> typeList = rType.getTypeParametersMap().stream().map(pair -> pair.b)
-                        .map(TypeParser::getTypeDef).collect(Collectors.toList());
+                        .map(TypeProcessor::createTypeDef).collect(Collectors.toList());
                 typeDef.setTypeParamList(typeList);
             } catch (UnsupportedOperationException e) {
                 log.debug("Unsolved type:{}, {}", type, e.getMessage());

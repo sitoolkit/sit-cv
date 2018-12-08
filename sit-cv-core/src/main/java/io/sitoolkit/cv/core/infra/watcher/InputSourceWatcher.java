@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 入力ソースの変更を監視するクラスです。
+ * This class is to monitor change of input source.
  *
  * @author yuichi.kuwahara
  */
@@ -43,11 +43,13 @@ public abstract class InputSourceWatcher {
     final long RELOAD_WAIT_TIME_MILLIS = 300;
 
     /**
-     * 入力ソースを監視対象に追加します。 実際の処理はサブクラスに委譲します。 また、プロセス開始後の初回実行時には監視中ファイルを作成します。
-     * このメソッドは繰り返し生成モードでない場合、何も行いません。
+     * Add an input source to be monitored. Actual processing is delegated to
+     * subclass. Also, at the first execution after the process starts, it
+     * creates a file being monitored. This method does nothing if it is not in
+     * continuous monitoring mode.
      *
      * @param inputSource
-     *            入力ソース
+     *            input source
      * @see #watchInputSource(java.lang.String)
      */
     public void watch(String inputSource) {
@@ -59,13 +61,14 @@ public abstract class InputSourceWatcher {
     }
 
     /**
-     * 入力ソースの監視を開始します。 実際の処理はサブクラスに委譲します。 このメソッドは繰り返し生成モードでない場合、何も行いません。
-     *
-     * @param cg
-     *            繰り返し生成インターフェース
+     * Start monitoring the input source. Actual processing is delegated to
+     * subclass. This method does nothing if it is not in continuous monitoring
+     * mode.
+     * 
+     * @param inputSourceEventListener
      * @see #watching()
      */
-    public void start(final ContinuousGeneratable cg) {
+    public void start(final InputSourceEventListener inputSourceEventListener) {
         if (!isContinue()) {
             return;
         }
@@ -87,8 +90,11 @@ public abstract class InputSourceWatcher {
                     throw new IllegalStateException(e);
                 }
                 getReadyToRegenerateSources().ifPresent(sources -> {
-                    log.info("Regenarate from source change {}", sources);
-                    cg.regenerate(sources);
+                    try {
+                        inputSourceEventListener.onChange(sources);
+                    } catch (Exception e) {
+                        log.error("Exception in the process of file change event", e);
+                    }
                 });
             }
         });
@@ -108,8 +114,8 @@ public abstract class InputSourceWatcher {
     }
 
     private synchronized Optional<Set<String>> getReadyToRegenerateSources() {
-        if (!waitingSources.isEmpty() &&
-                Instant.now().isAfter(lastSourceChangedTime.plusMillis(RELOAD_WAIT_TIME_MILLIS))) {
+        if (!waitingSources.isEmpty() && Instant.now()
+                .isAfter(lastSourceChangedTime.plusMillis(RELOAD_WAIT_TIME_MILLIS))) {
             Set<String> result = new HashSet<>(waitingSources);
             waitingSources.clear();
             return Optional.of(result);
@@ -119,22 +125,25 @@ public abstract class InputSourceWatcher {
     }
 
     /**
-     * 入力ソースを監視対象に追加する実際の処理を実装します。
+     * Implement the actual process of adding the input source to the monitoring
+     * target.
      *
      * @param inputSource
-     *            入力ソース
+     *            input source
      */
     protected abstract void watchInputSource(String inputSource);
 
     /**
-     * 入力ソースの監視を開始します。 サブクラスの実装責務は以下の通りです。
+     * Start monitoring the input source. Implementation duties of subclass are
+     * as follows.
      * <ul>
-     * <li>入力ソースの変更の監視
-     * <li>変更を検知した入力ソースで繰り返しインターフェースの再生成メソッドを実行
+     * <li>Monitor input source changes
+     * <li>Execute repeat interface onChange method on input source that
+     * detected change
      * </ul>
      *
      */
     protected abstract Set<String> watching();
 
-    protected abstract void end(ContinuousGeneratable cg);
+    protected abstract void end(InputSourceEventListener cg);
 }

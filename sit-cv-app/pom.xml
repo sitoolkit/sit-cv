@@ -8,7 +8,7 @@
     <dependency>
       <groupId>io.sitoolkit.cv</groupId>
       <artifactId>sit-cv-core</artifactId>
-      <version>1.0.0-beta.1</version>
+      <version>1.0.0-beta.2</version>
     </dependency>
 
     <dependency>
@@ -18,6 +18,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -85,7 +86,7 @@
   <parent>
     <groupId>io.sitoolkit.cv</groupId>
     <artifactId>sit-cv</artifactId>
-    <version>1.0.0-beta.1</version>
+    <version>1.0.0-beta.2</version>
   </parent>
 
   <dependencyManagement>
@@ -102,6 +103,7 @@
 
   <properties>
     <java.version>1.8</java.version>
+    <executable.classifier>exec</executable.classifier>
   </properties>
 
   <build>
@@ -114,9 +116,36 @@
             <goals>
               <goal>repackage</goal>
             </goals>
+            <configuration>
+              <classifier>${executable.classifier}</classifier>
+            </configuration>
           </execution>
         </executions>
       </plugin>
+      
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>attach-executable-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${project.basedir}/target/${project.build.finalName}-${executable.classifier}.jar</file>
+                  <classifier>${executable.classifier}</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 </project>

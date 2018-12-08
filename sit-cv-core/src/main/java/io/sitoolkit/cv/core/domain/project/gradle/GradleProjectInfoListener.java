@@ -2,12 +2,11 @@ package io.sitoolkit.cv.core.domain.project.gradle;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.sitoolkit.util.buidtoolhelper.process.StdoutListener;
+import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,24 +14,65 @@ import lombok.extern.slf4j.Slf4j;
 public class GradleProjectInfoListener implements StdoutListener {
 
     @Getter
-    Set<Path> javaSrcDirs = new HashSet<>();
-    @Getter
-    Set<Path> classpaths = new HashSet<>();
+    private final Project project;
+    private Project recordingProject;
+
+    public GradleProjectInfoListener(Path projectDir) {
+        this.project = new Project(projectDir);
+    }
 
     @Override
     public void nextLine(String line) {
 
         log.debug(line);
 
-        String javaSrcDir = StringUtils.substringAfter(line, "sitCvJavaSrcDir:");
-        if (StringUtils.isNotEmpty(javaSrcDir)) {
-            javaSrcDirs.add(Paths.get(javaSrcDir));
+        String javaBaseDirStr = StringUtils.substringAfter(line, "sitCvProjectDir:");
+        if (StringUtils.isNotEmpty(javaBaseDirStr)) {
+            recordBaseDirStr(javaBaseDirStr);
         }
 
-        String classpath = StringUtils.substringAfter(line, "sitCvClasspath:");
-        if (StringUtils.isNotEmpty(classpath)) {
-            classpaths.add(Paths.get(classpath));
+        String javaBuildDirStr = StringUtils.substringAfter(line, "sitCvBuildDir:");
+        if (StringUtils.isNotEmpty(javaBuildDirStr)) {
+            recordBuildDirStr(javaBuildDirStr);
+        }
+
+        String javaSrcDirStr = StringUtils.substringAfter(line, "sitCvJavaSrcDir:");
+        if (StringUtils.isNotEmpty(javaSrcDirStr)) {
+            recordSrcDirStr(javaSrcDirStr);
+        }
+
+        String classpathStr = StringUtils.substringAfter(line, "sitCvClasspath:");
+        if (StringUtils.isNotEmpty(classpathStr)) {
+            recordClasspathStr(classpathStr);
         }
     }
 
+    void recordBaseDirStr(String javaBaseDirStr) {
+        Path javaBaseDir = Paths.get(javaBaseDirStr);
+        if (project.getDir().equals(javaBaseDir)) {
+            recordingProject = project;
+
+        } else {
+            recordingProject = new Project(javaBaseDir);
+            project.getSubProjects().add(recordingProject);
+        }
+    }
+
+    void recordBuildDirStr(String javaBuildDirStr) {
+        if (recordingProject != null) {
+            recordingProject.setBuildDir(Paths.get(javaBuildDirStr));
+        }
+    }
+
+    void recordSrcDirStr(String javaSrcDirStr) {
+        if (recordingProject != null) {
+            recordingProject.getSrcDirs().add(Paths.get(javaSrcDirStr));
+        }
+    }
+
+    void recordClasspathStr(String classpathStr) {
+        if (recordingProject != null) {
+            recordingProject.getClasspaths().add(Paths.get(classpathStr));
+        }
+    }
 }

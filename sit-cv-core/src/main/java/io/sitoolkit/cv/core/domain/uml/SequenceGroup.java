@@ -2,17 +2,21 @@ package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class SequenceGroup extends SequenceElement {
+@EqualsAndHashCode(callSuper = true)
+public abstract class SequenceGroup extends SequenceElement {
 
     private List<SequenceElement> elements = new ArrayList<>();
 
     @Override
-    public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
-        return writer.write(lifeLine, this);
+    public Stream<MessageDef> getMessagesRecursively() {
+        return getElements().stream().flatMap(SequenceElement::getMessagesRecursively)
+                .filter(Objects::nonNull).distinct();
     }
-
 }

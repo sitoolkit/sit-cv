@@ -37,11 +37,8 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
                         .thenComparing(Comparator.comparing(MethodDef::getName)))
                 .map(this::method2str).collect(Collectors.joining("\n"));
 
-        String classStr = String.format("%s %s {\n"
-                + "%s\n"
-                + "%s\n"
-                + "}\n"
-                , clazz.getType(), clazz.getName(), fieldsStr, methodsStr);
+        String classStr = String.format("%s %s {\n" + "%s\n" + "%s\n" + "}\n", clazz.getType(),
+                clazz.getName(), fieldsStr, methodsStr);
 
         return classStr;
     }
@@ -90,7 +87,7 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
                         Stream.of("@enduml"))
                 .flatMap(Function.identity()).collect(Collectors.joining(System.lineSeparator()));
 
-        log.debug("serializedDiagram -> {}", umlString);
+        log.info("Serialized Diagram :\n{}", umlString);
 
         return umlString;
     }

@@ -2,8 +2,26 @@
 
 Code Visualizer is a development support tool to generate sequence diagram and class diagram from java source code.
 Sequence diagrams are generated for each public method which belong to specified class.
-Class diagrams are generated for each sequence diagram and include classes which appeare in it as parameter and return types.
+Class diagrams are generated for each sequence diagram and include classes which appeare in it as parameters and return types.
 
+This (https://sitoolkit.github.io/sit-cv/designdocs/) is generated diagrams from this project.
+
+Diagrams are provided as static web contents so you can see them with web browser.
+You can generate diagrams with two ways.
+
+1. Server mode
+1. Report mode
+
+## Server mode
+
+Code Visualizer can be run as an application server.
+In this mode, you can see diagrams via http://localhost:8080/ and the diagram will be automatically re-generated after source code modification.
+
+## Report mode
+
+Code Visualizer can be run as an batch application.
+After execution of report mode, diagrams are generated in project_root/docs/designdocs directory.
+These report files can be accessed with browser as local files and also published with web server or GitHub Pages.
 
 ## Demo
 
@@ -16,9 +34,9 @@ You can run Code Visualizer on Windows and macOS using following commands of eac
 ```
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
-start http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.1/sit-cv-app-1.0.0-beta.1.jar
-move %USERPROFILE%\Downloads\sit-cv-app-1.0.0-beta.1.jar .
-java -jar sit-cv-app-1.0.0-beta.1.jar
+start http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.2/sit-cv-app-1.0.0-beta.2-exec.jar
+move %USERPROFILE%\Downloads\sit-cv-app-1.0.0-beta.2-exec.jar .
+java -jar sit-cv-app-1.0.0-beta.2-exec.jar
 ```
 
 * macOS
@@ -27,8 +45,8 @@ java -jar sit-cv-app-1.0.0-beta.1.jar
 brew install graphviz
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
-curl -o sit-cv-app-1.0.0-beta.1.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.1/sit-cv-app-1.0.0-beta.1.jar 
-java -jar sit-cv-app-1.0.0-beta.1.jar
+curl -o sit-cv-app-1.0.0-beta.2-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.2/sit-cv-app-1.0.0-beta.2-exec.jar 
+java -jar sit-cv-app-1.0.0-beta.2-exec.jar
 ```
 
 After running last java command, you can see following log on your console.
@@ -44,7 +62,7 @@ Then you can access http://localhost:8080 with browser and see UML diagrams of D
 Running java command with --report option, static report files(html, css, js) are generated to docs/designdoc directory.
 
 ```
-java -jar sit-cv-app-1.0.0-beta.1.jar --report
+java -jar sit-cv-app-1.0.0-beta.2-exec.jar --cv.report
 ```
 
 You can see diagrams by opening docs/designdoc/index.html with browser.
@@ -64,7 +82,7 @@ If your project uses Maven, add plugin to pom.xml of your project.
         <plugin>
             <groupId>io.sitoolkit.cv</groupId>
             <artifactId>sit-cv-maven-plugin</artifactId>
-            <version>1.0.0-beta.1</version>
+            <version>1.0.0-beta.2</version>
         </plugin>
     </plugins>
   </build>
@@ -95,10 +113,11 @@ If your project uses Gradle, add plugin to build.gradle of your project.
 ```groovy
 buildscript {
   repositories {
-      mavenLocal()
+      jcenter()
+      mavenCentral()
   }
   dependencies {
-      classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'1.0.0-beta.1'
+      classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'1.0.0-beta.2'
   }
 }
 

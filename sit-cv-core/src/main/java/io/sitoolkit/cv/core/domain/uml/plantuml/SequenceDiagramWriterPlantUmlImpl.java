@@ -9,20 +9,26 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
+import io.sitoolkit.cv.core.domain.uml.BranchSequenceElement;
+import io.sitoolkit.cv.core.domain.uml.ConditionalSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
+import io.sitoolkit.cv.core.domain.uml.LoopSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.MessageDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
+import io.sitoolkit.cv.core.domain.uml.SequenceElement;
 import io.sitoolkit.cv.core.domain.uml.SequenceElementWriter;
-import io.sitoolkit.cv.core.domain.uml.SequenceGroup;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<SequenceDiagram>, SequenceElementWriter {
+public class SequenceDiagramWriterPlantUmlImpl
+        implements DiagramWriter<SequenceDiagram>, SequenceElementWriter {
+    private final String PARAM_INDENT = "  ";
 
     @NonNull
     PlantUmlWriter plantumlWriter;
@@ -50,37 +56,60 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         List<String> lines = new ArrayList<>();
         lines.add("@startuml");
 
-        lines.addAll(lifeline2str(diagram.getEntryLifeLine()));
+        lines.addAll(message2str("[", diagram.getEntryLifeLine().getEntryMessage()));
 
         lines.add("@enduml");
 
         String umlString = lines.stream().collect(Collectors.joining(System.lineSeparator()));
 
-        log.debug(umlString);
+        log.info("Serialized Diagram :\n{}", umlString);
 
         return umlString;
     }
 
     protected List<String> lifeline2str(LifeLineDef lifeLine) {
-        return lifeLine.getElements().stream().map(element -> element.write(lifeLine, this))
-                .flatMap(List::stream).collect(Collectors.toList());
+        List<String> lifeLineStrings = lifeLine.getElements().stream()
+                .map(element -> element.write(lifeLine, this)).flatMap(List::stream)
+                .collect(Collectors.toList());
+        lifeLineStrings.add(0, "activate " + lifeLine.getObjectName());
+        lifeLineStrings.add("deactivate " + lifeLine.getObjectName());
+        return lifeLineStrings;
     }
 
-    protected List<String> message2str(LifeLineDef lifeLine, MessageDef message) {
+    protected List<String> message2str(String sourceName, MessageDef message) {
         LifeLineDef target = message.getTarget();
         List<String> list = lifeline2str(target);
 
         list.add(0,
-                lifeLine.getObjectName() + " -> " + target.getObjectName() + " :" + "[[#{"
+                sourceName + "-> " + target.getObjectName() + " :" + "[[#{"
                         + message.getRequestQualifiedSignature() + "} "
-                        + idFormatter.format(message.getRequestName()) + "]]");
+                        + idFormatter.format(buildRequestName(message)) + "]]");
 
-        if (!StringUtils.equals(message.getResponseName(), "void")) {
-            list.add(lifeLine.getObjectName() + " <-- " + target.getObjectName() + " :"
-                    + idFormatter.format(message.getResponseName()));
+        String responseName = type2Str(message.getResponseType());
+        if (!StringUtils.equals(responseName, "void")) {
+            list.add(list.size() - 1, sourceName + "<-- " + target.getObjectName() + " :"
+                    + idFormatter.format(responseName));
         }
 
         return list;
+    }
+
+    protected String buildRequestName(MessageDef message) {
+        String paramNames = "";
+        if (message.getRequestParamTypes().size() > 0) {
+            String separator = plantumlWriter.LINE_SEPARATOR + PARAM_INDENT;
+            paramNames = separator + message.getRequestParamTypes().stream().map(this::type2Str)
+                    .collect(Collectors.joining("," + separator));
+        }
+        return message.getRequestName() + "(" + paramNames + ")";
+    }
+
+    protected String type2Str(TypeDef type) {
+        if (type.getVariable() == null) {
+            return type.toString();
+        } else {
+            return type.getVariable() + ": " + type.toString();
+        }
     }
 
     public void writeToFile(List<SequenceDiagram> diagrams, Path filePath) {
@@ -91,15 +120,42 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
         }
     }
 
+    private List<String> elements2str(LifeLineDef lifeLine, List<? extends SequenceElement> elements) {
+        return elements.stream().map(childElement -> childElement.write(lifeLine, this))
+                .flatMap(List::stream).collect(Collectors.toList());
+    }
+
     @Override
-    public List<String> write(LifeLineDef lifeLine, SequenceGroup group) {
+    public List<String> write(LifeLineDef lifeLine, LoopSequenceGroup group) {
         List<String> list = new ArrayList<>();
 
-        list.add("loop");
+        list.add("loop " + escapeLineSeparator(group.getScope()));
 
-        list.addAll(
-                group.getElements().stream().map(childElement -> childElement.write(lifeLine, this))
-                        .flatMap(List::stream).collect(Collectors.toList()));
+        list.addAll(elements2str(lifeLine, group.getElements()));
+
+        list.add("end");
+
+        return list;
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, ConditionalSequenceGroup group) {
+        List<String> list = new ArrayList<>();
+
+        String altType = group.isFirst() ? "alt" : "else";
+
+        list.add(altType + " " + escapeLineSeparator(group.getCondition()));
+
+        list.addAll(elements2str(lifeLine, group.getElements()));
+
+        return list;
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, BranchSequenceElement group) {
+        List<String> list = new ArrayList<>();
+
+        list.addAll(elements2str(lifeLine, group.getConditions()));
 
         list.add("end");
 
@@ -108,7 +164,10 @@ public class SequenceDiagramWriterPlantUmlImpl implements DiagramWriter<Sequence
 
     @Override
     public List<String> write(LifeLineDef lifeLine, MessageDef message) {
-        return message2str(lifeLine, message);
+        return message2str(lifeLine.getObjectName(), message);
     }
 
+    private String escapeLineSeparator(String str) {
+        return str.replaceAll("(\r\n|\n)", plantumlWriter.ESCAPED_LINE_SEPARATOR);
+    }
 }

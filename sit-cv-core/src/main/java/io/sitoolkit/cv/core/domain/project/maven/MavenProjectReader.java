@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
-import io.sitoolkit.util.buidtoolhelper.maven.MavenProject;
+import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
 
 public class MavenProjectReader implements ProjectReader {
 
@@ -18,15 +18,11 @@ public class MavenProjectReader implements ProjectReader {
             return Optional.empty();
         }
 
-        Project project = new Project(projectDir);
-        MavenProjectInfoListener listener = new MavenProjectInfoListener();
+        MavenProjectInfoListener listener = new MavenProjectInfoListener(projectDir);
 
         mvnPrj.mvnw("compile", "-X").stdout(listener).execute();
 
-        project.setClasspaths(listener.getClasspaths());
-        project.setSrcDirs(listener.getJavaSrcDirs());
-
-        return Optional.of(project);
+        return Optional.of(listener.getProject());
     }
 
 }

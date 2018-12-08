@@ -30,7 +30,7 @@
       <artifactId>logback-classic</artifactId>
       <optional>true</optional>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
@@ -38,7 +38,6 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.5</version>
     </dependency>
     <dependency>
       <groupId>org.zeroturnaround</groupId>
@@ -56,7 +55,6 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -73,7 +71,7 @@
     <dependency>
       <groupId>io.sitoolkit.util.bth</groupId>
       <artifactId>sit-util-bth</artifactId>
-      <version>1.0.0-alpha.4</version>
+      <version>1.0.0-alpha.6</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -86,12 +84,19 @@
       <version>1.3</version>
       <scope>test</scope>
     </dependency>
+	<dependency>
+	    <groupId>com.sun</groupId>
+	    <artifactId>tools</artifactId>
+	    <version>1.5.0</version>
+	    <scope>system</scope>
+        <systemPath>${java.home}/../lib/tools.jar</systemPath>
+    </dependency>
   </dependencies>
 
   <parent>
     <groupId>io.sitoolkit.cv</groupId>
     <artifactId>sit-cv</artifactId>
-    <version>1.0.0-beta.1</version>
+    <version>1.0.0-beta.2</version>
   </parent>
 
   <dependencyManagement>

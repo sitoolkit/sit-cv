@@ -18,9 +18,12 @@ package io.sitoolkit.cv.core.infra.watcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -36,7 +39,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * ファイルの入力ソースに対する監視クラス実装です。
+ * A monitoring class implementation for the input source of the file.
  *
  * @author yuichi.kuwahara
  */
@@ -48,50 +51,76 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
     private final Map<String, InputSource> watchingFileMap = new HashMap<>();
     private final Map<WatchKey, Path> pathMap = new HashMap<>();
 
-
-
     /**
-     * ファイルを監視対象に含めます。
+     * Include the file for monitoring.
      *
      * @param inputSource
-     *            監視対象ファイル
+     *            input source
      */
     @Override
     public void watchInputSource(String inputSource) {
-        File file = new File(inputSource);
-        if (!file.exists()) {
-            log.warn("File not found {}", file.getAbsolutePath());
+        Path path = Paths.get(inputSource).normalize().toAbsolutePath();
+
+        if (!path.toFile().exists()) {
+            log.warn("File not found {}", inputSource);
             return;
         }
-        if (watchingFileMap.containsKey(file.getAbsolutePath())) {
-            return;
-        }
-        log.info("Start to watch {}", file.getAbsolutePath());
-        watchingFileMap.put(file.getAbsolutePath(),
-                new InputSource(inputSource, file.lastModified()));
 
-        File dir = file.isFile() ? file.getParentFile() : file;
+        log.info("Start to watch {}", path);
 
-        if (file.isFile()) {
-            if (watchingDirSet.contains(dir.getAbsolutePath())) {
-                return;
+        if (path.toFile().isFile()) {
+            watchFile(path);
+        } else {
+            try {
+                Files.walk(path).forEach(childPath -> {
+                    if (childPath.toFile().isFile()) {
+                        watchFile(childPath);
+                    } else {
+                        watchDir(childPath);
+                    }
+                });
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
-            log.info("Start to watch {}", dir.getAbsolutePath());
-            watchingDirSet.add(dir.getAbsolutePath());
         }
 
-        Path dirPath = dir.toPath();
+    }
+
+    private void watchFile(Path file) {
+        String fileStr = file.toString();
+        if (watchingFileMap.containsKey(fileStr)) {
+            return;
+        }
+        log.debug("Start to watch {}", file);
+        watchingFileMap.put(fileStr, new InputSource(fileStr, file.toFile().lastModified()));
+    }
+
+    private void watchDir(Path dir) {
+
+        String dirStr = dir.toString();
+        if (watchingDirSet.contains(dirStr)) {
+            return;
+        }
+        log.debug("Start to watch {}", dir);
+        watchingDirSet.add(dir.toString());
 
         try {
             if (watcher == null) {
-                // TODO ファイル監視方式の統一
                 watcher = FileSystems.getDefault().newWatchService();
             }
-            WatchKey watchKey = dirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY,
+            WatchKey watchKey = dir.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY,
                     StandardWatchEventKinds.ENTRY_DELETE);
-            pathMap.put(watchKey, dirPath);
+            pathMap.put(watchKey, dir);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private Path toParentDir(Path path) {
+        if (path.toFile().isFile()) {
+            return path.getParent();
+        } else {
+            return path;
         }
     }
 
@@ -130,18 +159,15 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
         return inputSources;
     }
 
-
-
-
     @Override
-    protected void end(ContinuousGeneratable cg) {
+    protected void end(InputSourceEventListener cg) {
         try {
             watcher.close();
         } catch (IOException e) {
             log.warn("Exception when watcher close", e);
         }
 
-        cg.regenerate(watchingFileMap.values().stream().map(InputSource::getName)
+        cg.onChange(watchingFileMap.values().stream().map(InputSource::getName)
                 .collect(Collectors.toSet()));
     }
 

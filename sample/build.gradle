@@ -1,11 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
-group = 'org.springframework.boot'
-version = '1.5.14.RELEASE'
-
-description = """"""
-
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 tasks.withType(JavaCompile) {
@@ -14,8 +9,8 @@ tasks.withType(JavaCompile) {
 
 repositories {
     jcenter()
-    mavenLocal()
 }
+
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'1.5.14.RELEASE'
     testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version:'1.5.14.RELEASE') {
@@ -29,8 +24,8 @@ buildscript {
       mavenLocal()
   }
   dependencies {
-      classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'1.0.0-beta.1-SNAPSHOT'
+      classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:version
   }
 }
 
-apply plugin: 'sit-cv-gradle-plugin'
+apply plugin: 'io.sitoolkit.cv.sit-cv-gradle-plugin'

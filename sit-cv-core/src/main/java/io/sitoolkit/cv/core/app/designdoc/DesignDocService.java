@@ -1,6 +1,5 @@
 package io.sitoolkit.cv.core.app.designdoc;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
@@ -23,6 +23,8 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
+import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
 import io.sitoolkit.cv.core.domain.uml.DiagramModel;
@@ -60,53 +62,68 @@ public class DesignDocService {
     @NonNull
     private InputSourceWatcher watcher;
 
+    @NonNull
+    private ProjectManager projectManager;
+
     // key:classDef.sourceId, value:entrypoint
     private Map<String, Set<String>> entryPointMap = new HashMap<>();
 
     public void analyze() {
+        StopWatch stopWatch = StopWatch.createStarted();
+        projectManager.getCurrentProject().executeAllPreProcess();
         classDefReader.init().readDir();
+        log.info("Analysis finished in {}", stopWatch);
     }
 
-    public void watchDir(Path srcDir, ClassDefChangeEventListener listener) {
+    public void watchDir(Path srcDir, DesignDocChangeEventListener listener) {
 
         watcher.setContinue(true);
-        try {
-            Files.walk(srcDir).forEach(path -> watcher.watch(path.toFile().getAbsolutePath()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        watcher.watch(srcDir.toString());
         watcher.start(inputSources -> {
-            readSources(listener, inputSources);
+            int entryPoitSizeBefore = classDefRepository.getEntryPoints().size();
+
+            readSources(inputSources).forEach(listener::onDesignDocChange);
+
+            if (classDefRepository.getEntryPoints().size() != entryPoitSizeBefore) {
+                listener.onDesignDocListChange();
+            }
+
         });
     }
 
-    private void readSources(ClassDefChangeEventListener listener,
-            Collection<String> inputSources) {
+    /**
+     * 
+     * @param sourcePaths
+     *            file paths of source code to read.
+     * @return stream of designDocIds which are effected by input source.
+     */
+    private Stream<String> readSources(Collection<String> sourcePaths) {
 
+        Project currentProject = projectManager.getCurrentProject();
+        currentProject.executeAllPreProcess();
         classDefReader.init();
 
-        Set<ClassDef> readDefs = inputSources.stream().map(Paths::get)
+        Set<ClassDef> readDefs = sourcePaths.stream().map(Paths::get)
                 .filter(path -> !Files.isDirectory(path)).filter(Files::isReadable)
+                .map(currentProject::findParseTarget).filter(Optional::isPresent).map(Optional::get)
                 .map(classDefReader::readJava).filter(Optional::isPresent).map(Optional::get)
                 .collect(Collectors.toSet());
 
         readDefs.forEach(classDefRepository::save);
-        readDefs.forEach(clazz -> log.info("Read {}", clazz));
+        readDefs.forEach(clazz -> log.debug("Read {}", clazz));
 
-        Set<String> deletedIds = inputSources.stream().filter(s -> !Files.isDirectory(Paths.get(s)))
+        Set<String> deletedIds = sourcePaths.stream().filter(s -> !Files.isDirectory(Paths.get(s)))
                 .filter(sId -> !readDefs.stream()
                         .anyMatch(clazz -> StringUtils.equals(sId, clazz.getSourceId())))
                 .collect(Collectors.toSet());
-        deletedIds.forEach(clazz -> log.info("Remove {}", clazz));
+        deletedIds.forEach(clazz -> log.debug("Remove {}", clazz));
         deletedIds.forEach(classDefRepository::remove);
 
         classDefRepository.solveReferences();
 
-        Stream<String> entryPoints = readDefs.stream().map(ClassDef::getSourceId)
-                .map(entryPointMap::get).filter(Objects::nonNull).flatMap(Set::stream).distinct();
+        return readDefs.stream().map(ClassDef::getSourceId).map(entryPointMap::get)
+                .filter(Objects::nonNull).flatMap(Set::stream).distinct();
 
-        entryPoints.forEach(listener::onChange);
     }
 
     public List<String> getAllIds() {
@@ -115,12 +132,12 @@ public class DesignDocService {
 
     public DesignDoc get(String designDocId) {
 
+        log.info("Build diagram for {}", designDocId);
         MethodDef entryPoint = classDefRepository.findMethodByQualifiedSignature(designDocId);
-        log.info("Build diagram for {}", entryPoint);
 
         LifeLineDef lifeLine = sequenceProcessor.process(entryPoint.getClassDef(), entryPoint);
         SequenceDiagram sequenceModel = SequenceDiagram.builder().entryLifeLine(lifeLine).build();
-        ClassDiagram classModel = classProcessor.process(entryPoint);
+        ClassDiagram classModel = classProcessor.process(lifeLine);
 
         Stream<String> allSourceIds = Stream.of(sequenceModel, classModel)
                 .map(DiagramModel::getAllSourceIds).flatMap(Set::stream).distinct();

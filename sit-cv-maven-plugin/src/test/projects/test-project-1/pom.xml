@@ -5,17 +5,21 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.sitoolkit.cv</groupId>
-  <artifactId>sit-cv-maven-plugin</artifactId>
-  <version>1.0.0-beta.1-SNAPSHOT</version>
+  <artifactId>sit-cv-maven-plugin-test</artifactId>
+  <version>1.0.0-beta.2</version>
   <packaging>jar</packaging>
   <name>Test Mojo</name>
-
+  
   <build>
     <plugins>
       <plugin>
         <groupId>io.sitoolkit.cv</groupId>
         <artifactId>sit-cv-maven-plugin</artifactId>
-        <version>1.0.0-beta.1-SNAPSHOT</version>
+        <version>${project.version}</version>
+        <configuration>
+          <stopKey></stopKey>
+          <cvArgs>--server.port=8086</cvArgs>
+        </configuration>
       </plugin>
     </plugins>
   </build>

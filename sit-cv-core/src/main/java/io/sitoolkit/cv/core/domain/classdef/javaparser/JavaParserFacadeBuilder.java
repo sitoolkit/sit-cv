@@ -2,6 +2,7 @@ package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Set;
 
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -21,21 +22,23 @@ public class JavaParserFacadeBuilder {
     public static JavaParserFacade build(Project project) {
         CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
         combinedTypeSolver.add(new ReflectionTypeSolver());
-        project.getSrcDirs().stream().forEach(
+        project.getAllPreProcessedDirs().stream().forEach(
                 srcDir -> combinedTypeSolver.add(new JavaParserTypeSolver(srcDir.toFile())));
         // project.getBinDirs().stream()
         // .forEach(binDir ->
         // combinedTypeSolver.add(ClassDirTypeSolver.get(binDir)));
-        project.getClasspaths().stream().map(Path::toAbsolutePath).map(Path::toString)
-                .forEach(str -> {
+        Set<Path> classpaths = project.getAllClasspaths();
+        log.info("Adding classpaths for JavaParser:{}", classpaths);
+        classpaths.stream().map(Path::toAbsolutePath).map(Path::toString)
+                .filter(path -> path.endsWith(".jar")).forEach(str -> {
                     try {
                         combinedTypeSolver.add(JarTypeSolver.getJarTypeSolver(str));
-                        log.info("jar is added. {}", str);
                     } catch (IOException e) {
-                        log.warn("warn ", e);
+                        log.warn(e.getMessage(), e);
                     }
                 });
 
         return JavaParserFacade.get(combinedTypeSolver);
     }
+
 }

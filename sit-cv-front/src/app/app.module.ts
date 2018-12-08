@@ -26,7 +26,7 @@ import { DesignDocServerService } from './srv/designdoc/designdoc-server.service
 import { DesignDocReportService } from './srv/designdoc/designdoc-report.service';
 import { Config } from './srv/shared/config';
 import { HidePackagePipe } from './pipe/hide-package.pipe';
-import { CommentComponent } from './cmp/designdoc/comment/comment.component';
+import { ApiDocComponent } from './cmp/designdoc/apidoc/apidoc.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +36,7 @@ import { CommentComponent } from './cmp/designdoc/comment/comment.component';
     ErrorComponent,
     DoctreeComponent,
     HidePackagePipe,
-    CommentComponent,
+    ApiDocComponent,
   ],
   imports: [
     BrowserModule,
@@ -68,7 +68,7 @@ import { CommentComponent } from './cmp/designdoc/comment/comment.component';
   ],
   bootstrap: [AppComponent],
   entryComponents :[
-    CommentComponent
+    ApiDocComponent
   ]
 })
 export class AppModule { }

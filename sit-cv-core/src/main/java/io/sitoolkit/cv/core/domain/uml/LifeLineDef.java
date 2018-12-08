@@ -1,41 +1,53 @@
 package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
+@EqualsAndHashCode(exclude = { "entryMessage" })
+@ToString(exclude = { "entryMessage" })
 public class LifeLineDef {
     private String objectName;
-    private String entryMessage;
+    private MessageDef entryMessage;
     private String sourceId;
-    private List<MessageDef> messages = new ArrayList<>();
     private List<SequenceElement> elements = new ArrayList<>();
-    private String comment;
+    private ApiDocDef apiDoc;
 
     public Set<String> getAllSourceIds() {
-        Set<String> tags = messages.stream().map(MessageDef::getTarget)
+        Set<String> tags = getLifeLinesRecursively()
                 .map(LifeLineDef::getSourceId).collect(Collectors.toSet());
         tags.add(sourceId);
         return tags;
     }
 
-    public Map<String, String> getAllComments() {
-        Map<String, String> comments = new HashMap<>();
-        getComments(comments, messages);
-        return comments;
+    public Stream<MessageDef> getMessagesRecursively() {
+        return getElements().stream().flatMap(SequenceElement::getMessagesRecursively)
+                .filter(Objects::nonNull).distinct();
     }
 
-    void getComments(Map<String, String> comments, List<MessageDef> messages) {
-        messages.stream().forEach((message) -> {
-            LifeLineDef target = message.getTarget();
-            getComments(comments, target.getMessages());
-            comments.put(message.getRequestQualifiedSignature(), target.getComment());
-        });
+    public Stream<LifeLineDef> getLifeLinesRecursively() {
+        Stream<LifeLineDef> stream = getMessagesRecursively().map(MessageDef::getTarget);
+        return Stream.concat(Stream.of(this), stream);
+    }
+
+    public Map<String, ApiDocDef> getApiDocsRecursively() {
+        return getLifeLinesRecursively()
+                .collect(Collectors.toMap((l) -> l.getEntryMessage().getRequestQualifiedSignature(),
+                        LifeLineDef::getApiDoc, (doc1, doc2) -> doc1));
+    }
+
+    public Stream<MethodDef> getSequenceMethodsRecursively() {
+        return getMessagesRecursively().map(MessageDef::getMethodCall);
     }
 }

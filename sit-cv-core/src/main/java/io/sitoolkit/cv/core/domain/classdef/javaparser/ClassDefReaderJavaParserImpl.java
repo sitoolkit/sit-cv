@@ -23,6 +23,8 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.javadoc.Javadoc;
+import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -31,6 +33,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
 
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
@@ -69,20 +72,23 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
         Pattern p = Pattern.compile(config.getJavaFilePattern());
 
-        projectManager.getCurrentProject().getSrcDirs().stream().forEach(srcDir -> {
+        projectManager.getCurrentProject().getAllPreProcessedDirs().stream().forEach(srcDir -> {
             try {
                 List<Path> files = Files.walk(srcDir)
                         .filter(file -> p.matcher(file.toFile().getName()).matches())
                         .collect(Collectors.toList());
 
-                files.stream().forEach(javaFile -> {
+                int readCount = 0;
+                for (Path javaFile : files) {
+
                     readJava(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
 
-                    int readCount = reposiotry.countClassDefs();
-                    if (readCount % 10 == 0) {
-                        log.info("Processed java files : {} / {} ", readCount, files.size());
+                    readCount++;
+                    if (readCount % 10 == 0 || readCount == files.size()) {
+                        log.info("Processed java files : {} / {} in {}", readCount, files.size(),
+                                srcDir);
                     }
-                });
+                }
 
                 // JavaParserFacade seems to be NOT thread-safe
                 // files.stream().parallel().forEach(javaFile -> {
@@ -188,17 +194,15 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                         methodDef.setSignature(declaredMethod.getSignature());
                         methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
                         methodDef.setReturnType(
-                                TypeParser.getTypeDef(declaredMethod.getReturnType()));
-                        methodDef.setParamTypes(TypeParser.getParamTypes(declaredMethod));
-                        jpDeclaredMethod.getWrappedNode().getComment().ifPresent((comment) -> {
-                            methodDef.setComment(comment.toString());
-                        });
+                                TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
+                        methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
+                        methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
                         methodDefs.add(methodDef);
 
                         if (!typeDec.isInterface()) {
                             typeDec.getMethods().stream().forEach(method -> {
                                 if (equalMethods(declaredMethod, method)) {
-                                    method.accept(statementVisitor, methodDef.getStatements());
+                                    method.accept(statementVisitor, VisitContext.of(methodDef));
                                     methodDef
                                             .setActionPath(classActionPath + getActionPath(method));
                                 }
@@ -306,7 +310,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 fieldDef.setName(declaredField.getName());
 
                 ResolvedType type = declaredField.getType();
-                fieldDef.setType(TypeParser.getTypeDef(type));
+                fieldDef.setType(TypeProcessor.createTypeDef(type));
                 return fieldDef;
 
             } catch (Exception e) {
@@ -316,6 +320,28 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             }
 
         }).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    ApiDocDef readApiDocDef(JavaParserMethodDeclaration declaredMethod) {
+        String qualifiedClassName = declaredMethod.getPackageName() + "."
+                + declaredMethod.getClassName();
+
+        Optional<Javadoc> javadoc = declaredMethod.getWrappedNode().getJavadoc();
+        List<String> contents = new ArrayList<>();
+        if (javadoc.isPresent()) {
+            contents.add(javadoc.get().getDescription().toText());
+            List<String> tagContents = javadoc.get().getBlockTags().stream()
+                    .map(JavadocBlockTag::toText).collect(Collectors.toList());
+            contents.addAll(tagContents);
+        } else {
+            contents.add("No API Document.");
+        }
+
+        return ApiDocDef.builder().qualifiedClassName(qualifiedClassName)
+                .annotations(declaredMethod.getWrappedNode().getAnnotations().stream()
+                        .map(AnnotationExpr::toString).collect(Collectors.toList()))
+                .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString())
+                .contents(contents).build();
     }
 
     @Override

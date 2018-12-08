@@ -8,8 +8,10 @@ import java.nio.file.Path;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
+@Slf4j
 public class SitCvConfig {
 
     private static final String CONFIG_FILE_NAME = "sit-cv-config.json";
@@ -19,14 +21,20 @@ public class SitCvConfig {
     private FilterConditionGroup sequenceDiagramFilter;
 
     public static SitCvConfig load(Path baseDir) {
-        Path jsonFile = baseDir.resolve(CONFIG_FILE_NAME);
+        Path configFilePath = baseDir.resolve(CONFIG_FILE_NAME);
 
-        try {
-            String json = jsonFile.toFile().exists() ? new String(Files.readAllBytes(jsonFile))
-                    : SitResourceUtils.res2str(SitCvConfig.class, CONFIG_FILE_NAME);
-            return JsonUtils.str2obj(json, SitCvConfig.class);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        String json = null;
+        if (configFilePath.toFile().exists()) {
+            try {
+                log.info("Read config:{}", configFilePath.toAbsolutePath().normalize());
+                json = new String(Files.readAllBytes(configFilePath));
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        } else {
+            json = SitResourceUtils.res2str(SitCvConfig.class, CONFIG_FILE_NAME);
         }
+
+        return JsonUtils.str2obj(json, SitCvConfig.class);
     }
 }

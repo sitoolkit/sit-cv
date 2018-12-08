@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefFilter;
+import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
@@ -33,19 +35,29 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
     public LifeLineDef process(ClassDef clazz, MethodDef method, MethodCallStack callStack) {
         LifeLineDef lifeLine = new LifeLineDef();
         lifeLine.setSourceId(clazz.getSourceId());
-        lifeLine.setEntryMessage(method.getQualifiedSignature());
+        lifeLine.setEntryMessage(buildEntryMessage(lifeLine, method));
         lifeLine.setObjectName(clazz.getName());
         lifeLine.setElements(method.getStatements().stream()
                 .map(statement -> statement.process(this, callStack))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()));
-
-        lifeLine.setComment(method.getComment());
+        lifeLine.setApiDoc(method.getApiDoc());
 
         log.debug("Add lifeline {} -> {}", clazz.getName(), lifeLine);
 
         return lifeLine;
+    }
+
+    MessageDef buildEntryMessage(LifeLineDef lifeLine, MethodDef method) {
+        MessageDef message = new MessageDef();
+        message.setRequestName(method.getName());
+        message.setRequestParamTypes(method.getParamTypes());
+        message.setRequestQualifiedSignature(method.getQualifiedSignature());
+        message.setTarget(lifeLine);
+        message.setResponseType(method.getReturnType());
+
+        return message;
     }
 
     Optional<MessageDef> methodCall2Message(MethodCallDef methodCall, MethodCallStack callStack) {
@@ -67,10 +79,12 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         MethodCallStack pushedStack = callStack.push(methodImpl);
 
         MessageDef message = new MessageDef();
-        message.setRequestName(methodImpl.getSignature());
+        message.setRequestName(methodImpl.getName());
+        message.setRequestParamTypes(methodImpl.getParamTypes());
         message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl, pushedStack));
-        message.setResponseName(methodCall.getReturnType().toString());
+        message.setResponseType(methodCall.getReturnType());
+        message.setMethodCall(methodCall);
 
         return Optional.of(message);
 
@@ -84,20 +98,50 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
     @Override
     public Optional<SequenceElement> process(LoopStatement statement, MethodCallStack callStack) {
 
-        List<SequenceElement> groupElements =  statement.getChildren().stream()
+        List<SequenceElement> groupElements = statement.getChildren().stream()
                 .map(childStatement -> childStatement.process(this, callStack))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 
         if (groupElements.isEmpty()) {
             return Optional.empty();
-
         } else {
-            SequenceGroup group = new SequenceGroup();
+            LoopSequenceGroup group = new LoopSequenceGroup();
             group.getElements().addAll(groupElements);
+            group.setScope(statement.getScope());
             return Optional.of(group);
         }
+    }
+
+    @Override
+    public Optional<SequenceElement> process(BranchStatement statement, MethodCallStack callStack) {
+
+        List<ConditionalSequenceGroup> conditions = statement.getConditions().stream()
+                .map(childStatement -> childStatement.process(this, callStack))
+                .filter(Optional::isPresent).map(Optional::get)
+                .map(ConditionalSequenceGroup.class::cast).collect(Collectors.toList());
+
+        Optional<ConditionalSequenceGroup> notEmptyCondition = conditions.stream()
+                .filter((c) -> !c.getElements().isEmpty()).findAny();
+        return notEmptyCondition.map((condition) -> {
+            BranchSequenceElement group = new BranchSequenceElement();
+            group.getConditions().addAll(conditions);
+            return group;
+        });
+    }
+
+    @Override
+    public Optional<SequenceElement> process(ConditionalStatement statement,
+            MethodCallStack callStack) {
+
+        List<SequenceElement> groupElements = statement.getChildren().stream()
+                .map(child -> child.process(this, callStack)).filter(Optional::isPresent)
+                .map(Optional::get).collect(Collectors.toList());
+
+        ConditionalSequenceGroup group = new ConditionalSequenceGroup();
+        group.getElements().addAll(groupElements);
+        group.setCondition(statement.getCondition());
+        group.setFirst(statement.isFirst());
+        return Optional.of(group);
     }
 
     @Override
@@ -117,6 +161,16 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     @Override
     public Optional<SequenceElement> process(LoopStatement statement) {
+        return process(statement, MethodCallStack.getBlank());
+    }
+
+    @Override
+    public Optional<SequenceElement> process(BranchStatement statement) {
+        return process(statement, MethodCallStack.getBlank());
+    }
+
+    @Override
+    public Optional<SequenceElement> process(ConditionalStatement statement) {
         return process(statement, MethodCallStack.getBlank());
     }
 

@@ -19,18 +19,18 @@ package io.sitoolkit.cv.core.infra.watcher;
 import java.util.Collection;
 
 /**
- * 繰り返し生成を行うクラスが実装するインターフェースです。
+ * Interface that implements the change event of the input source.
  * 
  * @author yuichi.kuwahara
  */
 @FunctionalInterface
-public interface ContinuousGeneratable {
+public interface InputSourceEventListener {
 
     /**
-     * 繰り返し生成のイベントが検知されたら呼び出されるメソッドです。 実装クラスは生成処理を実装します。
+     * The method called when a change event of the input source is detected.
      * 
      * @param inputSources
-     *            イベントの元となった入力ソース
+     *            Input source from which the event originated
      */
-    void regenerate(Collection<String> inputSources);
+    void onChange(Collection<String> inputSources);
 }

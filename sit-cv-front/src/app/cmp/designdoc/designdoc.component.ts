@@ -1,10 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
-import {MatSnackBar} from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 import * as $ from 'jquery';
 import { DesignDocService } from '../../srv/designdoc/designdoc.service';
-import { CommentComponent } from './comment/comment.component';
+import { ApiDocComponent } from './apidoc/apidoc.component';
 
 class Diagram {
   diagram: SafeHtml;
@@ -23,7 +23,7 @@ export class DesignDocComponent implements OnInit {
   currentDesignDocId = '';
   currentDiagrams = [];
   objectKeys = Object.keys;
-  diagramComments = {};
+  diagramApiDocs = {};
   selectedMethodSignatures = [];
   currentMethodSignature = "";
   isDiagramLoading = false;
@@ -32,15 +32,15 @@ export class DesignDocComponent implements OnInit {
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar,
-    @Inject('DesignDocService') private ddService: DesignDocService) {}
+    @Inject('DesignDocService') private ddService: DesignDocService) { }
 
   ngOnInit() {
-      this.route.params.subscribe(params => {
-        if (params['designDocId']) {
-            this.showDesignDocDetail(params['designDocId']);
-        }
-      });
-    }
+    this.route.params.subscribe(params => {
+      if (params['designDocId']) {
+        this.showDesignDocDetail(params['designDocId']);
+      }
+    });
+  }
 
   renderDiagrams(diagrams: object) {
     let trustDiagrams: Diagram[] = [];
@@ -66,7 +66,7 @@ export class DesignDocComponent implements OnInit {
     this.ddService.getDetail(designDocId, (detail) => {
       this.isDiagramLoading = false;
       this.renderDiagrams(detail.diagrams);
-      this.diagramComments = detail.comments;
+      this.diagramApiDocs = detail.apiDocs;
     })
     return false;
   }
@@ -74,12 +74,12 @@ export class DesignDocComponent implements OnInit {
   methodNameClick(event) {
     let link: JQuery = $(event.target).closest('a');
     if (link.length > 0) {
-      this.snackBar.openFromComponent(CommentComponent, {
-            data: {
-                commentId: link.attr('xlink:title'),
-                comments: this.diagramComments
-            }
-        });
+      this.snackBar.openFromComponent(ApiDocComponent, {
+        data: {
+          apiDocId: link.attr('xlink:title'),
+          apiDocs: this.diagramApiDocs
+        }
+      });
     }
     return false;
   }

@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:if="ant:if"
-         xmlns:unless="ant:unless"
-         name="sit-cv"
-         basedir="."
-         default="deploy">
+<project xmlns:if="ant:if" xmlns:unless="ant:unless" name="sit-cv" basedir="." default="deploy">
 
   <condition property="os.windows" value="true" else="false">
     <os family="windows" />
@@ -12,7 +8,20 @@
     <os family="windows" />
   </condition>
 
+  <property name="gbasedir" value="${basedir}/sit-cv-gradle-plugin" />
+  <condition property="gradle.cmd" value="${gbasedir}/gradlew.bat" else="${gbasedir}/gradlew">
+    <os family="windows" />
+  </condition>
+
+
   <target name="deploy">
+    <antcall target="deploy-maven" />
+    <!--
+  	<antcall target="deploy-gradle"/>
+  	-->
+  </target>
+
+  <target name="deploy-maven">
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
       <arg value="-P" />
@@ -22,15 +31,40 @@
     </exec>
   </target>
 
+  <target name="deploy-gradle">
+    <exec executable="${gradle.cmd}" dir="${gbasedir}" failonerror="true">
+      <arg value="--no-daemon" />
+      <arg value="publishPlugins" />
+    </exec>
+  </target>
 
   <target name="set-version">
 
-    <property name="version" value="1.0.0-beta.1" />
+    <property name="version" value="1.0.0-beta.2" />
 
     <exec executable="${mvn.cmd}" dir="${basedir}">
       <arg value="-DnewVersion=${version}" />
       <arg value="versions:set" />
     </exec>
+
+    <exec executable="${mvn.cmd}" dir="${basedir}/sample">
+      <arg value="-DnewVersion=${version}" />
+      <arg value="versions:set" />
+    </exec>
+
+    <exec executable="${mvn.cmd}"
+          dir="${basedir}/sit-cv-maven-plugin/src/test/projects/test-project-1">
+      <arg value="-DnewVersion=${version}" />
+      <arg value="versions:set" />
+    </exec>
+
+    <replaceregexp file="${gbasedir}/gradle.properties"
+                   match="version=.*$"
+                   replace="version=${version}" />
+
+    <replaceregexp file="${basedir}/sample/gradle.properties"
+                   match="version=.*$"
+                   replace="version=${version}" />
 
   </target>
 

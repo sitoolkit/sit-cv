@@ -9,7 +9,9 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class LoopStatement extends CvStatement {
+public class LoopStatement extends CvStatementDefaultImpl {
+
+    private String scope;
 
     @Override
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {

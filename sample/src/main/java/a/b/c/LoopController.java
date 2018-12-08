@@ -3,6 +3,7 @@ package a.b.c;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,6 +33,9 @@ public class LoopController {
 
     public void multiLoop() {
 
+        /**
+         * loop comment
+         */
         for (int i = 0; i < 1; i++) {
             for (int j = 0; j < 1; j++) {
                 processor.process("");
@@ -58,6 +62,18 @@ public class LoopController {
         list.stream().map(processor::process);
     }
 
+    public void streamMethodRef2() {
+        List<String> list = Arrays.asList("");
+
+        list.stream().map(BProcessor::staticProcess)
+                .forEach(this::process);
+        list.stream().forEach(System.out::println);
+    }
+
+    private void process(String s){
+        processor.process(s);
+    }
+
     public void streamLambda() {
 
         List<String> list = Arrays.asList("");
@@ -75,13 +91,29 @@ public class LoopController {
             processor.process2(s);
         });
 
-        processor.getList("").stream()              // loop start
-            .filter(s -> processor.isNotNull(s))
-            .map(s -> processor.process(s))
-            .forEach(s -> {
-                processor.process2("");
-                processor.process3("");
-            });                                     // end loop
+            processor.getList("").stream() // loop start
+                    .filter(s -> processor.isNotNull(s))
+                    .map(s -> processor.process(s))
+                    .forEach(s -> {
+                        processor.process2("");
+                            processor.process3("");
+                    }); // end loop
+        }
+
+    public void streamLambda3() {
+        createStream().forEach(this::process);
     }
 
+    public void streamOf() {
+        Stream.of("").forEach(this::process);
+    }
+
+    public void deepHierarchy() {
+        processor.getSelf().getSelf().getSelf().getSelf().getSelf().getSelf().getSelf().getSelf()
+                .getSelf().getList("").stream().forEach(s -> processor.process(""));
+    }
+
+    private Stream<String> createStream() {
+        return Stream.of("");
+    }
 }

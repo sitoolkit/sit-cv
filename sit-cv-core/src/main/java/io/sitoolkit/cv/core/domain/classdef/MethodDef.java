@@ -10,9 +10,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@EqualsAndHashCode(of = "qualifiedSignature", callSuper = true)
-@ToString(exclude = { "classDef", "methodCalls" }, callSuper = true)
-public class MethodDef extends CvStatement {
+@EqualsAndHashCode(of = "qualifiedSignature")
+@ToString(exclude = { "classDef", "methodCalls" })
+public class MethodDef implements CvStatement {
 
     private String name;
     private String signature;
@@ -24,7 +24,7 @@ public class MethodDef extends CvStatement {
     private TypeDef returnType;
     private List<MethodCallDef> methodCalls = new ArrayList<>();
     private List<CvStatement> statements = new ArrayList<>();
-    private String comment = "";
+    private ApiDocDef apiDoc;
 
     public Stream<MethodDef> getMethodCallsRecursively() {
         return Stream.concat(Stream.of(this),

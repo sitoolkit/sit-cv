@@ -3,15 +3,9 @@
   flex-direction: column;
   height: 100%;
 }
-.docs-navbar-header {
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 2;
-}
+
 .sit-app >>> app-navbar {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
-

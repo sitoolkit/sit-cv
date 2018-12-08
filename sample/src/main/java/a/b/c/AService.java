@@ -10,6 +10,10 @@ public interface AService {
      * @param search condition
      * @return list of XEntity
      */
-    public List<XEntity> search(SearchConditioner condition);
+    public List<XEntity> search(SearchCondition condition);
+
+    public List<XEntity> searchByDoubleCondition(SearchCondition conditionFirst,
+            SearchCondition conditionSecond);
+
     public int save(XEntity entity);
 }
