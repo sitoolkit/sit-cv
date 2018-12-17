@@ -24,7 +24,6 @@ public class TrySequenceGroup extends SequenceGroup {
     public Stream<MessageDef> getMessagesRecursively() {
         Stream<MessageDef> tryMessages = Stream
                 .concat(getCatchGroups().stream(), Stream.of(finallyGroup)).filter(Objects::nonNull)
-                .flatMap(SequenceElement::getMessagesRecursively)
                 .flatMap(SequenceElement::getMessagesRecursively);
         return Stream.concat(super.getMessagesRecursively(), tryMessages).filter(Objects::nonNull)
                 .distinct();
