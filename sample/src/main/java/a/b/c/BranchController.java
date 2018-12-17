@@ -91,18 +91,41 @@ public class BranchController {
             processor.process2("");
         } catch (IOException e) {
             processor.process3("");
+        } finally {
+            processor.process4("");
         }
     }
 
-    public void tryWithFinallyStatement() {
+    public void tryWithoutFinallyStatement() {
         try {
             processor.process("");
         } catch (NullPointerException | NumberFormatException e) {
             processor.process2("");
         } catch (RuntimeException e) {
             processor.process3("");
+        }
+    }
+
+    public void nestedTryStatement() {
+        try (BufferedReader reader = processor.read()) {
+            processor.process("");
+            try {
+                processor.process2("");
+            } catch (NullPointerException e) {
+                processor.process3("");
+            }
+        } catch (ArrayIndexOutOfBoundsException | IOException e) {
+            try {
+                processor.process("");
+            } catch (NumberFormatException ex) {
+                processor.process3("");
+            }
         } finally {
-            processor.process4("");
+            try {
+                processor.process3("");
+            } catch (RuntimeException ex) {
+                processor.process4("");
+            }
         }
     }
 
