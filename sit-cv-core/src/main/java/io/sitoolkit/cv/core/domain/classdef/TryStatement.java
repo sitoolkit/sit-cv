@@ -2,7 +2,9 @@ package io.sitoolkit.cv.core.domain.classdef;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,4 +28,11 @@ public class TryStatement extends CvStatementDefaultImpl {
         return processor.process(this, context);
     }
 
+    @Override
+    public Stream<MethodCallDef> getMethodCallsRecursively() {
+        Stream<MethodCallDef> tryMethodCalls = Stream
+                .concat(catchStatements.stream(), Stream.of(finallyStatement))
+                .filter(Objects::nonNull).flatMap(CvStatement::getMethodCallsRecursively);
+        return Stream.concat(super.getMethodCallsRecursively(), tryMethodCalls);
+    }
 }
