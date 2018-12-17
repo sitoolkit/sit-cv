@@ -1,5 +1,9 @@
 package a.b.c;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BranchController {
@@ -77,6 +81,65 @@ public class BranchController {
         String result = num == 2 ? processor.process("") :
             num < 20 ? processor.process2("") :
             processor.process3("");
+    }
+
+    public void tryStatement() {
+        try (BufferedReader reader = processor.read()) {
+            processor.process("");
+        } catch (FileNotFoundException | NullPointerException | ArrayIndexOutOfBoundsException
+                | NumberFormatException e) {
+            processor.process2("");
+        } catch (IOException e) {
+            processor.process3("");
+        }
+    }
+
+    public void tryWithFinallyStatement() {
+        try {
+            processor.process("");
+        } catch (NullPointerException | NumberFormatException e) {
+            processor.process2("");
+        } catch (RuntimeException e) {
+            processor.process3("");
+        } finally {
+            processor.process4("");
+        }
+    }
+
+    public void emptyTryStatement() {
+        int i = 0;
+        try {
+            i++;
+        } catch (NullPointerException | NumberFormatException e) {
+            i++;
+        } catch (RuntimeException e) {
+            i++;
+        } finally {
+            i++;
+        }
+    }
+
+    public void notEmptyTryStatement() {
+        try {
+            processor.process("");
+        } catch (NullPointerException e) {
+        } catch (RuntimeException e) {
+        } finally {
+        }
+
+        try {
+        } catch (NullPointerException e) {
+        } catch (RuntimeException e) {
+            processor.process2("");
+        } finally {
+        }
+
+        try {
+        } catch (NullPointerException e) {
+        } catch (RuntimeException e) {
+        } finally {
+            processor.process3("");
+        }
     }
 
     private boolean isTrue() {

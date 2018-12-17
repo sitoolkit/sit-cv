@@ -98,6 +98,14 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         } else {
             ((CvStatementDefaultImpl) statement).getChildren().stream()
                     .forEach(this::solveMethodCall);
+
+            if (statement instanceof TryStatement) {
+                ((TryStatement) statement).getCatchStatements().stream().forEach(this::solveMethodCall);
+                FinallyStatement finallyStatement = ((TryStatement) statement).getFinallyStatement();
+                if (finallyStatement != null) {
+                    solveMethodCall(finallyStatement);
+                }
+            }
         }
     }
 
