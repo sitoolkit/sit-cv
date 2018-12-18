@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Builder.Default;
 
 @Data
 @Builder
@@ -20,6 +21,8 @@ public class FilterCondition {
 
     private String name;
     private String annotation;
+    @Default
+    private boolean withoutDetail = false;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Pattern namePattern;

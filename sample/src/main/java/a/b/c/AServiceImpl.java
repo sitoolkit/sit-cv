@@ -56,4 +56,10 @@ public class AServiceImpl implements AService {
 
         return aRepository.save(entity);
     }
+
+    @Override
+    public List<XEntity> filter() {
+        List<XEntity> result = aRepository.filter();
+        return result;
+    }
 }

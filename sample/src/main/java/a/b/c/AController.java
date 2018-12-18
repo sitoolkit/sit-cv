@@ -42,4 +42,8 @@ public class AController {
         }
         aService.save(entity);
     }
+
+    public List<XEntity> filter() {
+        return aService.filter();
+    }
 }

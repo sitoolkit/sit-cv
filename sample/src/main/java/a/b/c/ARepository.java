@@ -15,4 +15,6 @@ public interface ARepository {
             SearchCondition conditionSecond);
 
     public int save(XEntity entity);
+
+    public List<XEntity> filter();
 }
