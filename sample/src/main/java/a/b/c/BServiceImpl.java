@@ -7,10 +7,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class BServiceImpl implements BService {
 
     @Autowired
-    AService aService;
+    ARepositoryFileImpl aRepository;
 
     @Override
     public void search(SearchCondition condition) {
+    }
 
+    @Override
+    public int save(XEntity entity) {
+        return aRepository.save(entity);
     }
 }

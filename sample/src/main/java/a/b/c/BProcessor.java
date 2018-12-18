@@ -31,7 +31,6 @@ public class BProcessor {
         return input;
     }
 
-
     public boolean isNotNull(String input) {
         return input != null;
     }
