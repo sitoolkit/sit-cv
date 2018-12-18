@@ -43,12 +43,15 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         lifeLine.setSourceId(clazz.getSourceId());
         lifeLine.setEntryMessage(buildEntryMessage(lifeLine, method));
         lifeLine.setObjectName(clazz.getName());
-        lifeLine.setElements(method.getStatements().stream()
-                .map(statement -> statement.process(this, callStack))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList()));
         lifeLine.setApiDoc(method.getApiDoc());
+
+        if (ClassDefFilter.needsDetail(clazz, classFilterGroup)) {
+            lifeLine.setElements(method.getStatements().stream()
+                    .map(statement -> statement.process(this, callStack))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList()));
+        }
 
         log.debug("Add lifeline {} -> {}", clazz.getName(), lifeLine);
 

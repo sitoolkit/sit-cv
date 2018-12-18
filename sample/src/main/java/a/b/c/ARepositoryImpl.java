@@ -38,4 +38,9 @@ public class ARepositoryImpl implements ARepository{
     public int save(XEntity entity) {
         return 1;
     }
+
+    @Override
+    public List<XEntity> filter() {
+        return searchBy(new SearchCondition());
+    }
 }

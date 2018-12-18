@@ -16,4 +16,6 @@ public interface AService {
             SearchCondition conditionSecond);
 
     public int save(XEntity entity);
+
+    public List<XEntity> filter();
 }
