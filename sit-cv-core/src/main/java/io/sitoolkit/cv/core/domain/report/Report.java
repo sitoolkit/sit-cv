@@ -1,7 +1,5 @@
 package io.sitoolkit.cv.core.domain.report;
 
-import java.nio.file.Path;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Report {
-    private Path path;
-    @Builder.Default
-    private String content = "";
+    private String path;
+    private Object content;
 }
