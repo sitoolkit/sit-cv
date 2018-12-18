@@ -26,11 +26,6 @@ public class MethodDef implements CvStatement {
     private List<CvStatement> statements = new ArrayList<>();
     private ApiDocDef apiDoc;
 
-    public Stream<MethodDef> getMethodCallsRecursively() {
-        return Stream.concat(Stream.of(this),
-                methodCalls.stream().flatMap(MethodDef::getMethodCallsRecursively));
-    }
-
     @Override
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {
         return processor.process(this);
@@ -39,5 +34,11 @@ public class MethodDef implements CvStatement {
     @Override
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
         return processor.process(this, context);
+    }
+
+    @Override
+    public Stream<MethodCallDef> getMethodCallsRecursively() {
+        return Stream.concat(methodCalls.stream(), statements.stream())
+                .flatMap(CvStatement::getMethodCallsRecursively);
     }
 }

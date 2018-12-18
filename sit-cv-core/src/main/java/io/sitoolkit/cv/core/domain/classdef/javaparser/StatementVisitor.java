@@ -9,11 +9,13 @@ import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.CatchClause;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.stmt.TryStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
@@ -129,6 +131,10 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
             addElseConditionalStatement(blockStmt, context);
             super.visit(blockStmt, context);
             context.endContext();
+        } else if (isFinally(blockStmt)) {
+            context.startFinallyContext(blockStmt);
+            super.visit(blockStmt, context);
+            context.endContext();
         } else {
             super.visit(blockStmt, context);
         }
@@ -143,6 +149,31 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
         } else {
             super.visit(expressionStmt, context);
         }
+    }
+
+    @Override
+    public void visit(TryStmt tryStmt, VisitContext context) {
+        context.startTryContext(tryStmt);
+        super.visit(tryStmt, context);
+        context.endContext();
+    }
+
+    @Override
+    public void visit(CatchClause catchClause, VisitContext context) {
+        context.startCatchContext(catchClause, catchClause.getParameter().getType().getTokenRange()
+                .map(Object::toString).orElse(""));
+        super.visit(catchClause, context);
+        context.endContext();
+    }
+
+    boolean isFinally(Statement stmt) {
+        Optional<TryStmt> parentTry = stmt.getParentNode().filter(TryStmt.class::isInstance)
+                .map(TryStmt.class::cast);
+        if (parentTry.isPresent()) {
+            Optional<BlockStmt> finallyStmt = parentTry.get().getFinallyBlock();
+            return finallyStmt.isPresent() && finallyStmt.get() == stmt;
+        }
+        return false;
     }
 
     boolean isIfElse(Statement stmt) {
