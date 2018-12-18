@@ -16,9 +16,9 @@ public class ClassDefFilter {
 
     public static boolean needsDetail(ClassDef clazz, FilterConditionGroup filterConditions) {
 
-        return !filterConditions.getInclude().stream()
+        return filterConditions.getInclude().stream()
                 .filter(filterCondition -> matchCondition(clazz, filterCondition))
-                .filter(FilterCondition::isWithoutDetail).findAny().isPresent();
+                .filter(FilterCondition::isWithDetail).findAny().isPresent();
 
     }
 

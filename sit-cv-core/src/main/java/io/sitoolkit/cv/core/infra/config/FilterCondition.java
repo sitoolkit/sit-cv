@@ -6,23 +6,19 @@ import org.apache.commons.lang3.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Builder.Default;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FilterCondition {
 
     private String name;
     private String annotation;
-    @Default
-    private boolean withoutDetail = false;
+    private boolean withDetail = true;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Pattern namePattern;
