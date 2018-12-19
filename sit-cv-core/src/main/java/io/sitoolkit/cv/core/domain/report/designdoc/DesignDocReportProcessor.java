@@ -1,7 +1,5 @@
 package io.sitoolkit.cv.core.domain.report.designdoc;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,7 +8,6 @@ import java.util.Map;
 
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.report.Report;
-import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +19,7 @@ public class DesignDocReportProcessor {
         DesignDocDetailReportsAndPathMap reportsAndPath = buildAndGroupingDetailReports(designDocs);
         reports.addAll(reportsAndPath.getReports());
 
-        reports.add(buildIdListReport(reportsAndPath.getPathMap()));
+        reports.add(buildDetailPathMapReport(reportsAndPath.getPathMap()));
 
         return reports;
     }
@@ -37,9 +34,8 @@ public class DesignDocReportProcessor {
                 reportsAndPath.getPathMap().put(designDoc.getId(), path);
 
                 Report report = reportMap.computeIfAbsent(path,
-                        p -> Report.builder().path(Paths.get(p)).build());
-                String detailContent = buildDetailContent(designDoc);
-                report.setContent(report.getContent() + detailContent);
+                        p -> Report.builder().path(p).build());
+                report.setContent(buildDetail(designDoc));
             } catch (Exception e) {
                 log.warn("Exception when build report: designDocId '{}'", designDoc.getId(), e);
             }
@@ -58,22 +54,19 @@ public class DesignDocReportProcessor {
         return dirName + "/" + fileName;
     }
 
-    private String buildDetailContent(DesignDoc designDoc) {
+    private DesignDocReportDetailDef buildDetail(DesignDoc designDoc) {
         DesignDocReportDetailDef detail = new DesignDocReportDetailDef();
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
             detail.getDiagrams().put(diagram.getId(), data);
             detail.getApiDocs().putAll(diagram.getApiDocs());
         });
-        return "window.reportData.designDoc.detailList['" + designDoc.getId() + "'] = "
-                + JsonUtils.obj2str(detail) + ";";
+        return detail;
     }
 
-    private Report buildIdListReport(Map<String, String> detailPathMap) {
-        Path path = Paths.get("assets/designdoc-id-list.js");
-        String content = "window.reportData.designDoc.idList = " + JsonUtils.obj2str(detailPathMap);
-
-        return Report.builder().path(path).content(content).build();
+    private Report buildDetailPathMapReport(Map<String, String> detailPathMap) {
+        return Report.builder().path("assets/designdoc-detail-path-map.js").content(detailPathMap)
+                .build();
     }
 
     @Data
