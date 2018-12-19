@@ -1,6 +1,7 @@
 package io.sitoolkit.cv.core.domain.report.designdoc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,37 +17,28 @@ public class DesignDocReportProcessor {
 
     public List<Report<?>> process(List<DesignDoc> designDocs) {
         List<Report<?>> reports = new ArrayList<>();
-        DesignDocDetailReportsAndPathMap reportsAndPath = buildAndGroupingDetailReports(designDocs);
-        reports.addAll(reportsAndPath.getReports());
+        DetailReportsAndPathMap reportsAndPathMap = buildAndGroupingDetailReports(designDocs);
+        reports.addAll(reportsAndPathMap.getReports());
 
-        reports.add(buildDetailPathMapReport(reportsAndPath.getPathMap()));
+        reports.add(buildDetailPathMapReport(reportsAndPathMap.getPathMap()));
 
         return reports;
     }
 
-    private DesignDocDetailReportsAndPathMap buildAndGroupingDetailReports(
+    private DetailReportsAndPathMap buildAndGroupingDetailReports(
             List<DesignDoc> designDocs) {
-        Map<String, Report<Map<String, DesignDocReportDetailDef>>> reportMap = new HashMap<>();
-        DesignDocDetailReportsAndPathMap reportsAndPath = new DesignDocDetailReportsAndPathMap();
+        DetailReportsAndPathMap reportsAndPathMap = new DetailReportsAndPathMap();
 
         designDocs.stream().forEach(designDoc -> {
             try {
                 String path = buildDetailPath(designDoc);
-                reportsAndPath.getPathMap().put(designDoc.getId(), path);
-
-                Report<Map<String, DesignDocReportDetailDef>> report = reportMap.computeIfAbsent(path,
-                        p -> Report.<Map<String, DesignDocReportDetailDef>>builder().path(p)
-                                .content(new HashMap<String, DesignDocReportDetailDef>()).build());
-                report.getContent().put(designDoc.getId(), buildDetail(designDoc));
+                reportsAndPathMap.add(designDoc.getId(), path, buildDetail(designDoc));
             } catch (Exception e) {
                 log.warn("Exception when build report: designDocId '{}'", designDoc.getId(), e);
             }
-
         });
 
-        reportsAndPath.getReports().addAll(reportMap.values());
-
-        return reportsAndPath;
+        return reportsAndPathMap;
     }
 
     private String buildDetailPath(DesignDoc designDoc) {
@@ -73,8 +65,25 @@ public class DesignDocReportProcessor {
     }
 
     @Data
-    class DesignDocDetailReportsAndPathMap {
-        private List<Report<?>> reports = new ArrayList<>();
+    class DetailReportsAndPathMap {
+        private Map<String, Report<DetailMap>> reportMap = new HashMap<>();
         private Map<String, String> pathMap = new LinkedHashMap<>();
+
+        public void add(String designDocId, String path, DesignDocReportDetailDef detail) {
+            pathMap.put(designDocId, path);
+            Report<DetailMap> report = reportMap.computeIfAbsent(path,
+                    p -> Report.<DetailMap>builder().path(p).content(new DetailMap()).build());
+            report.getContent().getDetailMap().put(designDocId, detail);
+        }
+
+        public Collection<Report<DetailMap>> getReports() {
+            return reportMap.values();
+        }
     }
+
+    @Data
+    class DetailMap {
+        private Map<String, DesignDocReportDetailDef> detailMap = new HashMap<>();
+    }
+
 }

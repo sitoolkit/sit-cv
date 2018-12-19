@@ -5,6 +5,9 @@ import { ReportDataLoader } from "../shared/report-data-loader";
 import { AsyncSubject } from "rxjs";
 
 type DetailPathMap = { [id: string]: string };
+interface DetailMap {
+  detailMap: { [id: string]: DesignDocDetail };
+}
 
 @Injectable({ providedIn: 'root' })
 export class DesignDocReportRepository {
@@ -35,8 +38,8 @@ export class DesignDocReportRepository {
     callback: (detail: DesignDocDetail) => void
   ): void {
     this.detailPathMapSubject.subscribe(() => {
-      this.loader.loadScript(this.detailPathMap[designDocId], (detailMap: { [id: string]: DesignDocDetail }) => {
-        callback(detailMap[designDocId]);
+      this.loader.loadScript(this.detailPathMap[designDocId], (detailMap: DetailMap) => {
+        callback(detailMap.detailMap[designDocId]);
       })
     })
   }
