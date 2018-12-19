@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Report {
+public class Report<T> {
     private String path;
-    private Object content;
+    private T content;
 }

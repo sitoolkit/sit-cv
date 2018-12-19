@@ -14,7 +14,7 @@ export class DesignDocReportRepository {
 
   constructor(
     private loader: ReportDataLoader
-  ) {}
+  ) { }
 
   getIdList(
     callback: (idList: DesignDocIdList) => void
@@ -35,8 +35,8 @@ export class DesignDocReportRepository {
     callback: (detail: DesignDocDetail) => void
   ): void {
     this.detailPathMapSubject.subscribe(() => {
-      this.loader.loadScript(this.detailPathMap[designDocId], (detail: DesignDocDetail) => {
-        callback(detail);
+      this.loader.loadScript(this.detailPathMap[designDocId], (detailMap: { [id: string]: DesignDocDetail }) => {
+        callback(detailMap[designDocId]);
       })
     })
   }
