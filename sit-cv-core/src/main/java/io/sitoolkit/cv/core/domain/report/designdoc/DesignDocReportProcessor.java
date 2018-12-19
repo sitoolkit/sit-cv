@@ -19,7 +19,7 @@ public class DesignDocReportProcessor {
         DesignDocDetailReportsAndPathMap reportsAndPath = buildAndGroupingDetailReports(designDocs);
         reports.addAll(reportsAndPath.getReports());
 
-        reports.add(buildIdListReport(reportsAndPath.getPathMap()));
+        reports.add(buildDetailPathMapReport(reportsAndPath.getPathMap()));
 
         return reports;
     }
@@ -64,8 +64,9 @@ public class DesignDocReportProcessor {
         return detail;
     }
 
-    private Report buildIdListReport(Map<String, String> detailPathMap) {
-        return Report.builder().path("assets/designdoc-id-list.js").content(detailPathMap).build();
+    private Report buildDetailPathMapReport(Map<String, String> detailPathMap) {
+        return Report.builder().path("assets/designdoc-detail-path-map.js").content(detailPathMap)
+                .build();
     }
 
     @Data

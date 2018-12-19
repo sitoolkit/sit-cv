@@ -3,6 +3,18 @@
     "include":[
       {
         "name": ".*Controller.*"
+      },
+      {
+        "name": ".*Service.*"
+      },
+      {
+        "name": ".*Processor.*"
+      },
+      {
+        "name": ".*Validator.*"
+      },
+      {
+        "name": ".*Repository.*"
       }
     ],
     "exclude":[]

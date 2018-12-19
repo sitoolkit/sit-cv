@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Config } from "./config";
 
-interface ReportData {
+interface Report {
   path: string;
   content: any;
 }
@@ -35,12 +35,13 @@ export class ReportDataLoader {
     addEventListener("message", (event) => {
       if (event.source != window) return;
 
-      console.log("get message ", event);
-      let data: ReportData = event.data;
-      let callback = this.callbacks[data.path];
+      let report: Report = event.data;
+      console.log("Receive postMessage ", report);
+
+      let callback = this.callbacks[report.path];
       if (callback != null) {
-        this.callbacks[event.data.path](data.content);
-        delete this.callbacks[event.data.path];
+        this.callbacks[report.path](report.content);
+        delete this.callbacks[report.path];
       }
     });
   }
