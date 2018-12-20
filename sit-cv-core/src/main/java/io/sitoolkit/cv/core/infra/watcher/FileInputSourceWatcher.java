@@ -93,6 +93,18 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
         }
         log.debug("Start to watch {}", file);
         watchingFileMap.put(fileStr, new InputSource(fileStr, file.toFile().lastModified()));
+
+        try {
+            if (watcher == null) {
+                watcher = FileSystems.getDefault().newWatchService();
+            }
+            Path parentDir = toParentDir(file);
+            WatchKey watchKey = parentDir.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY,
+                    StandardWatchEventKinds.ENTRY_DELETE);
+            pathMap.put(watchKey, parentDir);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     private void watchDir(Path dir) {

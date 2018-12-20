@@ -88,7 +88,7 @@ public class ServiceFactory {
 
 
         return new DesignDocService(classDefReader, sequenceProcessor, classProcessor,
-                sequenceWriter, classWriter, classDefRepository, watcher, projectManager);
+                sequenceWriter, classWriter, classDefRepository, watcher, projectManager, config);
 
     }
 

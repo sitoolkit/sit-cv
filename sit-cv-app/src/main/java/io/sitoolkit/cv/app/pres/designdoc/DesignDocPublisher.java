@@ -39,6 +39,8 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
         projectManager.getCurrentProject().getAllSrcDirs().stream().forEach(srcDir -> {
             service.watchDir(srcDir, this);
         });
+
+        service.watchConfig(this);
     }
 
     @MessageMapping("/designdoc/list")

@@ -46,6 +46,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         lifeLine.setObjectName(clazz.getName());
         lifeLine.setApiDoc(method.getApiDoc());
 
+        FilterConditionGroup classFilterGroup = config.getSequenceDiagramFilter();
         if (ClassDefFilter.needsDetail(clazz, classFilterGroup)) {
             lifeLine.setElements(method.getStatements().stream()
                     .map(statement -> statement.process(this, callStack))
