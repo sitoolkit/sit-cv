@@ -32,7 +32,7 @@ import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
 import io.sitoolkit.cv.core.infra.watcher.InputSourceWatcher;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +67,7 @@ public class DesignDocService {
     private ProjectManager projectManager;
 
     @NonNull
-    private SitCvConfig config;
+    private SitCvConfigReader configReader;
 
     /**
      * key:classDef.sourceId, value:entrypoint
@@ -99,9 +99,13 @@ public class DesignDocService {
 
     public void watchConfig(DesignDocChangeEventListener listener) {
 
-        config.addChangeListener(newConfig -> {
-            entryPointMap.values().stream().filter(Objects::nonNull).flatMap(Set::stream).distinct()
-                    .forEach(listener::onDesignDocChange);
+        configReader.addChangeListener(newConfig -> {
+            Set<String> entryPoints;
+            synchronized (entryPointMap) {
+                entryPoints = entryPointMap.values().stream().filter(Objects::nonNull)
+                        .flatMap(Set::stream).distinct().collect(Collectors.toSet());
+            }
+            entryPoints.forEach(listener::onDesignDocChange);
         });
     }
 

@@ -28,4 +28,12 @@ public class JsonUtils {
             throw new UncheckedIOException(e);
         }
     }
+
+    public static <T> T str2obj(String str, Object obj) {
+        try {
+            return mapper.readerForUpdating(obj).readValue(str);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 }

@@ -20,6 +20,7 @@ import io.sitoolkit.cv.core.domain.uml.plantuml.ClassDiagramWriterPlantUmlImpl;
 import io.sitoolkit.cv.core.domain.uml.plantuml.PlantUmlWriter;
 import io.sitoolkit.cv.core.domain.uml.plantuml.SequenceDiagramWriterPlantUmlImpl;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
 import io.sitoolkit.cv.core.infra.graphviz.GraphvizManager;
 import io.sitoolkit.cv.core.infra.watcher.FileInputSourceWatcher;
 import io.sitoolkit.cv.core.infra.watcher.InputSourceWatcher;
@@ -59,12 +60,13 @@ public class ServiceFactory {
     }
 
     protected ServiceFactory createServices(Path projectDir) {
-        SitCvConfig cvConfig = SitCvConfig.load(projectDir);
+        SitCvConfigReader configReader = new SitCvConfigReader();
+        SitCvConfig config = configReader.read(projectDir);
 
         projectManager = new ProjectManager();
         projectManager.load(projectDir);
 
-        designDocService = createDesignDocService(cvConfig, projectManager);
+        designDocService = createDesignDocService(config, configReader, projectManager);
 
         reportService = createReportService(designDocService, projectManager);
 
@@ -72,7 +74,7 @@ public class ServiceFactory {
     }
 
     protected DesignDocService createDesignDocService(SitCvConfig config,
-            ProjectManager projectManager) {
+            SitCvConfigReader configReader, ProjectManager projectManager) {
         ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
         ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
                 projectManager, config);
@@ -88,7 +90,7 @@ public class ServiceFactory {
 
 
         return new DesignDocService(classDefReader, sequenceProcessor, classProcessor,
-                sequenceWriter, classWriter, classDefRepository, watcher, projectManager, config);
+                sequenceWriter, classWriter, classDefRepository, watcher, projectManager, configReader);
 
     }
 
