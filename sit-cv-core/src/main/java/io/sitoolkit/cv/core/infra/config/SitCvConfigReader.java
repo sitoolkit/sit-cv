@@ -29,6 +29,8 @@ public class SitCvConfigReader {
             config = readConfig(dir);
             baseDir = dir;
             startWatch();
+        } else {
+            log.info("SitCvConfig is already loaded: {}", baseDir);
         }
         return config;
     }
