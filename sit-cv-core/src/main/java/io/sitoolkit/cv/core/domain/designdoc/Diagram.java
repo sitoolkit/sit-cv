@@ -14,6 +14,8 @@ public class Diagram {
     private byte[] data;
     private DiagramType type;
     private Set<String> tags = new HashSet<>();
-    // key:methodSignature
+    /**
+     * key:methodSignature
+     */
     private Map<String, ApiDocDef> apiDocs = new HashMap<>();
 }

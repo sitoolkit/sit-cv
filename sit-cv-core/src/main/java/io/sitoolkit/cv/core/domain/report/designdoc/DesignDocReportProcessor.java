@@ -66,9 +66,13 @@ public class DesignDocReportProcessor {
 
     @Data
     class DetailReportsAndPathMap {
-        // key:report.path
+        /**
+         * key:report.path
+         */
         private Map<String, Report<DetailMap>> reportMap = new HashMap<>();
-        // key:designDocId, value:report.path
+        /**
+         * key:designDocId, value:report.path
+         */
         private Map<String, String> pathMap = new LinkedHashMap<>();
 
         public void add(String designDocId, String path, DesignDocReportDetailDef detail) {
@@ -85,7 +89,9 @@ public class DesignDocReportProcessor {
 
     @Data
     class DetailMap {
-        // key:designDocId
+        /**
+         * key:designDocId
+         */
         private Map<String, DesignDocReportDetailDef> detailMap = new HashMap<>();
     }
 

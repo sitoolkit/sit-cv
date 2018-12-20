@@ -9,9 +9,13 @@ import lombok.Data;
 @Data
 public class DetailResponse {
 
-    // key:diagram.id, value:diagram.data
+    /**
+     * key:diagram.id, value:diagram.data
+     */
     private Map<String, String> diagrams = new LinkedHashMap<>();
-    // key:methodSignature
+    /**
+     * key:methodSignature
+     */
     private Map<String, ApiDocDef> apiDocs = new LinkedHashMap<>();
 
 }
