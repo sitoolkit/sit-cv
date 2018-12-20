@@ -65,7 +65,9 @@ public class DesignDocService {
     @NonNull
     private ProjectManager projectManager;
 
-    // key:classDef.sourceId, value:entrypoint
+    /**
+     * key:classDef.sourceId, value:entrypoint
+     */
     private Map<String, Set<String>> entryPointMap = new HashMap<>();
 
     public void analyze() {
@@ -92,7 +94,7 @@ public class DesignDocService {
     }
 
     /**
-     * 
+     *
      * @param sourcePaths
      *            file paths of source code to read.
      * @return stream of designDocIds which are effected by input source.

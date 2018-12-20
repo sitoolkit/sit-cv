@@ -2,23 +2,34 @@ import { DesignDocDetail } from "./designdoc-detail";
 import { DesignDocIdList } from "./designdoc-id-list";
 import { Injectable } from "@angular/core";
 import { ReportDataLoader } from "../shared/report-data-loader";
-import { DesignDocLocalData } from "./designdoc-report-data";
+import { AsyncSubject } from "rxjs";
+
+type DetailPathMap = { [id: string]: string };
+interface DetailMap {
+  detailMap: { [id: string]: DesignDocDetail };
+}
 
 @Injectable({ providedIn: 'root' })
 export class DesignDocReportRepository {
 
+  private detailPathMapSubject: AsyncSubject<boolean> = new AsyncSubject<boolean>();
+  private detailPathMap: DetailPathMap;
+
   constructor(
-    private loader: ReportDataLoader,
-    private data: DesignDocLocalData
-  ) {}
+    private loader: ReportDataLoader
+  ) { }
 
   getIdList(
     callback: (idList: DesignDocIdList) => void
   ): void {
-    this.loader.loadScript("assets/designdoc-id-list.js", () => {
+    this.loader.loadScript("assets/designdoc-detail-path-map.js", (detailPathMap: DetailPathMap) => {
+      this.detailPathMap = detailPathMap;
       let idList = new DesignDocIdList();
-      idList.ids = Object.keys(this.data.idList);
+      idList.ids = Object.keys(detailPathMap);
       callback(idList);
+
+      this.detailPathMapSubject.next(true);
+      this.detailPathMapSubject.complete();
     })
   }
 
@@ -26,9 +37,10 @@ export class DesignDocReportRepository {
     designDocId: string,
     callback: (detail: DesignDocDetail) => void
   ): void {
-    this.loader.loadScript(this.data.idList[designDocId], () => {
-      let detail = this.data.detailList[designDocId];
-      callback(detail);
+    this.detailPathMapSubject.subscribe(() => {
+      this.loader.loadScript(this.detailPathMap[designDocId], (detailMap: DetailMap) => {
+        callback(detailMap.detailMap[designDocId]);
+      })
     })
   }
 

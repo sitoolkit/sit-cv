@@ -26,7 +26,7 @@ public class ReportService {
 
         List<DesignDoc> designDocs = designDocService.getAll();
 
-        List<Report> reports = designDocReportProcessor.process(designDocs);
+        List<Report<?>> reports = designDocReportProcessor.process(designDocs);
 
         reportWriter.write(projectManager.getCurrentProject().getDir(), reports);
     }

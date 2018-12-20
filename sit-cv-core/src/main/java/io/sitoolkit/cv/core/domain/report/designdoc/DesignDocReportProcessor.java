@@ -1,8 +1,7 @@
 package io.sitoolkit.cv.core.domain.report.designdoc;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,45 +9,36 @@ import java.util.Map;
 
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.report.Report;
-import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DesignDocReportProcessor {
 
-    public List<Report> process(List<DesignDoc> designDocs) {
-        List<Report> reports = new ArrayList<>();
-        DesignDocDetailReportsAndPathMap reportsAndPath = buildAndGroupingDetailReports(designDocs);
-        reports.addAll(reportsAndPath.getReports());
+    public List<Report<?>> process(List<DesignDoc> designDocs) {
+        List<Report<?>> reports = new ArrayList<>();
+        DetailReportsAndPathMap reportsAndPathMap = buildAndGroupingDetailReports(designDocs);
+        reports.addAll(reportsAndPathMap.getReports());
 
-        reports.add(buildIdListReport(reportsAndPath.getPathMap()));
+        reports.add(buildDetailPathMapReport(reportsAndPathMap.getPathMap()));
 
         return reports;
     }
 
-    private DesignDocDetailReportsAndPathMap buildAndGroupingDetailReports(List<DesignDoc> designDocs) {
-        Map<String, Report> reportMap = new HashMap<>();
-        DesignDocDetailReportsAndPathMap reportsAndPath = new DesignDocDetailReportsAndPathMap();
+    private DetailReportsAndPathMap buildAndGroupingDetailReports(
+            List<DesignDoc> designDocs) {
+        DetailReportsAndPathMap reportsAndPathMap = new DetailReportsAndPathMap();
 
         designDocs.stream().forEach(designDoc -> {
             try {
                 String path = buildDetailPath(designDoc);
-                reportsAndPath.getPathMap().put(designDoc.getId(), path);
-
-                Report report = reportMap.computeIfAbsent(path,
-                        p -> Report.builder().path(Paths.get(p)).build());
-                String detailContent = buildDetailContent(designDoc);
-                report.setContent(report.getContent() + detailContent);
+                reportsAndPathMap.add(designDoc.getId(), path, buildDetail(designDoc));
             } catch (Exception e) {
                 log.warn("Exception when build report: designDocId '{}'", designDoc.getId(), e);
             }
-
         });
 
-        reportsAndPath.getReports().addAll(reportMap.values());
-
-        return reportsAndPath;
+        return reportsAndPathMap;
     }
 
     private String buildDetailPath(DesignDoc designDoc) {
@@ -58,27 +48,51 @@ public class DesignDocReportProcessor {
         return dirName + "/" + fileName;
     }
 
-    private String buildDetailContent(DesignDoc designDoc) {
+    private DesignDocReportDetailDef buildDetail(DesignDoc designDoc) {
         DesignDocReportDetailDef detail = new DesignDocReportDetailDef();
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
             detail.getDiagrams().put(diagram.getId(), data);
             detail.getApiDocs().putAll(diagram.getApiDocs());
         });
-        return "window.reportData.designDoc.detailList['" + designDoc.getId() + "'] = "
-                + JsonUtils.obj2str(detail) + ";";
+        return detail;
     }
 
-    private Report buildIdListReport(Map<String, String> detailPathMap) {
-        Path path = Paths.get("assets/designdoc-id-list.js");
-        String content = "window.reportData.designDoc.idList = " + JsonUtils.obj2str(detailPathMap);
-
-        return Report.builder().path(path).content(content).build();
+    private Report<Map<String, String>> buildDetailPathMapReport(
+            Map<String, String> detailPathMap) {
+        return Report.<Map<String, String>>builder().path("assets/designdoc-detail-path-map.js")
+                .content(detailPathMap).build();
     }
 
     @Data
-    class DesignDocDetailReportsAndPathMap {
-        private List<Report> reports = new ArrayList<>();
+    class DetailReportsAndPathMap {
+        /**
+         * key:report.path
+         */
+        private Map<String, Report<DetailMap>> reportMap = new HashMap<>();
+        /**
+         * key:designDocId, value:report.path
+         */
         private Map<String, String> pathMap = new LinkedHashMap<>();
+
+        public void add(String designDocId, String path, DesignDocReportDetailDef detail) {
+            pathMap.put(designDocId, path);
+            Report<DetailMap> report = reportMap.computeIfAbsent(path,
+                    p -> Report.<DetailMap>builder().path(p).content(new DetailMap()).build());
+            report.getContent().getDetailMap().put(designDocId, detail);
+        }
+
+        public Collection<Report<DetailMap>> getReports() {
+            return reportMap.values();
+        }
     }
+
+    @Data
+    class DetailMap {
+        /**
+         * key:designDocId
+         */
+        private Map<String, DesignDocReportDetailDef> detailMap = new HashMap<>();
+    }
+
 }

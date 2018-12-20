@@ -32,6 +32,11 @@ public class ARepositoryFileImpl implements ARepository{
         return 0;
     }
 
+    @Override
+    public List<XEntity> filter() {
+        return searchBy(new SearchCondition());
+    }
+
     private BufferedWriter createWriter() throws IOException {
         FileWriter fw = new FileWriter("");
         BufferedWriter bw = new BufferedWriter(fw);
