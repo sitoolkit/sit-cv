@@ -29,6 +29,10 @@
   left: 0;
 }
 
+.diagrams {
+  position: relative;
+}
+
 mat-progress-bar {
   width: 30em;
   max-width: 100%;

@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material';
 import * as $ from 'jquery';
 import { DesignDocService } from '../../srv/designdoc/designdoc.service';
 import { ApiDocComponent } from './apidoc/apidoc.component';
+import { trigger, style, transition, animate } from '@angular/animations';
 
 class Diagram {
   diagram: SafeHtml;
@@ -16,12 +17,24 @@ class Diagram {
   selector: 'app-designdoc',
   templateUrl: './designdoc.component.html',
   styleUrls: ['./designdoc.component.css'],
+  animations: [
+    trigger('showDiagram', [
+      transition(":enter", [
+        style({ opacity: 0 }),
+        animate(500, style({ opacity: 1 }))
+      ]),
+      transition(":leave", [
+        style({ position: 'absolute', top: 0, left: 0 }),
+        animate(500, style({ opacity: 0 }))
+      ])
+    ]),
+  ],
 })
 
 export class DesignDocComponent implements OnInit {
   designDocIds = [];
   currentDesignDocId = '';
-  currentDiagrams = [];
+  currentDiagramGroups = [];
   objectKeys = Object.keys;
   diagramApiDocs = {};
   selectedMethodSignatures = [];
@@ -53,12 +66,12 @@ export class DesignDocComponent implements OnInit {
         heightRatio: (svg.height() / svg.width() * 100) + '%',
       });
     });
-    this.currentDiagrams = trustDiagrams;
+    this.currentDiagramGroups[0] = trustDiagrams;
   }
 
   showDesignDocDetail(designDocId) {
     if (this.currentDesignDocId) {
-      this.currentDiagrams = [];
+      this.currentDiagramGroups = [];
       this.selectedMethodSignatures = [];
     }
     this.currentDesignDocId = designDocId;
