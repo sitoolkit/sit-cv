@@ -7,6 +7,16 @@
     height: 100% !important;
 }
 
+.diagrams {
+  position: relative;
+}
+
+.diagram-group {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .diagram-container {
   display: inline-block;
   position: relative;
@@ -27,10 +37,6 @@
   position: absolute;
   top: 0;
   left: 0;
-}
-
-.diagrams {
-  position: relative;
 }
 
 mat-progress-bar {
