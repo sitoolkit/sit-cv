@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +18,7 @@ public class MessageDef extends SequenceElement {
     private String requestQualifiedSignature;
     private LifeLineDef target;
     private TypeDef responseType;
-    private MethodCallDef methodCall;
+    private MethodDef methodDef;
 
     @Override
     public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {

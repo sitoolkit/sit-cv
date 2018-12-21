@@ -48,6 +48,7 @@ public class LifeLineDef {
     }
 
     public Stream<MethodDef> getSequenceMethodsRecursively() {
-        return getMessagesRecursively().map(MessageDef::getMethodCall);
+        return Stream.concat(Stream.of(entryMessage.getMethodDef()),
+                getMessagesRecursively().map(MessageDef::getMethodDef));
     }
 }

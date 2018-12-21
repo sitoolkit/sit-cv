@@ -65,6 +65,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         message.setRequestQualifiedSignature(method.getQualifiedSignature());
         message.setTarget(lifeLine);
         message.setResponseType(method.getReturnType());
+        message.setMethodDef(method);
 
         return message;
     }
@@ -93,7 +94,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl, pushedStack));
         message.setResponseType(methodCall.getReturnType());
-        message.setMethodCall(methodCall);
+        message.setMethodDef(methodCall);
 
         return Optional.of(message);
 
