@@ -91,8 +91,11 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
         if (watchingFileMap.containsKey(fileStr)) {
             return;
         }
-        log.debug("Start to watch {}", file);
+        log.debug("Start to watch file {}", file);
         watchingFileMap.put(fileStr, new InputSource(fileStr, file.toFile().lastModified()));
+
+        Path parentDir = toParentDir(file);
+        registWatcher(parentDir);
     }
 
     private void watchDir(Path dir) {
@@ -101,9 +104,13 @@ public class FileInputSourceWatcher extends InputSourceWatcher {
         if (watchingDirSet.contains(dirStr)) {
             return;
         }
-        log.debug("Start to watch {}", dir);
+        log.debug("Start to watch dir {}", dir);
         watchingDirSet.add(dir.toString());
 
+        registWatcher(dir);
+    }
+
+    private void registWatcher(Path dir) {
         try {
             if (watcher == null) {
                 watcher = FileSystems.getDefault().newWatchService();
