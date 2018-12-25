@@ -4,7 +4,7 @@
   <!-- The Basics -->
   <groupId>io.sitoolkit.cv</groupId>
   <artifactId>sit-cv</artifactId>
-  <version>1.0.0-beta.3-SNAPSHOT</version>
+  <version>1.0.0-beta.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <parent>
@@ -33,6 +33,7 @@
     <module>sit-cv-app</module>
     <module>sit-cv-core</module>
     <module>sit-cv-maven-plugin</module>
+    <module>sit-cv-util</module>
   </modules>
 
 
