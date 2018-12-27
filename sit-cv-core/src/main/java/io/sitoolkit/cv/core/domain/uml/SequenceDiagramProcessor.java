@@ -21,6 +21,7 @@ import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.StatementProcessor;
 import io.sitoolkit.cv.core.domain.classdef.TryStatement;
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
+import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -28,10 +29,10 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     ImplementDetector implementDetector = new ImplementDetector();
 
-    private FilterConditionGroup classFilterGroup;
+    private SitCvConfig config;
 
-    public SequenceDiagramProcessor(FilterConditionGroup classFilterGroup) {
-        this.classFilterGroup = classFilterGroup;
+    public SequenceDiagramProcessor(SitCvConfig config) {
+        this.config = config;
     }
 
     public LifeLineDef process(ClassDef clazz, MethodDef method) {
@@ -45,6 +46,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         lifeLine.setObjectName(clazz.getName());
         lifeLine.setApiDoc(method.getApiDoc());
 
+        FilterConditionGroup classFilterGroup = config.getSequenceDiagramFilter();
         if (ClassDefFilter.needsDetail(clazz, classFilterGroup)) {
             lifeLine.setElements(method.getStatements().stream()
                     .map(statement -> statement.process(this, callStack))
@@ -71,6 +73,8 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
     }
 
     Optional<MessageDef> methodCall2Message(MethodCallDef methodCall, MethodCallStack callStack) {
+
+        FilterConditionGroup classFilterGroup = config.getSequenceDiagramFilter();
 
         if (methodCall.getClassDef() == null) {
             return Optional.empty();
