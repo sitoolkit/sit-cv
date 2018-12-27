@@ -16,9 +16,6 @@
   "sequenceDiagramFilter": {
     "include": [
       {
-        "name": ".*Controller.*"
-      },
-      {
         "name": ".*Service.*"
       },
       {

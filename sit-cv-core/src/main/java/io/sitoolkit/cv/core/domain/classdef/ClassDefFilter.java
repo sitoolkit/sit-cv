@@ -16,10 +16,11 @@ public class ClassDefFilter {
 
     public static boolean needsDetail(ClassDef clazz, FilterConditionGroup filterConditions) {
 
-        return filterConditions.getInclude().stream()
-                .filter(filterCondition -> matchCondition(clazz, filterCondition))
-                .filter(FilterCondition::isWithDetail).findAny().isPresent();
+        boolean withoutDetail = filterConditions.getInclude().stream()
+                .filter(condition -> matchCondition(clazz, condition))
+                .filter(condition -> !condition.isWithDetail()).findAny().isPresent();
 
+        return !withoutDetail;
     }
 
     private static boolean matchCondition(ClassDef clazz, FilterCondition filterCondition) {

@@ -31,6 +31,8 @@ public class ClassDefFilterTest {
         controller.setName("TestController");
         ClassDef service = new ClassDef();
         service.setName("TestService");
+        ClassDef publisher = new ClassDef();
+        publisher.setName("TestPublisher");
 
         FilterConditionGroup filterConditions = new FilterConditionGroup();
         FilterCondition condition1 = JsonUtils.str2obj("{\"name\": \".*Controller\"}", FilterCondition.class);
@@ -42,6 +44,7 @@ public class ClassDefFilterTest {
         assertThat(condition2.isWithDetail(), is(false));
         assertThat(ClassDefFilter.needsDetail(controller, filterConditions), is(true));
         assertThat(ClassDefFilter.needsDetail(service, filterConditions), is(false));
+        assertThat(ClassDefFilter.needsDetail(publisher, filterConditions), is(true));
     }
 
 }
