@@ -16,9 +16,6 @@
   "sequenceDiagramFilter": {
     "include": [
       {
-        "name": ".*Service.*"
-      },
-      {
         "name": ".*Processor"
       },
       {
