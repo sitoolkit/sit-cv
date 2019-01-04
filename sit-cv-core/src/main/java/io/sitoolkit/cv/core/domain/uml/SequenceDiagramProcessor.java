@@ -74,6 +74,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     Optional<MessageDef> methodCall2Message(MethodCallDef methodCall, MethodCallStack callStack) {
 
+        FilterConditionGroup entryPointFilterGroup = config.getEntryPointFilter();
         FilterConditionGroup classFilterGroup = config.getSequenceDiagramFilter();
 
         if (methodCall.getClassDef() == null) {
@@ -82,7 +83,8 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
         MethodDef methodImpl = implementDetector.detectImplMethod(methodCall);
 
-        if (!ClassDefFilter.match(methodImpl.getClassDef(), classFilterGroup)) {
+        if (!ClassDefFilter.match(methodImpl.getClassDef(), entryPointFilterGroup)
+                && !ClassDefFilter.match(methodImpl.getClassDef(), classFilterGroup)) {
             return Optional.empty();
         }
 
