@@ -6,14 +6,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-aop</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <version>3.12.1.GA</version>
+      <groupId>io.sitoolkit.cv</groupId>
+      <artifactId>sit-cv-core</artifactId>
+      <version>${project.version}</version>
     </dependency>   
   </dependencies>
 
@@ -50,7 +45,6 @@
           <archive>
             <manifestEntries>
               <Premain-Class>io.sitoolkit.cv.tools.RepositoryLogger</Premain-Class>
-              <Boot-Class-Path>C:/Users/masao/.m2/repository/org/aspectj/aspectjweaver/1.8.13/aspectjweaver-1.8.13.jar,C:/Users/masao/.m2/repository/org/javassist/javassist/3.23.1-GA/javassist-3.23.1-GA.jar</Boot-Class-Path>
             </manifestEntries>
           </archive>
         </configuration>
