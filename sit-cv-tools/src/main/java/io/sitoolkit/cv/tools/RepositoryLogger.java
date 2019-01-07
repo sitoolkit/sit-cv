@@ -43,35 +43,9 @@ public class RepositoryLogger {
 
         log.info("RepositoryLogger START");
 
-        instrumentation.addTransformer(new ClassFileTransformer() {
-            @Override
-            public byte[] transform(ClassLoader loader, String className,
-                    Class<?> classBeingRedefined, ProtectionDomain protectionDomain,
-                    byte[] classfileBuffer) throws IllegalClassFormatException {
+        instrumentation.addTransformer(new RepositoryClassTransformer());
 
-                System.setOut(logOutputStream);
-
-                if (className.matches(REPOSITORY_CLASS_REGEXP)) {
-                    return transformRepositoryMethods(className, classfileBuffer);
-                } else {
-                    return null;
-                }
-
-            }
-        });
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                System.setOut(originalSystemOut);
-
-                log.info("RepositoryLogger ShutdownHook START");
-
-                writeSqlLog(getLog());
-
-                log.info("RepositoryLogger ShutdownHook END");
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new SQLLogWriterThread());
     }
 
     private static PrintStream createLogOutputStream() {
@@ -79,23 +53,6 @@ public class RepositoryLogger {
         TeeOutputStream teeStream = new TeeOutputStream(new PrintStream(logByteArrayStream, true),
                 System.out);
         return new PrintStream(teeStream);
-    }
-
-    private static void writeSqlLog(String logStr) {
-        try (BufferedReader bufferedReader = new BufferedReader(new StringReader(logStr))) {
-            SqlLogListener sqlLogListener = new SqlLogListener();
-
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                sqlLogListener.nextLine(line);
-            }
-
-            log.info("RepositoryLogger SQL Count: {}", sqlLogListener.getSqlLogs().size());
-
-            CsvUtils.bean2csv(sqlLogListener.getSqlLogs(), Paths.get(SQL_LOG_PATH));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static String getLog() {
@@ -107,35 +64,82 @@ public class RepositoryLogger {
         return new String(logByteArrayStream.toByteArray());
     }
 
-    private static byte[] transformRepositoryMethods(String className, byte[] classfileBuffer) {
-        try {
-            ByteArrayInputStream stream = new ByteArrayInputStream(classfileBuffer);
-            CtClass ctClass = classPool.makeClass(stream);
+    private static class RepositoryClassTransformer implements ClassFileTransformer {
+        @Override
+        public byte[] transform(ClassLoader loader, String className,
+                Class<?> classBeingRedefined, ProtectionDomain protectionDomain,
+                byte[] classfileBuffer) throws IllegalClassFormatException {
 
-            Optional<Object> annotation = Stream.of(ctClass.getAnnotations())
-                    .filter((a) -> a.toString().equals(REPOSITORY_ANNOTATION)).findAny();
+            System.setOut(logOutputStream);
 
-            if (annotation.isPresent()) {
-                log.info("Find repository class: {}", className);
-
-                Arrays.asList(ctClass.getDeclaredMethods()).stream().forEach((ctMethod) -> {
-                    log.info("Find repository method: {}", ctMethod.getLongName());
-                    try {
-                        ctMethod.insertBefore("System.out.println(\"[RepositoryMethod]"
-                                + ctMethod.getLongName() + "\");");
-                    } catch (CannotCompileException e) {
-                        log.warn("Method transform Failed: {}", ctMethod.getLongName(), e);
-                    }
-                });
-                return ctClass.toBytecode();
-
+            if (className.matches(REPOSITORY_CLASS_REGEXP)) {
+                return transformRepositoryMethods(className, classfileBuffer);
+            } else {
+                return null;
             }
 
-        } catch (Exception e) {
-            log.warn("Transform Failed: {}", className, e);
         }
 
-        return null;
+        private byte[] transformRepositoryMethods(String className, byte[] classfileBuffer) {
+            try {
+                ByteArrayInputStream stream = new ByteArrayInputStream(classfileBuffer);
+                CtClass ctClass = classPool.makeClass(stream);
+
+                Optional<Object> annotation = Stream.of(ctClass.getAnnotations())
+                        .filter((a) -> a.toString().equals(REPOSITORY_ANNOTATION)).findAny();
+
+                if (annotation.isPresent()) {
+                    log.info("Find repository class: {}", className);
+
+                    Arrays.asList(ctClass.getDeclaredMethods()).stream().forEach((ctMethod) -> {
+                        log.info("Find repository method: {}", ctMethod.getLongName());
+                        try {
+                            ctMethod.insertBefore("System.out.println(\"[RepositoryMethod]"
+                                    + ctMethod.getLongName() + "\");");
+                        } catch (CannotCompileException e) {
+                            log.warn("Method transform Failed: {}", ctMethod.getLongName(), e);
+                        }
+                    });
+                    return ctClass.toBytecode();
+
+                }
+
+            } catch (Exception e) {
+                log.warn("Transform Failed: {}", className, e);
+            }
+
+            return null;
+        }
+    }
+
+    private static class SQLLogWriterThread extends Thread {
+        @Override
+        public void run() {
+            System.setOut(originalSystemOut);
+
+            log.info("RepositoryLogger ShutdownHook START");
+
+            writeSqlLog(getLog());
+
+            log.info("RepositoryLogger ShutdownHook END");
+        }
+
+        private void writeSqlLog(String logStr) {
+            try (BufferedReader bufferedReader = new BufferedReader(new StringReader(logStr))) {
+                SqlLogListener sqlLogListener = new SqlLogListener();
+
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    sqlLogListener.nextLine(line);
+                }
+
+                log.info("RepositoryLogger SQL Count: {}", sqlLogListener.getSqlLogs().size());
+
+                CsvUtils.bean2csv(sqlLogListener.getSqlLogs(), Paths.get(SQL_LOG_PATH));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }
