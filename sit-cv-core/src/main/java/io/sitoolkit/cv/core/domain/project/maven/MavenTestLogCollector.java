@@ -16,7 +16,9 @@ public class MavenTestLogCollector {
 
         SqlLogListener stdoutListener = new SqlLogListener();
 
-        project.mvnw("test").stdout(stdoutListener).execute();
+        project.mvnw("test",
+                "-DargLine=-javaagent:../sit-cv/sit-cv-tools/target/sit-cv-tools-1.0.0-beta.4-SNAPSHOT.jar")
+                .stdout(stdoutListener).execute();
 
         CsvUtils.bean2csv(stdoutListener.getSqlLogs(),
                 Paths.get("./target/sit-cv-repository-vs-sql.csv"));
