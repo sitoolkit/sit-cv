@@ -22,6 +22,8 @@ public class RepositoryLogger {
     public static void premain(String agentArgs, Instrumentation instrumentation) {
         classPool = ClassPool.getDefault();
 
+        System.out.println("RepositoryLogger premain start");
+
         instrumentation.addTransformer(new RepositoryClassTransformer());
     }
 
@@ -47,24 +49,27 @@ public class RepositoryLogger {
                 Optional<Object> annotation = Stream.of(ctClass.getAnnotations())
                         .filter((a) -> a.toString().equals(REPOSITORY_ANNOTATION)).findAny();
 
-                if (annotation.isPresent()) {
-//                    log.info("Find repository class: {}", className);
-
-                    Arrays.asList(ctClass.getDeclaredMethods()).stream().forEach((ctMethod) -> {
-//                        log.info("Find repository method: {}", ctMethod.getLongName());
-                        try {
-                            ctMethod.insertBefore("System.out.println(\"[RepositoryMethod]"
-                                    + ctMethod.getLongName() + "\");");
-                        } catch (CannotCompileException e) {
-//                            log.warn("Method transform Failed: {}", ctMethod.getLongName(), e);
-                        }
-                    });
-                    return ctClass.toBytecode();
-
+                if (!annotation.isPresent()) {
+                    return null;
                 }
 
+                System.out.println("Find repository class: " + className);
+
+                Arrays.asList(ctClass.getDeclaredMethods()).stream().forEach((ctMethod) -> {
+                    System.out.println("Find repository method: " + ctMethod.getLongName());
+                    try {
+                        ctMethod.insertBefore("System.out.println(\"[RepositoryMethod]"
+                                + ctMethod.getLongName() + "\");");
+                    } catch (CannotCompileException e) {
+                        System.out.println("Method transform Failed: " + ctMethod.getLongName());
+                        e.printStackTrace();
+                    }
+                });
+                return ctClass.toBytecode();
+
             } catch (Exception e) {
-//                log.warn("Transform Failed: {}", className, e);
+                System.out.println("Transform Failed: " + className);
+                e.printStackTrace();
             }
 
             return null;
