@@ -16,6 +16,7 @@ import javassist.CtClass;
 public class RepositoryLogger {
     private static String REPOSITORY_CLASS_REGEXP = ".*Repository.*";
     private static String REPOSITORY_ANNOTATION = "@org.springframework.stereotype.Repository";
+    private static String REPOSITORY_METHOD_MARKER = "[RepositoryMethod]";
 
     private static ClassPool classPool;
 
@@ -29,9 +30,9 @@ public class RepositoryLogger {
 
     private static class RepositoryClassTransformer implements ClassFileTransformer {
         @Override
-        public byte[] transform(ClassLoader loader, String className,
-                Class<?> classBeingRedefined, ProtectionDomain protectionDomain,
-                byte[] classfileBuffer) throws IllegalClassFormatException {
+        public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+                ProtectionDomain protectionDomain, byte[] classfileBuffer)
+                throws IllegalClassFormatException {
 
             if (className.matches(REPOSITORY_CLASS_REGEXP)) {
                 return transformRepositoryMethods(className, classfileBuffer);
@@ -58,7 +59,7 @@ public class RepositoryLogger {
                 Arrays.asList(ctClass.getDeclaredMethods()).stream().forEach((ctMethod) -> {
                     System.out.println("Find repository method: " + ctMethod.getLongName());
                     try {
-                        ctMethod.insertBefore("System.out.println(\"[RepositoryMethod]"
+                        ctMethod.insertBefore("System.out.println(\"" + REPOSITORY_METHOD_MARKER
                                 + ctMethod.getLongName() + "\");");
                     } catch (CannotCompileException e) {
                         System.out.println("Method transform Failed: " + ctMethod.getLongName());
