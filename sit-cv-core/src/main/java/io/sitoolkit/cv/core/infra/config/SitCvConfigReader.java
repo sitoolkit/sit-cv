@@ -36,7 +36,7 @@ public class SitCvConfigReader {
     }
 
     private SitCvConfig readConfig(Path baseDir) {
-         String json = readFile(baseDir);
+        String json = readFile(baseDir);
         return JsonUtils.str2obj(json, SitCvConfig.class);
     }
 
@@ -60,12 +60,17 @@ public class SitCvConfigReader {
 
     private void startWatch() {
         Path configFilePath = baseDir.resolve(CONFIG_FILE_NAME);
+
+        if (!configFilePath.toFile().exists()) {
+            return;
+        }
+
         watcher.setContinue(true);
         watcher.watch(configFilePath.toAbsolutePath().toString());
         watcher.start(inputSources -> {
             List<Consumer<SitCvConfig>> listeners;
             reload();
-            synchronized(this) {
+            synchronized (this) {
                 listeners = this.configListeners;
             }
             log.debug("config listeners: {}", listeners.toString());
