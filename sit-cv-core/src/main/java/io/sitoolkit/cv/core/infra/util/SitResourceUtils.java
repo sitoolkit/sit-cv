@@ -30,6 +30,7 @@ public class SitResourceUtils {
         URL resourceUrl = readResourc(owner.getClass(), resourceName);
 
         try {
+            log.info("Write resource to {}", targetPath);
             FileUtils.copyURLToFile(resourceUrl, targetPath.toFile());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
