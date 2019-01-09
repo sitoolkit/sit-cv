@@ -18,7 +18,7 @@
     <dependency>
       <groupId>net.sourceforge.plantuml</groupId>
       <artifactId>plantuml</artifactId>
-      <version>1.2018.9</version>
+      <version>1.2018.14</version>
     </dependency>
 
     <dependency>
@@ -42,7 +42,7 @@
     <dependency>
       <groupId>org.zeroturnaround</groupId>
       <artifactId>zt-zip</artifactId>
-      <version>1.10</version>
+      <version>1.13</version>
       <type>jar</type>
     </dependency>
 
@@ -104,7 +104,7 @@
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.0.4.RELEASE</version>
+        <version>${spring.boot.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
