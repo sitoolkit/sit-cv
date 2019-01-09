@@ -1,5 +1,8 @@
 package a.b.c;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +27,10 @@ public class BProcessor {
         return input;
     }
 
+    public String process4(String input) {
+        return input;
+    }
+
     public boolean isNotNull(String input) {
         return input != null;
     }
@@ -34,6 +41,10 @@ public class BProcessor {
 
     public BProcessor getSelf() {
         return this;
+    }
+
+    public BufferedReader read() throws FileNotFoundException {
+        return new BufferedReader(new FileReader(" "));
     }
 
 }

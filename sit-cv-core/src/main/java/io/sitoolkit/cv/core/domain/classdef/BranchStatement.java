@@ -3,6 +3,7 @@ package io.sitoolkit.cv.core.domain.classdef;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import lombok.Data;
 
@@ -19,5 +20,10 @@ public class BranchStatement implements CvStatement {
     @Override
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
         return processor.process(this, context);
+    }
+
+    @Override
+    public Stream<MethodCallDef> getMethodCallsRecursively() {
+        return conditions.stream().flatMap(CvStatement::getMethodCallsRecursively);
     }
 }

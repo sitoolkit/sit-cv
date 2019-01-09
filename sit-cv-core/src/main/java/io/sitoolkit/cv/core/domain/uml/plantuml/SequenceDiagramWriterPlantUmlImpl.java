@@ -12,14 +12,17 @@ import org.apache.commons.lang3.StringUtils;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import io.sitoolkit.cv.core.domain.designdoc.Diagram;
 import io.sitoolkit.cv.core.domain.uml.BranchSequenceElement;
+import io.sitoolkit.cv.core.domain.uml.CatchSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.ConditionalSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
+import io.sitoolkit.cv.core.domain.uml.FinallySequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.LoopSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.MessageDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import io.sitoolkit.cv.core.domain.uml.SequenceElement;
 import io.sitoolkit.cv.core.domain.uml.SequenceElementWriter;
+import io.sitoolkit.cv.core.domain.uml.TrySequenceGroup;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -158,6 +161,47 @@ public class SequenceDiagramWriterPlantUmlImpl
         list.addAll(elements2str(lifeLine, group.getConditions()));
 
         list.add("end");
+
+        return list;
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, TrySequenceGroup group) {
+        List<String> list = new ArrayList<>();
+
+        list.add("group try");
+
+        list.addAll(elements2str(lifeLine, group.getElements()));
+
+        list.addAll(elements2str(lifeLine, group.getCatchGroups()));
+
+        if (group.getFinallyGroup() != null) {
+            list.addAll(group.getFinallyGroup().write(lifeLine, this));
+        }
+
+        list.add("end");
+
+        return list;
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, CatchSequenceGroup group) {
+        List<String> list = new ArrayList<>();
+
+        list.add("else catch " + escapeLineSeparator(group.getParameter()));
+
+        list.addAll(elements2str(lifeLine, group.getElements()));
+
+        return list;
+    }
+
+    @Override
+    public List<String> write(LifeLineDef lifeLine, FinallySequenceGroup group) {
+        List<String> list = new ArrayList<>();
+
+        list.add("else finally");
+
+        list.addAll(elements2str(lifeLine, group.getElements()));
 
         return list;
     }

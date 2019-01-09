@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +34,7 @@ public class ReportWriter {
         setReportConfig(outputDir.toPath());
     }
 
-    public void write(Path projectDir, List<Report> reports) {
+    public void write(Path projectDir, List<Report<?>> reports) {
         Path outputDirPath = buildOutputDir(projectDir).toPath();
 
         writeReports(outputDirPath, reports);
@@ -41,14 +42,19 @@ public class ReportWriter {
         log.info("completed write to: {}", outputDirPath.toAbsolutePath().normalize());
     }
 
-    void writeReports(Path outputDirPath, List<Report> reports) {
+    void writeReports(Path outputDirPath, List<Report<?>> reports) {
         reports.stream().forEach((report) -> {
             try {
-                writeToFile(outputDirPath.resolve(report.getPath()).toFile(), report.getContent());
+                writeToFile(outputDirPath.resolve(report.getPath()).toFile(),
+                        report2javascript(report));
             } catch (Exception e) {
                 log.warn("Exception writing report: file '{}'", report.getPath(), e);
             }
         });
+    }
+
+    String report2javascript(Report<?> report) {
+        return "postMessage(" + JsonUtils.obj2str(report) + ", '*');";
     }
 
     void writeToFile(File file, String value) {

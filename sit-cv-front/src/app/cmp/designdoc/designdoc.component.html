@@ -1,11 +1,13 @@
 <div class="designdoc-container">
   <div class="diagrams">
-    <div *ngFor="let diagram of currentDiagrams" (click)="methodNameClick($event)" (mousemove)="methodNameMouseover($event)" class="diagram-row">
-      <div class="diagram-container">
-        <div class="diagram-spacer" [style.width]="diagram.width">
-          <div class="spacer-inner" [style.padding-top]="diagram.heightRatio"></div>
+    <div class="diagram-group" *ngFor="let group of currentDiagramGroups" [@diagramAnimation]="isLeaveAnimationEnabled ? 'leaveEnable' : ''">
+      <div class="diagram-row" *ngFor="let diagram of group.diagrams" (click)="methodNameClick($event)" (mousemove)="methodNameMouseover($event)">
+        <div class="diagram-container">
+          <div class="diagram-spacer" [style.width]="diagram.width">
+            <div class="spacer-inner" [style.padding-top]="diagram.heightRatio"></div>
+          </div>
+          <div class="diagram" [innerHTML]="diagram.diagram"></div>
         </div>
-        <div class="diagram" [innerHTML]="diagram.diagram"></div>
       </div>
     </div>
     <mat-progress-bar *ngIf="isDiagramLoading" [mode]="'indeterminate'"></mat-progress-bar>

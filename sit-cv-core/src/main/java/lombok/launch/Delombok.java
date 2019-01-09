@@ -6,9 +6,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Since the Shadow Class Loader hides Lombok's internal Delombok, we need to access it via reflection.
+ * Since the Shadow Class Loader hides Lombok's internal Delombok, we need to
+ * access it via reflection.
  *
- * @see <a href="https://github.com/rzwitserloot/lombok/blob/master/src/delombok/lombok/delombok/Delombok.java">lombok.delombok.Delombok</a>
+ * @see <a href=
+ *      "https://github.com/rzwitserloot/lombok/blob/master/src/delombok/lombok/delombok/Delombok.java">lombok.delombok.Delombok</a>
  */
 public class Delombok {
 
@@ -21,8 +23,9 @@ public class Delombok {
     private final Method setOutput;
     private final Method setSourcepath;
 
-    public Delombok () throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException {
-        final ClassLoader shadowClassLoader = Main.createShadowClassLoader();
+    public Delombok() throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+            NoSuchMethodException, SecurityException {
+        final ClassLoader shadowClassLoader = Main.getShadowClassLoader();
         final Class<?> delombokClass = shadowClassLoader.loadClass("lombok.delombok.Delombok");
         this.delombokInstance = delombokClass.newInstance();
         this.addDirectory = delombokClass.getMethod("addDirectory", File.class);
@@ -33,27 +36,32 @@ public class Delombok {
         this.setSourcepath = delombokClass.getMethod("setSourcepath", String.class);
     }
 
-    public void addDirectory (final File base) throws IllegalAccessException, IOException, InvocationTargetException {
+    public void addDirectory(final File base)
+            throws IllegalAccessException, IOException, InvocationTargetException {
         addDirectory.invoke(delombokInstance, base);
     }
 
-    public boolean delombok () throws IllegalAccessException, IOException, InvocationTargetException {
-        return Boolean.parseBoolean( delombok.invoke(delombokInstance).toString() );
+    public boolean delombok()
+            throws IllegalAccessException, IOException, InvocationTargetException {
+        return Boolean.parseBoolean(delombok.invoke(delombokInstance).toString());
     }
 
-    public void setCharset (final String charset) throws IllegalAccessException, InvocationTargetException {
+    public void setCharset(final String charset)
+            throws IllegalAccessException, InvocationTargetException {
         setCharset.invoke(delombokInstance, charset);
     }
 
-    public void setClasspath (final String classpath) throws IllegalAccessException, InvocationTargetException {
+    public void setClasspath(final String classpath)
+            throws IllegalAccessException, InvocationTargetException {
         setClasspath.invoke(delombokInstance, classpath);
     }
 
-    public void setOutput (final File dir) throws IllegalAccessException, InvocationTargetException {
+    public void setOutput(final File dir) throws IllegalAccessException, InvocationTargetException {
         setOutput.invoke(delombokInstance, dir);
     }
 
-    public void setSourcepath (final String sourcepath) throws IllegalAccessException, InvocationTargetException {
+    public void setSourcepath(final String sourcepath)
+            throws IllegalAccessException, InvocationTargetException {
         setSourcepath.invoke(delombokInstance, sourcepath);
     }
 }

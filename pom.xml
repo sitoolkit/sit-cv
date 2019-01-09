@@ -4,7 +4,7 @@
   <!-- The Basics -->
   <groupId>io.sitoolkit.cv</groupId>
   <artifactId>sit-cv</artifactId>
-  <version>1.0.0-beta.2</version>
+  <version>1.0.0-beta.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <parent>
@@ -18,7 +18,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.5</version>
+        <version>2.6</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -26,6 +26,7 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <spring.boot.version>2.1.1.RELEASE</spring.boot.version>
   </properties>
 
 

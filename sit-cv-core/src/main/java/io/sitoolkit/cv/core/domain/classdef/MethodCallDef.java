@@ -1,6 +1,7 @@
 package io.sitoolkit.cv.core.domain.classdef;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,4 +24,8 @@ public class MethodCallDef extends MethodDef {
         return processor.process(this, context);
     }
 
+    @Override
+    public Stream<MethodCallDef> getMethodCallsRecursively() {
+        return Stream.of(this);
+    }
 }
