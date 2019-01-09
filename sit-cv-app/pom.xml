@@ -8,7 +8,7 @@
     <dependency>
       <groupId>io.sitoolkit.cv</groupId>
       <artifactId>sit-cv-core</artifactId>
-      <version>1.0.0-beta.3-SNAPSHOT</version>
+      <version>1.0.0-beta.3</version>
     </dependency>
 
     <dependency>
@@ -86,7 +86,7 @@
   <parent>
     <groupId>io.sitoolkit.cv</groupId>
     <artifactId>sit-cv</artifactId>
-    <version>1.0.0-beta.3-SNAPSHOT</version>
+    <version>1.0.0-beta.3</version>
   </parent>
 
   <dependencyManagement>
