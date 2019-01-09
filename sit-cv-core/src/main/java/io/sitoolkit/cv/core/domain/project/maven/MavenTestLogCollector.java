@@ -22,8 +22,7 @@ public class MavenTestLogCollector {
         SqlLogListener stdoutListener = new SqlLogListener();
 
         Map<String, String> agentArgsMap = new HashMap<>();
-        agentArgsMap.put("repository.annotation",
-                "@org.springframework.stereotype\\.Repositor.*,.*sampleRepository.*");
+        agentArgsMap.put("repository.annotation", "@org.springframework.stereotype.Repository");
         agentArgsMap.put("repository.methodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
         String agentArgs = agentArgsMap.entrySet().stream()
                 .map((e) -> e.getKey() + "=" + e.getValue())
