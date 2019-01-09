@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>a.b.c</groupId>
   <artifactId>sample</artifactId>
-  <version>1.0.0-beta.3</version>
+  <version>1.0.0-beta.4-SNAPSHOT</version>
 
   <dependencyManagement>
     <dependencies>
