@@ -10,6 +10,11 @@
       <artifactId>javassist</artifactId>
       <version>3.24.1-GA</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.7</version>
+    </dependency>
   </dependencies>
 
   <parent>
@@ -27,15 +32,27 @@
     </resources>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.0</version>
         <configuration>
           <archive>
             <manifestEntries>
               <Premain-Class>io.sitoolkit.cv.tools.RepositoryLogger</Premain-Class>
             </manifestEntries>
           </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
         </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

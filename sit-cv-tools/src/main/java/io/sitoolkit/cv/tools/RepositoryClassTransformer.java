@@ -9,19 +9,22 @@ import java.nio.file.Paths;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.Stream;
 
+import io.sitoolkit.cv.tools.config.RepositoryLoggerConfig;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 
 public class RepositoryClassTransformer implements ClassFileTransformer {
 
-    private static String REPOSITORY_ANNOTATION = "@org.springframework.stereotype.Repository";
-    private static String REPOSITORY_METHOD_MARKER = "[RepositoryMethod]";
-
     private static ClassPool classPool = ClassPool.getDefault();
     private static Path currentProjectPath = Paths.get("").toAbsolutePath();
+
+    private RepositoryLoggerConfig config;
+
+    public RepositoryClassTransformer(RepositoryLoggerConfig config) {
+        this.config = config;
+    }
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
@@ -68,9 +71,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
 
     private boolean isRepositoryClass(CtClass ctClass) {
         try {
-            return Stream.of(ctClass.getAnnotations())
-                    .filter((a) -> a.toString().equals(REPOSITORY_ANNOTATION)).findAny()
-                    .isPresent();
+            return RepositoryFilter.match(ctClass.getAnnotations(), config.filterConditions);
         } catch (ClassNotFoundException e) {
             System.out.println("Get annotations failed: " + ctClass.getName());
             e.printStackTrace();
@@ -82,7 +83,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
         Arrays.asList(ctClass.getDeclaredMethods()).stream().forEach((ctMethod) -> {
             System.out.println("Repository method: " + ctMethod.getLongName());
             try {
-                ctMethod.insertBefore("System.out.println(\"" + REPOSITORY_METHOD_MARKER
+                ctMethod.insertBefore("System.out.println(\"" + config.methodMarker
                         + ctMethod.getLongName() + "\");");
             } catch (CannotCompileException e) {
                 System.out.println("Method transform Failed: " + ctMethod.getLongName());

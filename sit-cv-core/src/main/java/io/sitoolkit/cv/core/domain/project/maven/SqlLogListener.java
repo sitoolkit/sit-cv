@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SqlLogListener implements StdoutListener {
 
+    public static String REPOSITORY_METHOD_MARKER = "[RepositoryMethod]";
+
     @Getter
     private List<SqlLog> sqlLogs = new ArrayList<>();
     private StringBuilder readingSqlLog = new StringBuilder();
@@ -52,9 +54,11 @@ public class SqlLogListener implements StdoutListener {
             readingSqlLog.append("\n");
         }
 
-        String repositoryMethod = StringUtils.substringAfter(line, "[RepositoryMethod]");
-        if (!StringUtils.isEmpty(repositoryMethod)) {
-            readingRepositoryMethod = repositoryMethod;
+        if (line.startsWith(REPOSITORY_METHOD_MARKER)) {
+            String repositoryMethod = StringUtils.substringAfter(line, REPOSITORY_METHOD_MARKER);
+            if (!StringUtils.isEmpty(repositoryMethod)) {
+                readingRepositoryMethod = repositoryMethod;
+            }
         }
 
         if (sqlLogStartPattern.matcher(line).matches()) {
