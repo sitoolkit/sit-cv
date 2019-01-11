@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.sitoolkit.cv.core.infra.project.maven.MavenSitCvToolsManager;
 import io.sitoolkit.cv.core.infra.util.CsvUtils;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
 

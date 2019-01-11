@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.project.maven;
+package io.sitoolkit.cv.core.infra.project.maven;
 
 import java.nio.file.Path;
 
