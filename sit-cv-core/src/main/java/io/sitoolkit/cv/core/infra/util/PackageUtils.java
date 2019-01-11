@@ -13,7 +13,8 @@ public class PackageUtils {
             return version;
         }
 
-        File[] files = new File("./target").listFiles((FilenameFilter) new WildcardFileFilter("*.jar"));
+        File[] files = new File("./target")
+                .listFiles((FilenameFilter) new WildcardFileFilter("*.jar"));
         if (files.length == 0) {
             throw new RuntimeException("Packaged jar not found");
         }

@@ -32,20 +32,18 @@ public class MavenTestLogCollector {
 
         SqlLogListener stdoutListener = new SqlLogListener();
 
-         Map<String, String> agentArgsMap = new HashMap<>();
-         agentArgsMap.put("repository.annotation",
-         "@org.springframework.stereotype.Repository");
-         agentArgsMap.put("repository.methodMarker",
-         SqlLogListener.REPOSITORY_METHOD_MARKER);
-         String agentArgs = agentArgsMap.entrySet().stream()
-         .map((e) -> e.getKey() + "=" + e.getValue())
-         .collect(Collectors.joining(";", "=", ""));
+        Map<String, String> agentArgsMap = new HashMap<>();
+        agentArgsMap.put("repository.annotation", "@org.springframework.stereotype.Repository");
+        agentArgsMap.put("repository.methodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
+        String agentArgs = agentArgsMap.entrySet().stream()
+                .map((e) -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining(";", "=", ""));
 
-         project.mvnw("test", "-DargLine=-javaagent:" + jarPath.get() + agentArgs)
-         .stdout(stdoutListener).execute();
+        project.mvnw("test", "-DargLine=-javaagent:" + jarPath.get() + agentArgs)
+                .stdout(stdoutListener).execute();
 
-         CsvUtils.bean2csv(stdoutListener.getSqlLogs(),
-         Paths.get("./target/sit-cv-repository-vs-sql.csv"));
+        CsvUtils.bean2csv(stdoutListener.getSqlLogs(),
+                Paths.get("./target/sit-cv-repository-vs-sql.csv"));
     }
 
     private static Optional<String> resolveAgentJar(MavenProject project) {
@@ -57,7 +55,8 @@ public class MavenTestLogCollector {
 
         String jarPath = listener.getClasspath();
         if (jarPath == null) {
-            log.error("Dependency not found. Please add dependency to '{}:{}'", AGENT_JAR_NAME, packageVersion);
+            log.error("Dependency not found. Please add dependency to '{}:{}'", AGENT_JAR_NAME,
+                    packageVersion);
             return Optional.empty();
         }
 
