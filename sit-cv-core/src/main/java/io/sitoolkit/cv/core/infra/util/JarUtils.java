@@ -8,9 +8,12 @@ import java.util.jar.Manifest;
 public class JarUtils {
 
     public static String getImplementationVersion(String file) {
+        return getManifest(file).getMainAttributes().getValue("Implementation-Version");
+    }
+
+    public static Manifest getManifest(String file) {
         try (JarFile jarFile = new JarFile(file)) {
-            Manifest manifest = jarFile.getManifest();
-            return manifest.getMainAttributes().getValue("Implementation-Version");
+            return jarFile.getManifest();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
