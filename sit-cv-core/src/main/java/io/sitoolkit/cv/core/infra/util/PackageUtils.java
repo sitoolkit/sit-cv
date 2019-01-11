@@ -1,9 +1,14 @@
 package io.sitoolkit.cv.core.infra.util;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-import org.apache.commons.io.filefilter.WildcardFileFilter;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+
+import org.w3c.dom.Document;
 
 public class PackageUtils {
 
@@ -13,11 +18,21 @@ public class PackageUtils {
             return version;
         }
 
-        File[] files = new File("./target")
-                .listFiles((FilenameFilter) new WildcardFileFilter("*.jar"));
-        if (files.length == 0) {
-            throw new RuntimeException("Packaged jar not found");
-        }
-        return JarUtils.getImplementationVersion(files[0].getAbsolutePath());
+        return getVersionFromPomXml();
     }
+
+    private static String getVersionFromPomXml() {
+        try (InputStream is = Files.newInputStream(Paths.get("pom.xml"))) {
+            Document doc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder().parse(is);
+            doc.getDocumentElement().normalize();
+
+            return (String) XPathFactory.newInstance()
+                    .newXPath().compile("/project/parent/version")
+                    .evaluate(doc, XPathConstants.STRING);
+        } catch (Exception e) {
+            throw new RuntimeException("Get version from pom.xml failed");
+        }
+    }
+
 }
