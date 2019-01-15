@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { DesignDocService } from '../../srv/designdoc/designdoc.service';
-import { DesignDocMenuItem } from 'src/app/srv/designdoc/designdoc-menu-item';
+import { MenuItem } from 'src/app/srv/menu/menu-item';
 
 @Component({
   selector: 'app-doctree',
@@ -11,7 +11,7 @@ import { DesignDocMenuItem } from 'src/app/srv/designdoc/designdoc-menu-item';
 })
 export class DoctreeComponent {
 
-  nestedTreeControl = new NestedTreeControl<DesignDocMenuItem>((item: DesignDocMenuItem) => item.children);
+  nestedTreeControl = new NestedTreeControl<MenuItem>((item: MenuItem) => item.children);
   nestedDataSource = new MatTreeNestedDataSource();
 
   constructor( @Inject('DesignDocService') private ddService: DesignDocService) {
@@ -20,9 +20,9 @@ export class DoctreeComponent {
     });
   }
 
-  hasNestedChild = (_: number, item: DesignDocMenuItem) => !item.endpoint;
+  hasNestedChild = (_: number, item: MenuItem) => !item.endpoint;
 
-  toggleExpanded(item: DesignDocMenuItem) {
+  toggleExpanded(item: MenuItem) {
     if (this.nestedTreeControl.isExpanded(item)) {
       this.nestedTreeControl.collapse(item);
     } else {
@@ -30,7 +30,7 @@ export class DoctreeComponent {
     }
   }
 
-  expandRecursively(item: DesignDocMenuItem) {
+  expandRecursively(item: MenuItem) {
     this.nestedTreeControl.expand(item);
     if (item.children.length === 1) {
       this.expandRecursively(item.children[0]);

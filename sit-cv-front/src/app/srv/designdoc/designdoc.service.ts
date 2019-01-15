@@ -1,13 +1,9 @@
 import { DesignDocDetail } from './designdoc-detail';
-import { DesignDocIdList } from './designdoc-id-list';
-import { DesignDocMenuItem } from './designdoc-menu-item';
+import { MenuItem } from '../menu/menu-item';
 
 export interface DesignDocService {
   getMenuList(
-    callback: (menuItems: DesignDocMenuItem[]) => void
-  ): void
-  getIdList(
-    callback: (idList: DesignDocIdList) => void
+    callback: (menuItems: MenuItem[]) => void
   ): void
   getDetail(
     designDocId: string,

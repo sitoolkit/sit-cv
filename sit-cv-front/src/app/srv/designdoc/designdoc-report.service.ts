@@ -1,20 +1,13 @@
 import { Injectable } from '@angular/core';
 import { DesignDocService } from './designdoc.service';
-import { DesignDocIdList } from './designdoc-id-list';
 import { DesignDocDetail } from './designdoc-detail';
 import { DesignDocReportRepository } from './designdoc-report.repository';
-import { DesignDocMenuItem } from './designdoc-menu-item';
+import { MenuItem } from '../menu/menu-item';
 
 @Injectable()
 export class DesignDocReportService implements DesignDocService {
 
   constructor(private repository: DesignDocReportRepository) {}
-
-  getIdList(
-    callback: (idList: DesignDocIdList) => void
-  ): void {
-    this.repository.getIdList(callback);
-  }
 
   getDetail(
     designDocId: string,
@@ -24,7 +17,7 @@ export class DesignDocReportService implements DesignDocService {
   }
 
   getMenuList(
-    callback: (menuItems: DesignDocMenuItem[]) => void
+    callback: (menuItems: MenuItem[]) => void
   ): void {
   }
 

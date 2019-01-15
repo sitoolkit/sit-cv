@@ -3,10 +3,9 @@ import * as SockJS from 'sockjs-client';
 import { AsyncSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { DesignDocService } from './designdoc.service';
-import { DesignDocIdList } from './designdoc-id-list';
 import { DesignDocDetail } from './designdoc-detail';
 import { Config } from '../shared/config';
-import { DesignDocMenuItem } from './designdoc-menu-item';
+import { MenuItem } from '../menu/menu-item';
 
 @Injectable()
 export class DesignDocServerService implements DesignDocService {
@@ -32,19 +31,6 @@ export class DesignDocServerService implements DesignDocService {
     });
   }
 
-  getIdList(
-    callback: (idList: DesignDocIdList) => void
-  ): void {
-    this.connectionSource.subscribe(() => {
-      this.stompClient.subscribe('/topic/designdoc/list', (response: any) => {
-        let idList = new DesignDocIdList();
-        idList.ids = JSON.parse(response.body).designDocIds;
-        callback(idList);
-      });
-      this.stompClient.send('/app/designdoc/list');
-    })
-  }
-
   getDetail(
     designDocId: string,
     callback: (detail: DesignDocDetail) => void
@@ -64,7 +50,7 @@ export class DesignDocServerService implements DesignDocService {
   }
 
   getMenuList(
-    callback: (menuItems: DesignDocMenuItem[]) => void
+    callback: (menuItems: MenuItem[]) => void
   ): void {
     this.connectionSource.subscribe(() => {
       this.stompClient.subscribe('/topic/designdoc/list', (response: any) => {
