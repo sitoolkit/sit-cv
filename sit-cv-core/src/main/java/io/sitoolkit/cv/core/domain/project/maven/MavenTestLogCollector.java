@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.sitoolkit.cv.core.infra.project.maven.MavenSitCvToolsManager;
 import io.sitoolkit.cv.core.infra.util.CsvUtils;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
 
@@ -15,11 +16,12 @@ public class MavenTestLogCollector {
 
         Path projectDir = Paths.get("../../dddsample-core").toAbsolutePath().normalize();
 
-        String jarPath = "../sit-cv/sit-cv-tools/target/sit-cv-tools-1.0.0-beta.4-SNAPSHOT-jar-with-dependencies.jar";
-
         MavenProject project = MavenProject.load(projectDir);
 
         SqlLogListener stdoutListener = new SqlLogListener();
+
+        MavenSitCvToolsManager.initialize(project);
+        Path jarPath = MavenSitCvToolsManager.getInstance().getJarPath();
 
         Map<String, String> agentArgsMap = new HashMap<>();
         agentArgsMap.put("repository.annotation", "@org.springframework.stereotype.Repository");
@@ -28,8 +30,8 @@ public class MavenTestLogCollector {
                 .map((e) -> e.getKey() + "=" + e.getValue())
                 .collect(Collectors.joining(";", "=", ""));
 
-        project.mvnw("test", "-DargLine=-javaagent:" + jarPath + agentArgs).stdout(stdoutListener)
-                .execute();
+        project.mvnw("test", "-DargLine=-javaagent:" + jarPath.toString() + agentArgs)
+                .stdout(stdoutListener).execute();
 
         CsvUtils.bean2csv(stdoutListener.getSqlLogs(),
                 Paths.get("./target/sit-cv-repository-vs-sql.csv"));
