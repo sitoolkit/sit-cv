@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.app.pres.designdoc;
+package io.sitoolkit.cv.app.pres.menu;
 
 import java.util.ArrayList;
 import java.util.List;
