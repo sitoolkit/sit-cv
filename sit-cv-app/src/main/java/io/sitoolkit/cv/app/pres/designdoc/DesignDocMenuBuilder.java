@@ -10,18 +10,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.sitoolkit.cv.app.pres.menu.MenuItem;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
-import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 
 public class DesignDocMenuBuilder {
 
-    private static final String RESOURCE_PATH = "/menu/designdoc.json";
     private static final String FUNCTION_MODEL_MENU_NAME = "Function Model";
 
     private Pattern pattern = Pattern.compile("^(.*)\\.(.*?)(\\(.*)$");
 
-    public List<MenuItem> buildItemsAndAppendFunctionModelItems(List<String> designDocIds) {
+    public List<MenuItem> buildItemsAndAppendFunctionModelItems(String menuStr,
+            List<String> designDocIds) {
 
-        String menuStr = SitResourceUtils.res2str(this, RESOURCE_PATH);
         List<MenuItem> menuItems = JsonUtils.str2obj(menuStr, new TypeReference<List<MenuItem>>() {
         });
 
@@ -55,9 +53,9 @@ public class DesignDocMenuBuilder {
         String[] signatureParts = classSignature.split("\\.");
 
         List<MenuItem> currentItems = menuItems;
-        for(String part : signatureParts) {
-            Optional<MenuItem> childItem = currentItems.stream().filter((c) -> c.getName().equals(part))
-                    .findAny();
+        for (String part : signatureParts) {
+            Optional<MenuItem> childItem = currentItems.stream()
+                    .filter((c) -> c.getName().equals(part)).findAny();
 
             if (childItem.isPresent()) {
                 currentItems = childItem.get().getChildren();

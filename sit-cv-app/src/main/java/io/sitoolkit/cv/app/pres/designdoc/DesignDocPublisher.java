@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.sitoolkit.cv.app.infra.config.ApplicationConfig;
+import io.sitoolkit.cv.app.infra.menu.MenuReader;
 import io.sitoolkit.cv.app.pres.menu.MenuItem;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocChangeEventListener;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
@@ -35,6 +36,9 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
     ProjectManager projectManager;
 
     @Autowired
+    MenuReader menuReader;
+
+    @Autowired
     DesignDocMenuBuilder menuBuilder;
 
     @PostConstruct
@@ -51,9 +55,10 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
 
     @MessageMapping("/designdoc/list")
     public void publishDesingDocList() {
+        String menuStr = menuReader.read("designdoc");
 
         List<MenuItem> menuItems = menuBuilder
-                .buildItemsAndAppendFunctionModelItems(service.getAllIds());
+                .buildItemsAndAppendFunctionModelItems(menuStr, service.getAllIds());
 
         template.convertAndSend("/topic/designdoc/list", menuItems);
     }
