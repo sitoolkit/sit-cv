@@ -3,6 +3,7 @@ import { DesignDocService } from './designdoc.service';
 import { DesignDocIdList } from './designdoc-id-list';
 import { DesignDocDetail } from './designdoc-detail';
 import { DesignDocReportRepository } from './designdoc-report.repository';
+import { DesignDocMenuItem } from './designdoc-menu-item';
 
 @Injectable()
 export class DesignDocReportService implements DesignDocService {
@@ -20,6 +21,11 @@ export class DesignDocReportService implements DesignDocService {
     callback: (detail: DesignDocDetail) => void
   ): void {
     this.repository.getDetail(designDocId, callback);
+  }
+
+  getMenuList(
+    callback: (menuItems: DesignDocMenuItem[]) => void
+  ): void {
   }
 
 }

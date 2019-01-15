@@ -6,6 +6,7 @@ import { DesignDocService } from './designdoc.service';
 import { DesignDocIdList } from './designdoc-id-list';
 import { DesignDocDetail } from './designdoc-detail';
 import { Config } from '../shared/config';
+import { DesignDocMenuItem } from './designdoc-menu-item';
 
 @Injectable()
 export class DesignDocServerService implements DesignDocService {
@@ -59,6 +60,18 @@ export class DesignDocServerService implements DesignDocService {
         callback(detail);
       });
       this.stompClient.send('/app/designdoc/detail', {}, designDocId);
+    })
+  }
+
+  getMenuList(
+    callback: (menuItems: DesignDocMenuItem[]) => void
+  ): void {
+    this.connectionSource.subscribe(() => {
+      this.stompClient.subscribe('/topic/designdoc/list', (response: any) => {
+        let menuItems = JSON.parse(response.body);
+        callback(menuItems);
+      });
+      this.stompClient.send('/app/designdoc/list');
     })
   }
 

@@ -1,0 +1,15 @@
+[
+  {
+    "name" : "Data Model",
+    "children" :
+    [
+      {
+        "name" : "CRUD Matrix",
+        "endpoint" : "/designdoc/crud"
+      }
+    ]
+  },
+  {
+    "name" : "Function Model"
+  }
+]
