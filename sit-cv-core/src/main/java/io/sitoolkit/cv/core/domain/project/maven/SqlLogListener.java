@@ -23,7 +23,8 @@ public class SqlLogListener implements StdoutListener {
     private String readingRepositoryMethod = "";
     private boolean sqlLogging = false;
     private Pattern sqlLogStartPattern = Pattern.compile(".*org.hibernate.SQL.*");
-    private Pattern sqlLogEndPattern = Pattern.compile("^[0-9]{4}-.*");
+    private Pattern sqlLogEndPattern = Pattern
+            .compile("^([0-9]{4}-.*|" + Pattern.quote(REPOSITORY_METHOD_MARKER) + ".*)");
 
     @Override
     public void nextLine(String line) {
@@ -47,11 +48,10 @@ public class SqlLogListener implements StdoutListener {
                 readingSqlLog = new StringBuilder();
                 readingRepositoryMethod = "";
 
-                return;
+            } else {
+                readingSqlLog.append(line);
+                readingSqlLog.append("\n");
             }
-
-            readingSqlLog.append(line);
-            readingSqlLog.append("\n");
         }
 
         if (line.startsWith(REPOSITORY_METHOD_MARKER)) {
@@ -61,7 +61,8 @@ public class SqlLogListener implements StdoutListener {
             }
         }
 
-        if (sqlLogStartPattern.matcher(line).matches()) {
+        if (!StringUtils.isEmpty(readingRepositoryMethod)
+                && sqlLogStartPattern.matcher(line).matches()) {
             sqlLogging = true;
         }
     }
