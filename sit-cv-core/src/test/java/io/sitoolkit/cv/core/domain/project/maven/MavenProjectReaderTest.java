@@ -1,7 +1,7 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
 
 import java.nio.file.Paths;
 
@@ -18,11 +18,13 @@ public class MavenProjectReaderTest {
         // TODO we need to test using test-project/maven-multi
         Project project = reader.read(Paths.get("..")).get();
 
-        assertThat(project.getAllSrcDirs(), containsInAnyOrder(
-                project.getDir().resolve("sit-cv-app/src/main/java"),
-                project.getDir().resolve("sit-cv-core/src/main/java"),
-                project.getDir().resolve("sit-cv-maven-plugin/src/main/java"),
-                project.getDir().resolve("sit-cv-maven-plugin/target/generated-sources/plugin")));
+        assertThat(project.getAllSrcDirs(),
+                containsInAnyOrder(project.getDir().resolve("sit-cv-app/src/main/java"),
+                        project.getDir().resolve("sit-cv-core/src/main/java"),
+                        project.getDir().resolve("sit-cv-maven-plugin/src/main/java"),
+                        project.getDir()
+                                .resolve("sit-cv-maven-plugin/target/generated-sources/plugin"),
+                        project.getDir().resolve("sit-cv-tools/src/main/java")));
 
         System.out.println(project.getAllClasspaths());
     }
