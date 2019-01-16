@@ -5,7 +5,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import io.sitoolkit.cv.app.pres.designdoc.DetailResponse;
 import io.sitoolkit.cv.core.app.function.FunctionModelService;
 import io.sitoolkit.cv.core.domain.function.FunctionModel;
 import lombok.extern.slf4j.Slf4j;
