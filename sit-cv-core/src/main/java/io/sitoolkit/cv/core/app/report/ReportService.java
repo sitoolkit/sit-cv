@@ -2,7 +2,7 @@ package io.sitoolkit.cv.core.app.report;
 
 import java.util.List;
 
-import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
+import io.sitoolkit.cv.core.app.function.FunctionModelService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.Report;
@@ -17,14 +17,14 @@ public class ReportService {
 
     private ReportWriter reportWriter;
 
-    private DesignDocService designDocService;
+    private FunctionModelService functionModelService;
 
     private ProjectManager projectManager;
 
     public void export() {
         reportWriter.initDirectory(projectManager.getCurrentProject().getDir());
 
-        List<DesignDoc> designDocs = designDocService.getAll();
+        List<DesignDoc> designDocs = functionModelService.getAll();
 
         List<Report<?>> reports = designDocReportProcessor.process(designDocs);
 

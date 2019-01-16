@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.app.designdoc;
+package io.sitoolkit.cv.core.app.function;
 
 public interface DesignDocChangeEventListener {
 

@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.app.designdoc;
+package io.sitoolkit.cv.core.app.function;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class DesignDocService {
+public class FunctionModelService {
 
     @NonNull
     private ClassDefReader classDefReader;
