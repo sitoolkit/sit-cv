@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
+import io.sitoolkit.cv.core.domain.function.FunctionModel;
 import io.sitoolkit.cv.core.domain.report.Report;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DesignDocReportProcessor {
 
-    public List<Report<?>> process(List<DesignDoc> designDocs) {
+    public List<Report<?>> process(List<FunctionModel> functionModels) {
         List<Report<?>> reports = new ArrayList<>();
-        DetailReportsAndPathMap reportsAndPathMap = buildAndGroupingDetailReports(designDocs);
+        DetailReportsAndPathMap reportsAndPathMap = buildAndGroupingDetailReports(functionModels);
         reports.addAll(reportsAndPathMap.getReports());
 
         reports.add(buildDetailPathMapReport(reportsAndPathMap.getPathMap()));
@@ -26,29 +26,29 @@ public class DesignDocReportProcessor {
     }
 
     private DetailReportsAndPathMap buildAndGroupingDetailReports(
-            List<DesignDoc> designDocs) {
+            List<FunctionModel> functionModels) {
         DetailReportsAndPathMap reportsAndPathMap = new DetailReportsAndPathMap();
 
-        designDocs.stream().forEach(designDoc -> {
+        functionModels.stream().forEach(designDoc -> {
             try {
                 String path = buildDetailPath(designDoc);
                 reportsAndPathMap.add(designDoc.getId(), path, buildDetail(designDoc));
             } catch (Exception e) {
-                log.warn("Exception when build report: designDocId '{}'", designDoc.getId(), e);
+                log.warn("Exception when build report: functionId '{}'", designDoc.getId(), e);
             }
         });
 
         return reportsAndPathMap;
     }
 
-    private String buildDetailPath(DesignDoc designDoc) {
+    private String buildDetailPath(FunctionModel designDoc) {
         String dirName = designDoc.getPkg().replaceAll("\\.", "/");
         String fileName = designDoc.getClassName() + ".js";
 
         return dirName + "/" + fileName;
     }
 
-    private DesignDocReportDetailDef buildDetail(DesignDoc designDoc) {
+    private DesignDocReportDetailDef buildDetail(FunctionModel designDoc) {
         DesignDocReportDetailDef detail = new DesignDocReportDetailDef();
         designDoc.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
@@ -71,15 +71,15 @@ public class DesignDocReportProcessor {
          */
         private Map<String, Report<DetailMap>> reportMap = new HashMap<>();
         /**
-         * key:designDocId, value:report.path
+         * key:functionId, value:report.path
          */
         private Map<String, String> pathMap = new LinkedHashMap<>();
 
-        public void add(String designDocId, String path, DesignDocReportDetailDef detail) {
-            pathMap.put(designDocId, path);
+        public void add(String functionId, String path, DesignDocReportDetailDef detail) {
+            pathMap.put(functionId, path);
             Report<DetailMap> report = reportMap.computeIfAbsent(path,
                     p -> Report.<DetailMap>builder().path(p).content(new DetailMap()).build());
-            report.getContent().getDetailMap().put(designDocId, detail);
+            report.getContent().getDetailMap().put(functionId, detail);
         }
 
         public Collection<Report<DetailMap>> getReports() {
@@ -90,7 +90,7 @@ public class DesignDocReportProcessor {
     @Data
     class DetailMap {
         /**
-         * key:designDocId
+         * key:functionId
          */
         private Map<String, DesignDocReportDetailDef> detailMap = new HashMap<>();
     }

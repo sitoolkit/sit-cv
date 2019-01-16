@@ -21,8 +21,8 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
-import io.sitoolkit.cv.core.domain.designdoc.Diagram;
+import io.sitoolkit.cv.core.domain.function.FunctionModel;
+import io.sitoolkit.cv.core.domain.function.Diagram;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
@@ -113,7 +113,7 @@ public class FunctionModelService {
      *
      * @param sourcePaths
      *            file paths of source code to read.
-     * @return stream of designDocIds which are effected by input source.
+     * @return stream of functionIds which are effected by input source.
      */
     private Stream<String> readSources(Collection<String> sourcePaths) {
 
@@ -148,10 +148,10 @@ public class FunctionModelService {
         return classDefRepository.getEntryPoints();
     }
 
-    public DesignDoc get(String designDocId) {
+    public FunctionModel get(String functionId) {
 
-        log.info("Build diagram for {}", designDocId);
-        MethodDef entryPoint = classDefRepository.findMethodByQualifiedSignature(designDocId);
+        log.info("Build diagram for {}", functionId);
+        MethodDef entryPoint = classDefRepository.findMethodByQualifiedSignature(functionId);
 
         LifeLineDef lifeLine = sequenceProcessor.process(entryPoint.getClassDef(), entryPoint);
         SequenceDiagram sequenceModel = SequenceDiagram.builder().entryLifeLine(lifeLine).build();
@@ -169,22 +169,22 @@ public class FunctionModelService {
         Diagram sequenceDiagram = sequenceWriter.write(sequenceModel);
         Diagram classDiagram = classWriter.write(classModel);
 
-        DesignDoc doc = new DesignDoc();
-        doc.setId(designDocId);
-        doc.setPkg(entryPoint.getClassDef().getPkg());
-        doc.setClassName(entryPoint.getClassDef().getName());
-        doc.add(sequenceDiagram);
-        doc.add(classDiagram);
+        FunctionModel model = new FunctionModel();
+        model.setId(functionId);
+        model.setPkg(entryPoint.getClassDef().getPkg());
+        model.setClassName(entryPoint.getClassDef().getName());
+        model.add(sequenceDiagram);
+        model.add(classDiagram);
 
-        return doc;
+        return model;
     }
 
-    public List<DesignDoc> getAll() {
-        List<DesignDoc> designDocs = getAllIds().stream().map((designDocId) -> {
+    public List<FunctionModel> getAll() {
+        List<FunctionModel> designDocs = getAllIds().stream().map((functionId) -> {
             try {
-                return get(designDocId);
+                return get(functionId);
             } catch (Exception e) {
-                log.warn("Exception when create diagram: designDocId '{}'", designDocId, e);
+                log.warn("Exception when create diagram: functionId '{}'", functionId, e);
                 return null;
             }
         }).filter(Objects::nonNull).collect(Collectors.toList());

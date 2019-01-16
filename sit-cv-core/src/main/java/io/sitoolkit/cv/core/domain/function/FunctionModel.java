@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.designdoc;
+package io.sitoolkit.cv.core.domain.function;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data
-public class DesignDoc {
+public class FunctionModel {
     private String id;
     private String pkg;
     private String className;

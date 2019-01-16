@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.designdoc;
+package io.sitoolkit.cv.core.domain.function;
 
 import java.util.HashMap;
 import java.util.HashSet;

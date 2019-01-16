@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.designdoc;
+package io.sitoolkit.cv.core.domain.function;
 
 public enum DiagramType {
     ACTION_PROCESS_FLOW, ACTION_DATA_STRUCTURE;

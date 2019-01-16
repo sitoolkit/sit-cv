@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 
 import io.sitoolkit.cv.app.pres.designdoc.DetailResponse;
 import io.sitoolkit.cv.core.app.function.FunctionModelService;
-import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
+import io.sitoolkit.cv.core.domain.function.FunctionModel;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
@@ -20,18 +20,18 @@ public class FunctionModelPublisher {
     SimpMessagingTemplate template;
 
     @MessageMapping("/designdoc/detail")
-    public void publishDetail(String designDocId) {
+    public void publishDetail(String functionId) {
         DetailResponse response = new DetailResponse();
-        DesignDoc designDoc = service.get(designDocId);
+        FunctionModel functionModel = service.get(functionId);
 
-        designDoc.getAllDiagrams().stream().forEach(diagram -> {
+        functionModel.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
             response.getDiagrams().put(diagram.getId(), data);
             response.getApiDocs().putAll(diagram.getApiDocs());
         });
 
-        log.info("Publish design doc for {}", designDocId);
+        log.info("Publish function model for {}", functionId);
 
-        template.convertAndSend("/topic/designdoc/detail/" + designDocId, response);
+        template.convertAndSend("/topic/designdoc/detail/" + functionId, response);
     }
 }
