@@ -56,8 +56,6 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
 
     @Override
     public void onDesignDocChange(String designDocId) {
-        // TODO reload function model diagrams
-        // publishDetail(designDocId);
     }
 
     @Override
