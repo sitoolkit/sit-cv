@@ -13,16 +13,17 @@ public class DesignDocMenuBuilder {
 
     private Pattern designDocIdpattern = Pattern.compile("^(.*)\\.(.*?)(\\(.*)$");
 
-    public List<MenuItem> buildItemsAndAppendFunctionModelItems(List<String> designDocIds) {
+    public List<MenuItem> build(List<String> designDocIds) {
 
-        List<MenuItem> menuItems = buildMenuItems();
+        List<MenuItem> menuItems = buildStaticItems();
         menuItems.add(buildFunctionModelItem(designDocIds));
 
         return menuItems;
     }
 
-    private List<MenuItem> buildMenuItems() {
-        MenuItem crudMatrix = MenuItem.builder().name("CRUD Matrix").endpoint("/designdoc/crud").build();
+    private List<MenuItem> buildStaticItems() {
+        MenuItem crudMatrix = MenuItem.builder().name("CRUD Matrix").endpoint("/designdoc/crud")
+                .build();
         MenuItem dataModel = MenuItem.builder().name("Data Model")
                 .children(new ArrayList<>(Arrays.asList(crudMatrix))).build();
 
@@ -44,33 +45,29 @@ public class DesignDocMenuBuilder {
             String classSignature = matcher.group(1);
             String methodName = matcher.group(2);
 
-            List<MenuItem> classItems = findOrBuildClassItems(functionModelItems, classSignature);
+            String[] signatureParts = classSignature.split("\\.");
 
-            classItems.add(buildMethodItem(methodName, id));
+            List<MenuItem> currentItems = functionModelItems;
+            for (String part : signatureParts) {
+                Optional<MenuItem> partItem = findPartItem(currentItems, part);
+
+                if (partItem.isPresent()) {
+                    currentItems = partItem.get().getChildren();
+                } else {
+                    MenuItem newPartItem = MenuItem.builder().name(part).build();
+                    currentItems.add(newPartItem);
+                    currentItems = newPartItem.getChildren();
+                }
+            }
+
+            currentItems.add(buildMethodItem(methodName, id));
         });
 
         return functionModelItems;
     }
 
-    private List<MenuItem> findOrBuildClassItems(List<MenuItem> menuItems, String classSignature) {
-        String[] signatureParts = classSignature.split("\\.");
-
-        List<MenuItem> currentItems = menuItems;
-        for (String part : signatureParts) {
-            Optional<MenuItem> childItem = currentItems.stream()
-                    .filter((c) -> c.getName().equals(part)).findAny();
-
-            if (childItem.isPresent()) {
-                currentItems = childItem.get().getChildren();
-                continue;
-            }
-
-            MenuItem newChild = MenuItem.builder().name(part).build();
-            currentItems.add(newChild);
-            currentItems = newChild.getChildren();
-        }
-
-        return currentItems;
+    private Optional<MenuItem> findPartItem(List<MenuItem> items, String part) {
+        return items.stream().filter((c) -> c.getName().equals(part)).findAny();
     }
 
     private MenuItem buildMethodItem(String methodName, String designDocId) {

@@ -37,9 +37,11 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
     @Autowired
     DesignDocMenuBuilder menuBuilder;
 
+    List<MenuItem> menuItems;
+
     @PostConstruct
     public void init() {
-
+        buildMenu();
         publishDesingDocList();
 
         projectManager.getCurrentProject().getAllSrcDirs().stream().forEach(srcDir -> {
@@ -51,9 +53,6 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
 
     @MessageMapping("/designdoc/list")
     public void publishDesingDocList() {
-        List<MenuItem> menuItems = menuBuilder
-                .buildItemsAndAppendFunctionModelItems(service.getAllIds());
-
         template.convertAndSend("/topic/designdoc/list", menuItems);
     }
 
@@ -85,6 +84,11 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
 
     @Override
     public void onDesignDocListChange() {
+        buildMenu();
         publishDesingDocList();
+    }
+
+    private void buildMenu() {
+        menuItems = menuBuilder.build(service.getAllIds());
     }
 }
