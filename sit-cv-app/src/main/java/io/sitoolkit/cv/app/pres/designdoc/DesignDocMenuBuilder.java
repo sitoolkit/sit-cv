@@ -1,34 +1,37 @@
 package io.sitoolkit.cv.app.pres.designdoc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 import io.sitoolkit.cv.app.pres.menu.MenuItem;
-import io.sitoolkit.cv.core.infra.util.JsonUtils;
 
 public class DesignDocMenuBuilder {
 
-    private static final String FUNCTION_MODEL_MENU_NAME = "Function Model";
+    private Pattern designDocIdpattern = Pattern.compile("^(.*)\\.(.*?)(\\(.*)$");
 
-    private Pattern pattern = Pattern.compile("^(.*)\\.(.*?)(\\(.*)$");
+    public List<MenuItem> buildItemsAndAppendFunctionModelItems(List<String> designDocIds) {
 
-    public List<MenuItem> buildItemsAndAppendFunctionModelItems(String menuStr,
-            List<String> designDocIds) {
-
-        List<MenuItem> menuItems = JsonUtils.str2obj(menuStr, new TypeReference<List<MenuItem>>() {
-        });
-
-        MenuItem functionModelItem = menuItems.stream()
-                .filter((item) -> item.getName().equals(FUNCTION_MODEL_MENU_NAME)).findAny().get();
-        List<MenuItem> functionModelItems = buildFunctionModelItems(designDocIds);
-        functionModelItem.getChildren().addAll(functionModelItems);
+        List<MenuItem> menuItems = buildMenuItems();
+        menuItems.add(buildFunctionModelItem(designDocIds));
 
         return menuItems;
+    }
+
+    private List<MenuItem> buildMenuItems() {
+        MenuItem crudMatrix = MenuItem.builder().name("CRUD Matrix").endpoint("/designdoc/crud").build();
+        MenuItem dataModel = MenuItem.builder().name("Data Model")
+                .children(new ArrayList<>(Arrays.asList(crudMatrix))).build();
+
+        return new ArrayList<>(Arrays.asList(dataModel));
+    }
+
+    private MenuItem buildFunctionModelItem(List<String> designDocIds) {
+        List<MenuItem> children = buildFunctionModelItems(designDocIds);
+        return MenuItem.builder().name("Function Model").children(children).build();
     }
 
     private List<MenuItem> buildFunctionModelItems(List<String> designDocIds) {
@@ -36,7 +39,7 @@ public class DesignDocMenuBuilder {
         List<MenuItem> functionModelItems = new ArrayList<>();
 
         designDocIds.stream().forEach((id) -> {
-            Matcher matcher = pattern.matcher(id);
+            Matcher matcher = designDocIdpattern.matcher(id);
             matcher.matches();
             String classSignature = matcher.group(1);
             String methodName = matcher.group(2);
@@ -62,8 +65,7 @@ public class DesignDocMenuBuilder {
                 continue;
             }
 
-            MenuItem newChild = new MenuItem();
-            newChild.setName(part);
+            MenuItem newChild = MenuItem.builder().name(part).build();
             currentItems.add(newChild);
             currentItems = newChild.getChildren();
         }
@@ -72,9 +74,7 @@ public class DesignDocMenuBuilder {
     }
 
     private MenuItem buildMethodItem(String methodName, String designDocId) {
-        MenuItem item = new MenuItem();
-        item.setName(methodName);
-        item.setEndpoint("/designdoc/function/" + designDocId);
-        return item;
+        return MenuItem.builder().name(methodName).endpoint("/designdoc/function/" + designDocId)
+                .build();
     }
 }

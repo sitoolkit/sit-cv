@@ -6,7 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.sitoolkit.cv.app.infra.menu.MenuReader;
 import io.sitoolkit.cv.app.pres.designdoc.DesignDocMenuBuilder;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
@@ -35,11 +34,6 @@ public class BaseConfig {
     @Bean
     public ProjectManager projectManager(ServiceFactory serviceFactory) {
         return serviceFactory.getProjectManager();
-    }
-
-    @Bean
-    public MenuReader menuReader() {
-        return new MenuReader();
     }
 
     @Bean
