@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.report.designdoc;
+package io.sitoolkit.cv.core.domain.report.function;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -8,7 +8,7 @@ import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import lombok.Data;
 
 @Data
-public class DesignDocReportDetailDef {
+public class FunctionModelReportDetailDef {
 
     /**
      * key:diagram.id, value:diagram.data

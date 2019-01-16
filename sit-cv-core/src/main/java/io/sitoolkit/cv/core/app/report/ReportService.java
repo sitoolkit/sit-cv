@@ -7,13 +7,13 @@ import io.sitoolkit.cv.core.domain.function.FunctionModel;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.Report;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
-import io.sitoolkit.cv.core.domain.report.designdoc.DesignDocReportProcessor;
+import io.sitoolkit.cv.core.domain.report.function.FunctionModelReportProcessor;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class ReportService {
 
-    private DesignDocReportProcessor designDocReportProcessor;
+    private FunctionModelReportProcessor designDocReportProcessor;
 
     private ReportWriter reportWriter;
 

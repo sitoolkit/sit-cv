@@ -10,7 +10,7 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
-import io.sitoolkit.cv.core.domain.report.designdoc.DesignDocReportProcessor;
+import io.sitoolkit.cv.core.domain.report.function.FunctionModelReportProcessor;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
@@ -96,7 +96,7 @@ public class ServiceFactory {
 
     protected ReportService createReportService(FunctionModelService functionModelService,
             ProjectManager projectManager) {
-        DesignDocReportProcessor designDocReportProcessor = new DesignDocReportProcessor();
+        FunctionModelReportProcessor designDocReportProcessor = new FunctionModelReportProcessor();
         ReportWriter reportWriter = new ReportWriter();
 
         return new ReportService(designDocReportProcessor, reportWriter, functionModelService,

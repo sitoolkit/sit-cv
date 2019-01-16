@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.report.designdoc;
+package io.sitoolkit.cv.core.domain.report.function;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +13,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DesignDocReportProcessor {
+public class FunctionModelReportProcessor {
 
     public List<Report<?>> process(List<FunctionModel> functionModels) {
         List<Report<?>> reports = new ArrayList<>();
@@ -29,28 +29,28 @@ public class DesignDocReportProcessor {
             List<FunctionModel> functionModels) {
         DetailReportsAndPathMap reportsAndPathMap = new DetailReportsAndPathMap();
 
-        functionModels.stream().forEach(designDoc -> {
+        functionModels.stream().forEach(functionModel -> {
             try {
-                String path = buildDetailPath(designDoc);
-                reportsAndPathMap.add(designDoc.getId(), path, buildDetail(designDoc));
+                String path = buildDetailPath(functionModel);
+                reportsAndPathMap.add(functionModel.getId(), path, buildDetail(functionModel));
             } catch (Exception e) {
-                log.warn("Exception when build report: functionId '{}'", designDoc.getId(), e);
+                log.warn("Exception when build report: functionId '{}'", functionModel.getId(), e);
             }
         });
 
         return reportsAndPathMap;
     }
 
-    private String buildDetailPath(FunctionModel designDoc) {
-        String dirName = designDoc.getPkg().replaceAll("\\.", "/");
-        String fileName = designDoc.getClassName() + ".js";
+    private String buildDetailPath(FunctionModel functionModel) {
+        String dirName = functionModel.getPkg().replaceAll("\\.", "/");
+        String fileName = functionModel.getClassName() + ".js";
 
         return dirName + "/" + fileName;
     }
 
-    private DesignDocReportDetailDef buildDetail(FunctionModel designDoc) {
-        DesignDocReportDetailDef detail = new DesignDocReportDetailDef();
-        designDoc.getAllDiagrams().stream().forEach(diagram -> {
+    private FunctionModelReportDetailDef buildDetail(FunctionModel functionModel) {
+        FunctionModelReportDetailDef detail = new FunctionModelReportDetailDef();
+        functionModel.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
             detail.getDiagrams().put(diagram.getId(), data);
             detail.getApiDocs().putAll(diagram.getApiDocs());
@@ -75,7 +75,7 @@ public class DesignDocReportProcessor {
          */
         private Map<String, String> pathMap = new LinkedHashMap<>();
 
-        public void add(String functionId, String path, DesignDocReportDetailDef detail) {
+        public void add(String functionId, String path, FunctionModelReportDetailDef detail) {
             pathMap.put(functionId, path);
             Report<DetailMap> report = reportMap.computeIfAbsent(path,
                     p -> Report.<DetailMap>builder().path(p).content(new DetailMap()).build());
@@ -92,7 +92,7 @@ public class DesignDocReportProcessor {
         /**
          * key:functionId
          */
-        private Map<String, DesignDocReportDetailDef> detailMap = new HashMap<>();
+        private Map<String, FunctionModelReportDetailDef> detailMap = new HashMap<>();
     }
 
 }
