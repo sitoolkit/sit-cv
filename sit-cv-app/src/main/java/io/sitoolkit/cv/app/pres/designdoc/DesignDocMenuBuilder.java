@@ -2,72 +2,85 @@ package io.sitoolkit.cv.app.pres.designdoc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.app.pres.menu.MenuItem;
 
 public class DesignDocMenuBuilder {
 
-    private Pattern designDocIdpattern = Pattern.compile("^(.*)\\.(.*?)(\\(.*)$");
+    private static final Pattern QUALIFIED_METHOD_SIG_PATTERN = Pattern
+            .compile("^(.*)\\.(.*?)(\\(.*)$");
 
     public List<MenuItem> build(List<String> designDocIds) {
-
-        List<MenuItem> menuItems = buildStaticItems();
-        menuItems.add(buildFunctionModelItem(designDocIds));
-
-        return menuItems;
+        return Arrays.asList(buildDataModelItem(), buildFunctionModelItem(designDocIds));
     }
 
-    private List<MenuItem> buildStaticItems() {
-        MenuItem crudMatrix = MenuItem.builder().name("CRUD Matrix").endpoint("/designdoc/crud")
-                .build();
-        MenuItem dataModel = MenuItem.builder().name("Data Model")
-                .children(new ArrayList<>(Arrays.asList(crudMatrix))).build();
+    private MenuItem buildDataModelItem() {
+        MenuItem dataModelItem = MenuItem.builder().name("Data Model").build();
 
-        return new ArrayList<>(Arrays.asList(dataModel));
+        dataModelItem.getChildren()
+                .add(MenuItem.builder().name("CRUD Matrix").endpoint("/designdoc/crud").build());
+
+        return dataModelItem;
     }
 
     private MenuItem buildFunctionModelItem(List<String> designDocIds) {
-        List<MenuItem> children = buildFunctionModelItems(designDocIds);
-        return MenuItem.builder().name("Function Model").children(children).build();
+        MenuItem functionModelNode = MenuItem.builder().name("Function Model").build();
+        functionModelNode.getChildren().addAll(buildFunctionModelItems(designDocIds));
+        return functionModelNode;
     }
 
     private List<MenuItem> buildFunctionModelItems(List<String> designDocIds) {
 
-        List<MenuItem> functionModelItems = new ArrayList<>();
+        List<MenuItem> rootItems = new ArrayList<>();
+        // key : path (package name or fqcn)
+        Map<String, MenuItem> pathMenuItemMap = new HashMap<>();
 
-        designDocIds.stream().forEach((id) -> {
-            Matcher matcher = designDocIdpattern.matcher(id);
+        designDocIds.stream().forEach(designDocId -> {
+            Matcher matcher = QUALIFIED_METHOD_SIG_PATTERN.matcher(designDocId);
             matcher.matches();
-            String classSignature = matcher.group(1);
+            String fqcn = matcher.group(1);
             String methodName = matcher.group(2);
 
-            String[] signatureParts = classSignature.split("\\.");
-
-            List<MenuItem> currentItems = functionModelItems;
-            for (String part : signatureParts) {
-                Optional<MenuItem> partItem = findPartItem(currentItems, part);
-
-                if (partItem.isPresent()) {
-                    currentItems = partItem.get().getChildren();
-                } else {
-                    MenuItem newPartItem = MenuItem.builder().name(part).build();
-                    currentItems.add(newPartItem);
-                    currentItems = newPartItem.getChildren();
-                }
-            }
-
-            currentItems.add(buildMethodItem(methodName, id));
+            MenuItem classItem = findItemWithCreatingParent(fqcn, pathMenuItemMap, rootItems);
+            classItem.getChildren().add(buildMethodItem(methodName, designDocId));
         });
 
-        return functionModelItems;
+        return rootItems;
     }
 
-    private Optional<MenuItem> findPartItem(List<MenuItem> items, String part) {
-        return items.stream().filter((c) -> c.getName().equals(part)).findAny();
+    private MenuItem findItemWithCreatingParent(String currentPath,
+            Map<String, MenuItem> pathMenuItemMap, List<MenuItem> rootItems) {
+
+        MenuItem currentItem = pathMenuItemMap.get(currentPath);
+
+        if (currentItem != null) {
+            return currentItem;
+        }
+
+        boolean isRoot = !currentPath.contains(".");
+
+        String currentItemName = isRoot ? currentPath
+                : StringUtils.substringAfterLast(currentPath, ".");
+        currentItem = MenuItem.builder().name(currentItemName).build();
+        pathMenuItemMap.put(currentPath, currentItem);
+
+        if (isRoot) {
+            rootItems.add(currentItem);
+            return currentItem;
+        }
+
+        String parentPath = StringUtils.substringBeforeLast(currentPath, ".");
+        MenuItem parentItem = findItemWithCreatingParent(parentPath, pathMenuItemMap, rootItems);
+        parentItem.getChildren().add(currentItem);
+
+        return currentItem;
     }
 
     private MenuItem buildMethodItem(String methodName, String designDocId) {

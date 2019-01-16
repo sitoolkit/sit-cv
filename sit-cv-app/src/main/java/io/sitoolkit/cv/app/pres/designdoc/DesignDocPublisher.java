@@ -1,7 +1,5 @@
 package io.sitoolkit.cv.app.pres.designdoc;
 
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.sitoolkit.cv.app.infra.config.ApplicationConfig;
-import io.sitoolkit.cv.app.pres.menu.MenuItem;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocChangeEventListener;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
@@ -37,11 +34,8 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
     @Autowired
     DesignDocMenuBuilder menuBuilder;
 
-    List<MenuItem> menuItems;
-
     @PostConstruct
     public void init() {
-        buildMenu();
         publishDesingDocList();
 
         projectManager.getCurrentProject().getAllSrcDirs().stream().forEach(srcDir -> {
@@ -53,7 +47,7 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
 
     @MessageMapping("/designdoc/list")
     public void publishDesingDocList() {
-        template.convertAndSend("/topic/designdoc/list", menuItems);
+        template.convertAndSend("/topic/designdoc/list", menuBuilder.build(service.getAllIds()));
     }
 
     @MessageMapping("/designdoc/detail")
@@ -84,11 +78,7 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
 
     @Override
     public void onDesignDocListChange() {
-        buildMenu();
         publishDesingDocList();
     }
 
-    private void buildMenu() {
-        menuItems = menuBuilder.build(service.getAllIds());
-    }
 }
