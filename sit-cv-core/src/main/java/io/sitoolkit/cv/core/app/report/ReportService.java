@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ReportService {
 
-    private FunctionModelReportProcessor designDocReportProcessor;
+    private FunctionModelReportProcessor functionModelReportProcessor;
 
     private ReportWriter reportWriter;
 
@@ -26,7 +26,7 @@ public class ReportService {
 
         List<FunctionModel> functionModels = functionModelService.getAll();
 
-        List<Report<?>> reports = designDocReportProcessor.process(functionModels);
+        List<Report<?>> reports = functionModelReportProcessor.process(functionModels);
 
         reportWriter.write(projectManager.getCurrentProject().getDir(), reports);
     }

@@ -96,10 +96,10 @@ public class ServiceFactory {
 
     protected ReportService createReportService(FunctionModelService functionModelService,
             ProjectManager projectManager) {
-        FunctionModelReportProcessor designDocReportProcessor = new FunctionModelReportProcessor();
+        FunctionModelReportProcessor functionModelReportProcessor = new FunctionModelReportProcessor();
         ReportWriter reportWriter = new ReportWriter();
 
-        return new ReportService(designDocReportProcessor, reportWriter, functionModelService,
+        return new ReportService(functionModelReportProcessor, reportWriter, functionModelService,
                 projectManager);
     }
 }
