@@ -14,7 +14,8 @@ import {
   MatListModule,
   MatProgressBarModule,
   MatCardModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatTableModule
 } from '@angular/material';
 import { MatTreeModule } from '@angular/material/tree';
 import { FunctionModelComponent } from './cmp/function-model/function-model.component';
@@ -56,6 +57,7 @@ let serviceFactory = new ServiceFactory();
     MatProgressBarModule,
     MatCardModule,
     MatSnackBarModule,
+    MatTableModule,
     MY_ROUTES,
     HttpModule,
   ],

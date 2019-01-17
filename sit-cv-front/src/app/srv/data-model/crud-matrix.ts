@@ -1,6 +1,5 @@
-enum CrudType {
-  C, R, U, D
-}
+import { CrudType } from "./crud-type";
+
 class CrudRow {
   actionPath: string;
   cellMap: { [tableName: string]: CrudType[] };

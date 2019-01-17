@@ -29,7 +29,11 @@ public class CrudService {
         crud.add("a.b.c.BController.update(java.lang.String)", tableB, CrudType.UPDATE,
                 "update tableB set xxxx");
 
-        crud.add("a.b.c.BController.delete(java.lang.String)", tableC, CrudType.DELETE,
+        crud.add("a.b.c.CController.delete(java.lang.String)", tableB, CrudType.REFERENCE,
+                "select * from tableB where xxxx");
+        crud.add("a.b.c.CController.delete(java.lang.String)", tableC, CrudType.REFERENCE,
+                "select * from tableC where xxxx");
+        crud.add("a.b.c.CController.delete(java.lang.String)", tableC, CrudType.DELETE,
                 "delete from tableC where xxxx");
 
         return crud;

@@ -1,0 +1,29 @@
+.crud-container {
+  padding: 1em;
+}
+
+.crud-types {
+  display: flex;
+}
+
+.crud-types > * {
+  width: 25%;
+}
+
+table th {
+  min-width: 6em;
+  text-align: center;
+}
+
+table td {
+  padding: 0 1em;
+  text-align: center;
+}
+
+table th:not(:first-child) {
+  padding: 0 1em;
+}
+
+table th, table td {
+  border-right: 1px solid rgba(0, 0, 0, .12);
+}
