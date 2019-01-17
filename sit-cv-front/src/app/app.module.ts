@@ -21,7 +21,6 @@ import { DesignDocComponent } from './cmp/designdoc/designdoc.component';
 import { ErrorComponent } from './error.component';
 import { DoctreeComponent } from './cmp/doctree/doctree.component';
 
-import { DesignDocReportRepository } from './srv/designdoc/designdoc-report.repository';
 import { DesignDocServerService } from './srv/designdoc/designdoc-server.service';
 import { DesignDocReportService } from './srv/designdoc/designdoc-report.service';
 import { Config } from './srv/shared/config';
@@ -30,6 +29,7 @@ import { ApiDocComponent } from './cmp/designdoc/apidoc/apidoc.component';
 import { SitCvWebsocket } from './srv/shared/sit-cv-websocket';
 import { FunctionModelReportService } from './srv/function-model/function-model-report.service';
 import { FunctionModelServerService } from './srv/function-model/function-model-server.service';
+import { ReportDataLoader } from './srv/shared/report-data-loader';
 
 @NgModule({
   declarations: [
@@ -59,25 +59,25 @@ import { FunctionModelServerService } from './srv/function-model/function-model-
   providers: [
     {
       provide: 'DesignDocService',
-      useFactory: (repository: DesignDocReportRepository, socket: SitCvWebsocket, config: Config) => {
+      useFactory: (reportLoader: ReportDataLoader, socket: SitCvWebsocket, config: Config) => {
         if (config.isReportMode()) {
-          return new DesignDocReportService(repository);
+          return new DesignDocReportService(reportLoader);
         } else {
           return new DesignDocServerService(socket);
         }
       },
-      deps: [DesignDocReportRepository, SitCvWebsocket, Config]
+      deps: [ReportDataLoader, SitCvWebsocket, Config]
     },
     {
       provide: 'FunctionModelService',
-      useFactory: (repository: DesignDocReportRepository, socket: SitCvWebsocket, config: Config) => {
+      useFactory: (reportLoader: ReportDataLoader, socket: SitCvWebsocket, config: Config) => {
         if (config.isReportMode()) {
-          return new FunctionModelReportService(repository);
+          return new FunctionModelReportService(reportLoader);
         } else {
           return new FunctionModelServerService(socket);
         }
       },
-      deps: [DesignDocReportRepository, SitCvWebsocket, Config]
+      deps: [ReportDataLoader, SitCvWebsocket, Config]
     },
   ],
   bootstrap: [AppComponent],

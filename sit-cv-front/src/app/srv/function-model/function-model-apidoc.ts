@@ -1,4 +1,4 @@
-export class DesignDocApiDoc {
+export class FunctionModelApiDoc {
   qualifiedClassName: string;
   annotations: Array<string>;
   methodDeclaration: string;

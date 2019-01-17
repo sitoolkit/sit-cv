@@ -1,6 +1,6 @@
 import * as Stomp from '@stomp/stompjs';
 import { Injectable } from '@angular/core';
-import { DesignDocDetail } from '../designdoc/designdoc-detail';
+import { FunctionModelDetail } from './function-model-detail';
 import { SitCvWebsocket } from '../shared/sit-cv-websocket';
 import { FunctionModelService } from './function-model.service';
 
@@ -14,7 +14,7 @@ export class FunctionModelServerService implements FunctionModelService {
 
   getDetail(
     designDocId: string,
-    callback: (detail: DesignDocDetail) => void
+    callback: (detail: FunctionModelDetail) => void
   ): void {
     if (this.detailSubscriber != null) {
       this.detailSubscriber.unsubscribe();
@@ -23,7 +23,7 @@ export class FunctionModelServerService implements FunctionModelService {
     let subscribeUrl: string = '/topic/designdoc/detail/' + designDocId;
     this.socket.subscribe((client: Stomp.Client) => {
       this.detailSubscriber = client.subscribe(subscribeUrl, (response: any) => {
-        let detail = (<DesignDocDetail>JSON.parse(response.body));
+        let detail = (<FunctionModelDetail>JSON.parse(response.body));
         callback(detail);
       });
       client.send('/app/designdoc/detail', {}, designDocId);

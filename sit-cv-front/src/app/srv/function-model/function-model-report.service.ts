@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
-import { DesignDocDetail } from '../designdoc/designdoc-detail';
-import { DesignDocReportRepository } from '../designdoc/designdoc-report.repository';
+import { FunctionModelDetail } from './function-model-detail';
 import { FunctionModelService } from './function-model.service';
+import { ReportDataLoader } from '../shared/report-data-loader';
 
 @Injectable()
 export class FunctionModelReportService implements FunctionModelService {
 
-  constructor(private repository: DesignDocReportRepository) { }
+  constructor(private reportLoader: ReportDataLoader) { }
 
   getDetail(
     designDocId: string,
-    callback: (detail: DesignDocDetail) => void
+    callback: (detail: FunctionModelDetail) => void
   ): void {
-    this.repository.getDetail(designDocId, callback);
   }
 
 }

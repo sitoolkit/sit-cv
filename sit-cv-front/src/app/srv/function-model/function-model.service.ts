@@ -1,8 +1,8 @@
-import { DesignDocDetail } from '../designdoc/designdoc-detail';
+import { FunctionModelDetail } from './function-model-detail';
 
 export interface FunctionModelService {
   getDetail(
     designDocId: string,
-    callback: (detail: DesignDocDetail) => void
+    callback: (detail: FunctionModelDetail) => void
   ): void
 }
