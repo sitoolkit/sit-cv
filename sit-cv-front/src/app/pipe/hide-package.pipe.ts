@@ -8,7 +8,9 @@ export type HideOption = 'HIDE_ALL' | 'PARAM_TYPE_ONLY';
 export class HidePackagePipe implements PipeTransform {
 
   transform(value: string, hideOption: HideOption = 'HIDE_ALL'): string {
-    if (hideOption === 'PARAM_TYPE_ONLY') {
+    if (value == null) {
+      return '';
+    } else if (hideOption === 'PARAM_TYPE_ONLY') {
       return value.replace(/[(][^()]*[)]/g, this.hidePackageName);
     } else {
       return this.hidePackageName(value);

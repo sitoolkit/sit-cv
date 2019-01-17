@@ -31,9 +31,11 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
     @Autowired
     ProjectManager projectManager;
 
+    @Autowired
+    DesignDocMenuBuilder menuBuilder;
+
     @PostConstruct
     public void init() {
-
         publishDesingDocList();
 
         projectManager.getCurrentProject().getAllSrcDirs().stream().forEach(srcDir -> {
@@ -45,11 +47,7 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
 
     @MessageMapping("/designdoc/list")
     public void publishDesingDocList() {
-
-        ListResponse listResponse = new ListResponse();
-        listResponse.getDesignDocIds().addAll(service.getAllIds());
-
-        template.convertAndSend("/topic/designdoc/list", listResponse);
+        template.convertAndSend("/topic/designdoc/list", menuBuilder.build(service.getAllIds()));
     }
 
     @MessageMapping("/designdoc/detail")
@@ -82,4 +80,5 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
     public void onDesignDocListChange() {
         publishDesingDocList();
     }
+
 }

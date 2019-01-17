@@ -1,21 +1,45 @@
-import { Component } from '@angular/core';
-import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
+import { Component, OnInit } from '@angular/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Router, RoutesRecognized } from '@angular/router';
+import { DesignDocComponent } from '../designdoc/designdoc.component';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
+
+  subtitle: string
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
       map(result => result.matches)
     );
 
-  constructor(private breakpointObserver: BreakpointObserver) {}
+  constructor(
+    private breakpointObserver: BreakpointObserver,
+    private router: Router
+  ) { }
+
+  ngOnInit() {
+    this.router.events.subscribe(event => {
+      if (event instanceof RoutesRecognized) {
+        let componentType = event.state.root.firstChild.component;
+        let params = event.state.root.firstChild.params;
+        switch (componentType) {
+          case DesignDocComponent:
+            this.subtitle = params['designDocId'];
+            break;
+          default:
+            this.subtitle = null;
+            break;
+        }
+      }
+    });
+  }
 
 }
 
