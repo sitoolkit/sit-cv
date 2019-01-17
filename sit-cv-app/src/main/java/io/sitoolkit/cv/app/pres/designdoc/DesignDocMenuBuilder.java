@@ -25,7 +25,7 @@ public class DesignDocMenuBuilder {
         MenuItem dataModelItem = MenuItem.builder().name("Data Model").build();
 
         dataModelItem.getChildren()
-                .add(MenuItem.builder().name("CRUD Matrix").endpoint("/designdoc/crud").build());
+                .add(MenuItem.builder().name("CRUD Matrix").endpoint("/designdoc/data/crud").build());
 
         return dataModelItem;
     }

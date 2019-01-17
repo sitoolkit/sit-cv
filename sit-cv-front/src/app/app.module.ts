@@ -21,15 +21,13 @@ import { FunctionModelComponent } from './cmp/function-model/function-model.comp
 import { ErrorComponent } from './error.component';
 import { DoctreeComponent } from './cmp/doctree/doctree.component';
 
-import { DesignDocServerService } from './srv/designdoc/designdoc-server.service';
-import { DesignDocReportService } from './srv/designdoc/designdoc-report.service';
 import { Config } from './srv/shared/config';
 import { HidePackagePipe } from './pipe/hide-package.pipe';
 import { ApiDocComponent } from './cmp/function-model/apidoc/apidoc.component';
 import { SitCvWebsocket } from './srv/shared/sit-cv-websocket';
-import { FunctionModelReportService } from './srv/function-model/function-model-report.service';
-import { FunctionModelServerService } from './srv/function-model/function-model-server.service';
 import { ReportDataLoader } from './srv/shared/report-data-loader';
+import { CrudComponent } from './cmp/data-model/crud/crud.component';
+import { HttpModule } from '@angular/http';
 import { ServiceFactory } from './service-factory';
 
 let serviceFactory = new ServiceFactory();
@@ -43,6 +41,7 @@ let serviceFactory = new ServiceFactory();
     DoctreeComponent,
     HidePackagePipe,
     ApiDocComponent,
+    CrudComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,6 +57,7 @@ let serviceFactory = new ServiceFactory();
     MatCardModule,
     MatSnackBarModule,
     MY_ROUTES,
+    HttpModule,
   ],
   providers: [
     {

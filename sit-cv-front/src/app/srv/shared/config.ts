@@ -15,11 +15,13 @@ export class Config {
 
   mode: Mode;
   webSocketEndpoint: string;
+  httpEndpoint: string;
 
   constructor() {
     let config = window.config;
     this.mode = config.mode;
     this.webSocketEndpoint = config.webSocketEndpoint;
+    this.httpEndpoint = config.httpEndpoint;
   }
 
   isReportMode(): boolean {

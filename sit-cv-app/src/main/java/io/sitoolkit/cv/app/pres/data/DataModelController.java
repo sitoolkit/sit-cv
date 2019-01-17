@@ -14,7 +14,7 @@ public class DataModelController {
     CrudService crudService;
 
     @RequestMapping("/designdoc/data/crud")
-    public CrudMatrix index() {
+    public CrudMatrix crud() {
         return crudService.loadMatrix();
     }
 }
