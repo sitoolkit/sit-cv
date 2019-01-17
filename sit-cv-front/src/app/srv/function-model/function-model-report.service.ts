@@ -9,7 +9,7 @@ export class FunctionModelReportService implements FunctionModelService {
   constructor(private reportLoader: ReportDataLoader) { }
 
   getDetail(
-    designDocId: string,
+    functionId: string,
     callback: (detail: FunctionModelDetail) => void
   ): void {
   }

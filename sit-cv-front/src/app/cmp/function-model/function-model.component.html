@@ -1,4 +1,4 @@
-<div class="designdoc-container">
+<div class="function-model-container">
   <div class="diagrams">
     <div class="diagram-group" *ngFor="let group of currentDiagramGroups" [@diagramAnimation]="isLeaveAnimationEnabled ? 'leaveEnable' : ''">
       <div class="diagram-row" *ngFor="let diagram of group.diagrams" (click)="methodNameClick($event)" (mousemove)="methodNameMouseover($event)">
@@ -18,7 +18,7 @@
         <mat-card-title>{{signature}}</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        {{diagramComments[currentDesignDocId][signature]}}
+        {{diagramComments[currentFunctionId][signature]}}
       </mat-card-content>
     </mat-card>
   </div>

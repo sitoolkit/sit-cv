@@ -18,9 +18,9 @@ interface DiagramGroup {
 }
 
 @Component({
-  selector: 'app-designdoc',
-  templateUrl: './designdoc.component.html',
-  styleUrls: ['./designdoc.component.css'],
+  selector: 'app-function-model',
+  templateUrl: './function-model.component.html',
+  styleUrls: ['./function-model.component.css'],
   animations: [
     trigger('diagramAnimation', [
       transition(":enter", [
@@ -34,9 +34,8 @@ interface DiagramGroup {
   ],
 })
 
-export class DesignDocComponent implements OnInit {
-  designDocIds = [];
-  currentDesignDocId = '';
+export class FunctionModelComponent implements OnInit {
+  currentFunctionId = '';
   currentDiagramGroups: DiagramGroup[] = [];
   objectKeys = Object.keys;
   diagramApiDocs = {};
@@ -54,8 +53,8 @@ export class DesignDocComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      if (params['designDocId']) {
-        this.showDesignDocDetail(params['designDocId']);
+      if (params['functionId']) {
+        this.showFunctionDetail(params['functionId']);
       }
     });
   }
@@ -74,17 +73,17 @@ export class DesignDocComponent implements OnInit {
     this.currentDiagramGroups[0] = { diagrams: trustDiagrams };
   }
 
-  showDesignDocDetail(designDocId) {
-    if (this.currentDesignDocId) {
+  showFunctionDetail(functionId) {
+    if (this.currentFunctionId) {
       this.selectedMethodSignatures = [];
       this.isLeaveAnimationEnabled = false;
       this.chRef.detectChanges();
       this.currentDiagramGroups = [];
       this.isLeaveAnimationEnabled = true;
     }
-    this.currentDesignDocId = designDocId;
+    this.currentFunctionId = functionId;
     this.isDiagramLoading = true;
-    this.functionModelService.getDetail(designDocId, (detail) => {
+    this.functionModelService.getDetail(functionId, (detail) => {
       this.isDiagramLoading = false;
       this.renderDiagrams(detail.diagrams);
       this.diagramApiDocs = detail.apiDocs;

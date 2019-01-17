@@ -17,7 +17,7 @@ import {
   MatSnackBarModule
 } from '@angular/material';
 import { MatTreeModule } from '@angular/material/tree';
-import { DesignDocComponent } from './cmp/designdoc/designdoc.component';
+import { FunctionModelComponent } from './cmp/function-model/function-model.component';
 import { ErrorComponent } from './error.component';
 import { DoctreeComponent } from './cmp/doctree/doctree.component';
 
@@ -25,7 +25,7 @@ import { DesignDocServerService } from './srv/designdoc/designdoc-server.service
 import { DesignDocReportService } from './srv/designdoc/designdoc-report.service';
 import { Config } from './srv/shared/config';
 import { HidePackagePipe } from './pipe/hide-package.pipe';
-import { ApiDocComponent } from './cmp/designdoc/apidoc/apidoc.component';
+import { ApiDocComponent } from './cmp/function-model/apidoc/apidoc.component';
 import { SitCvWebsocket } from './srv/shared/sit-cv-websocket';
 import { FunctionModelReportService } from './srv/function-model/function-model-report.service';
 import { FunctionModelServerService } from './srv/function-model/function-model-server.service';
@@ -35,7 +35,7 @@ import { ReportDataLoader } from './srv/shared/report-data-loader';
   declarations: [
     AppComponent,
     NavbarComponent,
-    DesignDocComponent,
+    FunctionModelComponent,
     ErrorComponent,
     DoctreeComponent,
     HidePackagePipe,

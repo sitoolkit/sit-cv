@@ -3,7 +3,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router, RoutesRecognized } from '@angular/router';
-import { DesignDocComponent } from '../designdoc/designdoc.component';
+import { FunctionModelComponent } from '../function-model/function-model.component';
 
 @Component({
   selector: 'app-navbar',
@@ -30,8 +30,8 @@ export class NavbarComponent implements OnInit {
         let componentType = event.state.root.firstChild.component;
         let params = event.state.root.firstChild.params;
         switch (componentType) {
-          case DesignDocComponent:
-            this.subtitle = params['designDocId'];
+          case FunctionModelComponent:
+            this.subtitle = params['functionId'];
             break;
           default:
             this.subtitle = null;
