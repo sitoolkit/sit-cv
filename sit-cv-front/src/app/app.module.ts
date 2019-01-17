@@ -30,6 +30,9 @@ import { SitCvWebsocket } from './srv/shared/sit-cv-websocket';
 import { FunctionModelReportService } from './srv/function-model/function-model-report.service';
 import { FunctionModelServerService } from './srv/function-model/function-model-server.service';
 import { ReportDataLoader } from './srv/shared/report-data-loader';
+import { ServiceFactory } from './service-factory';
+
+let serviceFactory = new ServiceFactory();
 
 @NgModule({
   declarations: [
@@ -59,24 +62,12 @@ import { ReportDataLoader } from './srv/shared/report-data-loader';
   providers: [
     {
       provide: 'DesignDocService',
-      useFactory: (reportLoader: ReportDataLoader, socket: SitCvWebsocket, config: Config) => {
-        if (config.isReportMode()) {
-          return new DesignDocReportService(reportLoader);
-        } else {
-          return new DesignDocServerService(socket);
-        }
-      },
+      useFactory: serviceFactory.createDesignDocService,
       deps: [ReportDataLoader, SitCvWebsocket, Config]
     },
     {
       provide: 'FunctionModelService',
-      useFactory: (reportLoader: ReportDataLoader, socket: SitCvWebsocket, config: Config) => {
-        if (config.isReportMode()) {
-          return new FunctionModelReportService(reportLoader);
-        } else {
-          return new FunctionModelServerService(socket);
-        }
-      },
+      useFactory: serviceFactory.createFunctionModelService,
       deps: [ReportDataLoader, SitCvWebsocket, Config]
     },
   ],
