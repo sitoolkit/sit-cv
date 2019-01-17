@@ -34,7 +34,7 @@ public class FunctionModelPublisher implements DesignDocChangeEventListener {
         service.watchConfig(this);
     }
 
-    @MessageMapping("/designdoc/detail")
+    @MessageMapping("/designdoc/function")
     public void publishDetail(String functionId) {
         DetailResponse response = new DetailResponse();
         FunctionModel functionModel = service.get(functionId);
@@ -47,7 +47,7 @@ public class FunctionModelPublisher implements DesignDocChangeEventListener {
 
         log.info("Publish function model for {}", functionId);
 
-        template.convertAndSend("/topic/designdoc/detail/" + functionId, response);
+        template.convertAndSend("/topic/designdoc/function/" + functionId, response);
     }
 
     @Override

@@ -20,13 +20,13 @@ export class FunctionModelServerService implements FunctionModelService {
       this.detailSubscriber.unsubscribe();
       this.detailSubscriber = null;
     }
-    let subscribeUrl: string = '/topic/designdoc/detail/' + functionId;
+    let subscribeUrl: string = '/topic/designdoc/function/' + functionId;
     this.socket.subscribe((client: Stomp.Client) => {
       this.detailSubscriber = client.subscribe(subscribeUrl, (response: any) => {
         let detail = (<FunctionModelDetail>JSON.parse(response.body));
         callback(detail);
       });
-      client.send('/app/designdoc/detail', {}, functionId);
+      client.send('/app/designdoc/function', {}, functionId);
     })
   }
 
