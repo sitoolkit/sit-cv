@@ -28,6 +28,8 @@ import { Config } from './srv/shared/config';
 import { HidePackagePipe } from './pipe/hide-package.pipe';
 import { ApiDocComponent } from './cmp/designdoc/apidoc/apidoc.component';
 import { SitCvWebsocket } from './srv/shared/sit-cv-websocket';
+import { FunctionModelReportService } from './srv/function-model/function-model-report.service';
+import { FunctionModelServerService } from './srv/function-model/function-model-server.service';
 
 @NgModule({
   declarations: [
@@ -62,6 +64,17 @@ import { SitCvWebsocket } from './srv/shared/sit-cv-websocket';
           return new DesignDocReportService(repository);
         } else {
           return new DesignDocServerService(socket);
+        }
+      },
+      deps: [DesignDocReportRepository, SitCvWebsocket, Config]
+    },
+    {
+      provide: 'FunctionModelService',
+      useFactory: (repository: DesignDocReportRepository, socket: SitCvWebsocket, config: Config) => {
+        if (config.isReportMode()) {
+          return new FunctionModelReportService(repository);
+        } else {
+          return new FunctionModelServerService(socket);
         }
       },
       deps: [DesignDocReportRepository, SitCvWebsocket, Config]

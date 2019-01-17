@@ -3,9 +3,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material';
 import * as $ from 'jquery';
-import { DesignDocService } from '../../srv/designdoc/designdoc.service';
 import { ApiDocComponent } from './apidoc/apidoc.component';
 import { trigger, style, transition, animate } from '@angular/animations';
+import { FunctionModelService } from 'src/app/srv/function-model/function-model.service';
 
 interface Diagram {
   diagram: SafeHtml;
@@ -50,7 +50,7 @@ export class DesignDocComponent implements OnInit {
     private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar,
     private chRef: ChangeDetectorRef,
-    @Inject('DesignDocService') private ddService: DesignDocService) { }
+    @Inject('FunctionModelService') private functionModelService: FunctionModelService) { }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -84,7 +84,7 @@ export class DesignDocComponent implements OnInit {
     }
     this.currentDesignDocId = designDocId;
     this.isDiagramLoading = true;
-    this.ddService.getDetail(designDocId, (detail) => {
+    this.functionModelService.getDetail(designDocId, (detail) => {
       this.isDiagramLoading = false;
       this.renderDiagrams(detail.diagrams);
       this.diagramApiDocs = detail.apiDocs;
