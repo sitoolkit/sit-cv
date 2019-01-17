@@ -17,8 +17,8 @@ public class DesignDocMenuBuilder {
     private static final Pattern QUALIFIED_METHOD_SIG_PATTERN = Pattern
             .compile("^(.*)\\.(.*?)(\\(.*)$");
 
-    public List<MenuItem> build(List<String> designDocIds) {
-        return Arrays.asList(buildDataModelItem(), buildFunctionModelItem(designDocIds));
+    public List<MenuItem> build(List<String> functionIds) {
+        return Arrays.asList(buildDataModelItem(), buildFunctionModelItem(functionIds));
     }
 
     private MenuItem buildDataModelItem() {
@@ -30,26 +30,26 @@ public class DesignDocMenuBuilder {
         return dataModelItem;
     }
 
-    private MenuItem buildFunctionModelItem(List<String> designDocIds) {
+    private MenuItem buildFunctionModelItem(List<String> functionIds) {
         MenuItem functionModelNode = MenuItem.builder().name("Function Model").build();
-        functionModelNode.getChildren().addAll(buildFunctionModelItems(designDocIds));
+        functionModelNode.getChildren().addAll(buildFunctionModelItems(functionIds));
         return functionModelNode;
     }
 
-    private List<MenuItem> buildFunctionModelItems(List<String> designDocIds) {
+    private List<MenuItem> buildFunctionModelItems(List<String> functionIds) {
 
         List<MenuItem> rootItems = new ArrayList<>();
         // key : path (package name or fqcn)
         Map<String, MenuItem> pathMenuItemMap = new HashMap<>();
 
-        designDocIds.stream().forEach(designDocId -> {
-            Matcher matcher = QUALIFIED_METHOD_SIG_PATTERN.matcher(designDocId);
+        functionIds.stream().forEach(functionId -> {
+            Matcher matcher = QUALIFIED_METHOD_SIG_PATTERN.matcher(functionId);
             matcher.matches();
             String fqcn = matcher.group(1);
             String methodName = matcher.group(2);
 
             MenuItem classItem = findItemWithCreatingParent(fqcn, pathMenuItemMap, rootItems);
-            classItem.getChildren().add(buildMethodItem(methodName, designDocId));
+            classItem.getChildren().add(buildMethodItem(methodName, functionId));
         });
 
         return rootItems;
@@ -83,8 +83,8 @@ public class DesignDocMenuBuilder {
         return currentItem;
     }
 
-    private MenuItem buildMethodItem(String methodName, String designDocId) {
-        return MenuItem.builder().name(methodName).endpoint("/designdoc/function/" + designDocId)
+    private MenuItem buildMethodItem(String methodName, String functionId) {
+        return MenuItem.builder().name(methodName).endpoint("/designdoc/function/" + functionId)
                 .build();
     }
 }
