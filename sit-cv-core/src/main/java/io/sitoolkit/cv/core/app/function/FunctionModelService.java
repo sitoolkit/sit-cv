@@ -181,7 +181,7 @@ public class FunctionModelService {
     }
 
     public List<FunctionModel> getAll() {
-        List<FunctionModel> designDocs = getAllIds().stream().map((functionId) -> {
+        List<FunctionModel> functionModels = getAllIds().stream().map((functionId) -> {
             try {
                 return get(functionId);
             } catch (Exception e) {
@@ -190,7 +190,7 @@ public class FunctionModelService {
             }
         }).filter(Objects::nonNull).collect(Collectors.toList());
 
-        return designDocs;
+        return functionModels;
     }
 
 }
