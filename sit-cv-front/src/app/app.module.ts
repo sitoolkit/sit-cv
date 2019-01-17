@@ -27,6 +27,7 @@ import { DesignDocReportService } from './srv/designdoc/designdoc-report.service
 import { Config } from './srv/shared/config';
 import { HidePackagePipe } from './pipe/hide-package.pipe';
 import { ApiDocComponent } from './cmp/designdoc/apidoc/apidoc.component';
+import { SitCvWebsocket } from './srv/shared/sit-cv-websocket';
 
 @NgModule({
   declarations: [
@@ -56,14 +57,14 @@ import { ApiDocComponent } from './cmp/designdoc/apidoc/apidoc.component';
   providers: [
     {
       provide: 'DesignDocService',
-      useFactory: (repository: DesignDocReportRepository, config: Config) => {
+      useFactory: (repository: DesignDocReportRepository, socket: SitCvWebsocket, config: Config) => {
         if (config.isReportMode()) {
           return new DesignDocReportService(repository);
         } else {
-          return new DesignDocServerService(config);
+          return new DesignDocServerService(socket);
         }
       },
-      deps: [DesignDocReportRepository, Config]
+      deps: [DesignDocReportRepository, SitCvWebsocket, Config]
     },
   ],
   bootstrap: [AppComponent],
