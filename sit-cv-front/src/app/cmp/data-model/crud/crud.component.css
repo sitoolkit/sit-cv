@@ -13,6 +13,11 @@
 table th {
   min-width: 6em;
   text-align: center;
+  border-bottom-width: 2px;
+}
+
+table th:first-child, table td:first-child {
+  border-right-width: 2px;
 }
 
 table td {
