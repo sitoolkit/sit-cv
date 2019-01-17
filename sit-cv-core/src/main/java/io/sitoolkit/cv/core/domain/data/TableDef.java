@@ -1,11 +1,14 @@
 package io.sitoolkit.cv.core.domain.data;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.Data;
 import lombok.Getter;
 
 @Data
 public class TableDef implements Comparable<TableDef> {
 
+    @JsonValue
 	private String name;
 
 	@Getter

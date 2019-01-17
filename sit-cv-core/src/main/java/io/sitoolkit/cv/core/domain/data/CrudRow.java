@@ -14,7 +14,6 @@ public class CrudRow {
 	private String actionPath;
 	private Map<TableDef, Set<CrudType>> cellMap = new HashMap<>();
 	private Map<TableDef, Set<String>> sqlTextMap = new HashMap<>();
-	private Set<String> repositoryFunctions = new HashSet<>();
 
 	public CrudRow(String actionPath) {
 		super();
