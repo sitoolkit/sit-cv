@@ -2,6 +2,7 @@ package io.sitoolkit.cv.core.app.config;
 
 import java.nio.file.Path;
 
+import io.sitoolkit.cv.core.app.data.CrudService;
 import io.sitoolkit.cv.core.app.function.FunctionModelService;
 import io.sitoolkit.cv.core.app.report.ReportService;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
@@ -37,6 +38,9 @@ public class ServiceFactory {
     private FunctionModelService functionModelService;
 
     @Getter
+    private CrudService crudService;
+
+    @Getter
     private ProjectManager projectManager;
 
     private ServiceFactory() {
@@ -70,6 +74,8 @@ public class ServiceFactory {
 
         reportService = createReportService(functionModelService, projectManager);
 
+        crudService = createCrudService();
+
         return this;
     }
 
@@ -101,5 +107,9 @@ public class ServiceFactory {
 
         return new ReportService(functionModelReportProcessor, reportWriter, functionModelService,
                 projectManager);
+    }
+
+    protected CrudService createCrudService() {
+        return new CrudService();
     }
 }
