@@ -2,7 +2,7 @@ package io.sitoolkit.cv.core.app.config;
 
 import java.nio.file.Path;
 
-import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
+import io.sitoolkit.cv.core.app.function.FunctionModelService;
 import io.sitoolkit.cv.core.app.report.ReportService;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
@@ -10,7 +10,7 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
-import io.sitoolkit.cv.core.domain.report.designdoc.DesignDocReportProcessor;
+import io.sitoolkit.cv.core.domain.report.function.FunctionModelReportProcessor;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
@@ -34,7 +34,7 @@ public class ServiceFactory {
     private ReportService reportService;
 
     @Getter
-    private DesignDocService designDocService;
+    private FunctionModelService functionModelService;
 
     @Getter
     private ProjectManager projectManager;
@@ -52,7 +52,7 @@ public class ServiceFactory {
 
     public ServiceFactory initialize() {
         try {
-            designDocService.analyze();
+            functionModelService.analyze();
         } catch (Exception e) {
             log.error("Exception initializing Code Visualizer", e);
         }
@@ -66,14 +66,14 @@ public class ServiceFactory {
         projectManager = new ProjectManager();
         projectManager.load(projectDir);
 
-        designDocService = createDesignDocService(config, configReader, projectManager);
+        functionModelService = createFunctionModelService(config, configReader, projectManager);
 
-        reportService = createReportService(designDocService, projectManager);
+        reportService = createReportService(functionModelService, projectManager);
 
         return this;
     }
 
-    protected DesignDocService createDesignDocService(SitCvConfig config,
+    protected FunctionModelService createFunctionModelService(SitCvConfig config,
             SitCvConfigReader configReader, ProjectManager projectManager) {
         ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
         ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
@@ -88,18 +88,18 @@ public class ServiceFactory {
                 plantumlWriter);
         InputSourceWatcher watcher = new FileInputSourceWatcher();
 
-
-        return new DesignDocService(classDefReader, sequenceProcessor, classProcessor,
-                sequenceWriter, classWriter, classDefRepository, watcher, projectManager, configReader);
+        return new FunctionModelService(classDefReader, sequenceProcessor, classProcessor,
+                sequenceWriter, classWriter, classDefRepository, watcher, projectManager,
+                configReader);
 
     }
 
-    protected ReportService createReportService(DesignDocService designDocService,
+    protected ReportService createReportService(FunctionModelService functionModelService,
             ProjectManager projectManager) {
-        DesignDocReportProcessor designDocReportProcessor = new DesignDocReportProcessor();
+        FunctionModelReportProcessor functionModelReportProcessor = new FunctionModelReportProcessor();
         ReportWriter reportWriter = new ReportWriter();
 
-        return new ReportService(designDocReportProcessor, reportWriter, designDocService,
+        return new ReportService(functionModelReportProcessor, reportWriter, functionModelService,
                 projectManager);
     }
 }

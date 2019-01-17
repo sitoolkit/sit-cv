@@ -11,7 +11,7 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
-import io.sitoolkit.cv.core.domain.designdoc.Diagram;
+import io.sitoolkit.cv.core.domain.function.Diagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.RelationType;

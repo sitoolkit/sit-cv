@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 import io.sitoolkit.cv.app.pres.designdoc.DesignDocMenuBuilder;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
-import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
+import io.sitoolkit.cv.core.app.function.FunctionModelService;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 
 @Configuration
@@ -26,8 +26,8 @@ public class BaseConfig {
     }
 
     @Bean
-    public DesignDocService designService(ServiceFactory serviceFacotry) {
-        return serviceFacotry.getDesignDocService();
+    public FunctionModelService functionModelService(ServiceFactory serviceFacotry) {
+        return serviceFacotry.getFunctionModelService();
 
     }
 

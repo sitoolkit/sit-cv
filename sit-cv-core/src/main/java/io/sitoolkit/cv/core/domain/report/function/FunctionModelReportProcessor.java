@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.report.designdoc;
+package io.sitoolkit.cv.core.domain.report.function;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,17 +7,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.sitoolkit.cv.core.domain.designdoc.DesignDoc;
+import io.sitoolkit.cv.core.domain.function.FunctionModel;
 import io.sitoolkit.cv.core.domain.report.Report;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DesignDocReportProcessor {
+public class FunctionModelReportProcessor {
 
-    public List<Report<?>> process(List<DesignDoc> designDocs) {
+    public List<Report<?>> process(List<FunctionModel> functionModels) {
         List<Report<?>> reports = new ArrayList<>();
-        DetailReportsAndPathMap reportsAndPathMap = buildAndGroupingDetailReports(designDocs);
+        DetailReportsAndPathMap reportsAndPathMap = buildAndGroupingDetailReports(functionModels);
         reports.addAll(reportsAndPathMap.getReports());
 
         reports.add(buildDetailPathMapReport(reportsAndPathMap.getPathMap()));
@@ -26,31 +26,31 @@ public class DesignDocReportProcessor {
     }
 
     private DetailReportsAndPathMap buildAndGroupingDetailReports(
-            List<DesignDoc> designDocs) {
+            List<FunctionModel> functionModels) {
         DetailReportsAndPathMap reportsAndPathMap = new DetailReportsAndPathMap();
 
-        designDocs.stream().forEach(designDoc -> {
+        functionModels.stream().forEach(functionModel -> {
             try {
-                String path = buildDetailPath(designDoc);
-                reportsAndPathMap.add(designDoc.getId(), path, buildDetail(designDoc));
+                String path = buildDetailPath(functionModel);
+                reportsAndPathMap.add(functionModel.getId(), path, buildDetail(functionModel));
             } catch (Exception e) {
-                log.warn("Exception when build report: designDocId '{}'", designDoc.getId(), e);
+                log.warn("Exception when build report: functionId '{}'", functionModel.getId(), e);
             }
         });
 
         return reportsAndPathMap;
     }
 
-    private String buildDetailPath(DesignDoc designDoc) {
-        String dirName = designDoc.getPkg().replaceAll("\\.", "/");
-        String fileName = designDoc.getClassName() + ".js";
+    private String buildDetailPath(FunctionModel functionModel) {
+        String dirName = functionModel.getPkg().replaceAll("\\.", "/");
+        String fileName = functionModel.getClassName() + ".js";
 
         return dirName + "/" + fileName;
     }
 
-    private DesignDocReportDetailDef buildDetail(DesignDoc designDoc) {
-        DesignDocReportDetailDef detail = new DesignDocReportDetailDef();
-        designDoc.getAllDiagrams().stream().forEach(diagram -> {
+    private FunctionModelReportDetailDef buildDetail(FunctionModel functionModel) {
+        FunctionModelReportDetailDef detail = new FunctionModelReportDetailDef();
+        functionModel.getAllDiagrams().stream().forEach(diagram -> {
             String data = new String(diagram.getData());
             detail.getDiagrams().put(diagram.getId(), data);
             detail.getApiDocs().putAll(diagram.getApiDocs());
@@ -71,15 +71,15 @@ public class DesignDocReportProcessor {
          */
         private Map<String, Report<DetailMap>> reportMap = new HashMap<>();
         /**
-         * key:designDocId, value:report.path
+         * key:functionId, value:report.path
          */
         private Map<String, String> pathMap = new LinkedHashMap<>();
 
-        public void add(String designDocId, String path, DesignDocReportDetailDef detail) {
-            pathMap.put(designDocId, path);
+        public void add(String functionId, String path, FunctionModelReportDetailDef detail) {
+            pathMap.put(functionId, path);
             Report<DetailMap> report = reportMap.computeIfAbsent(path,
                     p -> Report.<DetailMap>builder().path(p).content(new DetailMap()).build());
-            report.getContent().getDetailMap().put(designDocId, detail);
+            report.getContent().getDetailMap().put(functionId, detail);
         }
 
         public Collection<Report<DetailMap>> getReports() {
@@ -90,9 +90,9 @@ public class DesignDocReportProcessor {
     @Data
     class DetailMap {
         /**
-         * key:designDocId
+         * key:functionId
          */
-        private Map<String, DesignDocReportDetailDef> detailMap = new HashMap<>();
+        private Map<String, FunctionModelReportDetailDef> detailMap = new HashMap<>();
     }
 
 }
