@@ -25,12 +25,13 @@ export class ServiceFactory {
   public createFunctionModelService(
     reportLoader: ReportDataLoader,
     socket: SitCvWebsocket,
-    config: Config): FunctionModelService {
-  if (config.isReportMode()) {
-    return new FunctionModelReportService(reportLoader);
-  } else {
-    return new FunctionModelServerService(socket);
-  }
+    config: Config
+  ): FunctionModelService {
+    if (config.isReportMode()) {
+      return new FunctionModelReportService(reportLoader);
+    } else {
+      return new FunctionModelServerService(socket);
+    }
   }
 
 }
