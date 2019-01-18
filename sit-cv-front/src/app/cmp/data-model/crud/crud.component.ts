@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DataModelServerService } from 'src/app/srv/data-model/data-model-server.service';
 import { CrudMatrix } from 'src/app/srv/data-model/crud-matrix';
 import { CrudType } from 'src/app/srv/data-model/crud-type';
+import { EnumUtils } from 'src/app/srv/shared/enum-utils';
 
 interface CrudTableRow {
   functionId: string;
@@ -21,9 +22,12 @@ export class CrudComponent implements OnInit {
   dataSource: CrudTableRow[];
   columns: string[];
   tableNames: string[];
-  crudTypes: CrudType[] = CrudType.values();
+  crudTypes: CrudType[] = this.enumUtils.values(CrudType);
 
-  constructor(private dataModelService: DataModelServerService) { }
+  constructor(
+    private dataModelService: DataModelServerService,
+    private enumUtils: EnumUtils
+  ) { }
 
   ngOnInit() {
     this.isLoading = true;
@@ -48,11 +52,12 @@ export class CrudComponent implements OnInit {
     })
   }
 
-  findCrudType(types: CrudType[], target: CrudType): CrudType | null {
+  isTypeIncludes(types: CrudType[], target: CrudType): boolean {
     if (types == null) {
       return null;
     }
-    return types.includes(target) ? target : null;
+    return types.includes(target);
+
   }
 
 }
