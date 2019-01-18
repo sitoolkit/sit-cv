@@ -28,7 +28,7 @@ public class CrudService {
         rowA.setActionPath("/a/create");
         rowA.getRepositoryFunctions().add("ARepository.create");
 
-        String functionB = "a.b.c.BController.update(java.lang.String)";
+        String functionB = "a.b.c.LoopController.multiLoop()";
         crud.add(functionB, tableB, CrudType.REFERENCE, "select * from tableB where xxxx");
         crud.add(functionB, tableB, CrudType.UPDATE, "update tableB set xxxx");
         CrudRow rowB = crud.getCrudRowMap().get(functionB);
@@ -36,7 +36,7 @@ public class CrudService {
         rowB.getRepositoryFunctions().add("BRepository.find");
         rowB.getRepositoryFunctions().add("BRepository.update");
 
-        String functionC = "a.b.c.CController.delete(java.lang.String)";
+        String functionC = "a.b.c.BranchController.ifStatement(int, java.lang.String)";
         crud.add(functionC, tableC, CrudType.REFERENCE, "select * from tableC where xxxx");
         crud.add(functionC, tableB, CrudType.REFERENCE, "select * from tableB where xxxx");
         crud.add(functionC, tableC, CrudType.DELETE, "delete from tableC where xxxx");
