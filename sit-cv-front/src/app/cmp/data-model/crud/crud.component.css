@@ -53,8 +53,3 @@ table td.mat-column-repositoryFunctions, table td.mat-column-functionId {
   padding: 1em;
   position: absolute;
 }
-
-mat-progress-bar {
-  width: 30em;
-  max-width: 100%;
-}

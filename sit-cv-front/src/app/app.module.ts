@@ -30,6 +30,7 @@ import { ReportDataLoader } from './srv/shared/report-data-loader';
 import { CrudComponent } from './cmp/data-model/crud/crud.component';
 import { HttpModule } from '@angular/http';
 import { ServiceFactory } from './service-factory';
+import { ProgressBarComponent } from './cmp/shared/progress-bar/progress-bar.component';
 
 let serviceFactory = new ServiceFactory();
 
@@ -43,6 +44,7 @@ let serviceFactory = new ServiceFactory();
     HidePackagePipe,
     ApiDocComponent,
     CrudComponent,
+    ProgressBarComponent,
   ],
   imports: [
     BrowserModule,

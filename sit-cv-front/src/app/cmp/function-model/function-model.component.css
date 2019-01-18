@@ -39,11 +39,6 @@
   left: 0;
 }
 
-mat-progress-bar {
-  width: 30em;
-  max-width: 100%;
-}
-
 .active {
   background: #E8EAF6;
 }

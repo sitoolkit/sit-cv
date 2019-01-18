@@ -10,7 +10,7 @@
         </div>
       </div>
     </div>
-    <mat-progress-bar *ngIf="isDiagramLoading" [mode]="'indeterminate'"></mat-progress-bar>
+    <app-progress-bar *ngIf="isDiagramLoading"></app-progress-bar>
   </div>
   <div class="comments">
     <mat-card class="comment" *ngFor="let signature of selectedMethodSignatures" [ngClass]="{active: signature == currentMethodSignature}">
