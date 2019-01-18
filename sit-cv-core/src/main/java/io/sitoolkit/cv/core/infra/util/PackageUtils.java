@@ -8,6 +8,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 
 public class PackageUtils {
@@ -27,8 +28,16 @@ public class PackageUtils {
                     .newDocumentBuilder().parse(is);
             doc.getDocumentElement().normalize();
 
+            String parentVersion = (String) XPathFactory.newInstance()
+            .newXPath().compile("/project/parent/version")
+            .evaluate(doc, XPathConstants.STRING);
+
+            if (StringUtils.isNotEmpty(parentVersion)) {
+                return parentVersion;
+            }
+
             return (String) XPathFactory.newInstance()
-                    .newXPath().compile("/project/parent/version")
+                    .newXPath().compile("/project/version")
                     .evaluate(doc, XPathConstants.STRING);
         } catch (Exception e) {
             throw new RuntimeException("Get version from pom.xml failed");

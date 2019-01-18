@@ -1,17 +1,40 @@
 package io.sitoolkit.cv.core.app.crud;
 
+import java.util.List;
+
 import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
+import io.sitoolkit.cv.core.domain.crud.CrudProcessor;
 import io.sitoolkit.cv.core.domain.crud.CrudRow;
 import io.sitoolkit.cv.core.domain.crud.CrudType;
+import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
+import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.tabledef.TableDef;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class CrudService {
 
+    @NonNull
+    private CrudProcessor processor;
+
+    @NonNull
+    ProjectManager projectManager;
+
     public CrudMatrix loadMatrix() {
+//        return generateSampleMatrix();
         return generateMatrix();
     }
 
     public CrudMatrix generateMatrix() {
+        List<SqlPerMethod> sqlPerMethodList = projectManager.getSqlLog();
+
+        CrudMatrix methodCrud = processor.buildMatrix(sqlPerMethodList);
+
+        return methodCrud;
+    }
+
+    public CrudMatrix generateSampleMatrix() {
 
         TableDef tableA = new TableDef("TableA");
         TableDef tableB = new TableDef("TableB");

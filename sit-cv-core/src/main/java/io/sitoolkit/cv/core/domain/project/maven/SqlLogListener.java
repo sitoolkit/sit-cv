@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +19,7 @@ public class SqlLogListener implements StdoutListener {
     public static String REPOSITORY_METHOD_MARKER = "[RepositoryMethod]";
 
     @Getter
-    private List<SqlLog> sqlLogs = new ArrayList<>();
+    private List<SqlPerMethod> sqlLogs = new ArrayList<>();
     private StringBuilder readingSqlLog = new StringBuilder();
     private String readingRepositoryMethod = "";
     private boolean sqlLogging = false;
@@ -36,7 +37,7 @@ public class SqlLogListener implements StdoutListener {
             if (sqlLogEndPattern.matcher(line).matches()) {
 
                 if (StringUtils.isNotEmpty(readingRepositoryMethod)) {
-                    SqlLog sqlLog = new SqlLog(readingRepositoryMethod, readingSqlLog.toString());
+                    SqlPerMethod sqlLog = new SqlPerMethod(readingRepositoryMethod, readingSqlLog.toString());
 
                     log.info("{}", sqlLog);
 
@@ -67,10 +68,4 @@ public class SqlLogListener implements StdoutListener {
         }
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class SqlLog {
-        private String repositoryMethod;
-        private String sqlText;
-    }
 }

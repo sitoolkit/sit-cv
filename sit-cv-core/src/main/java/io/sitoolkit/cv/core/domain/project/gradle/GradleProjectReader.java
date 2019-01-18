@@ -3,8 +3,11 @@ package io.sitoolkit.cv.core.domain.project.gradle;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
+import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
@@ -47,6 +50,12 @@ public class GradleProjectReader implements ProjectReader {
         }
 
         return Optional.of(listener.getProject());
+    }
+
+    @Override
+    public List<SqlPerMethod> getSqlLog(Project project) {
+        // TODO Get SQLlog with gradle
+        return Collections.emptyList();
     }
 
 }
