@@ -1,7 +1,9 @@
 package io.sitoolkit.cv.core.domain.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,6 +16,7 @@ public class CrudRow {
 	private String actionPath;
 	private Map<TableDef, Set<CrudType>> cellMap = new HashMap<>();
 	private Map<TableDef, Set<String>> sqlTextMap = new HashMap<>();
+	private List<String> repositoryFunctions = new ArrayList<>();
 
 	public CrudRow(String actionPath) {
 		super();

@@ -5,7 +5,9 @@ import { CrudType } from 'src/app/srv/data-model/crud-type';
 
 interface CrudTableRow {
   functionId: string;
+  actionPath: string;
   tableCrudMap: { [tableName: string]: CrudType[] };
+  repositoryFunctions: string[];
 }
 
 @Component({
@@ -15,6 +17,7 @@ interface CrudTableRow {
 })
 export class CrudComponent implements OnInit {
 
+  isLoading: boolean = false;
   dataSource: CrudTableRow[];
   columns: string[];
   tableNames: string[];
@@ -23,18 +26,24 @@ export class CrudComponent implements OnInit {
   constructor(private dataModelService: DataModelServerService) { }
 
   ngOnInit() {
-    this.dataModelService.getCrud((crud) => this.showCrudMatrix(crud));
+    this.isLoading = true;
+    this.dataModelService.getCrud((crud) => {
+      this.isLoading = false;
+      this.showCrudMatrix(crud)
+    });
   }
 
   showCrudMatrix(crudMatrix: CrudMatrix) {
     this.tableNames = crudMatrix.tableDefs;
-    this.columns = ['functionId'].concat(crudMatrix.tableDefs);
+    this.columns = ['functionId', 'actionPath'].concat(crudMatrix.tableDefs).concat(['repositoryFunctions']);
     this.dataSource = []
     Object.keys(crudMatrix.crudRowMap).forEach((functionId) => {
       let crudRow = crudMatrix.crudRowMap[functionId];
       this.dataSource.push({
         functionId: functionId,
+        actionPath: crudRow.actionPath,
         tableCrudMap: crudRow.cellMap,
+        repositoryFunctions: crudRow.repositoryFunctions,
       });
     })
   }

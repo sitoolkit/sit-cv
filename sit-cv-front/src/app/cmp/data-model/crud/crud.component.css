@@ -1,5 +1,17 @@
+app-crud {
+  height: 100%;
+  display: block;
+}
+
 .crud-container {
-  padding: 1em;
+  padding-left: 2px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.crud-table-container {
+  overflow: auto;
+  max-height: 100%;
 }
 
 .crud-types {
@@ -31,4 +43,18 @@ table th:not(:first-child) {
 
 table th, table td {
   border-right: 1px solid rgba(0, 0, 0, .12);
+}
+
+table td.mat-column-repositoryFunctions, table td.mat-column-functionId {
+  text-align: left;
+}
+
+.progress-bar-container {
+  padding: 1em;
+  position: absolute;
+}
+
+mat-progress-bar {
+  width: 30em;
+  max-width: 100%;
 }
