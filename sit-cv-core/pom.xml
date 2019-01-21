@@ -99,6 +99,12 @@
 	    <scope>system</scope>
         <systemPath>${java.home}/../lib/tools.jar</systemPath>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.jsqlparser</groupId>
+      <artifactId>jsqlparser</artifactId>
+      <version>1.1</version>
+    </dependency>
   </dependencies>
 
   <parent>
