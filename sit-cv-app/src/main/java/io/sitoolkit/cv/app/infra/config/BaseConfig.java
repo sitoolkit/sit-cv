@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 
 import io.sitoolkit.cv.app.pres.designdoc.DesignDocMenuBuilder;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
-import io.sitoolkit.cv.core.app.data.CrudService;
-import io.sitoolkit.cv.core.app.function.FunctionModelService;
+import io.sitoolkit.cv.core.app.crud.CrudService;
+import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 
 @Configuration

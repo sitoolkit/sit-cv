@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.report.function;
+package io.sitoolkit.cv.core.domain.report.functionmodel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.sitoolkit.cv.core.domain.function.FunctionModel;
+import io.sitoolkit.cv.core.domain.functionmodel.FunctionModel;
 import io.sitoolkit.cv.core.domain.report.Report;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

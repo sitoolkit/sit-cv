@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.app.pres.function;
+package io.sitoolkit.cv.app.pres.functionmodel;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

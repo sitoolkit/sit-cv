@@ -1,11 +1,11 @@
-package io.sitoolkit.cv.app.pres.data;
+package io.sitoolkit.cv.app.pres.datamodel;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.sitoolkit.cv.core.app.data.CrudService;
-import io.sitoolkit.cv.core.domain.data.CrudMatrix;
+import io.sitoolkit.cv.core.app.crud.CrudService;
+import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
 
 @RestController
 public class DataModelController {

@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.data;
+package io.sitoolkit.cv.core.domain.crud;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.sitoolkit.cv.core.domain.tabledef.TableDef;
 import lombok.Data;
 
 

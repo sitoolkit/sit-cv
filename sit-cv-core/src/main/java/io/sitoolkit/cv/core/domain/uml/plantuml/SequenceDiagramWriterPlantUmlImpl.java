@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
-import io.sitoolkit.cv.core.domain.function.Diagram;
+import io.sitoolkit.cv.core.domain.functionmodel.Diagram;
 import io.sitoolkit.cv.core.domain.uml.BranchSequenceElement;
 import io.sitoolkit.cv.core.domain.uml.CatchSequenceGroup;
 import io.sitoolkit.cv.core.domain.uml.ConditionalSequenceGroup;

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocChangeEventListener;
-import io.sitoolkit.cv.core.app.function.FunctionModelService;
+import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 
 @Controller

@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.report.function;
+package io.sitoolkit.cv.core.domain.report.functionmodel;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

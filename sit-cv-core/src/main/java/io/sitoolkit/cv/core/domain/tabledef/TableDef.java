@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.data;
+package io.sitoolkit.cv.core.domain.tabledef;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

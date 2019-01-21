@@ -1,9 +1,9 @@
-package io.sitoolkit.cv.core.app.data;
+package io.sitoolkit.cv.core.app.crud;
 
-import io.sitoolkit.cv.core.domain.data.CrudMatrix;
-import io.sitoolkit.cv.core.domain.data.CrudRow;
-import io.sitoolkit.cv.core.domain.data.CrudType;
-import io.sitoolkit.cv.core.domain.data.TableDef;
+import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
+import io.sitoolkit.cv.core.domain.crud.CrudRow;
+import io.sitoolkit.cv.core.domain.crud.CrudType;
+import io.sitoolkit.cv.core.domain.tabledef.TableDef;
 
 public class CrudService {
 

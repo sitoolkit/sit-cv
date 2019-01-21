@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.function;
+package io.sitoolkit.cv.core.domain.functionmodel;
 
 import java.util.Collection;
 import java.util.Collections;
