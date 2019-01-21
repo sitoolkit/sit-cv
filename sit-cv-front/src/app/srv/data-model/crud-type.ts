@@ -1,3 +1,3 @@
 export enum CrudType {
-  C, R, U, D
+  C, R, U, D, M
 }
