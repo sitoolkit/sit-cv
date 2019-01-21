@@ -39,7 +39,7 @@ public class ProjectManager {
 
     public List<SqlPerMethod> getSqlLog() {
         Optional<List<SqlPerMethod>> sqlLogs = readers.stream()
-                .map(reader -> reader.getSqlLog(currentProject)).filter((l) -> !l.isEmpty())
+                .map(reader -> reader.getSqlLog()).filter((l) -> !l.isEmpty())
                 .findFirst();
         return sqlLogs.orElse(Collections.emptyList());
     }

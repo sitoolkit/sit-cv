@@ -16,10 +16,12 @@ import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
 
 public class MavenProjectReader implements ProjectReader {
 
+    private MavenProject mvnPrj;
+
     @Override
     public Optional<Project> read(Path projectDir) {
 
-        MavenProject mvnPrj = MavenProject.load(projectDir);
+        mvnPrj = MavenProject.load(projectDir);
 
         if (!mvnPrj.available()) {
             return Optional.empty();
@@ -33,9 +35,7 @@ public class MavenProjectReader implements ProjectReader {
     }
 
     @Override
-    public List<SqlPerMethod> getSqlLog(Project project) {
-
-        MavenProject mvnPrj = MavenProject.load(project.getDir());
+    public List<SqlPerMethod> getSqlLog() {
 
         if (!mvnPrj.available()) {
             return Collections.emptyList();

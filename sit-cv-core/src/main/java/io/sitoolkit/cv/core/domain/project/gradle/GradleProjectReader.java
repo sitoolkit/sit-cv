@@ -53,7 +53,7 @@ public class GradleProjectReader implements ProjectReader {
     }
 
     @Override
-    public List<SqlPerMethod> getSqlLog(Project project) {
+    public List<SqlPerMethod> getSqlLog() {
         // TODO Get SQLlog with gradle
         return Collections.emptyList();
     }

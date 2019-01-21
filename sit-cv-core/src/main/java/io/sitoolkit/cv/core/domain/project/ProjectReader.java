@@ -10,5 +10,5 @@ public interface ProjectReader {
 
     Optional<Project> read(Path projectDir);
 
-    List<SqlPerMethod> getSqlLog(Project project);
+    List<SqlPerMethod> getSqlLog();
 }
