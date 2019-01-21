@@ -3,16 +3,12 @@ package io.sitoolkit.cv.core.domain.tabledef;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 public class TableDef implements Comparable<TableDef> {
 
     @JsonValue
 	private String name;
-
-	@Getter
-	private String nameToFind;
 
 	@Override
 	public int compareTo(TableDef o) {
@@ -22,6 +18,5 @@ public class TableDef implements Comparable<TableDef> {
 	public TableDef(String name) {
 		super();
 		this.name = name;
-		this.nameToFind = " " + name.toLowerCase() + " ";
 	}
 }

@@ -36,8 +36,8 @@ public class CrudMatrix {
         row.add(table, type, sqlText);
     }
 
-    public void addError(String function, String sqlText, String editedSqlText, String errorMessage) {
-        errorMap.put(function, new ErrorInfo(sqlText, editedSqlText, errorMessage));
+    public void addError(String function, String sqlText, String errorMessage) {
+        errorMap.put(function, new ErrorInfo(sqlText, errorMessage));
     }
 
 }

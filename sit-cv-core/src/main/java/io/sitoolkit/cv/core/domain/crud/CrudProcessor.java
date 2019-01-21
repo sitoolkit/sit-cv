@@ -26,7 +26,7 @@ public class CrudProcessor {
             CrudFindResult result = crudFinder.findCrud(sqlPerMethod.getSqlText());
 
             if (result.isError()) {
-                matrix.addError(sqlPerMethod.getRepositoryMethod(), sqlPerMethod.getSqlText(), "",
+                matrix.addError(sqlPerMethod.getRepositoryMethod(), sqlPerMethod.getSqlText(),
                         result.getErrMsg());
             }
 

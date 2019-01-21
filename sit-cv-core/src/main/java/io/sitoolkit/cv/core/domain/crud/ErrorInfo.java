@@ -7,6 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class ErrorInfo {
 	private String sqlText;
-	private String editedSqlText;
 	private String errorMessage;
 }
