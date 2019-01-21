@@ -39,7 +39,7 @@ export class CrudComponent implements OnInit {
 
   showCrudMatrix(crudMatrix: CrudMatrix) {
     this.tableNames = crudMatrix.tableDefs;
-    this.columns = ['functionId', 'actionPath'].concat(crudMatrix.tableDefs).concat(['repositoryFunctions']);
+    this.columns = ['functionId'].concat(crudMatrix.tableDefs);
     this.dataSource = []
     Object.keys(crudMatrix.crudRowMap).forEach((functionId) => {
       let crudRow = crudMatrix.crudRowMap[functionId];

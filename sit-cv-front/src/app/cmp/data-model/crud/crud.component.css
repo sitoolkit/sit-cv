@@ -38,7 +38,7 @@ table th, table td {
   border-right: 1px solid rgba(0, 0, 0, .12);
 }
 
-table td.mat-column-repositoryFunctions, table td.mat-column-functionId {
+table td.mat-column-functionId {
   text-align: left;
 }
 

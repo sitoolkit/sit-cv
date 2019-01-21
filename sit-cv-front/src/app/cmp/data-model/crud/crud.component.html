@@ -6,11 +6,9 @@
     <table mat-table [dataSource]="dataSource">
 
       <ng-container matColumnDef="functionId" sticky>
-        <th mat-header-cell *matHeaderCellDef>function</th>
+        <th mat-header-cell *matHeaderCellDef>function / table</th>
         <td mat-cell *matCellDef="let row">
-          <a [routerLink]="['/designdoc/function', row.functionId]">
-            {{ row.functionId | hidePackage: 'PARAM_TYPE_ONLY' }}
-          </a>
+          {{ row.functionId | hidePackage: 'PARAM_TYPE_ONLY' }}
         </td>
       </ng-container>
       <ng-container matColumnDef="actionPath">
