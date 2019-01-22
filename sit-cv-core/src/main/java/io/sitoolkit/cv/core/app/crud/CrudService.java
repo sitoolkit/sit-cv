@@ -2,6 +2,8 @@ package io.sitoolkit.cv.core.app.crud;
 
 import java.util.List;
 
+import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
+import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
 import io.sitoolkit.cv.core.domain.crud.CrudProcessor;
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
@@ -11,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class CrudService {
+
+    @NonNull
+    FunctionModelService functionModelService;
 
     @NonNull
     private CrudProcessor processor;
@@ -27,7 +32,11 @@ public class CrudService {
 
         CrudMatrix methodCrud = processor.buildMatrix(sqlPerMethodList);
 
-        return methodCrud;
+        List<ClassDef> entryPointClasses = functionModelService.getAllEntryPointClasses();
+
+        CrudMatrix entryPointCrud = processor.adjustAxis(entryPointClasses, methodCrud);
+
+        return entryPointCrud;
     }
 
 }
