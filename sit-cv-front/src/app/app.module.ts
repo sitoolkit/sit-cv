@@ -74,6 +74,7 @@ let serviceFactory = new ServiceFactory();
       useFactory: serviceFactory.createFunctionModelService,
       deps: [ReportDataLoader, SitCvWebsocket, Config]
     },
+    HidePackagePipe,
   ],
   bootstrap: [AppComponent],
   entryComponents :[

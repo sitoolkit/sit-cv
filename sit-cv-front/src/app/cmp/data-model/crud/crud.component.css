@@ -42,6 +42,15 @@ table td.mat-column-functionId {
   text-align: left;
 }
 
+table td.mat-column-functionId .package {
+  opacity: 0.5;
+}
+
+table td.mat-column-functionId .class-and-method {
+  font-weight: 500;
+  padding-left: 0.5em;
+}
+
 .progress-bar-container {
   padding: 1em;
   position: absolute;

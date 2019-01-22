@@ -3,12 +3,20 @@ import { DataModelServerService } from 'src/app/srv/data-model/data-model-server
 import { CrudMatrix } from 'src/app/srv/data-model/crud-matrix';
 import { CrudType } from 'src/app/srv/data-model/crud-type';
 import { EnumUtils } from 'src/app/srv/shared/enum-utils';
+import { HidePackagePipe } from 'src/app/pipe/hide-package.pipe';
 
 interface CrudTableRow {
   functionId: string;
+  package: string;
+  classAndMethod: string;
   actionPath: string;
   tableCrudMap: { [tableName: string]: CrudType[] };
   repositoryFunctions: string[];
+}
+
+interface SplittedFunctionId {
+  package: string;
+  classAndMethod: string;
 }
 
 @Component({
@@ -26,7 +34,8 @@ export class CrudComponent implements OnInit {
 
   constructor(
     private dataModelService: DataModelServerService,
-    private enumUtils: EnumUtils
+    private enumUtils: EnumUtils,
+    private hidePackagePipe: HidePackagePipe,
   ) { }
 
   ngOnInit() {
@@ -43,8 +52,11 @@ export class CrudComponent implements OnInit {
     this.dataSource = []
     Object.keys(crudMatrix.crudRowMap).forEach((functionId) => {
       let crudRow = crudMatrix.crudRowMap[functionId];
+      let splittedId = this.splitFunctionId(this.hidePackagePipe.transform(functionId, 'PARAM_TYPE_ONLY'));
       this.dataSource.push({
         functionId: functionId,
+        package: splittedId.package,
+        classAndMethod: splittedId.classAndMethod,
         actionPath: crudRow.actionPath,
         tableCrudMap: crudRow.cellMap,
         repositoryFunctions: crudRow.repositoryFunctions,
@@ -52,12 +64,19 @@ export class CrudComponent implements OnInit {
     })
   }
 
+  splitFunctionId(functionId: string): SplittedFunctionId {
+    let matches = functionId.match(/(.*)\.(.*\..*\(.*)/);
+    return {
+      package: matches[1],
+      classAndMethod: matches[2],
+    };
+}
+
   isTypeIncludes(types: CrudType[], target: CrudType): boolean {
     if (types == null) {
       return null;
     }
     return types.includes(target);
-
   }
 
 }

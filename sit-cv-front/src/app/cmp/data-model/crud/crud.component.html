@@ -5,15 +5,14 @@
   <div class="crud-table-container">
     <table mat-table [dataSource]="dataSource">
 
-      <ng-container matColumnDef="functionId" sticky>
+      <ng-container matColumnDef="functionId">
         <th mat-header-cell *matHeaderCellDef>function / table</th>
         <td mat-cell *matCellDef="let row">
-          {{ row.functionId | hidePackage: 'PARAM_TYPE_ONLY' }}
+          <div class="function-id">
+            <div class="package">{{ row.package }}</div>
+            <div class="class-and-method">{{ row.classAndMethod }}</div>
+          </div>
         </td>
-      </ng-container>
-      <ng-container matColumnDef="actionPath">
-        <th mat-header-cell *matHeaderCellDef>action path</th>
-        <td mat-cell *matCellDef="let row"> {{ row.actionPath }} </td>
       </ng-container>
       <ng-container *ngFor="let tableName of tableNames" matColumnDef="{{tableName}}">
         <th mat-header-cell *matHeaderCellDef> {{ tableName }} </th>
@@ -23,16 +22,6 @@
               <span *ngIf="isTypeIncludes(row.tableCrudMap[tableName], crudType)">
                 {{ crudType }}
               </span>
-            </div>
-          </div>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="repositoryFunctions">
-        <th mat-header-cell *matHeaderCellDef>repository functions</th>
-        <td mat-cell *matCellDef="let row">
-          <div class="repository-functions">
-            <div *ngFor="let func of row.repositoryFunctions">
-              {{ func }}
             </div>
           </div>
         </td>
