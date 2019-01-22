@@ -17,22 +17,28 @@ import {
   MatSnackBarModule
 } from '@angular/material';
 import { MatTreeModule } from '@angular/material/tree';
-import { DesignDocComponent } from './cmp/designdoc/designdoc.component';
+import { FunctionModelComponent } from './cmp/function-model/function-model.component';
 import { ErrorComponent } from './error.component';
 import { DoctreeComponent } from './cmp/doctree/doctree.component';
 
-import { DesignDocReportRepository } from './srv/designdoc/designdoc-report.repository';
 import { DesignDocServerService } from './srv/designdoc/designdoc-server.service';
 import { DesignDocReportService } from './srv/designdoc/designdoc-report.service';
 import { Config } from './srv/shared/config';
 import { HidePackagePipe } from './pipe/hide-package.pipe';
-import { ApiDocComponent } from './cmp/designdoc/apidoc/apidoc.component';
+import { ApiDocComponent } from './cmp/function-model/apidoc/apidoc.component';
+import { SitCvWebsocket } from './srv/shared/sit-cv-websocket';
+import { FunctionModelReportService } from './srv/function-model/function-model-report.service';
+import { FunctionModelServerService } from './srv/function-model/function-model-server.service';
+import { ReportDataLoader } from './srv/shared/report-data-loader';
+import { ServiceFactory } from './service-factory';
+
+let serviceFactory = new ServiceFactory();
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
-    DesignDocComponent,
+    FunctionModelComponent,
     ErrorComponent,
     DoctreeComponent,
     HidePackagePipe,
@@ -56,14 +62,13 @@ import { ApiDocComponent } from './cmp/designdoc/apidoc/apidoc.component';
   providers: [
     {
       provide: 'DesignDocService',
-      useFactory: (repository: DesignDocReportRepository, config: Config) => {
-        if (config.isReportMode()) {
-          return new DesignDocReportService(repository);
-        } else {
-          return new DesignDocServerService(config);
-        }
-      },
-      deps: [DesignDocReportRepository, Config]
+      useFactory: serviceFactory.createDesignDocService,
+      deps: [ReportDataLoader, SitCvWebsocket, Config]
+    },
+    {
+      provide: 'FunctionModelService',
+      useFactory: serviceFactory.createFunctionModelService,
+      deps: [ReportDataLoader, SitCvWebsocket, Config]
     },
   ],
   bootstrap: [AppComponent],

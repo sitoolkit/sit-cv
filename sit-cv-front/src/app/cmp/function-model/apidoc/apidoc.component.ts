@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBar } from '@angular/material';
-import { DesignDocApiDoc } from 'src/app/srv/designdoc/designdoc-apidoc';
+import { FunctionModelApiDoc } from 'src/app/srv/function-model/function-model-apidoc';
 
 @Component({
   selector: 'app-apidoc',
@@ -10,7 +10,7 @@ import { DesignDocApiDoc } from 'src/app/srv/designdoc/designdoc-apidoc';
 })
 export class ApiDocComponent implements OnInit {
   apiDocId = '';
-  apiDoc: DesignDocApiDoc;
+  apiDoc: FunctionModelApiDoc;
 
   constructor(@Inject (MAT_SNACK_BAR_DATA) public data: any, public snackBar:MatSnackBar) { }
 
