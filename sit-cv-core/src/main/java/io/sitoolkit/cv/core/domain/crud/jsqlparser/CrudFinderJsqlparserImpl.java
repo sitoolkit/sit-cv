@@ -55,7 +55,8 @@ public class CrudFinderJsqlparserImpl implements CrudFinder {
 
             } else if (stmt instanceof Merge) {
                 Merge merge = (Merge) stmt;
-                result.put(merge.getTable().getName(), CrudType.MERGE);
+                result.put(merge.getTable().getName(), CrudType.CREATE);
+                result.put(merge.getTable().getName(), CrudType.UPDATE);
 
                 findReferenceFromExpression(merge.getUsingSelect(), result);
 

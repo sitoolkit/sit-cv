@@ -84,7 +84,7 @@ public class CrudFinderJsqlparserImplTest {
         CrudFindResult tableCrud = finder.findCrud(
                 "MERGE INTO tab_1 t1 USING (SELECT col_1 FROM tab_2) t2 ON (t1.col_1 = t2.col_1) WHEN MATCHED THEN UPDATE SET col_2 = 1");
 
-        assertThat(getCruds(tableCrud, "tab_1"), is(toSet("M")));
+        assertThat(getCruds(tableCrud, "tab_1"), is(toSet("C", "U")));
         assertThat(getCruds(tableCrud, "tab_2"), is(toSet("R")));
     }
 }
