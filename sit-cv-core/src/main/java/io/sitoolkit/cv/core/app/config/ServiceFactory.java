@@ -9,6 +9,9 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
+import io.sitoolkit.cv.core.domain.crud.CrudFinder;
+import io.sitoolkit.cv.core.domain.crud.CrudProcessor;
+import io.sitoolkit.cv.core.domain.crud.jsqlparser.CrudFinderJsqlparserImpl;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
 import io.sitoolkit.cv.core.domain.report.functionmodel.FunctionModelReportProcessor;
@@ -74,7 +77,7 @@ public class ServiceFactory {
 
         reportService = createReportService(functionModelService, projectManager);
 
-        crudService = createCrudService();
+        crudService = createCrudService(projectManager);
 
         return this;
     }
@@ -109,7 +112,9 @@ public class ServiceFactory {
                 projectManager);
     }
 
-    protected CrudService createCrudService() {
-        return new CrudService();
+    protected CrudService createCrudService(ProjectManager projectManager) {
+        CrudFinder crudFinder = new CrudFinderJsqlparserImpl();
+        CrudProcessor crudProcessor = new CrudProcessor(crudFinder);
+        return new CrudService(crudProcessor, projectManager);
     }
 }

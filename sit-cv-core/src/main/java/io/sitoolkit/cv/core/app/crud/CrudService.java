@@ -1,58 +1,33 @@
 package io.sitoolkit.cv.core.app.crud;
 
-import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
-import io.sitoolkit.cv.core.domain.crud.CrudRow;
-import io.sitoolkit.cv.core.domain.crud.CrudType;
-import io.sitoolkit.cv.core.domain.tabledef.TableDef;
+import java.util.List;
 
+import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
+import io.sitoolkit.cv.core.domain.crud.CrudProcessor;
+import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
+import io.sitoolkit.cv.core.domain.project.ProjectManager;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class CrudService {
+
+    @NonNull
+    private CrudProcessor processor;
+
+    @NonNull
+    ProjectManager projectManager;
 
     public CrudMatrix loadMatrix() {
         return generateMatrix();
     }
 
     public CrudMatrix generateMatrix() {
+        List<SqlPerMethod> sqlPerMethodList = projectManager.getSqlLog();
 
-        TableDef tableA = new TableDef("TableA");
-        TableDef tableB = new TableDef("TableB");
-        TableDef tableC = new TableDef("TableC");
+        CrudMatrix methodCrud = processor.buildMatrix(sqlPerMethodList);
 
-        CrudMatrix crud = new CrudMatrix();
-        crud.getTableDefs().add(tableA);
-        crud.getTableDefs().add(tableB);
-        crud.getTableDefs().add(tableC);
-
-        String functionA = "a.b.c.AController.save(a.b.c.XEntity)";
-        crud.add(functionA, tableA, CrudType.CREATE, "insert into tableA values xxxx");
-        CrudRow rowA = crud.getCrudRowMap().get(functionA);
-        rowA.setActionPath("/a/create");
-        rowA.getRepositoryFunctions().add("ARepository.create");
-
-        String functionB = "a.b.c.LoopController.multiLoop()";
-        crud.add(functionB, tableB, CrudType.REFERENCE, "select * from tableB where xxxx");
-        crud.add(functionB, tableB, CrudType.UPDATE, "update tableB set xxxx");
-        CrudRow rowB = crud.getCrudRowMap().get(functionB);
-        rowB.setActionPath("/b/update");
-        rowB.getRepositoryFunctions().add("BRepository.find");
-        rowB.getRepositoryFunctions().add("BRepository.update");
-
-        String functionC = "a.b.c.BranchController.ifStatement(int, java.lang.String)";
-        crud.add(functionC, tableC, CrudType.REFERENCE, "select * from tableC where xxxx");
-        crud.add(functionC, tableB, CrudType.REFERENCE, "select * from tableB where xxxx");
-        crud.add(functionC, tableC, CrudType.DELETE, "delete from tableC where xxxx");
-        CrudRow rowC = crud.getCrudRowMap().get(functionC);
-        rowC.setActionPath("/c/delete");
-        rowC.getRepositoryFunctions().add("CRepository.find");
-        rowC.getRepositoryFunctions().add("BRepository.find");
-        rowC.getRepositoryFunctions().add("CRepository.delete");
-
-        String functionD = "a.b.c.AService.search(a.b.c.SearchCondition)";
-        crud.add(functionD, tableA, CrudType.REFERENCE, "select * from tableA where xxxx");
-        CrudRow rowD = crud.getCrudRowMap().get(functionD);
-        rowD.setActionPath(null);
-        rowD.getRepositoryFunctions().add("ARepository.search");
-
-        return crud;
+        return methodCrud;
     }
 
 }

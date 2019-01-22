@@ -2,9 +2,11 @@ package io.sitoolkit.cv.core.domain.project;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.gradle.GradleProjectReader;
 import io.sitoolkit.cv.core.domain.project.lombok.DelombokProcessor;
 import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
@@ -33,6 +35,13 @@ public class ProjectManager {
             throw new IllegalArgumentException("Project is not supported " + projectDir);
         }
 
+    }
+
+    public List<SqlPerMethod> getSqlLog() {
+        Optional<List<SqlPerMethod>> sqlLogs = readers.stream()
+                .map(reader -> reader.getSqlLog(currentProject)).filter((l) -> !l.isEmpty())
+                .findFirst();
+        return sqlLogs.orElse(Collections.emptyList());
     }
 
 }

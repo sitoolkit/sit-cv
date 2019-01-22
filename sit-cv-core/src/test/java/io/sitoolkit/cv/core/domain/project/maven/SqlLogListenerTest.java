@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import io.sitoolkit.cv.core.domain.project.maven.SqlLogListener.SqlLog;
+import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 
 public class SqlLogListenerTest {
 
@@ -38,7 +38,7 @@ public class SqlLogListenerTest {
         logs.add("end");
         logs.forEach((log) -> listener.nextLine(log));
 
-        List<SqlLog> sqlLogs = listener.getSqlLogs();
+        List<SqlPerMethod> sqlLogs = listener.getSqlLogs();
 
         assertThat(sqlLogs.size(), is(3));
         assertThat(sqlLogs.get(0).getRepositoryMethod(), is("AController.find1(Arg1)"));

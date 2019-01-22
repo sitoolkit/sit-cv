@@ -3,7 +3,7 @@ package io.sitoolkit.cv.core.domain.crud;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum CrudType {
-    CREATE, REFERENCE, UPDATE, DELETE, MERGE, NA;
+    CREATE, REFERENCE, UPDATE, DELETE;
 
     @JsonValue
     @Override
