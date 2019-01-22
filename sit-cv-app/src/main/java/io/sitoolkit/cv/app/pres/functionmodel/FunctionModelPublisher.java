@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.app.pres.function;
+package io.sitoolkit.cv.app.pres.functionmodel;
 
 import javax.annotation.PostConstruct;
 
@@ -8,8 +8,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocChangeEventListener;
-import io.sitoolkit.cv.core.app.function.FunctionModelService;
-import io.sitoolkit.cv.core.domain.function.FunctionModel;
+import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
+import io.sitoolkit.cv.core.domain.functionmodel.FunctionModel;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import lombok.extern.slf4j.Slf4j;
 

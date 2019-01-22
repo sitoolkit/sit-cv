@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.app.function;
+package io.sitoolkit.cv.core.app.functionmodel;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,8 +22,8 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.domain.function.FunctionModel;
-import io.sitoolkit.cv.core.domain.function.Diagram;
+import io.sitoolkit.cv.core.domain.functionmodel.Diagram;
+import io.sitoolkit.cv.core.domain.functionmodel.FunctionModel;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;

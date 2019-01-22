@@ -2,7 +2,8 @@ package io.sitoolkit.cv.core.app.config;
 
 import java.nio.file.Path;
 
-import io.sitoolkit.cv.core.app.function.FunctionModelService;
+import io.sitoolkit.cv.core.app.crud.CrudService;
+import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
 import io.sitoolkit.cv.core.app.report.ReportService;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
@@ -10,7 +11,7 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
-import io.sitoolkit.cv.core.domain.report.function.FunctionModelReportProcessor;
+import io.sitoolkit.cv.core.domain.report.functionmodel.FunctionModelReportProcessor;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagramProcessor;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
@@ -35,6 +36,9 @@ public class ServiceFactory {
 
     @Getter
     private FunctionModelService functionModelService;
+
+    @Getter
+    private CrudService crudService;
 
     @Getter
     private ProjectManager projectManager;
@@ -70,6 +74,8 @@ public class ServiceFactory {
 
         reportService = createReportService(functionModelService, projectManager);
 
+        crudService = createCrudService();
+
         return this;
     }
 
@@ -101,5 +107,9 @@ public class ServiceFactory {
 
         return new ReportService(functionModelReportProcessor, reportWriter, functionModelService,
                 projectManager);
+    }
+
+    protected CrudService createCrudService() {
+        return new CrudService();
     }
 }
