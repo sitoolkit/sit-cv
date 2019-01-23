@@ -193,4 +193,8 @@ public class FunctionModelService {
         return functionModels;
     }
 
+    public List<ClassDef> getAllEntryPointClasses() {
+        return classDefRepository.getAllEntryPointClasses();
+    }
+
 }

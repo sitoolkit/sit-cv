@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -132,11 +133,19 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     @Override
     public List<String> getEntryPoints() {
+        return getFilteredEntryPointClasses().map(ClassDef::getMethods).flatMap(List::stream)
+                .map(MethodDef::getQualifiedSignature).sorted().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ClassDef> getAllEntryPointClasses() {
+        return getFilteredEntryPointClasses().collect(Collectors.toList());
+    }
+
+    private Stream<ClassDef> getFilteredEntryPointClasses() {
         FilterConditionGroup entryPointFilter = config.getEntryPointFilter();
         return getAllClassDefs().stream()
-                .filter(classDef -> ClassDefFilter.match(classDef, entryPointFilter))
-                .map(ClassDef::getMethods).flatMap(List::stream)
-                .map(MethodDef::getQualifiedSignature).sorted().collect(Collectors.toList());
+                .filter(classDef -> ClassDefFilter.match(classDef, entryPointFilter));
     }
 
     @Override

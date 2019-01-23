@@ -17,6 +17,8 @@ public interface ClassDefRepository {
 
     List<String> getEntryPoints();
 
+    List<ClassDef> getAllEntryPointClasses();
+
     ClassDef findClassByQualifiedName(String qalifiedName);
 
     MethodDef findMethodByQualifiedSignature(String qualifiedSignature);
