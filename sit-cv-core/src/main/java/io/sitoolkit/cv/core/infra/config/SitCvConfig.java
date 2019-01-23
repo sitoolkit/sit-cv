@@ -9,5 +9,6 @@ public class SitCvConfig {
     private String javaFilePattern = ".*\\.(java|class)$";
     private FilterConditionGroup entryPointFilter;
     private FilterConditionGroup sequenceDiagramFilter;
+    private String crudPath = "./docs/datamodel/crud/crud.json";
 
 }

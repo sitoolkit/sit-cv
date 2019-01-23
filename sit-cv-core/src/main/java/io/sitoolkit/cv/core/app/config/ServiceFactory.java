@@ -11,6 +11,8 @@ import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
 import io.sitoolkit.cv.core.domain.crud.CrudFinder;
 import io.sitoolkit.cv.core.domain.crud.CrudProcessor;
+import io.sitoolkit.cv.core.domain.crud.CrudReader;
+import io.sitoolkit.cv.core.domain.crud.CrudWriter;
 import io.sitoolkit.cv.core.domain.crud.jsqlparser.CrudFinderJsqlparserImpl;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
@@ -77,7 +79,7 @@ public class ServiceFactory {
 
         reportService = createReportService(functionModelService, projectManager);
 
-        crudService = createCrudService(functionModelService, projectManager);
+        crudService = createCrudService(functionModelService, projectManager, config);
 
         return this;
     }
@@ -113,9 +115,13 @@ public class ServiceFactory {
     }
 
     protected CrudService createCrudService(FunctionModelService functionModelService,
-            ProjectManager projectManager) {
+            ProjectManager projectManager, SitCvConfig config) {
         CrudFinder crudFinder = new CrudFinderJsqlparserImpl();
         CrudProcessor crudProcessor = new CrudProcessor(crudFinder);
-        return new CrudService(functionModelService, crudProcessor, projectManager);
+        CrudReader crudReader = new CrudReader();
+        CrudWriter crudWriter = new CrudWriter();
+
+        return new CrudService(functionModelService, crudProcessor, projectManager, crudReader,
+                crudWriter, config);
     }
 }
