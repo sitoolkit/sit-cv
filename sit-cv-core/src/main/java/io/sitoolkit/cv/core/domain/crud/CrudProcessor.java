@@ -1,13 +1,13 @@
 package io.sitoolkit.cv.core.domain.crud;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.tabledef.TableDef;
-import io.sitoolkit.cv.core.domain.uml.ImplementDetector;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class CrudProcessor {
-
-    ImplementDetector implementDetector = new ImplementDetector();
 
     @NonNull
     CrudFinder crudFinder;
@@ -53,10 +51,23 @@ public class CrudProcessor {
         entryPoints.stream().forEach(entryPoint -> {
             entryPoint.getMethods().stream().forEach(entryPointMethod -> {
                 entryPointMethod.getMethodCallsRecursively().forEach(methodCalledByEntryPoint -> {
-                    MethodDef implMethod = implementDetector
-                            .detectImplMethod(methodCalledByEntryPoint);
-                    CrudRow repositoryMethodCrudRow = repositoryMethodMatrix.getCrudRowMap()
-                            .get(implMethod.getQualifiedSignature());
+
+                    CrudRow repositoryMethodCrudRow = null;
+
+                    if (methodCalledByEntryPoint.getClassDef() != null
+                            && methodCalledByEntryPoint.getClassDef().isInterface()) {
+
+                        Optional<CrudRow> crudRow = methodCalledByEntryPoint.getClassDef()
+                                .getKnownImplClasses().stream().map((classDef) -> {
+                                    String signature = classDef.getFullyQualifiedName() + "."
+                                            + methodCalledByEntryPoint.getSignature();
+                                    return repositoryMethodMatrix.getCrudRowMap().get(signature);
+                                }).filter(Objects::nonNull).findFirst();
+                        repositoryMethodCrudRow = crudRow.orElse(null);
+                    } else {
+                        repositoryMethodCrudRow = repositoryMethodMatrix.getCrudRowMap()
+                                .get(methodCalledByEntryPoint.getQualifiedSignature());
+                    }
 
                     if (repositoryMethodCrudRow == null) {
                         return;
@@ -71,7 +82,7 @@ public class CrudProcessor {
                     result.getTableDefs().addAll(repositoryMethodCrudRow.getCellMap().keySet());
 
                     log.debug("Mapped {} -> {} : {}", entryPointMethod.getQualifiedSignature(),
-                            implMethod.getQualifiedSignature(),
+                            methodCalledByEntryPoint.getQualifiedSignature(),
                             entryPointMethodCrudRow.getCellMap());
                 });
             });
