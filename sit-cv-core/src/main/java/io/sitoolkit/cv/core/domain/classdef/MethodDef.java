@@ -11,7 +11,7 @@ import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(of = "qualifiedSignature")
-@ToString(exclude = { "classDef", "methodCalls" })
+@ToString(exclude = { "classDef", "methodCalls", "statements" })
 public class MethodDef implements CvStatement {
 
     private String name;
@@ -38,7 +38,7 @@ public class MethodDef implements CvStatement {
 
     @Override
     public Stream<MethodCallDef> getMethodCallsRecursively() {
-        return Stream.concat(methodCalls.stream(), statements.stream())
+        return statements.stream()
                 .flatMap(CvStatement::getMethodCallsRecursively);
     }
 }

@@ -25,8 +25,6 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     private Map<String, MethodDef> methodDefMap = new HashMap<>();
 
-    private Map<String, List<MethodCallDef>> methodCallMap = new HashMap<>();
-
     private Map<String, List<CvStatement>> statementMap = new HashMap<>();
 
     @NonNull
@@ -38,7 +36,6 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
         classDef.getMethods().stream().forEach(methodDef -> {
             methodDefMap.put(methodDef.getQualifiedSignature(), methodDef);
-            methodCallMap.put(methodDef.getQualifiedSignature(), methodDef.getMethodCalls());
             statementMap.put(methodDef.getQualifiedSignature(), methodDef.getStatements());
         });
     }
@@ -53,7 +50,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
             classDefMap.remove(classDef.getFullyQualifiedName());
             classDef.getMethods().stream().forEach(methodDef -> {
                 methodDefMap.remove(methodDef.getQualifiedSignature());
-                methodCallMap.remove(methodDef.getQualifiedSignature());
+                statementMap.remove(methodDef.getQualifiedSignature());
             });
         });
     }
@@ -81,14 +78,6 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     public void solveMethodCalls(ClassDef classDef) {
         classDef.getMethods().stream().forEach(methodDef -> {
             solveMethodType(methodDef);
-            methodDef.getMethodCalls().stream().forEach(methodCall -> {
-                solveMethodCall(methodCall);
-            });
-        });
-
-        // TODO statement feature replace above to bellow
-        classDef.getMethods().stream().forEach(methodDef -> {
-            solveMethodType(methodDef);
             methodDef.getStatements().stream().forEach(this::solveMethodCall);
         });
 
@@ -101,17 +90,6 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     private void solveMethodCall(MethodCallDef methodCall) {
         solveMethodType(methodCall);
         soleveMethodCallClass(methodCall);
-
-        if (methodCall.getMethodCalls().isEmpty()) {
-            List<MethodCallDef> calledMethods = methodCallMap
-                    .get(methodCall.getQualifiedSignature());
-            if (calledMethods != null) {
-                methodCall.setMethodCalls(calledMethods);
-                calledMethods.stream().forEach(calledMethod -> {
-                    soleveMethodCallClass(calledMethod);
-                });
-            }
-        }
 
         if (methodCall.getStatements().isEmpty()) {
             List<CvStatement> statements = statementMap
