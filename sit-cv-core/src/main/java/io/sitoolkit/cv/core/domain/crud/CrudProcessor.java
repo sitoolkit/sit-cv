@@ -93,7 +93,7 @@ public class CrudProcessor {
                     }).filter(Objects::nonNull).findFirst();
             return crudRow;
         } else {
-            return Optional.of(
+            return Optional.ofNullable(
                     repositoryMethodMatrix.getCrudRowMap().get(methodCall.getQualifiedSignature()));
         }
     }
