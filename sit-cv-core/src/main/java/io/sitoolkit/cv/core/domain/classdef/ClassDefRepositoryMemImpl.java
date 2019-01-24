@@ -96,9 +96,6 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
                     .get(methodCall.getQualifiedSignature());
             if (statements != null) {
                 methodCall.setStatements(statements);
-                statements.stream().forEach(statement -> {
-                    solveMethodCall(statement);
-                });
             }
         }
     }
