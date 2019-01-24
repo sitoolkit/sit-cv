@@ -26,6 +26,8 @@ public class MethodCallDef extends MethodDef {
 
     @Override
     public Stream<MethodCallDef> getMethodCallsRecursively() {
-        return Stream.of(this);
+        Stream<MethodCallDef> statementMethodCalls = getStatements().stream()
+                .flatMap(CvStatement::getMethodCallsRecursively);
+        return Stream.concat(Stream.of(this), statementMethodCalls);
     }
 }

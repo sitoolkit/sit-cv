@@ -27,6 +27,8 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     private Map<String, List<MethodCallDef>> methodCallMap = new HashMap<>();
 
+    private Map<String, List<CvStatement>> statementMap = new HashMap<>();
+
     @NonNull
     private SitCvConfig config;
 
@@ -37,6 +39,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         classDef.getMethods().stream().forEach(methodDef -> {
             methodDefMap.put(methodDef.getQualifiedSignature(), methodDef);
             methodCallMap.put(methodDef.getQualifiedSignature(), methodDef.getMethodCalls());
+            statementMap.put(methodDef.getQualifiedSignature(), methodDef.getStatements());
         });
     }
 
@@ -106,6 +109,17 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
                 methodCall.setMethodCalls(calledMethods);
                 calledMethods.stream().forEach(calledMethod -> {
                     soleveMethodCallClass(calledMethod);
+                });
+            }
+        }
+
+        if (methodCall.getStatements().isEmpty()) {
+            List<CvStatement> statements = statementMap
+                    .get(methodCall.getQualifiedSignature());
+            if (statements != null) {
+                methodCall.setStatements(statements);
+                statements.stream().forEach(statement -> {
+                    solveMethodCall(statement);
                 });
             }
         }
