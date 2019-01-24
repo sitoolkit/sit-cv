@@ -38,13 +38,12 @@ public class CrudService {
     private SitCvConfig config;
 
     public CrudMatrix loadMatrix() {
-        Path crudPath = projectManager.getCurrentProject().getDir().resolve(config.getCrudPath());
-        Optional<CrudMatrix> crudMatrix = reader.read(crudPath);
+        Optional<CrudMatrix> crudMatrix = reader.read(buildCrudPath());
 
-        return crudMatrix.orElseGet(() -> generateMatrix(crudPath));
+        return crudMatrix.orElseGet(() -> generateMatrix());
     }
 
-    public CrudMatrix generateMatrix(Path crudPath) {
+    public CrudMatrix generateMatrix() {
         List<SqlPerMethod> sqlPerMethodList = projectManager.getSqlLog();
 
         CrudMatrix methodCrud = processor.buildMatrix(sqlPerMethodList);
@@ -53,13 +52,17 @@ public class CrudService {
 
         CrudMatrix entryPointCrud = processor.adjustAxis(entryPointClasses, methodCrud);
 
-        writer.write(entryPointCrud, crudPath);
+        writer.write(entryPointCrud, buildCrudPath());
 
         return entryPointCrud;
     }
 
     public void analyzeSql() {
         projectManager.generateSqlLog();
+    }
+
+    private Path buildCrudPath() {
+        return projectManager.getCurrentProject().getDir().resolve(config.getCrudPath());
     }
 
 }
