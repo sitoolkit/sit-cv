@@ -21,11 +21,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
+    /**
+     * key: classFullyQualifiedName
+     */
     private Map<String, ClassDef> classDefMap = new HashMap<>();
 
+    /**
+     * key: methodQualifiedSignature
+     */
     private Map<String, MethodDef> methodDefMap = new HashMap<>();
-
-    private Map<String, List<CvStatement>> statementMap = new HashMap<>();
 
     @NonNull
     private SitCvConfig config;
@@ -36,7 +40,6 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
         classDef.getMethods().stream().forEach(methodDef -> {
             methodDefMap.put(methodDef.getQualifiedSignature(), methodDef);
-            statementMap.put(methodDef.getQualifiedSignature(), methodDef.getStatements());
         });
     }
 
@@ -50,7 +53,6 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
             classDefMap.remove(classDef.getFullyQualifiedName());
             classDef.getMethods().stream().forEach(methodDef -> {
                 methodDefMap.remove(methodDef.getQualifiedSignature());
-                statementMap.remove(methodDef.getQualifiedSignature());
             });
         });
     }
@@ -92,10 +94,11 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         soleveMethodCallClass(methodCall);
 
         if (methodCall.getStatements().isEmpty()) {
-            List<CvStatement> statements = statementMap
+            MethodDef method = methodDefMap
                     .get(methodCall.getQualifiedSignature());
-            if (statements != null) {
-                methodCall.setStatements(statements);
+            if (method != null) {
+                methodCall.setStatements(method.getStatements());
+                methodCall.setMethodCalls(method.getMethodCalls());
             }
         }
     }
