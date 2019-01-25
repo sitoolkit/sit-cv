@@ -1,12 +1,10 @@
-package io.sitoolkit.cv.core.domain.uml;
+package io.sitoolkit.cv.core.domain.classdef;
 
 import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.sitoolkit.cv.core.domain.classdef.ClassDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

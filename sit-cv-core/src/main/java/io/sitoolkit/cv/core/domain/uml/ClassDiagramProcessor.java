@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
+import io.sitoolkit.cv.core.domain.classdef.ImplementDetector;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallStack;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;

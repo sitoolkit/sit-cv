@@ -6,10 +6,9 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
+import io.sitoolkit.cv.core.domain.classdef.ImplementCollector;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.tabledef.TableDef;
-import io.sitoolkit.cv.core.domain.uml.ImplementDetector;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CrudProcessor {
 
-    ImplementDetector implementDetector = new ImplementDetector();
+    ImplementCollector implementCollector = new ImplementCollector();
 
     @NonNull
     CrudFinder crudFinder;
@@ -56,10 +55,10 @@ public class CrudProcessor {
                 .flatMap(List::stream);
 
         entryPointMethods.forEach(entryPointMethod -> {
-            Stream<MethodDef> implementedMethodCalls = getImplementedMethodCallsRecursively(
-                    entryPointMethod);
+            Stream<MethodDef> implMethodCalls = Stream.concat(Stream.of(entryPointMethod),
+                    implementCollector.collectMethodCallsRecursively(entryPointMethod));
 
-            implementedMethodCalls.forEach(methodCalledByEntryPoint -> {
+            implMethodCalls.forEach(methodCalledByEntryPoint -> {
                 CrudRow repositoryMethodCrudRow = repositoryMethodMatrix.getCrudRowMap()
                         .get(methodCalledByEntryPoint.getQualifiedSignature());
 
@@ -82,17 +81,6 @@ public class CrudProcessor {
         });
 
         return result;
-    }
-
-    private Stream<MethodDef> getImplementedMethodCallsRecursively(MethodDef method) {
-        return Stream.concat(Stream.of(method),
-                getImplementedMethodCallsRecursively(method.getMethodCalls()));
-    }
-
-    private Stream<MethodDef> getImplementedMethodCallsRecursively(
-            List<MethodCallDef> methodCalls) {
-        return methodCalls.stream().map(implementDetector::detectImplMethod)
-                .flatMap(this::getImplementedMethodCallsRecursively);
     }
 
 }
