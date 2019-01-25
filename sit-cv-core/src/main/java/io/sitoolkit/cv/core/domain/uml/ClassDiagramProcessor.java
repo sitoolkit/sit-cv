@@ -19,13 +19,17 @@ import io.sitoolkit.cv.core.domain.classdef.MethodCallStack;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ClassDiagramProcessor {
 
-    ImplementDetector implementDetector = new ImplementDetector();
+    @NonNull
+    ImplementDetector implementDetector;
 
     public ClassDiagram process(MethodDef entryPoint) {
         return process(entryPoint.getQualifiedSignature(),

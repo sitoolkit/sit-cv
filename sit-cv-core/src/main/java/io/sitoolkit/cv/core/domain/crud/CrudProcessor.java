@@ -17,10 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CrudProcessor {
 
-    ImplementCollector implementCollector = new ImplementCollector();
-
     @NonNull
     CrudFinder crudFinder;
+
+    @NonNull
+    ImplementCollector implementCollector;
 
     public CrudMatrix buildMatrix(List<SqlPerMethod> sqlPerMethodList) {
         CrudMatrix matrix = new CrudMatrix();

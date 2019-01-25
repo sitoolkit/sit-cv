@@ -3,9 +3,14 @@ package io.sitoolkit.cv.core.domain.classdef;
 import java.util.List;
 import java.util.stream.Stream;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class ImplementCollector {
 
-    private ImplementDetector implementDetector = new ImplementDetector();
+    @NonNull
+    private ImplementDetector implementDetector;
 
     public Stream<MethodDef> collectMethodCallsRecursively(MethodDef method) {
         return collectMethodCallsRecursively(method.getMethodCalls());
