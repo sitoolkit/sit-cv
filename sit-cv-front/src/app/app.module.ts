@@ -28,9 +28,10 @@ import { ApiDocComponent } from './cmp/function-model/apidoc/apidoc.component';
 import { SitCvWebsocket } from './srv/shared/sit-cv-websocket';
 import { ReportDataLoader } from './srv/shared/report-data-loader';
 import { CrudComponent } from './cmp/data-model/crud/crud.component';
-import { HttpModule } from '@angular/http';
+import { HttpModule, Http } from '@angular/http';
 import { ServiceFactory } from './service-factory';
 import { ProgressBarComponent } from './cmp/shared/progress-bar/progress-bar.component';
+import { ServerRestPathBuilder } from './srv/shared/server-rest-path-builder';
 
 let serviceFactory = new ServiceFactory();
 
@@ -73,6 +74,11 @@ let serviceFactory = new ServiceFactory();
       provide: 'FunctionModelService',
       useFactory: serviceFactory.createFunctionModelService,
       deps: [ReportDataLoader, SitCvWebsocket, Config]
+    },
+    {
+      provide: 'DataModelService',
+      useFactory: serviceFactory.createDataModelService,
+      deps: [ReportDataLoader, Http, ServerRestPathBuilder, Config]
     },
     HidePackagePipe,
   ],

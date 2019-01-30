@@ -16,6 +16,7 @@ import io.sitoolkit.cv.core.domain.crud.jsqlparser.CrudFinderJsqlparserImpl;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDocMenuBuilder;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
+import io.sitoolkit.cv.core.domain.report.crud.CrudReportProcessor;
 import io.sitoolkit.cv.core.domain.report.designdoc.DesignDocReportProcessor;
 import io.sitoolkit.cv.core.domain.report.functionmodel.FunctionModelReportProcessor;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
@@ -44,10 +45,10 @@ public class ServiceFactory {
     private DesignDocService designDocService;
 
     @Getter
-    private ReportService reportService;
+    private CrudService crudService;
 
     @Getter
-    private CrudService crudService;
+    private ReportService reportService;
 
     @Getter
     private ProjectManager projectManager;
@@ -83,9 +84,10 @@ public class ServiceFactory {
 
         designDocService = createDesignDocService(functionModelService);
 
-        reportService = createReportService(functionModelService, designDocService, projectManager);
-
         crudService = createCrudService(functionModelService, projectManager);
+
+        reportService = createReportService(functionModelService, designDocService, crudService,
+                projectManager);
 
         return this;
     }
@@ -116,22 +118,25 @@ public class ServiceFactory {
         return new DesignDocService(functionModelService, menuBuilder);
     }
 
-    protected ReportService createReportService(FunctionModelService functionModelService,
-            DesignDocService designDocService, ProjectManager projectManager) {
-        FunctionModelReportProcessor functionModelReportProcessor = new FunctionModelReportProcessor();
-        DesignDocReportProcessor designDocReportProcessor = new DesignDocReportProcessor();
-        ReportWriter reportWriter = new ReportWriter();
-
-        return new ReportService(functionModelReportProcessor, designDocReportProcessor,
-                reportWriter, functionModelService, designDocService, projectManager);
-    }
-
     protected CrudService createCrudService(FunctionModelService functionModelService,
             ProjectManager projectManager) {
         CrudFinder crudFinder = new CrudFinderJsqlparserImpl();
         CrudProcessor crudProcessor = new CrudProcessor(crudFinder);
 
         return new CrudService(functionModelService, crudProcessor, projectManager);
+    }
+
+    protected ReportService createReportService(FunctionModelService functionModelService,
+            DesignDocService designDocService, CrudService crudService,
+            ProjectManager projectManager) {
+        FunctionModelReportProcessor functionModelReportProcessor = new FunctionModelReportProcessor();
+        DesignDocReportProcessor designDocReportProcessor = new DesignDocReportProcessor();
+        CrudReportProcessor crudReportProcessor = new CrudReportProcessor();
+        ReportWriter reportWriter = new ReportWriter();
+
+        return new ReportService(functionModelReportProcessor, designDocReportProcessor,
+                crudReportProcessor, reportWriter, functionModelService, designDocService,
+                crudService, projectManager);
     }
 
 }
