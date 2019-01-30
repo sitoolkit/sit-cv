@@ -6,9 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.sitoolkit.cv.app.pres.designdoc.DesignDocMenuBuilder;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import io.sitoolkit.cv.core.app.crud.CrudService;
+import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 
@@ -33,13 +33,14 @@ public class BaseConfig {
     }
 
     @Bean
-    public ProjectManager projectManager(ServiceFactory serviceFactory) {
-        return serviceFactory.getProjectManager();
+    public DesignDocService designDocService(ServiceFactory serviceFacotry) {
+        return serviceFacotry.getDesignDocService();
+
     }
 
     @Bean
-    public DesignDocMenuBuilder designDocMenuBuilder() {
-        return new DesignDocMenuBuilder();
+    public ProjectManager projectManager(ServiceFactory serviceFactory) {
+        return serviceFactory.getProjectManager();
     }
 
     @Bean

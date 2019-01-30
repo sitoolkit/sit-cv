@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.app.pres.menu;
+package io.sitoolkit.cv.core.domain.menu;
 
 import java.util.Comparator;
 import java.util.SortedSet;

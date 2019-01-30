@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.sitoolkit.cv.core.app.designdoc.DesignDocChangeEventListener;
+import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 
@@ -19,13 +20,13 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
     FunctionModelService functionModelService;
 
     @Autowired
+    DesignDocService designDocService;
+
+    @Autowired
     SimpMessagingTemplate template;
 
     @Autowired
     ProjectManager projectManager;
-
-    @Autowired
-    DesignDocMenuBuilder menuBuilder;
 
     @PostConstruct
     public void init() {
@@ -40,8 +41,7 @@ public class DesignDocPublisher implements DesignDocChangeEventListener {
 
     @MessageMapping("/designdoc/list")
     public void publishDesingDocList() {
-        template.convertAndSend("/topic/designdoc/list",
-                menuBuilder.build(functionModelService.getAllIds()));
+        template.convertAndSend("/topic/designdoc/list", designDocService.buildMenu());
     }
 
     @RequestMapping("")
