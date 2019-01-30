@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FunctionModelReportProcessor {
 
+    private static final String BASE_DIR = "functionmodel/";
+
     public List<Report<?>> process(List<FunctionModel> functionModels) {
         List<Report<?>> reports = new ArrayList<>();
         DetailReportsAndPathMap reportsAndPathMap = buildAndGroupingDetailReports(functionModels);
@@ -45,7 +47,7 @@ public class FunctionModelReportProcessor {
         String dirName = functionModel.getPkg().replaceAll("\\.", "/");
         String fileName = functionModel.getClassName() + ".js";
 
-        return dirName + "/" + fileName;
+        return BASE_DIR + dirName + "/" + fileName;
     }
 
     private FunctionModelReportDetailDef buildDetail(FunctionModel functionModel) {
@@ -60,7 +62,7 @@ public class FunctionModelReportProcessor {
 
     private Report<Map<String, String>> buildDetailPathMapReport(
             Map<String, String> detailPathMap) {
-        return Report.<Map<String, String>>builder().path("assets/designdoc-detail-path-map.js")
+        return Report.<Map<String, String>>builder().path(BASE_DIR + "detail-path-map.js")
                 .content(detailPathMap).build();
     }
 
