@@ -21,7 +21,9 @@ import io.sitoolkit.cv.core.infra.project.maven.MavenSitCvToolsManager;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.SitFileUtils;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class MavenProjectReader implements ProjectReader {
 
     private static final String LOG_DIR = "./target/sit-cv";
@@ -93,7 +95,11 @@ public class MavenProjectReader implements ProjectReader {
             throw new UncheckedIOException(e);
         }
 
-        JsonUtils.obj2file(sqlLogListener.getSqlLogs(), project.getDir().resolve(SQL_LOG_FILE));
+        Path sqlLogPath = project.getDir().resolve(SQL_LOG_FILE);
+        JsonUtils.obj2file(sqlLogListener.getSqlLogs(), sqlLogPath);
+
+        log.info("Wrote maven test log: {}", testLogPath.toAbsolutePath().normalize());
+        log.info("Wrote repository SQL log: {}", sqlLogPath.toAbsolutePath().normalize());
 
         return true;
     }
