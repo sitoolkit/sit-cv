@@ -1,9 +1,5 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,9 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MavenProjectReader implements ProjectReader {
 
-    private static final String LOG_DIR = "./target/sit-cv";
-    private static final String TEST_LOG_FILE = LOG_DIR + "/sit-cv-unit-test.log";
-    private static final String SQL_LOG_FILE = LOG_DIR + "/sit-cv-repository-vs-sql.json";
+    private static final String WORK_DIR = "./target/sit-cv";
+    private static final String SQL_LOG_FILE = WORK_DIR + "/sit-cv-repository-vs-sql.json";
 
     @Override
     public Optional<Project> read(Path projectDir) {
@@ -80,25 +75,14 @@ public class MavenProjectReader implements ProjectReader {
                 .map((e) -> e.getKey() + "=" + e.getValue())
                 .collect(Collectors.joining(";", "=", ""));
 
-        Path testLogPath = project.getDir().resolve(TEST_LOG_FILE);
-        SitFileUtils.createDirectories(testLogPath.getParent());
+        SitFileUtils.createDirectories(project.getDir().resolve(WORK_DIR));
 
-        try (FileWriter fw = new FileWriter(testLogPath.toFile());
-                BufferedWriter bw = new BufferedWriter(fw)) {
-
-            TestLogListener testLogListener = new TestLogListener(bw);
-
-            mvnPrj.mvnw("test", "-DargLine=-javaagent:" + jarPath.toString() + agentArgs)
-                    .stdout(sqlLogListener).stdout(testLogListener).execute();
-
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        mvnPrj.mvnw("test", "-DargLine=-javaagent:" + jarPath.toString() + agentArgs)
+                .stdout(sqlLogListener).execute();
 
         Path sqlLogPath = project.getDir().resolve(SQL_LOG_FILE);
         JsonUtils.obj2file(sqlLogListener.getSqlLogs(), sqlLogPath);
 
-        log.info("Wrote maven test log: {}", testLogPath.toAbsolutePath().normalize());
         log.info("Wrote repository SQL log: {}", sqlLogPath.toAbsolutePath().normalize());
 
         return true;
