@@ -1,6 +1,5 @@
 package io.sitoolkit.cv.core.app.crud;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +37,8 @@ public class CrudService {
     private SitCvConfig config;
 
     public CrudMatrix loadMatrix() {
-        Optional<CrudMatrix> crudMatrix = reader.read(buildCrudPath());
+        Optional<CrudMatrix> crudMatrix = reader
+                .read(projectManager.getCurrentProject().getCrudPath());
 
         return crudMatrix.orElseGet(() -> generateMatrix());
     }
@@ -52,17 +52,13 @@ public class CrudService {
 
         CrudMatrix entryPointCrud = processor.adjustAxis(entryPointClasses, methodCrud);
 
-        writer.write(entryPointCrud, buildCrudPath());
+        writer.write(entryPointCrud, projectManager.getCurrentProject().getCrudPath());
 
         return entryPointCrud;
     }
 
     public void analyzeSql() {
         projectManager.generateSqlLog();
-    }
-
-    private Path buildCrudPath() {
-        return projectManager.getCurrentProject().getDir().resolve(config.getCrudPath());
     }
 
 }

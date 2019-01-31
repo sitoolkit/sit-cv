@@ -47,6 +47,14 @@ public class JsonUtils {
         }
     }
 
+    public static <T> T file2obj(Path path, Class<T> objType) {
+        try {
+            return mapper.readValue(path.toFile(), objType);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     public static <T> T file2obj(Path path, TypeReference<T> objType) {
         try {
             return mapper.readValue(path.toFile(), objType);

@@ -22,9 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MavenProjectReader implements ProjectReader {
 
-    private static final String WORK_DIR = "./target/sit-cv";
-    private static final String SQL_LOG_FILE = WORK_DIR + "/sit-cv-repository-vs-sql.json";
-
     @Override
     public Optional<Project> read(Path projectDir) {
 
@@ -50,7 +47,7 @@ public class MavenProjectReader implements ProjectReader {
             return Collections.emptyList();
         }
 
-        return JsonUtils.file2obj(project.getDir().resolve(SQL_LOG_FILE),
+        return JsonUtils.file2obj(project.getDir().resolve(project.getSqlLogPath()),
                 new TypeReference<List<SqlPerMethod>>() {
                 });
     }
@@ -75,12 +72,12 @@ public class MavenProjectReader implements ProjectReader {
                 .map((e) -> e.getKey() + "=" + e.getValue())
                 .collect(Collectors.joining(";", "=", ""));
 
-        SitFileUtils.createDirectories(project.getDir().resolve(WORK_DIR));
+        SitFileUtils.createDirectories(project.getSqlLogPath().getParent());
 
         mvnPrj.mvnw("test", "-DargLine=-javaagent:" + jarPath.toString() + agentArgs)
                 .stdout(sqlLogListener).execute();
 
-        Path sqlLogPath = project.getDir().resolve(SQL_LOG_FILE);
+        Path sqlLogPath = project.getDir().resolve(project.getSqlLogPath());
         JsonUtils.obj2file(sqlLogListener.getSqlLogs(), sqlLogPath);
 
         log.info("Wrote repository SQL log: {}", sqlLogPath.toAbsolutePath().normalize());

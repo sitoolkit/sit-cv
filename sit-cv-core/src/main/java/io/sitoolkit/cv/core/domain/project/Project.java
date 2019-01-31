@@ -27,6 +27,11 @@ public class Project {
 
     private PreProcessor preProcessor = PreProcessor.DO_NOTHING;
 
+    private static final String WORK_DIR = "./target/sit-cv";
+    private static final String TEST_LOG_FILE = WORK_DIR + "/sit-cv-unit-test.log";
+    private static final String SQL_LOG_FILE = WORK_DIR + "/sit-cv-repository-vs-sql.json";
+    private static final String CRUD_FILE = WORK_DIR + "/crud.json";
+
     public Project(Path dir) {
         super();
         this.dir = dir.toAbsolutePath().normalize();
@@ -59,6 +64,18 @@ public class Project {
     public Optional<Path> findParseTarget(Path inputFile) {
         return findProjectFromSrc(inputFile)
                 .map(proj -> proj.getPreProcessor().getPreProcessedPath(inputFile));
+    }
+
+    public Path getTestLogPath() {
+        return dir.resolve(TEST_LOG_FILE);
+    }
+
+    public Path getSqlLogPath() {
+        return dir.resolve(SQL_LOG_FILE);
+    }
+
+    public Path getCrudPath() {
+        return dir.resolve(CRUD_FILE);
     }
 
     Set<Path> getPreProcessedDirs() {
