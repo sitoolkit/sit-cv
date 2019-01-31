@@ -44,4 +44,8 @@ public class ProjectManager {
         return sqlLogs.orElse(Collections.emptyList());
     }
 
+    public void generateSqlLog() {
+        readers.stream().map(reader -> reader.generateSqlLog(currentProject)).findFirst();
+    }
+
 }

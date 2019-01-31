@@ -39,4 +39,8 @@ public class CrudService {
         return entryPointCrud;
     }
 
+    public void analyzeSql() {
+        projectManager.generateSqlLog();
+    }
+
 }

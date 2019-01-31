@@ -32,4 +32,14 @@ public class SitFileUtils {
         }
     }
 
+
+    public static void createDirectories(Path path) {
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+    }
 }
