@@ -11,7 +11,6 @@ import io.sitoolkit.cv.core.domain.crud.CrudReader;
 import io.sitoolkit.cv.core.domain.crud.CrudWriter;
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -32,9 +31,6 @@ public class CrudService {
 
     @NonNull
     private CrudWriter writer;
-
-    @NonNull
-    private SitCvConfig config;
 
     public CrudMatrix loadMatrix() {
         Optional<CrudMatrix> crudMatrix = reader

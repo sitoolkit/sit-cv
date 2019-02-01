@@ -11,7 +11,7 @@ public class CrudReader {
 
     public Optional<CrudMatrix> read(Path path) {
         if (!path.toFile().exists()) {
-            log.info("CRUD matrix not exists: {}", path);
+            log.info("CRUD matrix doesn't exist: {}", path);
             return Optional.empty();
         }
 
