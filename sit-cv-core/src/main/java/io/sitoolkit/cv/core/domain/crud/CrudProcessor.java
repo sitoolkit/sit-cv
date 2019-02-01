@@ -1,14 +1,15 @@
 package io.sitoolkit.cv.core.domain.crud;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.tabledef.TableDef;
+import io.sitoolkit.cv.core.domain.uml.ImplementDetector;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class CrudProcessor {
+
+    ImplementDetector implementDetector = new ImplementDetector();
 
     @NonNull
     CrudFinder crudFinder;
@@ -49,53 +52,47 @@ public class CrudProcessor {
 
         CrudMatrix result = new CrudMatrix();
 
-        entryPoints.stream().forEach(entryPoint -> {
-            entryPoint.getMethods().stream().forEach(entryPointMethod -> {
-                entryPointMethod.getMethodCallsRecursively().forEach(methodCalledByEntryPoint -> {
+        Stream<MethodDef> entryPointMethods = entryPoints.stream().map(ClassDef::getMethods)
+                .flatMap(List::stream);
 
-                    Optional<CrudRow> foundRow = findRepositoryMethodCrudRow(
-                            repositoryMethodMatrix, methodCalledByEntryPoint);
+        entryPointMethods.forEach(entryPointMethod -> {
+            Stream<MethodDef> implementedMethodCalls = getImplementedMethodCallsRecursively(
+                    entryPointMethod);
 
-                    if (!foundRow.isPresent()) {
-                        return;
-                    }
+            implementedMethodCalls.forEach(methodCalledByEntryPoint -> {
+                CrudRow repositoryMethodCrudRow = repositoryMethodMatrix.getCrudRowMap()
+                        .get(methodCalledByEntryPoint.getQualifiedSignature());
 
-                    CrudRow repositoryMethodCrudRow = foundRow.get();
+                if (repositoryMethodCrudRow == null) {
+                    return;
+                }
 
-                    CrudRow entryPointMethodCrudRow = result.getCrudRowMap()
-                            .computeIfAbsent(entryPointMethod.getQualifiedSignature(), (key) -> {
-                                return new CrudRow(entryPointMethod.getActionPath());
-                            });
-                    entryPointMethodCrudRow.merge(repositoryMethodCrudRow);
+                CrudRow entryPointMethodCrudRow = result.getCrudRowMap()
+                        .computeIfAbsent(entryPointMethod.getQualifiedSignature(), (key) -> {
+                            return new CrudRow(entryPointMethod.getActionPath());
+                        });
+                entryPointMethodCrudRow.merge(repositoryMethodCrudRow);
 
-                    result.getTableDefs().addAll(repositoryMethodCrudRow.getCellMap().keySet());
+                result.getTableDefs().addAll(repositoryMethodCrudRow.getCellMap().keySet());
 
-                    log.debug("Mapped {} -> {} : {}", entryPointMethod.getQualifiedSignature(),
-                            methodCalledByEntryPoint.getQualifiedSignature(),
-                            entryPointMethodCrudRow.getCellMap());
-                });
+                log.debug("Mapped {} -> {} : {}", entryPointMethod.getQualifiedSignature(),
+                        methodCalledByEntryPoint.getQualifiedSignature(),
+                        entryPointMethodCrudRow.getCellMap());
             });
         });
 
         return result;
     }
 
-    private Optional<CrudRow> findRepositoryMethodCrudRow(CrudMatrix repositoryMethodMatrix,
-            MethodCallDef methodCall) {
+    private Stream<MethodDef> getImplementedMethodCallsRecursively(MethodDef method) {
+        return Stream.concat(Stream.of(method),
+                getImplementedMethodCallsRecursively(method.getMethodCalls()));
+    }
 
-        if (methodCall.getClassDef() != null && methodCall.getClassDef().isInterface()) {
-
-            Optional<CrudRow> crudRow = methodCall.getClassDef().getKnownImplClasses().stream()
-                    .map((classDef) -> {
-                        String signature = classDef.getFullyQualifiedName() + "."
-                                + methodCall.getSignature();
-                        return repositoryMethodMatrix.getCrudRowMap().get(signature);
-                    }).filter(Objects::nonNull).findFirst();
-            return crudRow;
-        } else {
-            return Optional.ofNullable(
-                    repositoryMethodMatrix.getCrudRowMap().get(methodCall.getQualifiedSignature()));
-        }
+    private Stream<MethodDef> getImplementedMethodCallsRecursively(
+            List<MethodCallDef> methodCalls) {
+        return methodCalls.stream().map(implementDetector::detectImplMethod)
+                .flatMap(this::getImplementedMethodCallsRecursively);
     }
 
 }
