@@ -96,7 +96,7 @@ public class ServiceFactory {
                 projectManager, config);
         SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(config,
                 implementDetector);
-        ClassDiagramProcessor classProcessor = new ClassDiagramProcessor(implementDetector);
+        ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
         GraphvizManager.initialize();
         PlantUmlWriter plantumlWriter = new PlantUmlWriter();
         DiagramWriter<SequenceDiagram> sequenceWriter = new SequenceDiagramWriterPlantUmlImpl(

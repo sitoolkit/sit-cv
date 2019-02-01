@@ -14,12 +14,9 @@ import java.util.stream.Stream;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
-import io.sitoolkit.cv.core.domain.classdef.ImplementDetector;
-import io.sitoolkit.cv.core.domain.classdef.MethodCallStack;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -27,14 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class ClassDiagramProcessor {
-
-    @NonNull
-    ImplementDetector implementDetector;
-
-    public ClassDiagram process(MethodDef entryPoint) {
-        return process(entryPoint.getQualifiedSignature(),
-                getSequenceMethodsRecursively(entryPoint).collect(Collectors.toSet()));
-    }
 
     public ClassDiagram process(LifeLineDef lifeLine) {
         return process(lifeLine.getEntryMessage().getRequestQualifiedSignature(),
@@ -100,22 +89,6 @@ public class ClassDiagramProcessor {
         ret.forEach(c -> log.debug("Field class picked :{}", c.getName()));
 
         return ret;
-    }
-
-    private Stream<MethodDef> getSequenceMethodsRecursively(MethodDef entryPoint) {
-        return getSequenceMethodsRecursively(entryPoint, MethodCallStack.getBlank());
-    }
-
-    private Stream<MethodDef> getSequenceMethodsRecursively(MethodDef entryPoint, MethodCallStack callStack) {
-        MethodDef methodImpl = implementDetector.detectImplMethod(entryPoint);
-        if (callStack.contains(methodImpl)) {
-            log.debug("method: {} is called recursively", methodImpl.getQualifiedSignature());
-            return Stream.empty();
-        }
-        MethodCallStack pushedStack = callStack.push(methodImpl);
-        return Stream.concat(Stream.of(methodImpl),
-                methodImpl.getMethodCalls().stream()
-                .flatMap(method -> getSequenceMethodsRecursively(method, pushedStack)));
     }
 
     Stream<ClassDef> getFieldClassesRecursively(ClassDef classDef) {

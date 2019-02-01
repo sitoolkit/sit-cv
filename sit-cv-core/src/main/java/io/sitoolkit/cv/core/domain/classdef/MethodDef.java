@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -36,11 +35,5 @@ public class MethodDef implements CvStatement {
     @Override
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
         return processor.process(this, context);
-    }
-
-    @Override
-    public Stream<MethodCallDef> getMethodCallsRecursively() {
-        return statements.stream()
-                .flatMap(CvStatement::getMethodCallsRecursively);
     }
 }
