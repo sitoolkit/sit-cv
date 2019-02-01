@@ -80,13 +80,8 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     public void solveMethodCalls(ClassDef classDef) {
         classDef.getMethods().stream().forEach(methodDef -> {
             solveMethodType(methodDef);
-            methodDef.getStatements().stream().forEach(this::solveMethodCall);
+            methodDef.getMethodCalls().stream().forEach(this::solveMethodCall);
         });
-
-    }
-
-    private void solveMethodCall(CvStatement statement) {
-        statement.getMethodCallsRecursively().forEach(this::solveMethodCall);
     }
 
     private void solveMethodCall(MethodCallDef methodCall) {

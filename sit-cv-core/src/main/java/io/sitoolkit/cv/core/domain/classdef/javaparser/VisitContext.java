@@ -17,6 +17,7 @@ import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatementDefaultImpl;
 import io.sitoolkit.cv.core.domain.classdef.FinallyStatement;
 import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
+import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.TryStatement;
 import lombok.extern.slf4j.Slf4j;
@@ -98,9 +99,18 @@ public class VisitContext {
                 .reduce((first, second) -> second).get();
     }
 
-    public void addStatement(CvStatement statement) {
-        log.debug("{}Add statment {} to {}", getLogLeftPadding(), statement, getCurrent());
-        addChild(getCurrent(), statement);
+    public CvStatement getCurrentMethod() {
+        return stack.stream().filter(MethodDef.class::isInstance)
+                .reduce((first, second) -> second).get();
+    }
+
+    public void addMethodCall(MethodCallDef methodCallDef) {
+        log.debug("{}Add MethodCall {} to {}", getLogLeftPadding(), methodCallDef, getCurrent());
+        CvStatement currentMethod = getCurrentMethod();
+        if(currentMethod != null) {
+            ((MethodDef) currentMethod).getMethodCalls().add(methodCallDef);
+        }
+        addChild(getCurrent(), methodCallDef);
     }
 
     public boolean isInLoop() {
