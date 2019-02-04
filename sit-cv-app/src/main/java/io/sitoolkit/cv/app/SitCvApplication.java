@@ -34,19 +34,18 @@ public class SitCvApplication {
         }
     }
 
-    private static ServiceFactory createAndInitializeServiceFactory(ApplicationArguments appArgs) {
+    private static Path getProjectDir(ApplicationArguments appArgs) {
         List<String> projects = appArgs.getOptionValues(SitCvApplicationOption.PROJECT.getKey());
-        Path projectDir = projects == null || projects.isEmpty() ? Paths.get(".")
+        return projects == null || projects.isEmpty() ? Paths.get(".")
                 : Paths.get(projects.get(0));
-        return ServiceFactory.createAndInitialize(projectDir);
     }
 
     private static void executeReportMode(ApplicationArguments appArgs) {
-        createAndInitializeServiceFactory(appArgs).getReportService().export();
+        ServiceFactory.createAndInitialize(getProjectDir(appArgs)).getReportService().export();
     }
 
     private static void executeAnalyzeSqlMode(ApplicationArguments appArgs) {
-        createAndInitializeServiceFactory(appArgs).getCrudService().analyzeSql();
+        ServiceFactory.create(getProjectDir(appArgs)).getCrudService().analyzeSql();
     }
 
     /**

@@ -2,14 +2,16 @@ package io.sitoolkit.cv.core.domain.project;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.gradle.GradleProjectReader;
 import io.sitoolkit.cv.core.domain.project.lombok.DelombokProcessor;
 import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
+import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.Getter;
 
 public class ProjectManager {
@@ -38,10 +40,14 @@ public class ProjectManager {
     }
 
     public List<SqlPerMethod> getSqlLog() {
-        Optional<List<SqlPerMethod>> sqlLogs = readers.stream()
-                .map(reader -> reader.getSqlLog(currentProject)).filter((l) -> !l.isEmpty())
-                .findFirst();
-        return sqlLogs.orElse(Collections.emptyList());
+        Optional<List<SqlPerMethod>> sqlLogs = JsonUtils.file2obj(
+                currentProject.getDir().resolve(currentProject.getSqlLogPath()),
+                new TypeReference<List<SqlPerMethod>>() {
+                });
+        return sqlLogs.orElseThrow(() -> {
+            return new IllegalStateException(
+                    "SQL log file not found. Please run '--cv.analyze-sql' first.");
+        });
     }
 
     public void generateSqlLog() {

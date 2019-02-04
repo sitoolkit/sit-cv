@@ -9,8 +9,9 @@ import java.util.Set;
 
 import io.sitoolkit.cv.core.domain.tabledef.TableDef;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-
+@NoArgsConstructor
 @Data
 public class CrudRow {
 
