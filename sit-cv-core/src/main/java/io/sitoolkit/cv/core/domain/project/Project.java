@@ -66,11 +66,11 @@ public class Project {
     }
 
     public Path getSqlLogPath() {
-        return dir.resolve(SQL_LOG_FILE);
+        return dir.resolve(SQL_LOG_FILE).normalize();
     }
 
     public Path getCrudPath() {
-        return dir.resolve(CRUD_FILE);
+        return dir.resolve(CRUD_FILE).normalize();
     }
 
     Set<Path> getPreProcessedDirs() {

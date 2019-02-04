@@ -1,7 +1,6 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,13 +39,6 @@ public class MavenProjectReader implements ProjectReader {
 
     @Override
     public List<SqlPerMethod> getSqlLog(Project project) {
-
-        MavenProject mvnPrj = MavenProject.load(project.getDir());
-
-        if (!mvnPrj.available()) {
-            return Collections.emptyList();
-        }
-
         return JsonUtils.file2obj(project.getDir().resolve(project.getSqlLogPath()),
                 new TypeReference<List<SqlPerMethod>>() {
                 });
