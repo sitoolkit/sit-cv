@@ -7,10 +7,9 @@ import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
 import io.sitoolkit.cv.core.domain.crud.CrudProcessor;
-import io.sitoolkit.cv.core.domain.crud.CrudReader;
-import io.sitoolkit.cv.core.domain.crud.CrudWriter;
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
+import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -26,15 +25,9 @@ public class CrudService {
     @NonNull
     ProjectManager projectManager;
 
-    @NonNull
-    private CrudReader reader;
-
-    @NonNull
-    private CrudWriter writer;
-
     public CrudMatrix loadMatrix() {
-        Optional<CrudMatrix> crudMatrix = reader
-                .read(projectManager.getCurrentProject().getCrudPath());
+        Optional<CrudMatrix> crudMatrix = JsonUtils
+                .file2obj(projectManager.getCurrentProject().getCrudPath(), CrudMatrix.class);
 
         return crudMatrix.orElseGet(() -> generateMatrix());
     }
@@ -48,7 +41,7 @@ public class CrudService {
 
         CrudMatrix entryPointCrud = processor.adjustAxis(entryPointClasses, methodCrud);
 
-        writer.write(entryPointCrud, projectManager.getCurrentProject().getCrudPath());
+        JsonUtils.obj2file(entryPointCrud, projectManager.getCurrentProject().getCrudPath());
 
         return entryPointCrud;
     }
