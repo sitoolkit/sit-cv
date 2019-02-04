@@ -27,16 +27,26 @@ public class SitCvApplication {
 
         if (appArgs.containsOption(SitCvApplicationOption.REPORT.getKey())) {
             executeReportMode(appArgs);
+        } else if (appArgs.containsOption(SitCvApplicationOption.ANALYZE_SQL.getKey())) {
+            executeAnalyzeSqlMode(appArgs);
         } else {
             SpringApplication.run(SitCvApplication.class, args);
         }
     }
 
-    private static void executeReportMode(ApplicationArguments appArgs) {
+    private static ServiceFactory createAndInitializeServiceFactory(ApplicationArguments appArgs) {
         List<String> projects = appArgs.getOptionValues(SitCvApplicationOption.PROJECT.getKey());
         Path projectDir = projects == null || projects.isEmpty() ? Paths.get(".")
                 : Paths.get(projects.get(0));
-        ServiceFactory.createAndInitialize(projectDir).getReportService().export();
+        return ServiceFactory.createAndInitialize(projectDir);
+    }
+
+    private static void executeReportMode(ApplicationArguments appArgs) {
+        createAndInitializeServiceFactory(appArgs).getReportService().export();
+    }
+
+    private static void executeAnalyzeSqlMode(ApplicationArguments appArgs) {
+        createAndInitializeServiceFactory(appArgs).getCrudService().analyzeSql();
     }
 
     /**

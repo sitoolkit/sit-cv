@@ -11,4 +11,6 @@ public interface ProjectReader {
     Optional<Project> read(Path projectDir);
 
     List<SqlPerMethod> getSqlLog(Project project);
+
+    boolean generateSqlLog(Project project);
 }

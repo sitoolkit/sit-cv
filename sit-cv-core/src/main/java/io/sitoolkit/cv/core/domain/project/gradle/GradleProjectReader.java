@@ -58,4 +58,9 @@ public class GradleProjectReader implements ProjectReader {
         return Collections.emptyList();
     }
 
+    @Override
+    public boolean generateSqlLog(Project project) {
+        // TODO Generate SQLlog with gradle
+        return false;
+    }
 }
