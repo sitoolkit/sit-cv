@@ -2,23 +2,17 @@ package io.sitoolkit.cv.core.domain.project.maven;
 
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
-import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
 import io.sitoolkit.cv.core.infra.project.maven.MavenSitCvToolsManager;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.SitFileUtils;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class MavenProjectReader implements ProjectReader {
 
     @Override
@@ -35,13 +29,6 @@ public class MavenProjectReader implements ProjectReader {
         mvnPrj.mvnw("compile", "-X").stdout(listener).execute();
 
         return Optional.of(listener.getProject());
-    }
-
-    @Override
-    public List<SqlPerMethod> getSqlLog(Project project) {
-        return JsonUtils.file2obj(project.getDir().resolve(project.getSqlLogPath()),
-                new TypeReference<List<SqlPerMethod>>() {
-                });
     }
 
     @Override
@@ -71,8 +58,6 @@ public class MavenProjectReader implements ProjectReader {
 
         Path sqlLogPath = project.getDir().resolve(project.getSqlLogPath());
         JsonUtils.obj2file(sqlLogListener.getSqlLogs(), sqlLogPath);
-
-        log.info("Wrote repository SQL log: {}", sqlLogPath.toAbsolutePath().normalize());
 
         return true;
     }
