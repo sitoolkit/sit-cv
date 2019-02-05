@@ -20,78 +20,7 @@ public class ClassDefRepositoryMemImplTest {
     }
 
     @Test
-    public void resolveMethodCalls() {
-        ClassDef clazz1 = createClassDef("a.b.c", "Controller");
-        MethodDef method1 = createMethodDef(clazz1, "controller1()");
-        clazz1.getMethods().add(method1);
-
-        ClassDef clazz2 = createClassDef("a.b.c", "Service");
-        MethodDef method2 = createMethodDef(clazz2, "service1()");
-        clazz2.getMethods().add(method2);
-
-        ClassDef clazz3 = createClassDef("a.b.c", "Repository");
-        MethodDef method3_1 = createMethodDef(clazz3, "repository1()");
-        clazz3.getMethods().add(method3_1);
-        MethodDef method3_2 = createMethodDef(clazz3, "repository2()");
-        clazz3.getMethods().add(method3_2);
-
-        method1.getMethodCalls().add(createMethodCallDef(method2));
-        method2.getMethodCalls().add(createMethodCallDef(method3_1));
-        method3_1.getMethodCalls().add(createMethodCallDef(method3_2));
-
-        repository.save(clazz1);
-        repository.save(clazz2);
-        repository.save(clazz3);
-
-        repository.solveReferences();
-
-        assertThat(repository.countClassDefs(), is(3));
-
-        MethodDef methodResult1 = repository
-                .findMethodByQualifiedSignature("a.b.c.Controller.controller1()");
-        assertThat(methodResult1.getMethodCalls().size(), is(1));
-
-        MethodCallDef methodCallResult1 = methodResult1.getMethodCalls().iterator().next();
-        assertThat(methodCallResult1.getQualifiedSignature(), is("a.b.c.Service.service1()"));
-        assertThat(methodCallResult1.getMethodCalls().size(), is(1));
-
-        MethodCallDef methodCallResult2 = methodCallResult1.getMethodCalls().iterator().next();
-        assertThat(methodCallResult2.getQualifiedSignature(), is("a.b.c.Repository.repository1()"));
-        assertThat(methodCallResult2.getMethodCalls().size(), is(1));
-
-        MethodCallDef methodCallResult3 = methodCallResult2.getMethodCalls().iterator().next();
-        assertThat(methodCallResult3.getQualifiedSignature(), is("a.b.c.Repository.repository2()"));
-    }
-
-    @Test
-    public void resolveInfiniteMethodCalls() {
-        ClassDef clazz1 = createClassDef("a.b.c", "Controller");
-        MethodDef method1 = createMethodDef(clazz1, "controller1()");
-        clazz1.getMethods().add(method1);
-        MethodDef method2 = createMethodDef(clazz1, "controller2()");
-        clazz1.getMethods().add(method2);
-
-        method1.getMethodCalls().add(createMethodCallDef(method2));
-        method2.getMethodCalls().add(createMethodCallDef(method1));
-
-        repository.save(clazz1);
-
-        repository.solveReferences();
-
-        MethodDef methodResult1 = repository
-                .findMethodByQualifiedSignature("a.b.c.Controller.controller1()");
-        assertThat(methodResult1.getMethodCalls().size(), is(1));
-
-        MethodCallDef methodCallResult1 = methodResult1.getMethodCalls().iterator().next();
-        assertThat(methodCallResult1.getMethodCalls().size(), is(1));
-        assertThat(methodCallResult1.getMethodCalls().iterator().next().getQualifiedSignature(),
-                is("a.b.c.Controller.controller1()"));
-        assertThat(methodCallResult1.getMethodCalls().iterator().next().getMethodCalls().iterator()
-                .next().getQualifiedSignature(), is("a.b.c.Controller.controller2()"));
-    }
-
-    @Test
-    public void resolveStatements() {
+    public void resolveMethodCallsAndStatements() {
         ClassDef clazz1 = createClassDef("a.b.c", "Controller");
         MethodDef method1 = createMethodDef(clazz1, "controller1()");
         clazz1.getMethods().add(method1);
@@ -149,9 +78,40 @@ public class ClassDefRepositoryMemImplTest {
         assertThat(methodCallResult2.getQualifiedSignature(), is("a.b.c.Repository.repository1()"));
         assertThat(methodCallResult2.getMethodCalls().size(), is(1));
         assertThat(methodCallResult2.getStatements().size(), is(1));
+        assertThat(methodCallResult1.getMethodCalls().iterator().next() == methodCallResult2,
+                is(true));
 
         MethodCallDef methodCallResult3 = (MethodCallDef) methodCallResult2.getStatements().get(0);
         assertThat(methodCallResult3.getQualifiedSignature(), is("a.b.c.Repository.repository2()"));
+        assertThat(methodCallResult2.getMethodCalls().iterator().next() == methodCallResult3,
+                is(true));
+    }
+
+    @Test
+    public void resolveInfiniteMethodCalls() {
+        ClassDef clazz1 = createClassDef("a.b.c", "Controller");
+        MethodDef method1 = createMethodDef(clazz1, "controller1()");
+        clazz1.getMethods().add(method1);
+        MethodDef method2 = createMethodDef(clazz1, "controller2()");
+        clazz1.getMethods().add(method2);
+
+        method1.getMethodCalls().add(createMethodCallDef(method2));
+        method2.getMethodCalls().add(createMethodCallDef(method1));
+
+        repository.save(clazz1);
+
+        repository.solveReferences();
+
+        MethodDef methodResult1 = repository
+                .findMethodByQualifiedSignature("a.b.c.Controller.controller1()");
+        assertThat(methodResult1.getMethodCalls().size(), is(1));
+
+        MethodCallDef methodCallResult1 = methodResult1.getMethodCalls().iterator().next();
+        assertThat(methodCallResult1.getMethodCalls().size(), is(1));
+        assertThat(methodCallResult1.getMethodCalls().iterator().next().getQualifiedSignature(),
+                is("a.b.c.Controller.controller1()"));
+        assertThat(methodCallResult1.getMethodCalls().iterator().next().getMethodCalls().iterator()
+                .next().getQualifiedSignature(), is("a.b.c.Controller.controller2()"));
     }
 
     @Test
