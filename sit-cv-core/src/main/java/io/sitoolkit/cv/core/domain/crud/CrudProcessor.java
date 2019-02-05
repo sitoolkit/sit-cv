@@ -56,8 +56,8 @@ public class CrudProcessor {
                 .flatMap(List::stream);
 
         entryPointMethods.forEach(entryPointMethod -> {
-            Stream<MethodDef> implMethodCalls = Stream.concat(Stream.of(entryPointMethod),
-                    implementCollector.collectMethodCallsRecursively(entryPointMethod));
+            Stream<MethodDef> implMethodCalls = implementCollector
+                    .collectMethodCallsRecursively(entryPointMethod);
 
             implMethodCalls.forEach(methodCalledByEntryPoint -> {
                 CrudRow repositoryMethodCrudRow = repositoryMethodMatrix.getCrudRowMap()

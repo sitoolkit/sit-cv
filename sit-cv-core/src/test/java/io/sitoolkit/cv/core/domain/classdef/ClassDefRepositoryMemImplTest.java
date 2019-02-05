@@ -15,7 +15,7 @@ public class ClassDefRepositoryMemImplTest {
     static ClassDefRepository repository;
 
     @BeforeClass
-    public static void initVisitor() {
+    public static void init() {
         repository = new ClassDefRepositoryMemImpl(new SitCvConfig());
     }
 

@@ -15,7 +15,8 @@ public class ImplementCollector {
     private ImplementDetector implementDetector;
 
     public Stream<MethodDef> collectMethodCallsRecursively(MethodDef method) {
-        return collectMethodCallsRecursively(method.getMethodCalls(), MethodCallStack.getBlank());
+        return Stream.concat(Stream.of(method),
+                collectMethodCallsRecursively(method.getMethodCalls(), MethodCallStack.getBlank()));
     }
 
     private Stream<MethodDef> collectMethodCallsRecursively(MethodDef method,
