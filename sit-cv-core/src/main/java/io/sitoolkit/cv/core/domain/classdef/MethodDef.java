@@ -1,8 +1,10 @@
 package io.sitoolkit.cv.core.domain.classdef;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import lombok.Data;
@@ -22,7 +24,7 @@ public class MethodDef implements CvStatement {
     private ClassDef classDef;
     private List<TypeDef> paramTypes;
     private TypeDef returnType;
-    private List<MethodCallDef> methodCalls = new ArrayList<>();
+    private Set<MethodCallDef> methodCalls = new HashSet<>();
     private List<CvStatement> statements = new ArrayList<>();
     private ApiDocDef apiDoc;
 
