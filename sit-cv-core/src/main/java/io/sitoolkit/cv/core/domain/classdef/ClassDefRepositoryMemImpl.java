@@ -86,7 +86,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     private void solveMethodCall(MethodCallDef methodCall) {
         solveMethodType(methodCall);
-        soleveMethodCallClass(methodCall);
+        solveMethodCallClass(methodCall);
 
         if (methodCall.getStatements().isEmpty()) {
             MethodDef method = methodDefMap
@@ -112,7 +112,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         });
     }
 
-    private void soleveMethodCallClass(MethodCallDef calledMethod) {
+    private void solveMethodCallClass(MethodCallDef calledMethod) {
         ClassDef calledMethodClass = classDefMap
                 .get(calledMethod.getPackageName() + "." + calledMethod.getClassName());
         calledMethod.setClassDef(calledMethodClass);
