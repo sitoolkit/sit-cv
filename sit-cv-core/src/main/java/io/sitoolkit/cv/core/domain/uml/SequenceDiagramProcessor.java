@@ -14,7 +14,6 @@ import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatementDefaultImpl;
 import io.sitoolkit.cv.core.domain.classdef.FinallyStatement;
-import io.sitoolkit.cv.core.domain.classdef.ImplementDetector;
 import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallStack;
@@ -33,9 +32,6 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
     @NonNull
     private SitCvConfig config;
-
-    @NonNull
-    ImplementDetector implementDetector;
 
     public LifeLineDef process(ClassDef clazz, MethodDef method) {
         return process(clazz, method, MethodCallStack.getBlank());
@@ -83,7 +79,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
             return Optional.empty();
         }
 
-        MethodDef methodImpl = implementDetector.detectImplMethod(methodCall);
+        MethodDef methodImpl = methodCall.findImplementation();
 
         if (!ClassDefFilter.match(methodImpl.getClassDef(), entryPointFilterGroup)
                 && !ClassDefFilter.match(methodImpl.getClassDef(), classFilterGroup)) {

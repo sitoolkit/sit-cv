@@ -6,7 +6,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
-import io.sitoolkit.cv.core.domain.classdef.ImplementCollector;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.tabledef.TableDef;
 import lombok.NonNull;
@@ -19,9 +18,6 @@ public class CrudProcessor {
 
     @NonNull
     CrudFinder crudFinder;
-
-    @NonNull
-    ImplementCollector implementCollector;
 
     public CrudMatrix buildMatrix(List<SqlPerMethod> sqlPerMethodList) {
         CrudMatrix matrix = new CrudMatrix();
@@ -56,10 +52,9 @@ public class CrudProcessor {
                 .flatMap(List::stream);
 
         entryPointMethods.forEach(entryPointMethod -> {
-            Stream<MethodDef> implMethodCalls = implementCollector
-                    .collectMethodCallsRecursively(entryPointMethod);
+            Stream<MethodDef> implMethods = entryPointMethod.collectCalledMethodsRecursively();
 
-            implMethodCalls.forEach(methodCalledByEntryPoint -> {
+            implMethods.forEach(methodCalledByEntryPoint -> {
                 CrudRow repositoryMethodCrudRow = repositoryMethodMatrix.getCrudRowMap()
                         .get(methodCalledByEntryPoint.getQualifiedSignature());
 

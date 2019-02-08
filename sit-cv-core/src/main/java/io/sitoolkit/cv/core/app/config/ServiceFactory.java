@@ -8,8 +8,6 @@ import io.sitoolkit.cv.core.app.report.ReportService;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
-import io.sitoolkit.cv.core.domain.classdef.ImplementCollector;
-import io.sitoolkit.cv.core.domain.classdef.ImplementDetector;
 import io.sitoolkit.cv.core.domain.classdef.javaparser.ClassDefReaderJavaParserImpl;
 import io.sitoolkit.cv.core.domain.crud.CrudFinder;
 import io.sitoolkit.cv.core.domain.crud.CrudProcessor;
@@ -75,27 +73,21 @@ public class ServiceFactory {
         projectManager = new ProjectManager();
         projectManager.load(projectDir);
 
-        ImplementDetector implementDetector = new ImplementDetector();
-        ImplementCollector implementCollector = new ImplementCollector(implementDetector);
-
-        functionModelService = createFunctionModelService(config, configReader, projectManager,
-                implementDetector);
+        functionModelService = createFunctionModelService(config, configReader, projectManager);
 
         reportService = createReportService(functionModelService, projectManager);
 
-        crudService = createCrudService(functionModelService, projectManager, implementCollector);
+        crudService = createCrudService(functionModelService, projectManager);
 
         return this;
     }
 
     protected FunctionModelService createFunctionModelService(SitCvConfig config,
-            SitCvConfigReader configReader, ProjectManager projectManager,
-            ImplementDetector implementDetector) {
+            SitCvConfigReader configReader, ProjectManager projectManager) {
         ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
         ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
                 projectManager, config);
-        SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(config,
-                implementDetector);
+        SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(config);
         ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
         GraphvizManager.initialize();
         PlantUmlWriter plantumlWriter = new PlantUmlWriter();
@@ -121,9 +113,9 @@ public class ServiceFactory {
     }
 
     protected CrudService createCrudService(FunctionModelService functionModelService,
-            ProjectManager projectManager, ImplementCollector implementCollector) {
+            ProjectManager projectManager) {
         CrudFinder crudFinder = new CrudFinderJsqlparserImpl();
-        CrudProcessor crudProcessor = new CrudProcessor(crudFinder, implementCollector);
+        CrudProcessor crudProcessor = new CrudProcessor(crudFinder);
 
         return new CrudService(functionModelService, crudProcessor, projectManager);
     }
