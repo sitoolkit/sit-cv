@@ -26,6 +26,6 @@ public class MethodCallDef extends MethodDef {
 
     @Override
     public Stream<MethodCallDef> getMethodCallsRecursively() {
-        return Stream.of(this);
+        return Stream.concat(Stream.of(this), super.getMethodCallsRecursively());
     }
 }

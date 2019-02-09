@@ -21,11 +21,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
+    /**
+     * key: classFullyQualifiedName
+     */
     private Map<String, ClassDef> classDefMap = new HashMap<>();
 
+    /**
+     * key: methodQualifiedSignature
+     */
     private Map<String, MethodDef> methodDefMap = new HashMap<>();
-
-    private Map<String, List<MethodCallDef>> methodCallMap = new HashMap<>();
 
     @NonNull
     private SitCvConfig config;
@@ -36,7 +40,6 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
         classDef.getMethods().stream().forEach(methodDef -> {
             methodDefMap.put(methodDef.getQualifiedSignature(), methodDef);
-            methodCallMap.put(methodDef.getQualifiedSignature(), methodDef.getMethodCalls());
         });
     }
 
@@ -50,7 +53,6 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
             classDefMap.remove(classDef.getFullyQualifiedName());
             classDef.getMethods().stream().forEach(methodDef -> {
                 methodDefMap.remove(methodDef.getQualifiedSignature());
-                methodCallMap.remove(methodDef.getQualifiedSignature());
             });
         });
     }
@@ -78,35 +80,20 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     public void solveMethodCalls(ClassDef classDef) {
         classDef.getMethods().stream().forEach(methodDef -> {
             solveMethodType(methodDef);
-            methodDef.getMethodCalls().stream().forEach(methodCall -> {
-                solveMethodCall(methodCall);
-            });
+            methodDef.getMethodCalls().stream().forEach(this::solveMethodCall);
         });
-
-        // TODO statement feature replace above to bellow
-        classDef.getMethods().stream().forEach(methodDef -> {
-            solveMethodType(methodDef);
-            methodDef.getStatements().stream().forEach(this::solveMethodCall);
-        });
-
-    }
-
-    private void solveMethodCall(CvStatement statement) {
-        statement.getMethodCallsRecursively().forEach(this::solveMethodCall);
     }
 
     private void solveMethodCall(MethodCallDef methodCall) {
         solveMethodType(methodCall);
-        soleveMethodCallClass(methodCall);
+        solveMethodCallClass(methodCall);
 
-        if (methodCall.getMethodCalls().isEmpty()) {
-            List<MethodCallDef> calledMethods = methodCallMap
+        if (methodCall.getStatements().isEmpty()) {
+            MethodDef method = methodDefMap
                     .get(methodCall.getQualifiedSignature());
-            if (calledMethods != null) {
-                methodCall.setMethodCalls(calledMethods);
-                calledMethods.stream().forEach(calledMethod -> {
-                    soleveMethodCallClass(calledMethod);
-                });
+            if (method != null) {
+                methodCall.setStatements(method.getStatements());
+                methodCall.setMethodCalls(method.getMethodCalls());
             }
         }
     }
@@ -125,7 +112,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
         });
     }
 
-    private void soleveMethodCallClass(MethodCallDef calledMethod) {
+    private void solveMethodCallClass(MethodCallDef calledMethod) {
         ClassDef calledMethodClass = classDefMap
                 .get(calledMethod.getPackageName() + "." + calledMethod.getClassName());
         calledMethod.setClassDef(calledMethodClass);

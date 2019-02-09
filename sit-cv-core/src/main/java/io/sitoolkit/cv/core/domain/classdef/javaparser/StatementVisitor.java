@@ -103,7 +103,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
                 methodResolver.resolve(methodCallExpr)
                         .map(resolvedMethodDeclaration -> DeclationProcessor.createMethodCall(
                                 resolvedMethodDeclaration, methodCallExpr.getParentNode()))
-                        .ifPresent(context::addStatement);
+                        .ifPresent(context::addMethodCall);
             }
         }
     }
@@ -121,7 +121,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
             super.visit(methodReferenceExpr, context);
             methodResolver.resolve(methodReferenceExpr)
                     .map((m) -> DeclationProcessor.createMethodCall(m, Optional.empty()))
-                    .ifPresent(context::addStatement);
+                    .ifPresent(context::addMethodCall);
         }
     }
 
