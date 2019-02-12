@@ -27,12 +27,4 @@ public class TryStatement extends CvStatementDefaultImpl {
     public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
         return processor.process(this, context);
     }
-
-    @Override
-    public Stream<MethodCallDef> getMethodCallsRecursively() {
-        Stream<MethodCallDef> tryMethodCalls = Stream
-                .concat(catchStatements.stream(), Stream.of(finallyStatement))
-                .filter(Objects::nonNull).flatMap(CvStatement::getMethodCallsRecursively);
-        return Stream.concat(super.getMethodCallsRecursively(), tryMethodCalls);
-    }
 }

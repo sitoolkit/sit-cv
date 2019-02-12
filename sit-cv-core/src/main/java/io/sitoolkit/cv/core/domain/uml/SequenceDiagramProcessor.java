@@ -22,18 +22,16 @@ import io.sitoolkit.cv.core.domain.classdef.StatementProcessor;
 import io.sitoolkit.cv.core.domain.classdef.TryStatement;
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class SequenceDiagramProcessor implements StatementProcessor<SequenceElement, MethodCallStack> {
 
-    ImplementDetector implementDetector = new ImplementDetector();
-
+    @NonNull
     private SitCvConfig config;
-
-    public SequenceDiagramProcessor(SitCvConfig config) {
-        this.config = config;
-    }
 
     public LifeLineDef process(ClassDef clazz, MethodDef method) {
         return process(clazz, method, MethodCallStack.getBlank());
@@ -81,7 +79,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
             return Optional.empty();
         }
 
-        MethodDef methodImpl = implementDetector.detectImplMethod(methodCall);
+        MethodDef methodImpl = methodCall.findImplementation();
 
         if (!ClassDefFilter.match(methodImpl.getClassDef(), entryPointFilterGroup)
                 && !ClassDefFilter.match(methodImpl.getClassDef(), classFilterGroup)) {

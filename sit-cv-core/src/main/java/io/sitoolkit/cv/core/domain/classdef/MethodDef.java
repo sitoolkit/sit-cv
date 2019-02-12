@@ -10,7 +10,9 @@ import java.util.stream.Stream;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @EqualsAndHashCode(of = "qualifiedSignature")
 @ToString(exclude = { "classDef", "methodCalls", "statements" })
@@ -38,9 +40,46 @@ public class MethodDef implements CvStatement {
         return processor.process(this, context);
     }
 
-    @Override
-    public Stream<MethodCallDef> getMethodCallsRecursively() {
-        return statements.stream()
-                .flatMap(CvStatement::getMethodCallsRecursively);
+    public MethodDef findImplementation() {
+        ClassDef clazz = getClassDef();
+
+        if (clazz == null) {
+            return this;
+        }
+
+        ClassDef impleClass = clazz.findImplementation();
+        Optional<MethodDef> methodImpl = impleClass.findMethodBySignature(getSignature());
+        if (methodImpl.isPresent()) {
+            return methodImpl.get();
+        }
+
+        return this;
+    }
+
+    public Stream<MethodDef> collectCalledMethodsRecursively() {
+        return Stream.concat(Stream.of(this),
+                collectCalledMethodsRecursively(getMethodCalls(), MethodCallStack.getBlank()));
+    }
+
+    private Stream<MethodDef> collectCalledMethodsRecursively(MethodCallDef method,
+            MethodCallStack callStack) {
+
+        MethodDef methodImpl = method.findImplementation();
+
+        if (callStack.contains(methodImpl)) {
+            log.debug("method: {} is called recursively", methodImpl.getQualifiedSignature());
+            return Stream.empty();
+        }
+        MethodCallStack pushedStack = callStack.push(methodImpl);
+
+        return Stream.concat(Stream.of(methodImpl),
+                collectCalledMethodsRecursively(methodImpl.getMethodCalls(), pushedStack));
+    }
+
+    private Stream<MethodDef> collectCalledMethodsRecursively(Set<MethodCallDef> methodCalls,
+            MethodCallStack callStack) {
+        return methodCalls.stream().flatMap((method) -> {
+            return collectCalledMethodsRecursively(method, callStack);
+        });
     }
 }
