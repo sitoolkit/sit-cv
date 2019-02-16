@@ -11,6 +11,9 @@ export class DesignDocReportService implements DesignDocService {
   getMenuList(
     callback: (menuItems: MenuItem[]) => void
   ): void {
+    this.reportLoader.loadScript("assets/designdoc-list.js", (menuItems) => {
+      callback(menuItems);
+    })
   }
 
 }

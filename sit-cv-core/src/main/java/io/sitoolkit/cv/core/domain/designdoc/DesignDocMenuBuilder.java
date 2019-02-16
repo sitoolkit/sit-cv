@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.app.pres.designdoc;
+package io.sitoolkit.cv.core.domain.designdoc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.sitoolkit.cv.app.pres.menu.MenuItem;
+import io.sitoolkit.cv.core.domain.menu.MenuItem;
 
 public class DesignDocMenuBuilder {
 
