@@ -27,6 +27,7 @@ These report files can be accessed with browser as local files and also publishe
 
 If you want to know how Code Visualizer works, try to run it for DDD Sample app (https://github.com/citerus/dddsample-core).
 JRE v1.8+ and Git are required.
+For macOS and Linux, Graphviz(https://www.graphviz.org/) are required.
 You can run Code Visualizer on Windows and macOS using following commands of each OS.
 
 * Windows
@@ -45,7 +46,18 @@ java -jar sit-cv-app-1.0.0-beta.2-exec.jar
 brew install graphviz
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
-curl -o sit-cv-app-1.0.0-beta.2-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.2/sit-cv-app-1.0.0-beta.2-exec.jar 
+curl -o sit-cv-app-1.0.0-beta.2-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.2/sit-cv-app-1.0.0-beta.2-exec.jar
+java -jar sit-cv-app-1.0.0-beta.2-exec.jar
+```
+
+* Ubuntu
+
+```
+sudo apt update
+sudo apt install graphviz
+git clone https://github.com/citerus/dddsample-core.git
+cd dddsample-core
+curl -o sit-cv-app-1.0.0-beta.2-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.2/sit-cv-app-1.0.0-beta.2-exec.jar
 java -jar sit-cv-app-1.0.0-beta.2-exec.jar
 ```
 
