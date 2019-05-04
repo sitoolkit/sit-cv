@@ -35,9 +35,9 @@ You can run Code Visualizer on Windows and macOS using following commands of eac
 ```
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
-start http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.2/sit-cv-app-1.0.0-beta.2-exec.jar
-move %USERPROFILE%\Downloads\sit-cv-app-1.0.0-beta.2-exec.jar .
-java -jar sit-cv-app-1.0.0-beta.2-exec.jar
+start http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.3/sit-cv-app-1.0.0-beta.3-exec.jar
+move %USERPROFILE%\Downloads\sit-cv-app-1.0.0-beta.3-exec.jar .
+java -jar sit-cv-app-1.0.0-beta.3-exec.jar
 ```
 
 * macOS
@@ -46,8 +46,8 @@ java -jar sit-cv-app-1.0.0-beta.2-exec.jar
 brew install graphviz
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
-curl -o sit-cv-app-1.0.0-beta.2-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.2/sit-cv-app-1.0.0-beta.2-exec.jar
-java -jar sit-cv-app-1.0.0-beta.2-exec.jar
+curl -o sit-cv-app-1.0.0-beta.3-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.3/sit-cv-app-1.0.0-beta.3-exec.jar
+java -jar sit-cv-app-1.0.0-beta.3-exec.jar
 ```
 
 * Ubuntu
@@ -57,8 +57,8 @@ sudo apt update
 sudo apt install graphviz
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
-curl -o sit-cv-app-1.0.0-beta.2-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.2/sit-cv-app-1.0.0-beta.2-exec.jar
-java -jar sit-cv-app-1.0.0-beta.2-exec.jar
+curl -o sit-cv-app-1.0.0-beta.3-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.3/sit-cv-app-1.0.0-beta.3-exec.jar
+java -jar sit-cv-app-1.0.0-beta.3-exec.jar
 ```
 
 After running last java command, you can see following log on your console.
@@ -74,7 +74,7 @@ Then you can access http://localhost:8080 with browser and see UML diagrams of D
 Running java command with --report option, static report files(html, css, js) are generated to docs/designdoc directory.
 
 ```
-java -jar sit-cv-app-1.0.0-beta.2-exec.jar --cv.report
+java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.report
 ```
 
 You can see diagrams by opening docs/designdoc/index.html with browser.
@@ -94,7 +94,7 @@ If your project uses Maven, add plugin to pom.xml of your project.
         <plugin>
             <groupId>io.sitoolkit.cv</groupId>
             <artifactId>sit-cv-maven-plugin</artifactId>
-            <version>1.0.0-beta.2</version>
+            <version>1.0.0-beta.3</version>
         </plugin>
     </plugins>
   </build>
@@ -121,15 +121,25 @@ mvn sit-cv:report
 
 If your project uses Gradle, add plugin to build.gradle of your project.
 
+* Using the plugins DSL:
+
+```groovy
+plugins {
+  id "io.sitoolkit.cv.sit-cv-gradle-plugin" version "1.0.0-beta.3"
+}
+```
+
+* Using legacy plugin application:
 
 ```groovy
 buildscript {
   repositories {
-      jcenter()
-      mavenCentral()
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
   }
   dependencies {
-      classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'1.0.0-beta.2'
+    classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'1.0.0-beta.3'
   }
 }
 
@@ -141,13 +151,13 @@ Then you can use following commands in your project directory.
 * Server mode
 
 ```
-gradle cvRun
+gradlew cvRun
 ```
 
 * Report mode
 
 ```
-gradle cvReport
+gradlew cvReport
 ```
 
 
