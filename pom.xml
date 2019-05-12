@@ -40,11 +40,11 @@
 
   <!-- Build Settings -->
   <build>
-    
+
     <defaultGoal>antrun:run</defaultGoal>
-    
+
     <plugins>
-    
+
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.8</version>
@@ -157,6 +157,12 @@
                 <goals>
                   <goal>sign</goal>
                 </goals>
+                <configuration>
+                  <gpgArguments>
+                    <arg>--pinentry-mode</arg>
+                    <arg>loopback</arg>
+                  </gpgArguments>
+                </configuration>
               </execution>
             </executions>
           </plugin>
