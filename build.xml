@@ -13,18 +13,28 @@
     <os family="windows" />
   </condition>
 
-
   <target name="deploy">
+    <antcall target="analyze" />
     <antcall target="deploy-maven" />
-    <!--
   	<antcall target="deploy-gradle"/>
-  	-->
   </target>
 
+  <target name="analyze">
+    <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
+      <env key="JAVA_HOME" value="${java.home}" />
+      <arg value="clean" />
+      <arg value="test" />
+      <arg value="sonar:sonar" />
+      <arg value="--fail-at-end" />
+      <arg value="--activate-profiles" />
+      <arg value="analyze" />
+    </exec>
+  </target>
+  
   <target name="deploy-maven">
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
-      <arg value="-P" />
+      <arg value="--activate-profiles" />
       <arg value="release" />
       <arg value="clean" />
       <arg value="deploy" />
