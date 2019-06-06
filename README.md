@@ -162,20 +162,20 @@ gradlew cvReport
 
 ## Generate CRUD Matrix
 
-If your project meets the following conditions, you can generate a CRUD matrix based on the test execution log.
+If your project meets the following conditions, you can generate a CRUD matrix based on the log output by test.
 
 - Is a maven project
 - Repository class is annotated @org.springframework.stereotype.Repository
 - Using the Hibernate ORM
 
-To generate a CRUD matrix, run the following command before launching Server mode or Report mode:
+The first time you generate a CRUD matrix, run the test automatically to analyze the log by doing the following at startup:
 
 ```sh
-# execution with java command
+# Specify cv.analyze-sql option in java command
 java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql
 
-# or maven plugin
-mvn sit-cv:analyze-sql
+# or Execute analyze-sql goal in maven plugin
+mvn sit-cv:analyze-sql sit-cv:run
 ```
 
 ## Configuration for Your Project
