@@ -174,7 +174,7 @@ The first time you generate a CRUD matrix, run the test automatically to analyze
 # Specify cv.analyze-sql option in java command
 java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql
 
-# or Execute analyze-sql goal in maven plugin
+# or Execute analyze-sql goal of maven plugin
 mvn sit-cv:analyze-sql sit-cv:run
 ```
 
