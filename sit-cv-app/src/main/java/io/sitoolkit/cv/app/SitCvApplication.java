@@ -25,12 +25,21 @@ public class SitCvApplication {
     public static void main(String[] args) {
         ApplicationArguments appArgs = new DefaultApplicationArguments(args);
 
-        if (appArgs.containsOption(SitCvApplicationOption.REPORT.getKey())) {
-            executeReportMode(appArgs);
-        } else if (appArgs.containsOption(SitCvApplicationOption.ANALYZE_SQL.getKey())) {
-            executeAnalyzeSqlMode(appArgs);
-        } else {
+        boolean isAnalyzeSqlMode = appArgs
+                .containsOption(SitCvApplicationOption.ANALYZE_SQL.getKey());
+        boolean isReportMode = appArgs.containsOption(SitCvApplicationOption.REPORT.getKey());
+
+        if (!isAnalyzeSqlMode && !isReportMode) {
             SpringApplication.run(SitCvApplication.class, args);
+            return;
+        }
+
+        if (isAnalyzeSqlMode) {
+            executeAnalyzeSqlMode(appArgs);
+        }
+
+        if (isReportMode) {
+            executeReportMode(appArgs);
         }
     }
 
