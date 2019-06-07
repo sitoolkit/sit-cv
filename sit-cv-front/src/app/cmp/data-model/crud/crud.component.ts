@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { DataModelServerService } from 'src/app/srv/data-model/data-model-server.service';
 import { CrudMatrix } from 'src/app/srv/data-model/crud-matrix';
 import { CrudType } from 'src/app/srv/data-model/crud-type';
 import { EnumUtils } from 'src/app/srv/shared/enum-utils';
 import { HidePackagePipe } from 'src/app/pipe/hide-package.pipe';
+import { DataModelService } from 'src/app/srv/data-model/data-model.service';
 
 interface CrudTableRow {
   functionId: string;
@@ -33,7 +34,7 @@ export class CrudComponent implements OnInit {
   crudTypes: CrudType[] = this.enumUtils.values(CrudType);
 
   constructor(
-    private dataModelService: DataModelServerService,
+    @Inject('DataModelService') private dataModelService: DataModelService,
     private enumUtils: EnumUtils,
     private hidePackagePipe: HidePackagePipe,
   ) { }

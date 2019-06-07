@@ -7,6 +7,11 @@ import { DesignDocServerService } from "./srv/designdoc/designdoc-server.service
 import { FunctionModelService } from "./srv/function-model/function-model.service";
 import { FunctionModelReportService } from "./srv/function-model/function-model-report.service";
 import { FunctionModelServerService } from "./srv/function-model/function-model-server.service";
+import { DataModelReportService } from "./srv/data-model/data-model-report.service";
+import { DataModelServerService } from "./srv/data-model/data-model-server.service";
+import { DataModelService } from "./srv/data-model/data-model.service";
+import { Http } from "@angular/http";
+import { ServerRestPathBuilder } from "./srv/shared/server-rest-path-builder";
 
 export class ServiceFactory {
 
@@ -31,6 +36,19 @@ export class ServiceFactory {
       return new FunctionModelReportService(reportLoader);
     } else {
       return new FunctionModelServerService(socket);
+    }
+  }
+
+  public createDataModelService(
+    reportLoader: ReportDataLoader,
+    http: Http,
+    pathBuilder: ServerRestPathBuilder,
+    config: Config
+  ): DataModelService {
+    if (config.isReportMode()) {
+      return new DataModelReportService(reportLoader);
+    } else {
+      return new DataModelServerService(http, pathBuilder);
     }
   }
 
