@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.project;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -50,8 +51,9 @@ public class ProjectManager {
         });
     }
 
-    public void generateSqlLog() {
-        readers.stream().map(reader -> reader.generateSqlLog(currentProject)).findFirst();
+    public void generateSqlLog(URL configUrl) {
+        readers.stream().map(reader -> reader.generateSqlLog(configUrl, currentProject))
+                .findFirst();
     }
 
 }

@@ -4,13 +4,37 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RepositoryFilterCondition {
 
+    private String name;
     private String annotation;
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private Pattern namePattern;
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     private Pattern annotationPattern;
 
-    public RepositoryFilterCondition(String annotation) {
-        this.annotation = annotation;
+    public boolean matchName(String name) {
+        if (StringUtils.isEmpty(this.name)) {
+            return true;
+        }
+
+        if (namePattern == null) {
+            namePattern = Pattern.compile(this.name);
+        }
+
+        return namePattern.matcher(name).matches();
     }
 
     public boolean matchAnnotation(String annotation) {

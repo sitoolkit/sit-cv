@@ -2,6 +2,8 @@ package io.sitoolkit.cv.core.infra.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -36,8 +38,24 @@ public class SitCvConfigReader {
     }
 
     private SitCvConfig readConfig(Path baseDir) {
-        String json = readFile(baseDir);
-        return JsonUtils.str2obj(json, SitCvConfig.class);
+        URL url = getURL(baseDir.resolve(CONFIG_FILE_NAME));
+        log.info("Read config:{}", url.toString());
+        String json = SitResourceUtils.res2str(url);
+        SitCvConfig config = JsonUtils.str2obj(json, SitCvConfig.class);
+        config.setSourceUrl(url);
+        return config;
+    }
+
+    private URL getURL(Path configFilePath) {
+        if (!configFilePath.toFile().exists()) {
+            return SitResourceUtils.getResourceUrl(SitCvConfig.class, CONFIG_FILE_NAME);
+        }
+
+        try {
+            return configFilePath.toUri().toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String readFile(Path baseDir) {

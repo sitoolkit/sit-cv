@@ -1,6 +1,7 @@
 package io.sitoolkit.cv.core.domain.project.gradle;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class GradleProjectReader implements ProjectReader {
     }
 
     @Override
-    public boolean generateSqlLog(Project project) {
+    public boolean generateSqlLog(URL configUrl, Project project) {
         // TODO Generate SQLlog with gradle
         return false;
     }

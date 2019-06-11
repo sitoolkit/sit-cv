@@ -27,7 +27,7 @@ public class SitResourceUtils {
     }
 
     public static void res2file(Object owner, String resourceName, Path targetPath) {
-        URL resourceUrl = readResourc(owner.getClass(), resourceName);
+        URL resourceUrl = getResourceUrl(owner.getClass(), resourceName);
 
         try {
             log.info("Write resource to {}", targetPath);
@@ -42,16 +42,18 @@ public class SitResourceUtils {
     }
 
     public static String res2str(Class<?> owner, String resourceName) {
-        URL resourceUrl = readResourc(owner, resourceName);
+        return res2str(getResourceUrl(owner, resourceName));
+    }
 
+    public static String res2str(URL resourceUrl) {
         try {
             return IOUtils.toString(resourceUrl, Charset.defaultCharset());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
-
-    private static URL readResourc(Class<?> owner, String resourceName) {
+    
+    public static URL getResourceUrl(Class<?> owner, String resourceName) {
         URL resourceUrl = owner.getResource(resourceName);
 
         if (resourceUrl == null) {

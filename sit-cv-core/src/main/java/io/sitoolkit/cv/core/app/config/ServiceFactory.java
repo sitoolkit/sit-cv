@@ -84,7 +84,7 @@ public class ServiceFactory {
 
         designDocService = createDesignDocService(functionModelService);
 
-        crudService = createCrudService(functionModelService, projectManager);
+        crudService = createCrudService(config, functionModelService, projectManager);
 
         reportService = createReportService(functionModelService, designDocService, crudService,
                 projectManager);
@@ -118,12 +118,12 @@ public class ServiceFactory {
         return new DesignDocService(functionModelService, menuBuilder);
     }
 
-    protected CrudService createCrudService(FunctionModelService functionModelService,
-            ProjectManager projectManager) {
+    protected CrudService createCrudService(SitCvConfig config,
+            FunctionModelService functionModelService, ProjectManager projectManager) {
         CrudFinder crudFinder = new CrudFinderJsqlparserImpl();
         CrudProcessor crudProcessor = new CrudProcessor(crudFinder);
 
-        return new CrudService(functionModelService, crudProcessor, projectManager);
+        return new CrudService(config, functionModelService, crudProcessor, projectManager);
     }
 
     protected ReportService createReportService(FunctionModelService functionModelService,

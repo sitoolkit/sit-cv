@@ -1,9 +1,12 @@
 package io.sitoolkit.cv.tools.config;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.Data;
+
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RepositoryLoggerConfig {
-    public List<RepositoryFilterCondition> filterConditions = new ArrayList<>();
-    public String methodMarker;
+    private RepositoryFilterConditionGroup repositoryFilter;
+    private String repositoryMethodMarker;
 }

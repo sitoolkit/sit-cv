@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class MavenProjectReader implements ProjectReader {
     }
 
     @Override
-    public boolean generateSqlLog(Project project) {
+    public boolean generateSqlLog(URL configUrl, Project project) {
         MavenProject mvnPrj = MavenProject.load(project.getDir());
 
         if (!mvnPrj.available()) {
@@ -45,8 +46,8 @@ public class MavenProjectReader implements ProjectReader {
         Path jarPath = MavenSitCvToolsManager.getInstance().getJarPath();
 
         Map<String, String> agentArgsMap = new HashMap<>();
-        agentArgsMap.put("repository.annotation", "@org.springframework.stereotype.Repository");
-        agentArgsMap.put("repository.methodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
+        agentArgsMap.put("configUrl", configUrl.toString());
+        agentArgsMap.put("repositoryMethodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
         String agentArgs = agentArgsMap.entrySet().stream()
                 .map((e) -> e.getKey() + "=" + e.getValue())
                 .collect(Collectors.joining(";", "=", ""));
