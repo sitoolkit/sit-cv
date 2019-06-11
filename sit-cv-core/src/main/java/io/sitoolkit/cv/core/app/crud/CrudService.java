@@ -9,16 +9,12 @@ import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
 import io.sitoolkit.cv.core.domain.crud.CrudProcessor;
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class CrudService {
-
-    @NonNull
-    SitCvConfig sitCvConfig;
     
     @NonNull
     FunctionModelService functionModelService;
@@ -51,7 +47,7 @@ public class CrudService {
     }
 
     public void analyzeSql() {
-        projectManager.generateSqlLog(sitCvConfig.getSourceUrl());
+        projectManager.generateSqlLog();
     }
 
 }

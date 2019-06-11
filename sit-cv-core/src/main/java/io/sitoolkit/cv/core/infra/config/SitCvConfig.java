@@ -13,6 +13,7 @@ public class SitCvConfig {
     private String javaFilePattern = ".*\\.(java|class)$";
     private FilterConditionGroup entryPointFilter;
     private FilterConditionGroup sequenceDiagramFilter;
-    private StartEndPattern sqlStartEndPattern;
+    private FilterConditionGroup repositoryFilter;
+    private SqlEnclosureFilter sqlEnclosureFilter;
 
 }

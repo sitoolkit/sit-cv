@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
+import io.sitoolkit.cv.core.infra.config.SqlEnclosureFilter;
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +17,19 @@ public class SqlLogListener implements StdoutListener {
 
     public static String REPOSITORY_METHOD_MARKER = "[RepositoryMethod]";
 
+    private static Pattern MARKER_PATTERN = Pattern
+            .compile("^" + Pattern.quote(REPOSITORY_METHOD_MARKER) + ".*");
+
     @Getter
     private List<SqlPerMethod> sqlLogs = new ArrayList<>();
     private StringBuilder readingSqlLog = new StringBuilder();
     private String readingRepositoryMethod = "";
     private boolean sqlLogging = false;
-    private Pattern sqlLogStartPattern = Pattern.compile(".*org.hibernate.SQL.*");
-    private Pattern sqlLogEndPattern = Pattern
-            .compile("^([0-9]{4}-.*|" + Pattern.quote(REPOSITORY_METHOD_MARKER) + ".*)");
+    private SqlEnclosureFilter sqlEnclosureFilter;
+
+    public SqlLogListener(SqlEnclosureFilter sqlEnclosureFilter) {
+        this.sqlEnclosureFilter = sqlEnclosureFilter;
+    }
 
     @Override
     public void nextLine(String line) {
@@ -32,10 +38,11 @@ public class SqlLogListener implements StdoutListener {
 
         if (sqlLogging) {
 
-            if (sqlLogEndPattern.matcher(line).matches()) {
+            if (sqlEnclosureFilter.getEnd().match(line) || MARKER_PATTERN.matcher(line).matches()) {
 
                 if (StringUtils.isNotEmpty(readingRepositoryMethod)) {
-                    SqlPerMethod sqlLog = new SqlPerMethod(readingRepositoryMethod, readingSqlLog.toString());
+                    SqlPerMethod sqlLog = new SqlPerMethod(readingRepositoryMethod,
+                            readingSqlLog.toString());
 
                     log.info("{}", sqlLog);
 
@@ -61,7 +68,7 @@ public class SqlLogListener implements StdoutListener {
         }
 
         if (!StringUtils.isEmpty(readingRepositoryMethod)
-                && sqlLogStartPattern.matcher(line).matches()) {
+                && sqlEnclosureFilter.getStart().match(line)) {
             sqlLogging = true;
         }
     }

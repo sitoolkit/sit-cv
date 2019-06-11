@@ -1,6 +1,5 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +8,7 @@ import java.util.stream.Collectors;
 
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
+import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import io.sitoolkit.cv.core.infra.project.maven.MavenSitCvToolsManager;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.SitFileUtils;
@@ -33,20 +33,20 @@ public class MavenProjectReader implements ProjectReader {
     }
 
     @Override
-    public boolean generateSqlLog(URL configUrl, Project project) {
+    public boolean generateSqlLog(Project project, SitCvConfig sitCvConfig) {
         MavenProject mvnPrj = MavenProject.load(project.getDir());
 
         if (!mvnPrj.available()) {
             return false;
         }
 
-        SqlLogListener sqlLogListener = new SqlLogListener();
+        SqlLogListener sqlLogListener = new SqlLogListener(sitCvConfig.getSqlEnclosureFilter());
 
         MavenSitCvToolsManager.initialize(mvnPrj);
         Path jarPath = MavenSitCvToolsManager.getInstance().getJarPath();
 
         Map<String, String> agentArgsMap = new HashMap<>();
-        agentArgsMap.put("configUrl", configUrl.toString());
+        agentArgsMap.put("configUrl", sitCvConfig.getSourceUrl().toString());
         agentArgsMap.put("repositoryMethodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
         String agentArgs = agentArgsMap.entrySet().stream()
                 .map((e) -> e.getKey() + "=" + e.getValue())

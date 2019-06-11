@@ -1,6 +1,5 @@
 package io.sitoolkit.cv.core.domain.project;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -12,8 +11,10 @@ import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.gradle.GradleProjectReader;
 import io.sitoolkit.cv.core.domain.project.lombok.DelombokProcessor;
 import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
+import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.Getter;
+import lombok.Setter;
 
 public class ProjectManager {
 
@@ -22,6 +23,9 @@ public class ProjectManager {
 
     @Getter
     private Project currentProject;
+
+    @Setter
+    private SitCvConfig sitCvConfig;
 
     public void load(Path projectDir) {
 
@@ -51,8 +55,9 @@ public class ProjectManager {
         });
     }
 
-    public void generateSqlLog(URL configUrl) {
-        readers.stream().map(reader -> reader.generateSqlLog(configUrl, currentProject))
+    public void generateSqlLog() {
+        readers.stream()
+                .map(reader -> reader.generateSqlLog(currentProject, sitCvConfig))
                 .findFirst();
     }
 
