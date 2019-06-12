@@ -33,9 +33,9 @@ public class FilterPatternTest {
         FilterPattern pattern = new FilterPattern(null, false);
 
         assertThat(pattern.isEmpty(), is(true));
-        assertThat(pattern.match("no-match"), is(true));
-        assertThat(pattern.match(""), is(true));
-        assertThat(pattern.match(null), is(true));
+        assertThat(pattern.match("no-match"), is(false));
+        assertThat(pattern.match(""), is(false));
+        assertThat(pattern.match(null), is(false));
     }
 
 }
