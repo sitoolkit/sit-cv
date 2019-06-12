@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
-import io.sitoolkit.cv.core.infra.config.SqlEnclosureFilter;
+import io.sitoolkit.cv.core.infra.config.EnclosureFilterCondition;
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +25,9 @@ public class SqlLogListener implements StdoutListener {
     private StringBuilder readingSqlLog = new StringBuilder();
     private String readingRepositoryMethod = "";
     private boolean sqlLogging = false;
-    private SqlEnclosureFilter sqlEnclosureFilter;
+    private EnclosureFilterCondition sqlEnclosureFilter;
 
-    public SqlLogListener(SqlEnclosureFilter sqlEnclosureFilter) {
+    public SqlLogListener(EnclosureFilterCondition sqlEnclosureFilter) {
         this.sqlEnclosureFilter = sqlEnclosureFilter;
     }
 
@@ -38,7 +38,7 @@ public class SqlLogListener implements StdoutListener {
 
         if (sqlLogging) {
 
-            if (sqlEnclosureFilter.getEnd().match(line) || MARKER_PATTERN.matcher(line).matches()) {
+            if (sqlEnclosureFilter.matchEnd(line) || MARKER_PATTERN.matcher(line).matches()) {
 
                 if (StringUtils.isNotEmpty(readingRepositoryMethod)) {
                     SqlPerMethod sqlLog = new SqlPerMethod(readingRepositoryMethod,
@@ -67,8 +67,7 @@ public class SqlLogListener implements StdoutListener {
             }
         }
 
-        if (!StringUtils.isEmpty(readingRepositoryMethod)
-                && sqlEnclosureFilter.getStart().match(line)) {
+        if (!StringUtils.isEmpty(readingRepositoryMethod) && sqlEnclosureFilter.matchStart(line)) {
             sqlLogging = true;
         }
     }

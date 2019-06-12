@@ -19,6 +19,8 @@ public class FilterCondition {
     private String name;
     private String annotation;
     private boolean withDetail = true;
+    
+    // TODO use FilterPattern　class
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Pattern namePattern;

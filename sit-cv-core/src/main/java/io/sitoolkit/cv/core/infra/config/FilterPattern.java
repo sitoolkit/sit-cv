@@ -2,19 +2,21 @@ package io.sitoolkit.cv.core.infra.config;
 
 import java.util.regex.Pattern;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
-@RequiredArgsConstructor
 public class FilterPattern {
 
-    @NonNull
-    private String patternString;
     private Pattern pattern;
+
+    public FilterPattern(String patternString) {
+        if (!StringUtils.isEmpty(patternString)) {
+            pattern = Pattern.compile(patternString);
+        }
+    }
 
     public boolean match(String value) {
         if (pattern == null) {
-            pattern = Pattern.compile(patternString);
+            return false;
         }
 
         return pattern.matcher(value).matches();

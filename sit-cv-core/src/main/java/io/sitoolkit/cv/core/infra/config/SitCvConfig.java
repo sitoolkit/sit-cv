@@ -14,6 +14,6 @@ public class SitCvConfig {
     private FilterConditionGroup entryPointFilter;
     private FilterConditionGroup sequenceDiagramFilter;
     private FilterConditionGroup repositoryFilter;
-    private SqlEnclosureFilter sqlEnclosureFilter;
+    private EnclosureFilterCondition sqlEnclosureFilter;
 
 }

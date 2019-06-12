@@ -9,12 +9,12 @@ import java.util.List;
 import org.junit.Test;
 
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
-import io.sitoolkit.cv.core.infra.config.SqlEnclosureFilter;
+import io.sitoolkit.cv.core.infra.config.EnclosureFilterCondition;
 
 public class SqlLogListenerTest {
 
     SqlLogListener listener = new SqlLogListener(
-            new SqlEnclosureFilter(".*org.hibernate.SQL.*", "^[0-9]{4}-.*"));
+            new EnclosureFilterCondition(".*org.hibernate.SQL.*", "^[0-9]{4}-.*"));
 
     @Test
     public void testListen() {
