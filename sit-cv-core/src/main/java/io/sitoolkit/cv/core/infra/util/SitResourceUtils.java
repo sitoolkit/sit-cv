@@ -43,14 +43,14 @@ public class SitResourceUtils {
 
     public static String res2str(Class<?> owner, String resourceName) {
         URL resourceUrl = getResourceUrl(owner, resourceName);
-        
+
         try {
             return IOUtils.toString(resourceUrl, Charset.defaultCharset());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
-    
+
     public static URL getResourceUrl(Class<?> owner, String resourceName) {
         URL resourceUrl = owner.getResource(resourceName);
 

@@ -2,11 +2,14 @@ package io.sitoolkit.cv.core.infra.config;
 
 import java.net.URL;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 @Data
 public class SitCvConfig {
 
+    @JsonIgnore
     private URL sourceUrl;
     
     private String jarList = "jar-list.txt";

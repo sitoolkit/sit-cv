@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.infra.config;
 
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -53,7 +54,7 @@ public class SitCvConfigReader {
         try {
             return configFilePath.toAbsolutePath().normalize().toUri().toURL();
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

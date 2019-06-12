@@ -60,7 +60,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <Premain-Class>io.sitoolkit.cv.tools.RepositoryLogger</Premain-Class>
+              <Premain-Class>io.sitoolkit.cv.tools.app.RepositoryLogger</Premain-Class>
             </manifestEntries>
           </archive>
           <descriptorRefs>

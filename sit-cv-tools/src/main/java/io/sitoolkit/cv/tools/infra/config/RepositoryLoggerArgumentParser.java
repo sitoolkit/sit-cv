@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.tools.infra.config;
 
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class RepositoryLoggerArgumentParser {
             URL url = new URL(configUrl);
             return JsonUtils.url2obj(url, RepositoryLoggerConfig.class);
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
