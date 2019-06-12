@@ -12,12 +12,14 @@ public class RepositoryFilter {
 
         return filterConditions.getInclude().stream()
                 .anyMatch(filterCondition -> matchCondition(ctClass, filterCondition));
-
     }
 
-    private static boolean matchCondition(CtClass ctClass,
-            FilterCondition filterCondition) {
+    private static boolean matchCondition(CtClass ctClass, FilterCondition filterCondition) {
         boolean matchClassName = filterCondition.matchName(ctClass.getName());
+
+        if (filterCondition.getAnnotationPattern().isEmpty()) {
+            return matchClassName;
+        }
 
         Object[] annotations;
         try {
@@ -27,13 +29,10 @@ public class RepositoryFilter {
             return false;
         }
 
-        if (filterCondition.getAnnotationPattern().isEmpty()) {
-            return matchClassName;
-        }
-
         boolean matchAnnotation = Arrays.stream(annotations)
                 .anyMatch(annotation -> filterCondition.matchAnnotation(annotation.toString()));
 
         return matchClassName && matchAnnotation;
     }
+
 }

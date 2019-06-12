@@ -8,7 +8,7 @@ import org.junit.Test;
 public class EnclosureFilterConditionTest {
 
     @Test
-    public void matchTest() {
+    public void match() {
         EnclosureFilterCondition condition = new EnclosureFilterCondition(".*start", "end.*");
         
         assertThat(condition.matchStart("match-start"), is(true));
@@ -16,7 +16,7 @@ public class EnclosureFilterConditionTest {
     }
     
     @Test
-    public void emptyPatternTest() {
+    public void emptyPattern() {
         EnclosureFilterCondition emptyCondition = new EnclosureFilterCondition("", null);
         
         assertThat(emptyCondition.matchStart("nomatch"), is(false));

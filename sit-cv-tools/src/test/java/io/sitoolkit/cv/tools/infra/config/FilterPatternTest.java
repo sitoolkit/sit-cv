@@ -19,37 +19,23 @@ public class FilterPatternTest {
     }
 
     @Test
-    public void emptyPatternTest() {
+    public void emptyPattern() {
         FilterPattern pattern = new FilterPattern("", true);
 
         assertThat(pattern.isEmpty(), is(true));
         assertThat(pattern.match("match"), is(true));
         assertThat(pattern.match(""), is(true));
         assertThat(pattern.match(null), is(true));
-
-        pattern = new FilterPattern("", false);
-
-        assertThat(pattern.isEmpty(), is(true));
-        assertThat(pattern.match("no-match"), is(false));
-        assertThat(pattern.match(""), is(false));
-        assertThat(pattern.match(null), is(false));
     }
 
     @Test
-    public void nullPatternTest() {
-        FilterPattern pattern = new FilterPattern(null, true);
+    public void nullPattern() {
+        FilterPattern pattern = new FilterPattern(null, false);
 
         assertThat(pattern.isEmpty(), is(true));
         assertThat(pattern.match("no-match"), is(true));
         assertThat(pattern.match(""), is(true));
         assertThat(pattern.match(null), is(true));
-
-        pattern = new FilterPattern(null, false);
-
-        assertThat(pattern.isEmpty(), is(true));
-        assertThat(pattern.match("no-match"), is(false));
-        assertThat(pattern.match(""), is(false));
-        assertThat(pattern.match(null), is(false));
     }
 
 }

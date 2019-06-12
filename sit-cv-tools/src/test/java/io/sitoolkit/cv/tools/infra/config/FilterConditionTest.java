@@ -8,7 +8,7 @@ import org.junit.Test;
 public class FilterConditionTest {
 
     @Test
-    public void matchTest() {
+    public void match() {
         FilterCondition condition = new FilterCondition(".*name", "@annotation.*");
 
         assertThat(condition.matchName("match-name"), is(true));
@@ -16,7 +16,7 @@ public class FilterConditionTest {
     }
 
     @Test
-    public void emptyPatternTest() {
+    public void emptyPattern() {
         FilterCondition emptyCondition = new FilterCondition("", null);
 
         assertThat(emptyCondition.matchName("nomatch"), is(true));

@@ -14,6 +14,15 @@ public class RepositoryLoggerArgumentParser {
     private static final String KEY_VALUE_SEPARATOR = "=";
 
     public RepositoryLoggerConfig parse(String args) {
+        Map<String, String> valueMap = parseArgs(args);
+
+        RepositoryLoggerConfig config = readConfig(valueMap.get("configUrl"));
+        config.setRepositoryMethodMarker(valueMap.get("repositoryMethodMarker"));
+
+        return config;
+    }
+
+    private Map<String, String> parseArgs(String args) {
         Map<String, String> valueMap = new HashMap<>();
         for (String item : args.split(ITEM_SEPARATOR)) {
             String[] keyValue = item.split(KEY_VALUE_SEPARATOR);
@@ -22,13 +31,10 @@ public class RepositoryLoggerArgumentParser {
             String value = keyValue.length == 1 ? null : keyValue[1];
             valueMap.put(key, value);
         }
-
-        RepositoryLoggerConfig config = readConfig(valueMap.get("configUrl"));
-        config.setRepositoryMethodMarker(valueMap.get("repositoryMethodMarker"));
-
-        return config;
+        
+        return valueMap;
     }
-
+    
     private RepositoryLoggerConfig readConfig(String configUrl) {
         try {
             URL url = new URL(configUrl);

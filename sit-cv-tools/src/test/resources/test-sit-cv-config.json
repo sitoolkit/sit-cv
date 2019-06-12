@@ -1,31 +1,7 @@
 {
   "entryPointFilter": {
-    "include":[
-      {
-        "name": ".*Controller.*"
-      }
-    ],
-    "exclude":[]
   },
   "sequenceDiagramFilter": {
-    "include": [
-      {
-        "name": ".*Controller.*"
-      },
-      {
-        "name": ".*Service.*"
-      },
-      {
-        "name": ".*Processor.*"
-      },
-      {
-        "name": ".*Validator.*"
-      },
-      {
-        "name": ".*Repository.*"
-      }
-    ],
-    "exclude": []
   },
   "repositoryFilter": {
     "include": [

@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class CrudService {
-    
+
     @NonNull
     FunctionModelService functionModelService;
 
