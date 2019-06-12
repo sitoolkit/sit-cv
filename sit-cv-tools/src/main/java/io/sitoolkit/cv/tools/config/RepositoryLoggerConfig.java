@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RepositoryLoggerConfig {
-    private RepositoryFilterConditionGroup repositoryFilter;
+    private FilterConditionGroup repositoryFilter;
     private String repositoryMethodMarker;
 }

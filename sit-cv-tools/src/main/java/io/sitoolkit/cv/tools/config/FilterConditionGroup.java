@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RepositoryFilterConditionGroup {
+public class FilterConditionGroup {
 
-    private List<RepositoryFilterCondition> include;
-    private List<RepositoryFilterCondition> exclude;
+    private List<FilterCondition> include;
+    private List<FilterCondition> exclude;
 
 }

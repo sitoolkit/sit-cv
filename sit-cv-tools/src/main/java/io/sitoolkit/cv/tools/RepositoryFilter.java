@@ -2,15 +2,13 @@ package io.sitoolkit.cv.tools;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang3.StringUtils;
-
-import io.sitoolkit.cv.tools.config.RepositoryFilterCondition;
-import io.sitoolkit.cv.tools.config.RepositoryFilterConditionGroup;
+import io.sitoolkit.cv.tools.config.FilterCondition;
+import io.sitoolkit.cv.tools.config.FilterConditionGroup;
 import javassist.CtClass;
 
 public class RepositoryFilter {
 
-    public static boolean match(CtClass ctClass, RepositoryFilterConditionGroup filterConditions) {
+    public static boolean match(CtClass ctClass, FilterConditionGroup filterConditions) {
 
         return filterConditions.getInclude().stream()
                 .anyMatch(filterCondition -> matchCondition(ctClass, filterCondition));
@@ -18,7 +16,7 @@ public class RepositoryFilter {
     }
 
     private static boolean matchCondition(CtClass ctClass,
-            RepositoryFilterCondition filterCondition) {
+            FilterCondition filterCondition) {
         boolean matchClassName = filterCondition.matchName(ctClass.getName());
 
         Object[] annotations;
@@ -29,7 +27,7 @@ public class RepositoryFilter {
             return false;
         }
 
-        if (StringUtils.isEmpty(filterCondition.getAnnotation())) {
+        if (filterCondition.getAnnotationPattern().isEmpty()) {
             return matchClassName;
         }
 

@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.infra.config;
+package io.sitoolkit.cv.tools.config;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;

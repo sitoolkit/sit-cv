@@ -14,8 +14,8 @@ public class EnclosureFilterCondition {
     @JsonCreator
     public EnclosureFilterCondition(@JsonProperty("start") String start,
             @JsonProperty("end") String end) {
-        this.startPattern = new FilterPattern(start);
-        this.endPattern = new FilterPattern(end);
+        this.startPattern = new FilterPattern(start, false);
+        this.endPattern = new FilterPattern(end, false);
     }
 
     public boolean matchStart(String value) {

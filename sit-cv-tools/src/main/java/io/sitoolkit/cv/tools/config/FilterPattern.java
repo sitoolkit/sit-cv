@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.infra.config;
+package io.sitoolkit.cv.tools.config;
 
 import java.util.regex.Pattern;
 
