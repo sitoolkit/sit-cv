@@ -16,7 +16,7 @@ public class EnclosureFilterConditionTest {
     }
     
     @Test
-    public void emptyTest() {
+    public void emptyPatternTest() {
         EnclosureFilterCondition emptyCondition = new EnclosureFilterCondition("", null);
         
         assertThat(emptyCondition.matchStart("nomatch"), is(false));
