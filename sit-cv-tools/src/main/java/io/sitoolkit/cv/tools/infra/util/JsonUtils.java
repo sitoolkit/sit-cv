@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.tools.infra;
+package io.sitoolkit.cv.tools.infra.util;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

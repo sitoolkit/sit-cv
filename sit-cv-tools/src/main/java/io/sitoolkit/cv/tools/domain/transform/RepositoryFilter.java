@@ -1,9 +1,9 @@
-package io.sitoolkit.cv.tools;
+package io.sitoolkit.cv.tools.domain.transform;
 
 import java.util.Arrays;
 
-import io.sitoolkit.cv.tools.config.FilterCondition;
-import io.sitoolkit.cv.tools.config.FilterConditionGroup;
+import io.sitoolkit.cv.tools.infra.config.FilterCondition;
+import io.sitoolkit.cv.tools.infra.config.FilterConditionGroup;
 import javassist.CtClass;
 
 public class RepositoryFilter {

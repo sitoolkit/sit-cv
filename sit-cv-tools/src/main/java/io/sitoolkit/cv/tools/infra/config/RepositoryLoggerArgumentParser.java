@@ -1,11 +1,11 @@
-package io.sitoolkit.cv.tools.config;
+package io.sitoolkit.cv.tools.infra.config;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.sitoolkit.cv.tools.infra.JsonUtils;
+import io.sitoolkit.cv.tools.infra.util.JsonUtils;
 
 public class RepositoryLoggerArgumentParser {
 

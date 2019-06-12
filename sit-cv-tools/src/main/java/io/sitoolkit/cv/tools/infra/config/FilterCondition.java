@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.tools.config;
+package io.sitoolkit.cv.tools.infra.config;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.tools;
+package io.sitoolkit.cv.tools.domain.transform;
 
 import java.io.ByteArrayInputStream;
 import java.lang.instrument.ClassFileTransformer;
@@ -10,7 +10,7 @@ import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Optional;
 
-import io.sitoolkit.cv.tools.config.RepositoryLoggerConfig;
+import io.sitoolkit.cv.tools.infra.config.RepositoryLoggerConfig;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;

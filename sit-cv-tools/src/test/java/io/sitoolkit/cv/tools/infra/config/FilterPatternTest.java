@@ -5,6 +5,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.Test;
 
+import io.sitoolkit.cv.tools.infra.config.FilterPattern;
+
 public class FilterPatternTest {
 
     @Test
