@@ -42,10 +42,8 @@ public class SitResourceUtils {
     }
 
     public static String res2str(Class<?> owner, String resourceName) {
-        return res2str(getResourceUrl(owner, resourceName));
-    }
-
-    public static String res2str(URL resourceUrl) {
+        URL resourceUrl = getResourceUrl(owner, resourceName);
+        
         try {
             return IOUtils.toString(resourceUrl, Charset.defaultCharset());
         } catch (IOException e) {

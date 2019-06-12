@@ -2,6 +2,7 @@ package io.sitoolkit.cv.core.infra.util;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -38,6 +39,22 @@ public class JsonUtils {
     public static <T> T str2obj(String str, Object obj) {
         try {
             return mapper.readerForUpdating(obj).readValue(str);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T url2obj(URL url, Class<T> objType) {
+        try {
+            return mapper.readValue(url, objType);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T url2obj(URL url, Object obj) {
+        try {
+            return mapper.readerForUpdating(obj).readValue(url);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

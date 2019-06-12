@@ -1,10 +1,7 @@
 package io.sitoolkit.cv.core.infra.config;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,42 +35,26 @@ public class SitCvConfigReader {
     }
 
     private SitCvConfig readConfig(Path baseDir) {
-        URL url = getURL(baseDir.resolve(CONFIG_FILE_NAME));
+        URL url = getConfigURL(baseDir);
         log.info("Read config:{}", url.toString());
-        String json = SitResourceUtils.res2str(url);
-        SitCvConfig config = JsonUtils.str2obj(json, SitCvConfig.class);
+        
+        SitCvConfig config = JsonUtils.url2obj(url, SitCvConfig.class);
         config.setSourceUrl(url);
         return config;
     }
 
-    private URL getURL(Path configFilePath) {
+    private URL getConfigURL(Path baseDir) {
+        Path configFilePath = baseDir.resolve(CONFIG_FILE_NAME);
+
         if (!configFilePath.toFile().exists()) {
             return SitResourceUtils.getResourceUrl(SitCvConfig.class, CONFIG_FILE_NAME);
         }
 
         try {
-            return configFilePath.toUri().toURL();
+            return configFilePath.toAbsolutePath().normalize().toUri().toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private String readFile(Path baseDir) {
-        Path configFilePath = baseDir.resolve(CONFIG_FILE_NAME);
-
-        String json = null;
-        if (configFilePath.toFile().exists()) {
-            try {
-                log.info("Read config:{}", configFilePath.toAbsolutePath().normalize());
-                json = new String(Files.readAllBytes(configFilePath));
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        } else {
-            json = SitResourceUtils.res2str(SitCvConfig.class, CONFIG_FILE_NAME);
-        }
-
-        return json;
     }
 
     private void startWatch() {
@@ -101,7 +82,6 @@ public class SitCvConfigReader {
     }
 
     private synchronized void reload() {
-        String json = readFile(this.baseDir);
-        JsonUtils.str2obj(json, config);
+        JsonUtils.url2obj(config.getSourceUrl(), config);
     }
 }

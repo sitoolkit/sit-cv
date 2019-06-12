@@ -4,18 +4,25 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.Value;
+
+@Value
 public class FilterPattern {
 
+    private boolean empty;
     private Pattern pattern;
 
     public FilterPattern(String patternString) {
-        if (!StringUtils.isEmpty(patternString)) {
+        empty = StringUtils.isEmpty(patternString);
+        if (empty) {
+            pattern = null;
+        } else {
             pattern = Pattern.compile(patternString);
         }
     }
 
     public boolean match(String value) {
-        if (pattern == null) {
+        if (isEmpty()) {
             return false;
         }
 
