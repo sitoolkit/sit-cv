@@ -1,8 +1,8 @@
 package io.sitoolkit.cv.core.infra.config;
 
-import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,26 +36,26 @@ public class SitCvConfigReader {
     }
 
     private SitCvConfig readConfig(Path baseDir) {
-        String json = readFile(baseDir);
-        return JsonUtils.str2obj(json, SitCvConfig.class);
+        URL url = getConfigURL(baseDir);
+        log.info("Read config:{}", url.toString());
+        
+        SitCvConfig config = JsonUtils.url2obj(url, SitCvConfig.class);
+        config.setSourceUrl(url);
+        return config;
     }
 
-    private String readFile(Path baseDir) {
+    private URL getConfigURL(Path baseDir) {
         Path configFilePath = baseDir.resolve(CONFIG_FILE_NAME);
 
-        String json = null;
-        if (configFilePath.toFile().exists()) {
-            try {
-                log.info("Read config:{}", configFilePath.toAbsolutePath().normalize());
-                json = new String(Files.readAllBytes(configFilePath));
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        } else {
-            json = SitResourceUtils.res2str(SitCvConfig.class, CONFIG_FILE_NAME);
+        if (!configFilePath.toFile().exists()) {
+            return SitResourceUtils.getResourceUrl(SitCvConfig.class, CONFIG_FILE_NAME);
         }
 
-        return json;
+        try {
+            return configFilePath.toAbsolutePath().normalize().toUri().toURL();
+        } catch (MalformedURLException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     private void startWatch() {
@@ -83,7 +83,6 @@ public class SitCvConfigReader {
     }
 
     private synchronized void reload() {
-        String json = readFile(this.baseDir);
-        JsonUtils.str2obj(json, config);
+        JsonUtils.url2obj(config.getSourceUrl(), config);
     }
 }

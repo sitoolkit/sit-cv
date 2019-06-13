@@ -1,0 +1,21 @@
+{
+  "entryPointFilter": {
+  },
+  "sequenceDiagramFilter": {
+  },
+  "repositoryFilter": {
+    "include": [
+      {
+        "name": ".*Repository"
+      },
+      {
+        "annotation": "@.*Repository"
+      }
+    ],
+    "exclude": []
+  },
+  "sqlEnclosureFilter": {
+    "start": ".*org.hibernate.SQL.*",
+    "end": "^[0-9]{4}-.*"
+  }
+}

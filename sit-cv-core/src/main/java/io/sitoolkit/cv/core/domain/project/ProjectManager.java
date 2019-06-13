@@ -11,8 +11,10 @@ import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.gradle.GradleProjectReader;
 import io.sitoolkit.cv.core.domain.project.lombok.DelombokProcessor;
 import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
+import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.Getter;
+import lombok.Setter;
 
 public class ProjectManager {
 
@@ -21,6 +23,9 @@ public class ProjectManager {
 
     @Getter
     private Project currentProject;
+
+    @Setter
+    private SitCvConfig sitCvConfig;
 
     public void load(Path projectDir) {
 
@@ -51,7 +56,9 @@ public class ProjectManager {
     }
 
     public void generateSqlLog() {
-        readers.stream().map(reader -> reader.generateSqlLog(currentProject)).findFirst();
+        readers.stream()
+                .map(reader -> reader.generateSqlLog(currentProject, sitCvConfig))
+                .findFirst();
     }
 
 }

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
+import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import io.sitoolkit.util.buildtoolhelper.gradle.GradleProject;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +51,7 @@ public class GradleProjectReader implements ProjectReader {
     }
 
     @Override
-    public boolean generateSqlLog(Project project) {
+    public boolean generateSqlLog(Project project, SitCvConfig sitCvConfig) {
         // TODO Generate SQLlog with gradle
         return false;
     }

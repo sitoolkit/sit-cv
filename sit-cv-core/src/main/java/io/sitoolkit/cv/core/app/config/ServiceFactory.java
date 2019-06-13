@@ -79,6 +79,7 @@ public class ServiceFactory {
 
         projectManager = new ProjectManager();
         projectManager.load(projectDir);
+        projectManager.setSitCvConfig(config);
 
         functionModelService = createFunctionModelService(config, configReader, projectManager);
 

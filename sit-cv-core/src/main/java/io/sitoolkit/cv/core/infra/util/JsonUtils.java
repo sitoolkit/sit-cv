@@ -2,6 +2,7 @@ package io.sitoolkit.cv.core.infra.util;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -14,14 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JsonUtils {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private JsonUtils() {
     }
 
     public static String obj2str(Object obj) {
         try {
-            return mapper.writeValueAsString(obj);
+            return MAPPER.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             throw new UncheckedIOException(e);
         }
@@ -29,7 +30,7 @@ public class JsonUtils {
 
     public static <T> T str2obj(String str, Class<T> objType) {
         try {
-            return mapper.readValue(str, objType);
+            return MAPPER.readValue(str, objType);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -37,7 +38,23 @@ public class JsonUtils {
 
     public static <T> T str2obj(String str, Object obj) {
         try {
-            return mapper.readerForUpdating(obj).readValue(str);
+            return MAPPER.readerForUpdating(obj).readValue(str);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T url2obj(URL url, Class<T> objType) {
+        try {
+            return MAPPER.readValue(url, objType);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static <T> T url2obj(URL url, Object obj) {
+        try {
+            return MAPPER.readerForUpdating(obj).readValue(url);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -48,7 +65,7 @@ public class JsonUtils {
 
         try {
             SitFileUtils.createDirectories(path.getParent());
-            mapper.writeValue(path.toFile(), obj);
+            MAPPER.writeValue(path.toFile(), obj);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -63,7 +80,7 @@ public class JsonUtils {
         log.info("Read file to object: {}", formatPath(path));
 
         try {
-            return Optional.of(mapper.readValue(path.toFile(), objType));
+            return Optional.of(MAPPER.readValue(path.toFile(), objType));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -78,7 +95,7 @@ public class JsonUtils {
         log.info("Read file to object: {}", formatPath(path));
 
         try {
-            return Optional.of(mapper.readValue(path.toFile(), objType));
+            return Optional.of(MAPPER.readValue(path.toFile(), objType));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

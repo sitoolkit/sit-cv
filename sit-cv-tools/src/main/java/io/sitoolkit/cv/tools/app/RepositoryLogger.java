@@ -1,8 +1,9 @@
-package io.sitoolkit.cv.tools;
+package io.sitoolkit.cv.tools.app;
 
 import java.lang.instrument.Instrumentation;
 
-import io.sitoolkit.cv.tools.config.RepositoryLoggerArgumentParser;
+import io.sitoolkit.cv.tools.domain.transform.RepositoryClassTransformer;
+import io.sitoolkit.cv.tools.infra.config.RepositoryLoggerArgumentParser;
 
 public class RepositoryLogger {
 
