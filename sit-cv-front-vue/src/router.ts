@@ -6,9 +6,20 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {
-      path: '/',
-      name: 'home',
+      path: '/designdoc',
+      name: 'designdoc',
       component: () => import('./views/Home.vue'),
+      children: [
+        {
+          path: 'function/:functionId',
+          name: 'function',
+          component: () => import('./components/function/FunctionModel.vue'),
+        },
+      ],
+    },
+    {
+      path: '*',
+      redirect: 'designdoc',
     },
   ],
 });
