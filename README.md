@@ -71,7 +71,7 @@ Then you can access http://localhost:8080 with browser and see UML diagrams of D
 
 * Report Mode
 
-Running java command with --report option, static report files(html, css, js) are generated to docs/designdoc directory.
+Running java command with --cv.report option, static report files(html, css, js) are generated to docs/designdoc directory.
 
 ```
 java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.report
@@ -79,6 +79,18 @@ java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.report
 
 You can see diagrams by opening docs/designdoc/index.html with browser.
 
+* Generate CRUD matrix
+
+Run with the --cv.analyze-sql option to generate a CRUD matrix.
+Use this option to automatically run tests and analyze logs to get SQL.
+
+```sh
+# Server Mode
+java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql
+
+# or Report Mode
+java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql --cv.report
+```
 
 ## How to Use in Your Project
 
@@ -116,6 +128,11 @@ mvn sit-cv:run
 mvn sit-cv:report
 ```
 
+* Analyze test log to generate CRUD matrix
+
+```
+mvn sit-cv:analyze-sql
+```
 
 ### Gradle Project
 
@@ -160,11 +177,16 @@ gradlew cvRun
 gradlew cvReport
 ```
 
+* Analyze test log to generate CRUD matrix
+
+```
+gradlew cvAnalyzeSql
+```
 
 ## Configuration for Your Project
 
 If you want to customize filter condition to draw classes on diagrams, put sit-cv-config.json in your project root directory.
-It's JSON structure is as folows.
+It's JSON structure is as follows.
 
 * sit-cv-config.json
 
@@ -182,12 +204,17 @@ It's JSON structure is as folows.
         "name": ".*Controller",
         "annotation": ""
       },
-    ],
-    "exclude":[]
+    ]
   },
   "sequenceDiagramFilter": {
-    "include": [],
-    "exclude": []
+    "include": []
+  },
+  "repositoryFilter": {
+    "include": []
+  },
+  "sqlEnclosureFilter": {
+    "start": ".*Pattern before SQL starts.*",
+    "end": ".*Pattern after SQL ends.*"
   }
 }
 ```
@@ -195,8 +222,11 @@ It's JSON structure is as folows.
 |          Key          |                                   Description                                    |
 | --------------------- | -------------------------------------------------------------------------------- |
 | entoryPointFilter     | Filter rule to recognize as entry point i.e. left end class of sequence diagram. |
-| include               | Classes which matches one of these rules are included to sequence diagram.       |
-| exclude               | Classes which matches one of these rules are excluded to sequence diagram.       |
+| include               | Include classes that match one of these rules for processing.                    |
 | name                  | Pattern to match class qualified name.                                           |
 | annotation            | Pattern to match qualified annotation name of class.                             |
 | sequenceDiagramFilter | Filter rule to draw sequence diagram.                                            |
+| repositoryFilter      | Filter rule to find repository classes. This is used to generate CRUD matrix.    |
+| sqlEnclosureFilter    | Filter rule to find SQL from test log. This is used to generate CRUD matrix.     |
+| start                 | Pattern to match the line just before SQL starts.                                |
+| end                   | Pattern to match the line just after SQL ends.                                   |
