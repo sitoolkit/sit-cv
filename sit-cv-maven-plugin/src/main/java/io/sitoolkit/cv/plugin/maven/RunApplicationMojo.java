@@ -13,6 +13,11 @@ import io.sitoolkit.cv.app.SitCvApplication;
 @Mojo(name = "run")
 public class RunApplicationMojo extends AbstractMojo {
 
+    public static final String ANALYZE_SQL_OPTION = "analyze-sql";
+    
+    @Parameter(property = ANALYZE_SQL_OPTION, defaultValue = "false")
+    private boolean shouldAnalyzeSql;
+    
     @Parameter
     private String cvArgs;
 
@@ -22,7 +27,7 @@ public class RunApplicationMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
 
-        SitCvApplication.main(getCvArgsAsArray());
+        SitCvApplication.main(getArgsAsArray());
 
         getLog().info("Press " + stopKey + " and enter to stop server");
 
@@ -37,8 +42,11 @@ public class RunApplicationMojo extends AbstractMojo {
         }
     }
 
-    private String[] getCvArgsAsArray() {
-        return StringUtils.isEmpty(cvArgs) ? new String[0] : cvArgs.split(" ");
+    private String[] getArgsAsArray() {
+        String args = StringUtils.defaultString(cvArgs);
+        String analyzeSqlOption = shouldAnalyzeSql ? (" --cv." + ANALYZE_SQL_OPTION) : "";
+
+        return (args + analyzeSqlOption).trim().split(" ");
     }
 
 }

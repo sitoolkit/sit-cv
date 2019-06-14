@@ -128,10 +128,14 @@ mvn sit-cv:run
 mvn sit-cv:report
 ```
 
-* Analyze test log to generate CRUD matrix
+* Generate CRUD matrix
 
 ```
-mvn sit-cv:analyze-sql
+# Server Mode
+mvn sit-cv:run --Danalyze-sql=true
+
+# or Report Mode
+mvn sit-cv:report --Danalyze-sql=true
 ```
 
 ### Gradle Project
@@ -177,10 +181,14 @@ gradlew cvRun
 gradlew cvReport
 ```
 
-* Analyze test log to generate CRUD matrix
+* Generate CRUD matrix
 
 ```
-gradlew cvAnalyzeSql
+# Server Mode
+gradlew cvRun --analyze-sql
+
+# or Report Mode
+gradlew cvReport --analyze-sql
 ```
 
 ## Configuration for Your Project
