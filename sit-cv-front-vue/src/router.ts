@@ -13,7 +13,10 @@ export default new Router({
         {
           path: 'function/:functionId',
           name: 'function',
-          component: () => import('./components/function/FunctionModel.vue'),
+          components: {
+            default: () => import('./components/function/FunctionModel.vue'),
+            title: () => import('./components/function/FunctionModelTitle.vue'),
+          },
         },
       ],
     },

@@ -27,7 +27,7 @@ class SitCvWebsocket {
   }
 
   private connect() {
-    this.socket = new SockJS('http://' + location.hostname + ':8080/gs-guide-websocket');
+    this.socket = new SockJS(`${process.env.VUE_APP_BACK_URL}/gs-guide-websocket`);
     this.stompClient = Stomp.over(this.socket);
     this.stompClient.connect(
       {},

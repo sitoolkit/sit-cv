@@ -1,6 +1,11 @@
 <template>
   <base-frame>
-    <router-view></router-view>
+    <template #title>
+      <router-view name="title"/>
+    </template>
+    <template #default>
+      <router-view/>
+    </template>
   </base-frame>
 </template>
 

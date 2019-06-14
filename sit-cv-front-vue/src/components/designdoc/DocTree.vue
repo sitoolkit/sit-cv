@@ -1,7 +1,7 @@
 <template>
   <div>
     <ul>
-      <li v-for="item in menuItems" v-bind:key="item.endpoint" class="aa">
+      <li v-for="item in menuItems" v-bind:key="item.endpoint">
         <router-link :to="item.endpoint">{{item.name}}</router-link>
       </li>
     </ul>

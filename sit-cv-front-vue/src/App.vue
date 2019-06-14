@@ -1,8 +1,6 @@
 <template>
   <div id="app">
-    <keep-alive include="Home,DocTree">
-      <router-view/>
-    </keep-alive>
+    <router-view/>
   </div>
 </template>
 
