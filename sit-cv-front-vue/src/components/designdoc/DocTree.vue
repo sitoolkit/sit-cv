@@ -9,13 +9,15 @@
 </template>
 
 <script lang="ts">
-import * as Stomp from 'webstomp-client';
 import MenuItem from '@/domains/designdoc/MenuItem';
-import SitCvWebsocket from '@/infrastructures/SitCvWebsocket';
 import { Component, Vue } from 'vue-property-decorator';
+import DesignDocService from '../../domains/designdoc/DesignDocService';
+import DesignDocServerService from '../../domains/designdoc/DesignDocServerService';
 
 @Component
 export default class DocTree extends Vue {
+  private designDocService: DesignDocService = DesignDocServerService;
+
   private menuItems: MenuItem[] = [];
 
   public created() {
@@ -23,19 +25,8 @@ export default class DocTree extends Vue {
   }
 
   public async drawMenu() {
-    const menuItems: MenuItem[] = await this.fetchMenuItems();
+    const menuItems: MenuItem[] = await this.designDocService.fetchMenuItems();
     this.menuItems = this.flattenMenuItems(menuItems, []);
-  }
-
-  public async fetchMenuItems(): Promise<MenuItem[]> {
-    return new Promise((resolve) => {
-      SitCvWebsocket.subscribe((client: Stomp.Client) => {
-        client.subscribe('/topic/designdoc/list', (response: any) => {
-          resolve(JSON.parse(response.body));
-        });
-        client.send('/app/designdoc/list');
-      });
-    });
   }
 
   private flattenMenuItems(menuItems: MenuItem[], result: MenuItem[]): MenuItem[] {
