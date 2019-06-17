@@ -28,7 +28,7 @@ export default class DocTree extends Vue {
   }
 
   public async fetchMenuItems(): Promise<MenuItem[]> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       SitCvWebsocket.subscribe((client: Stomp.Client) => {
         client.subscribe('/topic/designdoc/list', (response: any) => {
           resolve(JSON.parse(response.body));
@@ -39,7 +39,7 @@ export default class DocTree extends Vue {
   }
 
   private flattenMenuItems(menuItems: MenuItem[], result: MenuItem[]): MenuItem[] {
-    menuItems.forEach(item => {
+    menuItems.forEach((item) => {
       if (item.endpoint) {
         result.push(item);
       }
