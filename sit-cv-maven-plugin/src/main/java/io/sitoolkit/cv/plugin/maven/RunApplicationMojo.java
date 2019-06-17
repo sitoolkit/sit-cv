@@ -16,7 +16,7 @@ public class RunApplicationMojo extends AbstractMojo {
     public static final String ANALYZE_SQL_OPTION = "analyze-sql";
     
     @Parameter(property = ANALYZE_SQL_OPTION, defaultValue = "false")
-    private boolean shouldAnalyzeSql;
+    private boolean analyzeSql;
     
     @Parameter
     private String cvArgs;
@@ -44,7 +44,7 @@ public class RunApplicationMojo extends AbstractMojo {
 
     private String[] getArgsAsArray() {
         String args = StringUtils.defaultString(cvArgs);
-        String analyzeSqlOption = shouldAnalyzeSql ? (" --cv." + ANALYZE_SQL_OPTION) : "";
+        String analyzeSqlOption = analyzeSql ? (" --cv." + ANALYZE_SQL_OPTION) : "";
 
         return (args + analyzeSqlOption).trim().split(" ");
     }
