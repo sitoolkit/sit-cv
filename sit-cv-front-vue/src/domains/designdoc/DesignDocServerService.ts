@@ -18,7 +18,7 @@ class DesignDocServerService implements DesignDocService {
   public async fetchMenuItems(): Promise<MenuItem[]> {
     return new Promise((resolve) => {
       SitCvWebsocket.subscribe((client: Stomp.Client) => {
-        client.subscribe('/topic/designdoc/list', (response: any) => {
+        client.subscribe('/topic/designdoc/list', (response: Stomp.Message) => {
           resolve(JSON.parse(response.body));
         });
         client.send('/app/designdoc/list');

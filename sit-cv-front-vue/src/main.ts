@@ -4,12 +4,12 @@ import router from './router';
 
 Vue.config.productionTip = false;
 
-// Vuikit
-import Vuikit from 'vuikit';
-import VuikitIcons from '@vuikit/icons';
-
+// UIkit, Vuikit
 import './assets/uikit.sit-cv-theme.min.css';
 import './assets/uikit.min.js';
+
+import Vuikit from 'vuikit';
+import VuikitIcons from '@vuikit/icons';
 
 Vue.use(Vuikit);
 Vue.use(VuikitIcons);
