@@ -16,7 +16,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 @Component
 export default class DocTree extends Vue {
-  public menuItems: MenuItem[] = [];
+  private menuItems: MenuItem[] = [];
 
   public created() {
     this.drawMenu();

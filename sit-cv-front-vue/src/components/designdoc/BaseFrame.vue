@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import DocTree from './DocTree.vue';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
 @Component({ components: { DocTree } })
 export default class BaseFrame extends Vue {}

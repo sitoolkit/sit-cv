@@ -52,10 +52,10 @@ Next, edit the compile-less script in etc/uikit/package.json.
 {
   "scripts": {
     // Windows
-    "compile-less": "yarn icons && node build/less && copy dist\\css\\uikit.mono-am-theme.min.css ..\\..\\src\\assets",
+    "compile-less": "yarn icons && node build/less && copy dist\\css\\uikit.sit-cv-theme.min.css ..\\..\\src\\assets",
 
     // Mac
-    "compile-less": "yarn icons && node build/less && cp dist/css/uikit.mono-am-theme.min.css ../../src/assets",
+    "compile-less": "yarn icons && node build/less && cp dist/css/uikit.sit-cv-theme.min.css ../../src/assets",
   }
 }
 ```

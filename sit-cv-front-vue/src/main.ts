@@ -9,7 +9,7 @@ import Vuikit from 'vuikit';
 import VuikitIcons from '@vuikit/icons';
 
 import './assets/uikit.sit-cv-theme.min.css';
-import './assets/uikit.js';
+import './assets/uikit.min.js';
 
 Vue.use(Vuikit);
 Vue.use(VuikitIcons);
