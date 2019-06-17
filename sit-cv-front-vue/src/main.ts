@@ -8,7 +8,7 @@ Vue.config.productionTip = false;
 import Vuikit from 'vuikit';
 import VuikitIcons from '@vuikit/icons';
 
-import './assets/uikit.mono-am-theme.min.css';
+import './assets/uikit.sit-cv-theme.min.css';
 import './assets/uikit.js';
 
 Vue.use(Vuikit);
