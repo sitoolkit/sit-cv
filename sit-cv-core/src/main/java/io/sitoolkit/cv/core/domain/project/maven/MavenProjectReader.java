@@ -46,6 +46,7 @@ public class MavenProjectReader implements ProjectReader {
         Path jarPath = MavenSitCvToolsManager.getInstance().getJarPath();
 
         Map<String, String> agentArgsMap = new HashMap<>();
+        agentArgsMap.put("projectType", "maven");
         agentArgsMap.put("configUrl", sitCvConfig.getSourceUrl().toString());
         agentArgsMap.put("repositoryMethodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
         String agentArgs = agentArgsMap.entrySet().stream()

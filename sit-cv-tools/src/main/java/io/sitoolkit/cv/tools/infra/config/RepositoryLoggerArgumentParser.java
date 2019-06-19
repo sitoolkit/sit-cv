@@ -18,6 +18,7 @@ public class RepositoryLoggerArgumentParser {
 
         RepositoryLoggerConfig config = readConfig(valueMap.get("configUrl"));
         config.setRepositoryMethodMarker(valueMap.get("repositoryMethodMarker"));
+        config.setProjectType(valueMap.get("projectType"));
 
         return config;
     }
