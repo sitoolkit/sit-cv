@@ -7,16 +7,19 @@ import java.util.Optional;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
-import io.sitoolkit.cv.core.domain.project.analyze.AnalyzeSqlParameterBuilder;
-import io.sitoolkit.cv.core.domain.project.analyze.SqlLogListener;
+import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
 import io.sitoolkit.cv.core.infra.project.maven.MavenSitCvToolsManager;
-import io.sitoolkit.cv.core.infra.util.JsonUtils;
-import io.sitoolkit.cv.core.infra.util.SitFileUtils;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class MavenProjectReader implements ProjectReader {
+
+    @NonNull
+    private SqlLogProcessor sqlLogProcessor;
 
     public static void main(String[] args) {
         Path projectDir = Paths.get(args[0]);
@@ -24,9 +27,9 @@ public class MavenProjectReader implements ProjectReader {
         SitCvConfig config = configReader.read(projectDir);
         ServiceFactory factory = ServiceFactory.create(projectDir);
         Project project = factory.getProjectManager().getCurrentProject();
-        new MavenProjectReader().generateSqlLog(project, config);
+        new MavenProjectReader(new SqlLogProcessor()).generateSqlLog(project, config);
     }
-    
+
     @Override
     public Optional<Project> read(Path projectDir) {
 
@@ -51,19 +54,13 @@ public class MavenProjectReader implements ProjectReader {
             return false;
         }
 
-        SqlLogListener sqlLogListener = new SqlLogListener(sitCvConfig.getSqlEnclosureFilter());
-
         MavenSitCvToolsManager.initialize(mvnPrj);
-        Path agentJarPath = MavenSitCvToolsManager.getInstance().getJarPath();
-        String javaAgentParameter = AnalyzeSqlParameterBuilder.build(agentJarPath, "maven",
-                sitCvConfig.getSourceUrl());
+        Path agentJar = MavenSitCvToolsManager.getInstance().getJarPath();
 
-        SitFileUtils.createDirectories(project.getSqlLogPath().getParent());
-
-        mvnPrj.mvnw("test", "-DargLine=" + javaAgentParameter).stdout(sqlLogListener).execute();
-
-        JsonUtils.obj2file(sqlLogListener.getSqlLogs(), project.getSqlLogPath());
-
+        sqlLogProcessor.process(sitCvConfig, agentJar, project, "maven", (String param) -> {
+            return mvnPrj.mvnw("test", "-DargLine=" + param);
+        });
         return true;
     }
+
 }

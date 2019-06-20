@@ -8,10 +8,11 @@ import java.nio.file.Paths;
 import org.junit.Test;
 
 import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 
 public class MavenProjectReaderTest {
 
-    MavenProjectReader reader = new MavenProjectReader();
+    MavenProjectReader reader = new MavenProjectReader(new SqlLogProcessor());
 
     @Test
     public void testMulti() {

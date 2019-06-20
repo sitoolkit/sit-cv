@@ -1,6 +1,8 @@
 package io.sitoolkit.cv.core.app.config;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 import io.sitoolkit.cv.core.app.crud.CrudService;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
@@ -15,6 +17,10 @@ import io.sitoolkit.cv.core.domain.crud.CrudProcessor;
 import io.sitoolkit.cv.core.domain.crud.jsqlparser.CrudFinderJsqlparserImpl;
 import io.sitoolkit.cv.core.domain.designdoc.DesignDocMenuBuilder;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
+import io.sitoolkit.cv.core.domain.project.ProjectReader;
+import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
+import io.sitoolkit.cv.core.domain.project.gradle.GradleProjectReader;
+import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
 import io.sitoolkit.cv.core.domain.report.ReportWriter;
 import io.sitoolkit.cv.core.domain.report.crud.CrudReportProcessor;
 import io.sitoolkit.cv.core.domain.report.designdoc.DesignDocReportProcessor;
@@ -77,9 +83,8 @@ public class ServiceFactory {
         SitCvConfigReader configReader = new SitCvConfigReader();
         SitCvConfig config = configReader.read(projectDir);
 
-        projectManager = new ProjectManager();
+        projectManager = createProjectManager(config);
         projectManager.load(projectDir);
-        projectManager.setSitCvConfig(config);
 
         functionModelService = createFunctionModelService(config, configReader, projectManager);
 
@@ -91,6 +96,14 @@ public class ServiceFactory {
                 projectManager);
 
         return this;
+    }
+    
+    protected ProjectManager createProjectManager(SitCvConfig config) {
+        SqlLogProcessor sqlLogProcessor = new SqlLogProcessor();
+        List<ProjectReader> readers = Arrays.asList(new MavenProjectReader(sqlLogProcessor),
+                    new GradleProjectReader(sqlLogProcessor));
+
+        return new ProjectManager(readers, config);
     }
 
     protected FunctionModelService createFunctionModelService(SitCvConfig config,
