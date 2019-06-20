@@ -45,8 +45,7 @@ public class ProjectManager {
     }
 
     public List<SqlPerMethod> getSqlLog() {
-        Optional<List<SqlPerMethod>> sqlLogs = JsonUtils.file2obj(
-                currentProject.getDir().resolve(currentProject.getSqlLogPath()),
+        Optional<List<SqlPerMethod>> sqlLogs = JsonUtils.file2obj(currentProject.getSqlLogPath(),
                 new TypeReference<List<SqlPerMethod>>() {
                 });
         return sqlLogs.orElseThrow(() -> {
@@ -56,8 +55,7 @@ public class ProjectManager {
     }
 
     public void generateSqlLog() {
-        readers.stream()
-                .map(reader -> reader.generateSqlLog(currentProject, sitCvConfig))
+        readers.stream().map(reader -> reader.generateSqlLog(currentProject, sitCvConfig))
                 .findFirst();
     }
 

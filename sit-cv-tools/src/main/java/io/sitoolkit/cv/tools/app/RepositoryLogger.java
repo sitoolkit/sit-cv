@@ -12,20 +12,18 @@ public class RepositoryLogger {
 
     public static void premain(String agentArgs, Instrumentation instrumentation) {
 
+        System.out.println("RepositoryLogger premain start. args: " + agentArgs);
+
         RepositoryLoggerConfig config = argParser.parse(agentArgs);
 
-        if (isGradleWorkerMainProcess(config.getProjectType())) {
+        if (config.getProjectType().equals("gradle")
+                && !System.getProperty("sun.java.command").contains("GradleWorkerMain")) {
+            System.out.println(
+                    "RepositoryLogger premain exit. Because it was executed by a command other than GradleWorkerMain.");
             return;
         }
 
-        System.out.println("RepositoryLogger premain start. args: " + agentArgs);
-
         instrumentation.addTransformer(new RepositoryClassTransformer(argParser.parse(agentArgs)));
-    }
-
-    private static boolean isGradleWorkerMainProcess(String projectType) {
-        return projectType.equals("gradle")
-                && !System.getProperty("sun.java.command").contains("GradleWorkerMain");
     }
 
 }

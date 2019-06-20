@@ -72,6 +72,10 @@ public class Project {
     public Path getCrudPath() {
         return dir.resolve(CRUD_FILE);
     }
+    
+    public Path getWorkDir() {
+        return dir.resolve(WORK_DIR);
+    }
 
     Set<Path> getPreProcessedDirs() {
         return getSrcDirs().stream().map(srcDir -> preProcessor.getPreProcessedPath(srcDir))

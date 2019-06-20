@@ -1,4 +1,4 @@
-package io.sitoolkit.cv.core.domain.project.maven;
+package io.sitoolkit.cv.core.domain.project.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class SqlLogListener implements StdoutListener {
     public static String REPOSITORY_METHOD_MARKER = "[RepositoryMethod]";
 
     private static Pattern MARKER_PATTERN = Pattern
-            .compile("^" + Pattern.quote(REPOSITORY_METHOD_MARKER) + ".*");
+            .compile("^\\s*" + Pattern.quote(REPOSITORY_METHOD_MARKER) + ".*");
 
     @Getter
     private List<SqlPerMethod> sqlLogs = new ArrayList<>();
@@ -36,9 +36,11 @@ public class SqlLogListener implements StdoutListener {
 
         System.out.println(line);
 
+        boolean isMarkerLine = MARKER_PATTERN.matcher(line).matches();
+        
         if (sqlLogging) {
 
-            if (sqlEnclosureFilter.matchEnd(line) || MARKER_PATTERN.matcher(line).matches()) {
+            if (isMarkerLine || sqlEnclosureFilter.matchEnd(line)) {
 
                 if (StringUtils.isNotEmpty(readingRepositoryMethod)) {
                     SqlPerMethod sqlLog = new SqlPerMethod(readingRepositoryMethod,
@@ -60,7 +62,7 @@ public class SqlLogListener implements StdoutListener {
             }
         }
 
-        if (line.startsWith(REPOSITORY_METHOD_MARKER)) {
+        if (isMarkerLine) {
             String repositoryMethod = StringUtils.substringAfter(line, REPOSITORY_METHOD_MARKER);
             if (!StringUtils.isEmpty(repositoryMethod)) {
                 readingRepositoryMethod = repositoryMethod;
