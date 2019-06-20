@@ -22,7 +22,7 @@ public class MavenProjectReader implements ProjectReader {
     private SqlLogProcessor sqlLogProcessor;
 
     public static void main(String[] args) {
-        Path projectDir = Paths.get(args[0]);
+        Path projectDir = Paths.get(args[0]).toAbsolutePath();
         SitCvConfigReader configReader = new SitCvConfigReader();
         SitCvConfig config = configReader.read(projectDir);
         ServiceFactory factory = ServiceFactory.create(projectDir);
