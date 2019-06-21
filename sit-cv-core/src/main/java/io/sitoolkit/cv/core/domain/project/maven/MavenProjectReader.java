@@ -22,7 +22,7 @@ public class MavenProjectReader implements ProjectReader {
     private SqlLogProcessor sqlLogProcessor;
 
     public static void main(String[] args) {
-        Path projectDir = Paths.get(args[0]).toAbsolutePath();
+        Path projectDir = Paths.get(args[0]);
         SitCvConfigReader configReader = new SitCvConfigReader();
         SitCvConfig config = configReader.read(projectDir);
         ServiceFactory factory = ServiceFactory.create(projectDir);
@@ -57,8 +57,8 @@ public class MavenProjectReader implements ProjectReader {
         MavenSitCvToolsManager.initialize(mvnPrj);
         Path agentJar = MavenSitCvToolsManager.getInstance().getJarPath();
 
-        sqlLogProcessor.process(sitCvConfig, agentJar, project, "maven", (String param) -> {
-            return mvnPrj.mvnw("test", "-DargLine=" + param);
+        sqlLogProcessor.process("maven", sitCvConfig, agentJar, project, (String agentParam) -> {
+            return mvnPrj.mvnw("test", "-DargLine=" + agentParam);
         });
         return true;
     }

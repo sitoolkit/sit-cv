@@ -49,8 +49,8 @@ public class MavenSitCvToolsManager {
     }
 
     private void install(MavenProject project) {
-        String artifactArg = String.format("-Dartifact=io.sitoolkit.cv:%s:%s:jar:%s",
-                ARTIFACT_ID, instance.version, CLASSIFIER);
+        String artifactArg = String.format("-Dartifact=io.sitoolkit.cv:%s:%s:jar:%s", ARTIFACT_ID,
+                instance.version, CLASSIFIER);
 
         log.info("Installing {}...", ARTIFACT_ID);
         project.mvnw("dependency:get", artifactArg).execute();

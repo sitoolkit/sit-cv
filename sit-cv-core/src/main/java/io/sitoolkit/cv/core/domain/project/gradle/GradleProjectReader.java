@@ -30,7 +30,7 @@ public class GradleProjectReader implements ProjectReader {
     private SqlLogProcessor sqlLogProcessor;
 
     public static void main(String[] args) {
-        Path projectDir = Paths.get(args[0]).toAbsolutePath();
+        Path projectDir = Paths.get(args[0]);
         SitCvConfigReader configReader = new SitCvConfigReader();
         SitCvConfig config = configReader.read(projectDir);
         ServiceFactory factory = ServiceFactory.create(projectDir);
@@ -82,9 +82,9 @@ public class GradleProjectReader implements ProjectReader {
         GradleSitCvToolsManager.initialize(project.getWorkDir());
         Path agentJar = GradleSitCvToolsManager.getInstance().getJarPath();
 
-        sqlLogProcessor.process(sitCvConfig, agentJar, project, "maven", (String param) -> {
+        sqlLogProcessor.process("gradle", sitCvConfig, agentJar, project, (String agentParam) -> {
             ProcessCommand command = gradleProject.gradlew("--no-daemon", "--rerun-tasks", "test");
-            command.getEnv().put("JAVA_TOOL_OPTIONS", param);
+            command.getEnv().put("JAVA_TOOL_OPTIONS", agentParam);
             return command;
         });
 

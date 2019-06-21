@@ -23,17 +23,5 @@
       }
     ],
     "exclude": []
-  },
-  "repositoryFilter": {
-    "include": [
-      {
-        "name": ".*Repository.*"
-      }
-    ],
-    "exclude": []
-  },
-  "sqlEnclosureFilter": {
-    "start": ".*org.hibernate.SQL.*",
-    "end": "^[0-9]{4}-.*"
   }
 }

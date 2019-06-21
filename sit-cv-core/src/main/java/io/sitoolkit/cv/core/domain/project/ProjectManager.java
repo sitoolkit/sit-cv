@@ -54,7 +54,7 @@ public class ProjectManager {
     }
 
     public void generateSqlLog() {
-        readers.stream().map(reader -> reader.generateSqlLog(currentProject, sitCvConfig))
+        readers.stream().filter(reader -> reader.generateSqlLog(currentProject, sitCvConfig))
                 .findFirst();
     }
 

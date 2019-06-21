@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.plugin.gradle;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -14,9 +15,15 @@ import org.gradle.api.tasks.options.Option;
 
 public class RunTask extends JavaExec {
 
+    public static final String ANALYZE_SQL_OPTION = "analyze-sql";
+
+    public static final String ANALYZE_SQL_DESCRIPTION = "Run tests and analyze SQL logs to generate a CRUD matrix";
+
     private String stopKey = "x";
 
     private String cvArgs;
+
+    private boolean analyzeSql;
 
     @Input
     @Optional
@@ -29,9 +36,29 @@ public class RunTask extends JavaExec {
         this.cvArgs = cvArgs;
     }
 
+    @Option(option = ANALYZE_SQL_OPTION, description = ANALYZE_SQL_DESCRIPTION)
+    public void setAnalyzeSql(boolean analyzeSql) {
+        this.analyzeSql = analyzeSql;
+    }
+
     private List<String> getCvArgsAsList() {
-        return StringUtils.isEmpty(cvArgs) ? Collections.emptyList()
-                : Arrays.asList(cvArgs.split(" "));
+        List<String> args = new ArrayList<>();
+
+        if (StringUtils.isNotEmpty(cvArgs)) {
+            args.addAll(Arrays.asList(cvArgs.split(" ")));
+        }
+
+        if (analyzeSql) {
+            args.add("--cv." + ANALYZE_SQL_OPTION);
+        }
+
+        return args;
+    }
+
+    @Override
+    public void exec() {
+        setArgs(getCvArgsAsList());
+        super.exec();
     }
 
     public void configure() {
@@ -39,7 +66,6 @@ public class RunTask extends JavaExec {
         FileCollection classpath = getProject().getBuildscript().getConfigurations()
                 .findByName("classpath");
         setClasspath(classpath);
-        setArgs(getCvArgsAsList());
         getConventionMapping().map("jvmArgs", new Callable<Iterable<String>>() {
             @SuppressWarnings("unchecked")
             @Override

@@ -15,7 +15,7 @@ import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
 
 public class SqlLogProcessor {
 
-    public void process(SitCvConfig config, Path agentJar, Project project, String projectType,
+    public void process(String projectType, SitCvConfig config, Path agentJar, Project project,
             Function<String, ProcessCommand> commandBuilder) {
 
         SitFileUtils.createDirectories(project.getSqlLogPath().getParent());
