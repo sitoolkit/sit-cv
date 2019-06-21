@@ -12,7 +12,9 @@ import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CrudService {
 
@@ -33,9 +35,15 @@ public class CrudService {
     }
 
     public CrudMatrix generateMatrix() {
-        List<SqlPerMethod> sqlPerMethodList = projectManager.getSqlLog();
+        Optional<List<SqlPerMethod>> sqlPerMethodList = projectManager.getSqlLog();
 
-        CrudMatrix methodCrud = processor.buildMatrix(sqlPerMethodList);
+        if (!sqlPerMethodList.isPresent()) {
+            log.warn(
+                    "SQL log file not found. If you need a CRUD matrix, please run analyze-sql first.");
+            return new CrudMatrix();
+        }
+
+        CrudMatrix methodCrud = processor.buildMatrix(sqlPerMethodList.get());
 
         List<ClassDef> entryPointClasses = functionModelService.getAllEntryPointClasses();
 

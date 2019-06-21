@@ -43,14 +43,10 @@ public class ProjectManager {
 
     }
 
-    public List<SqlPerMethod> getSqlLog() {
-        Optional<List<SqlPerMethod>> sqlLogs = JsonUtils.file2obj(currentProject.getSqlLogPath(),
+    public Optional<List<SqlPerMethod>> getSqlLog() {
+        return JsonUtils.file2obj(currentProject.getSqlLogPath(),
                 new TypeReference<List<SqlPerMethod>>() {
                 });
-        return sqlLogs.orElseThrow(() -> {
-            return new IllegalStateException(
-                    "SQL log file not found. Please run '--cv.analyze-sql' first.");
-        });
     }
 
     public void generateSqlLog() {
