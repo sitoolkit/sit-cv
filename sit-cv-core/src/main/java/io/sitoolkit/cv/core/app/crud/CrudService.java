@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.app.crud;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,10 +29,21 @@ public class CrudService {
     ProjectManager projectManager;
 
     public CrudMatrix loadMatrix() {
-        Optional<CrudMatrix> crudMatrix = JsonUtils
+        Optional<CrudMatrix> crudMatrixOpt = JsonUtils
                 .file2obj(projectManager.getCurrentProject().getCrudPath(), CrudMatrix.class);
 
-        return crudMatrix.orElseGet(() -> generateMatrix());
+        if (!crudMatrixOpt.isPresent()) {
+            return generateMatrix();
+        }
+
+        CrudMatrix crudMatrix = crudMatrixOpt.get();
+        File sqlLogFile = projectManager.getCurrentProject().getSqlLogPath().toFile();
+
+        if (!sqlLogFile.exists() || crudMatrix.getLastModified() == sqlLogFile.lastModified()) {
+            return crudMatrix;
+        }
+
+        return generateMatrix();
     }
 
     public CrudMatrix generateMatrix() {
@@ -48,6 +60,10 @@ public class CrudService {
         List<ClassDef> entryPointClasses = functionModelService.getAllEntryPointClasses();
 
         CrudMatrix entryPointCrud = processor.adjustAxis(entryPointClasses, methodCrud);
+
+        long lastModified = projectManager.getCurrentProject().getSqlLogPath().toFile()
+                .lastModified();
+        entryPointCrud.setLastModified(lastModified);
 
         JsonUtils.obj2file(entryPointCrud, projectManager.getCurrentProject().getCrudPath());
 

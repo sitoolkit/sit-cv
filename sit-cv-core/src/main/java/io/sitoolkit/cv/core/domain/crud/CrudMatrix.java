@@ -7,13 +7,18 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import io.sitoolkit.cv.core.domain.tabledef.TableDef;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Data
 public class CrudMatrix {
 
+    private long lastModified;
+    
     /**
      * key: function
      */
