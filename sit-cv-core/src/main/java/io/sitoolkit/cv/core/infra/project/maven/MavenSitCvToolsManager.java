@@ -3,8 +3,10 @@ package io.sitoolkit.cv.core.infra.project.maven;
 import java.nio.file.Path;
 
 import io.sitoolkit.cv.core.infra.SitRepository;
+import io.sitoolkit.cv.core.infra.project.DefaultStdoutListener;
 import io.sitoolkit.cv.core.infra.util.PackageUtils;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
+import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,6 +18,8 @@ public class MavenSitCvToolsManager {
 
     private static final String ARTIFACT_ID = "sit-cv-tools";
     private static final String CLASSIFIER = "jar-with-dependencies";
+
+    private static final StdoutListener STDOUT_LISTENER = new DefaultStdoutListener();
 
     private String version;
     private String jarName;
@@ -31,13 +35,7 @@ public class MavenSitCvToolsManager {
         }
 
         instance = new MavenSitCvToolsManager();
-        if (!instance.getJarPath().toFile().exists()) {
-            log.info("{} jar not found in SitRepository", ARTIFACT_ID);
-
-            instance.install(project);
-        } else {
-            log.info("{} jar found in SitRepository : {}", ARTIFACT_ID, instance.getJarPath());
-        }
+        instance.install(project);
     }
 
     public Path getJarPath() {
@@ -53,11 +51,12 @@ public class MavenSitCvToolsManager {
                 instance.version, CLASSIFIER);
 
         log.info("Installing {}...", ARTIFACT_ID);
-        project.mvnw("dependency:get", artifactArg).execute();
+        project.mvnw("dependency:get", artifactArg).stdout(STDOUT_LISTENER).execute();
 
         log.info("Copying {}...", ARTIFACT_ID);
-        project.mvnw("dependency:copy", artifactArg, "-DoutputDirectory=" + instance.getDirectory())
-                .execute();
+        project.mvnw("dependency:copy", artifactArg, "-DoutputDirectory=" + instance.getDirectory(),
+                "-Dmdep.overWriteReleases=true", "-Dmdep.overWriteSnapshots=true",
+                "-DoutputAbsoluteArtifactFilename=true").stdout(STDOUT_LISTENER).execute();
 
         if (!getJarPath().toFile().exists()) {
             throw new RuntimeException("Install failed");
