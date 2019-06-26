@@ -127,18 +127,18 @@
 
   <properties>
     <javaparser.version>3.6.27</javaparser.version>
-    <mainResourcesDir>${project.basedir}/src/main/resources</mainResourcesDir>
-    <sitCvToolsInstaller.pomFile>io/sitoolkit/cv/core/infra/project/maven</sitCvToolsInstaller.pomFile>
+    <main.resourcesDir>${project.basedir}/src/main/resources</main.resourcesDir>
+    <infra.project.mavenDir>io/sitoolkit/cv/core/infra/project/maven</infra.project.mavenDir>
   </properties>
 
   <build>
     <resources>
       <resource>
-        <directory>${mainResourcesDir}</directory>
+        <directory>${main.resourcesDir}</directory>
       </resource>
       <resource>
-        <directory>${mainResourcesDir}/${sitCvToolsInstaller.pomFile}</directory>
-        <targetPath>${sitCvToolsInstaller.pomFile}</targetPath>
+        <directory>${main.resourcesDir}/${infra.project.mavenDir}</directory>
+        <targetPath>${infra.project.mavenDir}</targetPath>
         <filtering>true</filtering>
       </resource>
     </resources>
