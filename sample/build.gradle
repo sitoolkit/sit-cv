@@ -16,6 +16,9 @@ dependencies {
     testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version:'1.5.14.RELEASE') {
         exclude(module: 'commons-logging')
     }
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+    testCompile 'junit:junit:4.12'
 }
 
 buildscript {
@@ -29,3 +32,9 @@ buildscript {
 }
 
 apply plugin: 'io.sitoolkit.cv.sit-cv-gradle-plugin'
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+}

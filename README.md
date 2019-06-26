@@ -148,6 +148,12 @@ If your project uses Gradle, add plugin to build.gradle of your project.
 plugins {
   id "io.sitoolkit.cv.sit-cv-gradle-plugin" version "1.0.0-beta.3"
 }
+
+test {
+  testLogging {
+    showStandardStreams = true
+  }
+}
 ```
 
 * Using legacy plugin application:

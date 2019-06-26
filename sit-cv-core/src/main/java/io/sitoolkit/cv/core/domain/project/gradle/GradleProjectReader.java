@@ -3,19 +3,40 @@ package io.sitoolkit.cv.core.domain.project.gradle;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
+import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
+import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
+import io.sitoolkit.cv.core.infra.project.gradle.GradleSitCvToolsManager;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import io.sitoolkit.util.buildtoolhelper.gradle.GradleProject;
+import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@RequiredArgsConstructor
 @Slf4j
 public class GradleProjectReader implements ProjectReader {
 
     private static final String PROJECT_INFO_SCRIPT_NAME = "project-info.gradle";
+
+    @NonNull
+    private SqlLogProcessor sqlLogProcessor;
+
+    public static void main(String[] args) {
+        Path projectDir = Paths.get(args[0]);
+        SitCvConfigReader configReader = new SitCvConfigReader();
+        SitCvConfig config = configReader.read(projectDir);
+        ServiceFactory factory = ServiceFactory.create(projectDir);
+        Project project = factory.getProjectManager().getCurrentProject();
+        new GradleProjectReader(new SqlLogProcessor()).generateSqlLog(project, config);
+    }
 
     @Override
     public Optional<Project> read(Path projectDir) {
@@ -52,7 +73,21 @@ public class GradleProjectReader implements ProjectReader {
 
     @Override
     public boolean generateSqlLog(Project project, SitCvConfig sitCvConfig) {
-        // TODO Generate SQLlog with gradle
-        return false;
+        GradleProject gradleProject = GradleProject.load(project.getDir());
+
+        if (!gradleProject.available()) {
+            return false;
+        }
+
+        GradleSitCvToolsManager.initialize(project.getWorkDir());
+        Path agentJar = GradleSitCvToolsManager.getInstance().getJarPath();
+
+        sqlLogProcessor.process("gradle", sitCvConfig, agentJar, project, (String agentParam) -> {
+            ProcessCommand command = gradleProject.gradlew("--no-daemon", "--rerun-tasks", "test");
+            command.getEnv().put("JAVA_TOOL_OPTIONS", agentParam);
+            return command;
+        });
+
+        return true;
     }
 }

@@ -12,10 +12,11 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 
 import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 
 public class GradleProjectReaderTest {
 
-    GradleProjectReader reader = new GradleProjectReader();
+    GradleProjectReader reader = new GradleProjectReader(new SqlLogProcessor());
 
     @Test
     public void testMultiProject() {

@@ -13,5 +13,7 @@ public class RepositoryLoggerConfig {
     private String repositoryMethodMarker;
     
     private FilterConditionGroup repositoryFilter;
-    
+
+    private String projectType;
+
 }

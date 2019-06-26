@@ -1,31 +1,30 @@
 package io.sitoolkit.cv.core.domain.project;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
-import io.sitoolkit.cv.core.domain.project.gradle.GradleProjectReader;
 import io.sitoolkit.cv.core.domain.project.lombok.DelombokProcessor;
-import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class ProjectManager {
 
-    private List<ProjectReader> readers = Arrays.asList(new MavenProjectReader(),
-            new GradleProjectReader());
+    @NonNull
+    private List<ProjectReader> readers;
+
+    @NonNull
+    private SitCvConfig sitCvConfig;
 
     @Getter
     private Project currentProject;
-
-    @Setter
-    private SitCvConfig sitCvConfig;
 
     public void load(Path projectDir) {
 
@@ -44,20 +43,14 @@ public class ProjectManager {
 
     }
 
-    public List<SqlPerMethod> getSqlLog() {
-        Optional<List<SqlPerMethod>> sqlLogs = JsonUtils.file2obj(
-                currentProject.getDir().resolve(currentProject.getSqlLogPath()),
+    public Optional<List<SqlPerMethod>> getSqlLog() {
+        return JsonUtils.file2obj(currentProject.getSqlLogPath(),
                 new TypeReference<List<SqlPerMethod>>() {
                 });
-        return sqlLogs.orElseThrow(() -> {
-            return new IllegalStateException(
-                    "SQL log file not found. Please run '--cv.analyze-sql' first.");
-        });
     }
 
     public void generateSqlLog() {
-        readers.stream()
-                .map(reader -> reader.generateSqlLog(currentProject, sitCvConfig))
+        readers.stream().filter(reader -> reader.generateSqlLog(currentProject, sitCvConfig))
                 .findFirst();
     }
 

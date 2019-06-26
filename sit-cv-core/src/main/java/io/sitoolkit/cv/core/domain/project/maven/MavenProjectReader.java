@@ -1,20 +1,34 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
+import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
 import io.sitoolkit.cv.core.infra.project.maven.MavenSitCvToolsManager;
-import io.sitoolkit.cv.core.infra.util.JsonUtils;
-import io.sitoolkit.cv.core.infra.util.SitFileUtils;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class MavenProjectReader implements ProjectReader {
+
+    @NonNull
+    private SqlLogProcessor sqlLogProcessor;
+
+    public static void main(String[] args) {
+        Path projectDir = Paths.get(args[0]);
+        SitCvConfigReader configReader = new SitCvConfigReader();
+        SitCvConfig config = configReader.read(projectDir);
+        ServiceFactory factory = ServiceFactory.create(projectDir);
+        Project project = factory.getProjectManager().getCurrentProject();
+        new MavenProjectReader(new SqlLogProcessor()).generateSqlLog(project, config);
+    }
 
     @Override
     public Optional<Project> read(Path projectDir) {
@@ -40,26 +54,13 @@ public class MavenProjectReader implements ProjectReader {
             return false;
         }
 
-        SqlLogListener sqlLogListener = new SqlLogListener(sitCvConfig.getSqlEnclosureFilter());
-
         MavenSitCvToolsManager.initialize(mvnPrj);
-        Path jarPath = MavenSitCvToolsManager.getInstance().getJarPath();
+        Path agentJar = MavenSitCvToolsManager.getInstance().getJarPath();
 
-        Map<String, String> agentArgsMap = new HashMap<>();
-        agentArgsMap.put("configUrl", sitCvConfig.getSourceUrl().toString());
-        agentArgsMap.put("repositoryMethodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
-        String agentArgs = agentArgsMap.entrySet().stream()
-                .map((e) -> e.getKey() + "=" + e.getValue())
-                .collect(Collectors.joining(";", "=", ""));
-
-        SitFileUtils.createDirectories(project.getSqlLogPath().getParent());
-
-        mvnPrj.mvnw("test", "-DargLine=-javaagent:" + jarPath.toString() + agentArgs)
-                .stdout(sqlLogListener).execute();
-
-        Path sqlLogPath = project.getDir().resolve(project.getSqlLogPath());
-        JsonUtils.obj2file(sqlLogListener.getSqlLogs(), sqlLogPath);
-
+        sqlLogProcessor.process("maven", sitCvConfig, agentJar, project, (String agentParam) -> {
+            return mvnPrj.mvnw("test", "-DargLine=" + agentParam);
+        });
         return true;
     }
+
 }
