@@ -2,11 +2,10 @@ package io.sitoolkit.cv.core.infra.project.maven;
 
 import java.nio.file.Path;
 
-import io.sitoolkit.cv.core.infra.SitRepository;
-import io.sitoolkit.cv.core.infra.project.DefaultStdoutListener;
-import io.sitoolkit.cv.core.infra.util.PackageUtils;
+import io.sitoolkit.cv.core.infra.util.SitFileUtils;
+import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
-import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
+import io.sitoolkit.util.buildtoolhelper.maven.MavenUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,52 +16,48 @@ public class MavenSitCvToolsManager {
     private static MavenSitCvToolsManager instance;
 
     private static final String ARTIFACT_ID = "sit-cv-tools";
-    private static final String CLASSIFIER = "jar-with-dependencies";
 
-    private static final StdoutListener STDOUT_LISTENER = new DefaultStdoutListener();
+    @Getter
+    private Path jarPath;
 
-    private String version;
-    private String jarName;
-
-    private MavenSitCvToolsManager() {
-        version = PackageUtils.getVersion();
-        jarName = String.format("%s-%s-%s.jar", ARTIFACT_ID, version, CLASSIFIER);
-    }
-
-    public static void initialize(MavenProject project) {
+    public static void initialize(Path workDir) {
         if (instance != null) {
             return;
         }
 
         instance = new MavenSitCvToolsManager();
-        instance.install(project);
+        instance.install(workDir);
     }
 
-    public Path getJarPath() {
-        return getDirectory().resolve(jarName);
+    private void install(Path workDir) {
+        Path projectDir = workDir.resolve("sit-cv-tools-installer");
+
+        createInstallerProject(projectDir);
+        resolveJarPath(projectDir);
     }
 
-    private Path getDirectory() {
-        return SitRepository.getRepositoryPath().resolve("sit-cv/" + ARTIFACT_ID);
+    private void createInstallerProject(Path projectDir) {
+        SitFileUtils.createDirectories(projectDir);
+        SitResourceUtils.res2file(MavenSitCvToolsManager.class, "pom.xml",
+                projectDir.resolve("pom.xml"));
+        MavenUtils.findAndInstall(projectDir);
     }
 
-    private void install(MavenProject project) {
-        String artifactArg = String.format("-Dartifact=io.sitoolkit.cv:%s:%s:jar:%s", ARTIFACT_ID,
-                instance.version, CLASSIFIER);
+    private void resolveJarPath(Path projectDir) {
+        MavenProject project = MavenProject.load(projectDir);
+        MavenSitCvToolsPathListener listener = new MavenSitCvToolsPathListener();
 
-        log.info("Installing {}...", ARTIFACT_ID);
-        project.mvnw("dependency:get", artifactArg).stdout(STDOUT_LISTENER).execute();
+        log.info("Finding {}...", ARTIFACT_ID);
+        project.mvnw("dependency:build-classpath", "-DincludeArtifactIds=" + ARTIFACT_ID)
+                .stdout(listener).execute();
 
-        log.info("Copying {}...", ARTIFACT_ID);
-        project.mvnw("dependency:copy", artifactArg, "-DoutputDirectory=" + instance.getDirectory(),
-                "-Dmdep.overWriteReleases=true", "-Dmdep.overWriteSnapshots=true",
-                "-DoutputAbsoluteArtifactFilename=true").stdout(STDOUT_LISTENER).execute();
+        jarPath = listener.getJarPath();
 
-        if (!getJarPath().toFile().exists()) {
+        if (jarPath == null) {
             throw new RuntimeException("Install failed");
         }
 
-        log.info("Finished Installing {}", ARTIFACT_ID);
+        log.info("sit-cv-tools found: {}", jarPath);
     }
 
 }

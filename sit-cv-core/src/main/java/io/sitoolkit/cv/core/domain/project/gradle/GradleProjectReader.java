@@ -12,7 +12,7 @@ import io.sitoolkit.cv.core.domain.project.ProjectReader;
 import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
-import io.sitoolkit.cv.core.infra.project.gradle.GradleSitCvToolsManager;
+import io.sitoolkit.cv.core.infra.project.maven.MavenSitCvToolsManager;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import io.sitoolkit.util.buildtoolhelper.gradle.GradleProject;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
@@ -79,8 +79,8 @@ public class GradleProjectReader implements ProjectReader {
             return false;
         }
 
-        GradleSitCvToolsManager.initialize(project.getWorkDir());
-        Path agentJar = GradleSitCvToolsManager.getInstance().getJarPath();
+        MavenSitCvToolsManager.initialize(project.getWorkDir());
+        Path agentJar = MavenSitCvToolsManager.getInstance().getJarPath();
 
         sqlLogProcessor.process("gradle", sitCvConfig, agentJar, project, (String agentParam) -> {
             ProcessCommand command = gradleProject.gradlew("--no-daemon", "--rerun-tasks", "test");

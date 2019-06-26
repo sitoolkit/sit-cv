@@ -27,7 +27,11 @@ public class SitResourceUtils {
     }
 
     public static void res2file(Object owner, String resourceName, Path targetPath) {
-        URL resourceUrl = getResourceUrl(owner.getClass(), resourceName);
+        res2file(owner.getClass(), resourceName, targetPath);
+    }
+
+    public static void res2file(Class<?> owner, String resourceName, Path targetPath) {
+        URL resourceUrl = getResourceUrl(owner, resourceName);
 
         try {
             log.info("Write resource to {}", targetPath);

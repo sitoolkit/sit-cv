@@ -54,7 +54,7 @@ public class MavenProjectReader implements ProjectReader {
             return false;
         }
 
-        MavenSitCvToolsManager.initialize(mvnPrj);
+        MavenSitCvToolsManager.initialize(project.getWorkDir());
         Path agentJar = MavenSitCvToolsManager.getInstance().getJarPath();
 
         sqlLogProcessor.process("maven", sitCvConfig, agentJar, project, (String agentParam) -> {
