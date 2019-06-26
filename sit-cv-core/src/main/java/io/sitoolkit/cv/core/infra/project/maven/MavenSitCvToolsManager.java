@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import io.sitoolkit.cv.core.infra.util.SitFileUtils;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
-import io.sitoolkit.util.buildtoolhelper.maven.MavenUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,14 +39,13 @@ public class MavenSitCvToolsManager {
         SitFileUtils.createDirectories(projectDir);
         SitResourceUtils.res2file(MavenSitCvToolsManager.class, "pom.xml",
                 projectDir.resolve("pom.xml"));
-        MavenUtils.findAndInstall(projectDir);
     }
 
     private void resolveJarPath(Path projectDir) {
         MavenProject project = MavenProject.load(projectDir);
         MavenSitCvToolsPathListener listener = new MavenSitCvToolsPathListener();
 
-        log.info("Finding {}...", ARTIFACT_ID);
+        log.info("Finding {} in directory {}", ARTIFACT_ID, projectDir);
         project.mvnw("dependency:build-classpath", "-DincludeArtifactIds=" + ARTIFACT_ID)
                 .stdout(listener).execute();
 
