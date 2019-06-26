@@ -2,7 +2,6 @@ package io.sitoolkit.cv.core.infra.project.maven;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.regex.Pattern;
 
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.Getter;
@@ -14,14 +13,22 @@ public class MavenSitCvToolsPathListener implements StdoutListener {
     @Getter
     private Path jarPath;
 
-    private static final Pattern PATH_PATTERN = Pattern.compile(".*sit-cv-tools.*\\.jar$");
+    private static final String PREVIOUS_MESSAGE = "[INFO] Dependencies classpath:";
+
+    private boolean messageDetected = false;
 
     @Override
     public void nextLine(String line) {
         log.info(line);
 
-        if (PATH_PATTERN.matcher(line).matches()) {
+        if (PREVIOUS_MESSAGE.equals(line.trim())) {
+            messageDetected = true;
+            return;
+        }
+
+        if (messageDetected) {
             jarPath = Paths.get(line);
+            messageDetected = false;
         }
     }
 
