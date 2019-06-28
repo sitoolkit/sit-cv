@@ -39,7 +39,7 @@ public class CrudService {
         CrudMatrix crudMatrix = crudMatrixOpt.get();
         File sqlLogFile = projectManager.getCurrentProject().getSqlLogPath().toFile();
 
-        if (!sqlLogFile.exists() || crudMatrix.getLastModified() == sqlLogFile.lastModified()) {
+        if (!sqlLogFile.exists() || crudMatrix.getSqlLogLastModified() == sqlLogFile.lastModified()) {
             return crudMatrix;
         }
 
@@ -63,7 +63,7 @@ public class CrudService {
 
         long lastModified = projectManager.getCurrentProject().getSqlLogPath().toFile()
                 .lastModified();
-        entryPointCrud.setLastModified(lastModified);
+        entryPointCrud.setSqlLogLastModified(lastModified);
 
         JsonUtils.obj2file(entryPointCrud, projectManager.getCurrentProject().getCrudPath());
 
