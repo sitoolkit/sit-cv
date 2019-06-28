@@ -27,9 +27,9 @@ public class Project {
 
     private PreProcessor preProcessor = PreProcessor.DO_NOTHING;
 
-    private static final String WORK_DIR = "./target/sit-cv";
-    private static final String SQL_LOG_FILE = WORK_DIR + "/sit-cv-repository-vs-sql.json";
-    private static final String CRUD_FILE = WORK_DIR + "/crud.json";
+    private static final String WORK_DIR = "sit-cv";
+    private static final String SQL_LOG_FILE = "sit-cv-repository-vs-sql.json";
+    private static final String CRUD_FILE = "crud.json";
 
     public Project(Path dir) {
         super();
@@ -66,15 +66,15 @@ public class Project {
     }
 
     public Path getSqlLogPath() {
-        return dir.resolve(SQL_LOG_FILE);
+        return getWorkDir().resolve(SQL_LOG_FILE);
     }
 
     public Path getCrudPath() {
-        return dir.resolve(CRUD_FILE);
+        return getWorkDir().resolve(CRUD_FILE);
     }
-    
+
     public Path getWorkDir() {
-        return dir.resolve(WORK_DIR);
+        return dir.resolve(buildDir).resolve(WORK_DIR);
     }
 
     Set<Path> getPreProcessedDirs() {
