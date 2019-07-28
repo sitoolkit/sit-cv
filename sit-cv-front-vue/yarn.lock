@@ -7265,6 +7265,11 @@ vue-class-component@^7.0.1, vue-class-component@^7.0.2:
   resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-7.1.0.tgz#b33efcb10e17236d684f70b1e96f1946ec793e87"
   integrity sha512-G9152NzUkz0i0xTfhk0Afc8vzdXxDR1pfN4dTwE72cskkgJtdXfrKBkMfGvDuxUh35U500g5Ve4xL8PEGdWeHg==
 
+vue-cli-plugin-vuetify@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/vue-cli-plugin-vuetify/-/vue-cli-plugin-vuetify-0.6.1.tgz#4fe0b7322a90a9c9f0aff2e18fd9249088b33080"
+  integrity sha512-WZzXXTdFOXWXVhSL4zXs1nJvC/6Py9kXm4S+bdh+W0xucwXlIAr19cgqCjV9ahR4cznQ/SBDv8x4RFCpPgGAHQ==
+
 vue-hot-reload-api@^2.3.0:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.3.3.tgz#2756f46cb3258054c5f4723de8ae7e87302a1ccf"
@@ -7318,6 +7323,11 @@ vue@^2.5.16, vue@^2.6.10:
   version "2.6.10"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
   integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
+
+vuetify@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-2.0.0.tgz#58c72247251412b5e804c8c38a0e12bcb736d949"
+  integrity sha512-AbtHkWdvxF3QrR/xCpu2XL+KJ59Z7/KQQmbV4gPn6Q3VlQ5tXaGR4AJO1uNrvGCTlLlQxWHGcwMGOiHU7aIlqg==
 
 vuikit@^0.8.10:
   version "0.8.10"

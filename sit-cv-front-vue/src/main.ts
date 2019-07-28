@@ -10,11 +10,13 @@ import './assets/uikit.min.js';
 
 import Vuikit from 'vuikit';
 import VuikitIcons from '@vuikit/icons';
+import vuetify from './plugins/vuetify';
 
 Vue.use(Vuikit);
 Vue.use(VuikitIcons);
 
 new Vue({
   router,
-  render: (h) => h(App),
+  vuetify,
+  render: (h) => h(App)
 }).$mount('#app');

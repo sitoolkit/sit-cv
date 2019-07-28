@@ -1,11 +1,10 @@
 <template>
-  <div>
-    <ul>
-      <li v-for="item in menuItems" v-bind:key="item.endpoint">
-        <router-link :to="item.endpoint">{{item.name}}</router-link>
-      </li>
-    </ul>
-  </div>
+  <v-treeview :items="menuItems">
+    <template slot="label" slot-scope="props">
+      <router-link :to="props.item.endpoint" v-if="props.item.endpoint">{{ props.item.name }}</router-link>
+      <span v-else>{{ props.item.name }}</span>
+    </template>
+  </v-treeview>
 </template>
 
 <script lang="ts">
@@ -17,28 +16,14 @@ import DesignDocServerService from '../../domains/designdoc/DesignDocServerServi
 @Component
 export default class DocTree extends Vue {
   private designDocService: DesignDocService = DesignDocServerService;
-
-  private menuItems: MenuItem[] = [];
+  menuItems: object = [];
 
   public created() {
     this.drawMenu();
   }
 
   public async drawMenu() {
-    const menuItems: MenuItem[] = await this.designDocService.fetchMenuItems();
-    this.menuItems = this.flattenMenuItems(menuItems, []);
-  }
-
-  private flattenMenuItems(menuItems: MenuItem[], result: MenuItem[]): MenuItem[] {
-    menuItems.forEach((item) => {
-      if (item.endpoint) {
-        result.push(item);
-      }
-      if (item.children) {
-        this.flattenMenuItems(item.children, result);
-      }
-    });
-    return result;
+    this.menuItems = await this.designDocService.fetchMenuItems();
   }
 }
 </script>
