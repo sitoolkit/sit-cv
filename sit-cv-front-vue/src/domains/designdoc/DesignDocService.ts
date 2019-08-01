@@ -1,5 +1,5 @@
 import MenuItem from '@/domains/designdoc/MenuItem';
 
 export default interface DesignDocService {
-  fetchMenuItems(): Promise<object>;
+  fetchMenuItems(): Promise<string>;
 }

@@ -16,7 +16,7 @@ import DesignDocServerService from '../../domains/designdoc/DesignDocServerServi
 @Component
 export default class DocTree extends Vue {
   private designDocService: DesignDocService = DesignDocServerService;
-  menuItems: object = [];
+  menuItems: string = "";
 
   public created() {
     this.drawMenu();
