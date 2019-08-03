@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuItem {
+    private String id;
     private String name;
     private String endpoint;
     @Default

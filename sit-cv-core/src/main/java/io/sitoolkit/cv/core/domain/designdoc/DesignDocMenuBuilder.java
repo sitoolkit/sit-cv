@@ -22,16 +22,17 @@ public class DesignDocMenuBuilder {
     }
 
     private MenuItem buildDataModelItem() {
-        MenuItem dataModelItem = MenuItem.builder().name("Data Model").build();
+        MenuItem dataModelItem = MenuItem.builder().id("data-model").name("Data Model").build();
 
-        dataModelItem.getChildren()
-                .add(MenuItem.builder().name("CRUD Matrix").endpoint("/designdoc/data/crud").build());
+        dataModelItem.getChildren().add(MenuItem.builder().id("crud-matrix").name("CRUD Matrix")
+                .endpoint("/designdoc/data/crud").build());
 
         return dataModelItem;
     }
 
     private MenuItem buildFunctionModelItem(List<String> functionIds) {
-        MenuItem functionModelNode = MenuItem.builder().name("Function Model").build();
+        MenuItem functionModelNode = MenuItem.builder().id("function-model").name("Function Model")
+                .build();
         functionModelNode.getChildren().addAll(buildFunctionModelItems(functionIds));
         return functionModelNode;
     }
@@ -68,7 +69,7 @@ public class DesignDocMenuBuilder {
 
         String currentItemName = isRoot ? currentPath
                 : StringUtils.substringAfterLast(currentPath, ".");
-        currentItem = MenuItem.builder().name(currentItemName).build();
+        currentItem = MenuItem.builder().id(currentPath).name(currentItemName).build();
         pathMenuItemMap.put(currentPath, currentItem);
 
         if (isRoot) {
@@ -84,7 +85,7 @@ public class DesignDocMenuBuilder {
     }
 
     private MenuItem buildMethodItem(String methodName, String functionId) {
-        return MenuItem.builder().name(methodName).endpoint("/designdoc/function/" + functionId)
-                .build();
+        return MenuItem.builder().id(functionId + "." + methodName).name(methodName)
+                .endpoint("/designdoc/function/" + functionId).build();
     }
 }
