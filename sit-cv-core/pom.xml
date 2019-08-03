@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>sit-cv-core</artifactId>
 
@@ -97,7 +95,7 @@
       <artifactId>tools</artifactId>
       <version>1.5.0</version>
       <scope>system</scope>
-      <systemPath>${java.home}/../lib/tools.jar</systemPath>
+      <systemPath>${tools.jar.path}</systemPath>
     </dependency>
 
     <dependency>
@@ -127,6 +125,7 @@
 
   <properties>
     <javaparser.version>3.6.27</javaparser.version>
+    <tools.jar.path>${java.home}/../lib/tools.jar</tools.jar.path>
   </properties>
 
   <build>
@@ -156,5 +155,20 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+
+    <profile>
+      <id>missing-tools.jar</id>
+      <activation>
+        <file>
+          <missing>${tools.jar.path}</missing>
+        </file>
+      </activation>
+      <properties>
+        <tools.jar.path>${java.home}/lib/tools.jar</tools.jar.path>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>
