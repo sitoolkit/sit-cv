@@ -30,7 +30,8 @@
   "repositoryFilter": {
     "include": [
       {
-        "name": ".*Repository"
+        "name": ".*Repository.*",
+        "annotation": ".*(Repository|Named)"
       }
     ],
     "exclude": []
