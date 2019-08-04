@@ -23,11 +23,29 @@ Code Visualizer can be run as an batch application.
 After execution of report mode, diagrams are generated in project_root/docs/designdocs directory.
 These report files can be accessed with browser as local files and also published with web server or GitHub Pages.
 
+## Required Software
+
+* JDK v1.8
+* Graphviz(https://www.graphviz.org/) 
+  * For Windows, Graphviz is installed automatically
+  * For macOS or Linux, you need to install manually with following commands.
+
+* macOS
+
+```
+brew install graphviz
+```
+
+* Ubuntu
+
+```
+sudo apt update
+sudo apt install graphviz
+```
+
 ## Demo
 
 If you want to know how Code Visualizer works, try to run it for DDD Sample app (https://github.com/citerus/dddsample-core).
-JRE v1.8+ and Git are required.
-For macOS and Linux, Graphviz(https://www.graphviz.org/) are required.
 You can run Code Visualizer on Windows and macOS using following commands of each OS.
 
 * Windows
@@ -37,28 +55,16 @@ git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
 start http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.3/sit-cv-app-1.0.0-beta.3-exec.jar
 move %USERPROFILE%\Downloads\sit-cv-app-1.0.0-beta.3-exec.jar .
-java -jar sit-cv-app-1.0.0-beta.3-exec.jar
+java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql
 ```
 
-* macOS
+* macOS, Linux
 
 ```
-brew install graphviz
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
 curl -o sit-cv-app-1.0.0-beta.3-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.3/sit-cv-app-1.0.0-beta.3-exec.jar
-java -jar sit-cv-app-1.0.0-beta.3-exec.jar
-```
-
-* Ubuntu
-
-```
-sudo apt update
-sudo apt install graphviz
-git clone https://github.com/citerus/dddsample-core.git
-cd dddsample-core
-curl -o sit-cv-app-1.0.0-beta.3-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.3/sit-cv-app-1.0.0-beta.3-exec.jar
-java -jar sit-cv-app-1.0.0-beta.3-exec.jar
+java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql
 ```
 
 After running last java command, you can see following log on your console.
@@ -132,10 +138,10 @@ mvn sit-cv:report
 
 ```
 # Server Mode
-mvn sit-cv:run --Danalyze-sql=true
+mvn sit-cv:run -Danalyze-sql=true
 
 # or Report Mode
-mvn sit-cv:report --Danalyze-sql=true
+mvn sit-cv:report -Danalyze-sql=true
 ```
 
 ### Gradle Project
