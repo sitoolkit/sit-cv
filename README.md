@@ -53,9 +53,9 @@ You can run Code Visualizer on Windows and macOS using following commands of eac
 ```
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
-start http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.3/sit-cv-app-1.0.0-beta.3-exec.jar
-move %USERPROFILE%\Downloads\sit-cv-app-1.0.0-beta.3-exec.jar .
-java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql
+start http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.4/sit-cv-app-1.0.0-beta.4-exec.jar
+move %USERPROFILE%\Downloads\sit-cv-app-1.0.0-beta.4-exec.jar .
+java -jar sit-cv-app-1.0.0-beta.4-exec.jar --cv.analyze-sql
 ```
 
 * macOS, Linux
@@ -63,8 +63,8 @@ java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql
 ```
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
-curl -o sit-cv-app-1.0.0-beta.3-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.3/sit-cv-app-1.0.0-beta.3-exec.jar
-java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql
+curl -o sit-cv-app-1.0.0-beta.4-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.4/sit-cv-app-1.0.0-beta.4-exec.jar
+java -jar sit-cv-app-1.0.0-beta.4-exec.jar --cv.analyze-sql
 ```
 
 After running last java command, you can see following log on your console.
@@ -80,7 +80,7 @@ Then you can access http://localhost:8080 with browser and see UML diagrams of D
 Running java command with --cv.report option, static report files(html, css, js) are generated to docs/designdoc directory.
 
 ```
-java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.report
+java -jar sit-cv-app-1.0.0-beta.4-exec.jar --cv.report
 ```
 
 You can see diagrams by opening docs/designdoc/index.html with browser.
@@ -92,10 +92,10 @@ Use this option to automatically run tests and analyze logs to get SQL.
 
 ```sh
 # Server Mode
-java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql
+java -jar sit-cv-app-1.0.0-beta.4-exec.jar --cv.analyze-sql
 
 # or Report Mode
-java -jar sit-cv-app-1.0.0-beta.3-exec.jar --cv.analyze-sql --cv.report
+java -jar sit-cv-app-1.0.0-beta.4-exec.jar --cv.analyze-sql --cv.report
 ```
 
 ## How to Use in Your Project
@@ -112,7 +112,7 @@ If your project uses Maven, add plugin to pom.xml of your project.
         <plugin>
             <groupId>io.sitoolkit.cv</groupId>
             <artifactId>sit-cv-maven-plugin</artifactId>
-            <version>1.0.0-beta.3</version>
+            <version>1.0.0-beta.4</version>
         </plugin>
     </plugins>
   </build>
@@ -152,7 +152,7 @@ If your project uses Gradle, add plugin to build.gradle of your project.
 
 ```groovy
 plugins {
-  id "io.sitoolkit.cv.sit-cv-gradle-plugin" version "1.0.0-beta.3"
+  id "io.sitoolkit.cv.sit-cv-gradle-plugin" version "1.0.0-beta.4"
 }
 
 test {
@@ -172,7 +172,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'1.0.0-beta.3'
+    classpath group: 'io.sitoolkit.cv', name: 'sit-cv-gradle-plugin', version:'1.0.0-beta.4'
   }
 }
 
