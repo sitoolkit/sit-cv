@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:if="ant:if" xmlns:unless="ant:unless" name="sit-cv" basedir="." default="deploy">
 
+  <property name="version" value="1.0.0-beta.4-SNAPSHOT" />
+  
+  <condition property="isSnapshotVersion">
+    <matches pattern=".*-SNAPSHOT" string="${version}"/>
+  </condition>
+
   <condition property="os.windows" value="true" else="false">
     <os family="windows" />
   </condition>
@@ -41,7 +47,7 @@
     </exec>
   </target>
 
-  <target name="deploy-gradle">
+  <target name="deploy-gradle" unless="${isSnapshotVersion}">
     <exec executable="${gradle.cmd}" dir="${gbasedir}" failonerror="true">
       <arg value="--no-daemon" />
       <arg value="publishPlugins" />
@@ -49,8 +55,6 @@
   </target>
 
   <target name="set-version">
-
-    <property name="version" value="1.0.0-beta.4-SNAPSHOT" />
 
     <exec executable="${mvn.cmd}" dir="${basedir}">
       <arg value="-DnewVersion=${version}" />
@@ -77,5 +81,5 @@
                    replace="version=${version}" />
 
   </target>
-
+   
 </project>
