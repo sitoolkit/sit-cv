@@ -108,7 +108,7 @@
   <parent>
     <groupId>io.sitoolkit.cv</groupId>
     <artifactId>sit-cv</artifactId>
-    <version>1.0.0-beta.4</version>
+    <version>1.0.0-beta.5-SNAPSHOT</version>
   </parent>
 
   <dependencyManagement>
