@@ -10,11 +10,20 @@ import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
 @RestController
 public class DataModelController {
 
-    @Autowired
-    CrudService crudService;
+  @Autowired
+  CrudService crudService;
 
-    @RequestMapping("/designdoc/data/crud")
-    public CrudMatrix crud() {
-        return crudService.loadMatrix();
-    }
+  @Autowired
+  DataModelProcessor processor;
+
+  @RequestMapping("/designdoc/data/crud")
+  public CrudMatrix crud() {
+    return crudService.loadMatrix();
+  }
+
+  @RequestMapping("/designdoc/data/crud2")
+  public CrudResponseDto crud2() {
+    CrudMatrix crud = crudService.loadMatrix();
+    return processor.entity2dto(crud);
+  }
 }

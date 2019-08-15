@@ -8,17 +8,17 @@ export default new Router({
     {
       path: '/designdoc',
       name: 'designdoc',
-      component: () => import('./views/Home.vue'),
-      children: [
-        {
-          path: 'function/:functionId',
-          name: 'function',
-          components: {
-            default: () => import('./components/function/FunctionModel.vue'),
-            title: () => import('./components/function/FunctionModelTitle.vue'),
-          },
-        },
-      ],
+      component: () => import('@/views/Home.vue'),
+    },
+    {
+      path: '/designdoc/data/crud',
+      name: 'crud',
+      component: () => import('@/views/Crud.vue'),
+    },
+    {
+      path: '/designdoc/function/:functionId',
+      name: 'function',
+      component: () => import('@/views/FunctionModel.vue'),
     },
     {
       path: '*',

@@ -16,67 +16,66 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CrudProcessor {
 
-    @NonNull
-    CrudFinder crudFinder;
+  @NonNull
+  CrudFinder crudFinder;
 
-    public CrudMatrix buildMatrix(List<SqlPerMethod> sqlPerMethodList) {
-        CrudMatrix matrix = new CrudMatrix();
+  public CrudMatrix buildMatrix(List<SqlPerMethod> sqlPerMethodList) {
+    CrudMatrix matrix = new CrudMatrix();
 
-        sqlPerMethodList.stream().forEach(sqlPerMethod -> {
+    sqlPerMethodList.stream().forEach(sqlPerMethod -> {
 
-            if (StringUtils.isEmpty(sqlPerMethod.getSqlText())) {
-                return;
-            }
+      if (StringUtils.isEmpty(sqlPerMethod.getSqlText())) {
+        return;
+      }
 
-            CrudFindResult result = crudFinder.findCrud(sqlPerMethod.getSqlText());
+      CrudFindResult result = crudFinder.findCrud(sqlPerMethod.getSqlText());
 
-            if (result.isError()) {
-                matrix.addError(sqlPerMethod.getRepositoryMethod(), sqlPerMethod.getSqlText(),
-                        result.getErrMsg());
-            }
+      if (result.isError()) {
+        matrix.addError(sqlPerMethod.getRepositoryMethod(), sqlPerMethod.getSqlText(),
+            result.getErrMsg());
+      }
 
-            result.getMap().keySet().stream()
-                    .forEach(table -> result.getMap().get(table).stream()
-                            .forEach(crud -> matrix.add(sqlPerMethod.getRepositoryMethod(),
-                                    new TableDef(table), crud, sqlPerMethod.getSqlText())));
-        });
+      result.getMap().keySet().stream()
+          .forEach(table -> result.getMap().get(table).stream()
+              .forEach(crud -> matrix.add(sqlPerMethod.getRepositoryMethod(), new TableDef(table),
+                  crud, sqlPerMethod.getSqlText())));
+    });
 
-        return matrix;
-    }
+    return matrix;
+  }
 
-    public CrudMatrix adjustAxis(List<ClassDef> entryPoints, CrudMatrix repositoryMethodMatrix) {
+  public CrudMatrix adjustAxis(List<ClassDef> entryPoints, CrudMatrix repositoryMethodMatrix) {
 
-        CrudMatrix result = new CrudMatrix();
+    CrudMatrix result = new CrudMatrix();
 
-        Stream<MethodDef> entryPointMethods = entryPoints.stream().map(ClassDef::getMethods)
-                .flatMap(List::stream);
+    Stream<MethodDef> entryPointMethods = entryPoints.stream().map(ClassDef::getMethods)
+        .flatMap(List::stream);
 
-        entryPointMethods.forEach(entryPointMethod -> {
-            Stream<MethodDef> implMethods = entryPointMethod.collectCalledMethodsRecursively();
+    entryPointMethods.forEach(entryPointMethod -> {
+      Stream<MethodDef> implMethods = entryPointMethod.collectCalledMethodsRecursively();
 
-            implMethods.forEach(methodCalledByEntryPoint -> {
-                CrudRow repositoryMethodCrudRow = repositoryMethodMatrix.getCrudRowMap()
-                        .get(methodCalledByEntryPoint.getQualifiedSignature());
+      implMethods.forEach(methodCalledByEntryPoint -> {
+        CrudRow repositoryMethodCrudRow = repositoryMethodMatrix.getCrudRowMap()
+            .get(methodCalledByEntryPoint.getQualifiedSignature());
 
-                if (repositoryMethodCrudRow == null) {
-                    return;
-                }
+        if (repositoryMethodCrudRow == null) {
+          return;
+        }
 
-                CrudRow entryPointMethodCrudRow = result.getCrudRowMap()
-                        .computeIfAbsent(entryPointMethod.getQualifiedSignature(), (key) -> {
-                            return new CrudRow(entryPointMethod.getActionPath());
-                        });
-                entryPointMethodCrudRow.merge(repositoryMethodCrudRow);
-
-                result.getTableDefs().addAll(repositoryMethodCrudRow.getCellMap().keySet());
-
-                log.debug("Mapped {} -> {} : {}", entryPointMethod.getQualifiedSignature(),
-                        methodCalledByEntryPoint.getQualifiedSignature(),
-                        entryPointMethodCrudRow.getCellMap());
+        CrudRow entryPointMethodCrudRow = result.getCrudRowMap()
+            .computeIfAbsent(entryPointMethod.getQualifiedSignature(), (key) -> {
+              return new CrudRow(entryPointMethod.getActionPath());
             });
-        });
+        entryPointMethodCrudRow.merge(repositoryMethodCrudRow);
 
-        return result;
-    }
+        result.getTableDefs().addAll(repositoryMethodCrudRow.getCellMap().keySet());
+
+        log.debug("Mapped {} -> {} : {}", entryPointMethod.getQualifiedSignature(),
+            methodCalledByEntryPoint.getQualifiedSignature(), entryPointMethodCrudRow.getCellMap());
+      });
+    });
+
+    return result;
+  }
 
 }

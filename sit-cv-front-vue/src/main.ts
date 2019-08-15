@@ -4,19 +4,27 @@ import router from './router';
 
 Vue.config.productionTip = false;
 
-// UIkit, Vuikit
-import './assets/uikit.sit-cv-theme.min.css';
-import './assets/uikit.min.js';
+Vue.config.errorHandler = (err, vm, info) => {
 
-import Vuikit from 'vuikit';
-import VuikitIcons from '@vuikit/icons';
+  // This handling is for the strange TypeError only happens the first navigation to crud.
+  // We don't know the solution yet, so just reload it.
+  if (
+    err instanceof TypeError &&
+    err.message.startsWith("Cannot create property 'isRootInsert' on string") &&
+    location.href.endsWith('crud')
+  ) {
+    location.reload();
+
+  } else {
+    console.error(err);
+  }
+};
+
+// Vuetify
 import vuetify from './plugins/vuetify';
-
-Vue.use(Vuikit);
-Vue.use(VuikitIcons);
 
 new Vue({
   router,
   vuetify,
-  render: (h) => h(App)
+  render: (h) => h(App),
 }).$mount('#app');

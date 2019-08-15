@@ -1,5 +1,14 @@
-import MenuItem from '@/domains/designdoc/MenuItem';
+import MenuItem from './MenuItem';
+import FunctionModelDetail from './FunctionModelDetail';
+import CrudMatrix from './CrudMatrix';
 
 export default interface DesignDocService {
-  fetchMenuItems(): Promise<string>;
+  fetchMenuItems(callback: (menuItems: MenuItem[]) => void): void;
+
+  fetchFunctionModelDetail(
+    functionId: string,
+    callback: (funcionModelDetail: FunctionModelDetail) => void
+  ): void;
+
+  getCrudModel(): Promise<CrudMatrix>;
 }
