@@ -1,12 +1,30 @@
-import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
 
-import { AppModule } from './app/app.module';
-import { environment } from './environments/environment';
+Vue.config.productionTip = false;
 
-if (environment.production) {
-  enableProdMode();
-}
+Vue.config.errorHandler = (err, vm, info) => {
 
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.log(err));
+  // This handling is for the strange TypeError only happens the first navigation to crud.
+  // We don't know the solution yet, so just reload it.
+  if (
+    err instanceof TypeError &&
+    err.message.startsWith("Cannot create property 'isRootInsert' on string") &&
+    location.href.endsWith('crud')
+  ) {
+    location.reload();
+
+  } else {
+    console.error(err);
+  }
+};
+
+// Vuetify
+import vuetify from './plugins/vuetify';
+
+new Vue({
+  router,
+  vuetify,
+  render: (h) => h(App),
+}).$mount('#app');

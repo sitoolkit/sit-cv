@@ -7,16 +7,13 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "Launch Chrome against localhost",
-      "url": "http://localhost:4200",
-      "webRoot": "${workspaceFolder}"
+      "name": "vuejs: chrome",
+      "url": "http://localhost:8081",
+      "webRoot": "${workspaceFolder}/src",
+      "breakOnLoad": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./src/*": "${webRoot}/*"
+      }
     },
-    {
-      "type": "chrome",
-      "request": "attach",
-      "name": "Attach to Chrome",
-      "port": 9222,
-      "webRoot": "${workspaceFolder}"
-    }
   ]
 }

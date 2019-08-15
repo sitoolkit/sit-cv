@@ -1,26 +1,30 @@
-# SitCvFront
+# sit-cv-front-vue
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.1.2.
-
-## Development server
-
-```sh
-ng serve
+## Project setup
+```
+yarn install
 ```
 
-- Navigate to `http://localhost:4200/`.
-
-
-## Build
-
-```sh
-ng build --prod
+### Compiles and hot-reloads for development
+```
+yarn run serve
 ```
 
-## Debug for report mode
-
-```sh
-ng build --watch --configuration=reportDev
+### Compiles and minifies for production
+```
+yarn run build
 ```
 
-- Open `dist/sit-cv-front/index.html` in a browser.
+### Run your tests
+```
+yarn run test
+```
+
+### Lints and fixes files
+```
+yarn run lint
+```
+
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.sitoolkit.cv.core.app.crud.CrudService;
 import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
+import io.sitoolkit.cv.core.domain.report.crud.CrudResponseDto;
+import io.sitoolkit.cv.core.domain.report.crud.DataModelProcessor;
 
 @RestController
 public class DataModelController {
@@ -13,16 +15,11 @@ public class DataModelController {
   @Autowired
   CrudService crudService;
 
-  @Autowired
-  DataModelProcessor processor;
+  // TODO to be refactored.
+  DataModelProcessor processor = new DataModelProcessor();
 
   @RequestMapping("/designdoc/data/crud")
-  public CrudMatrix crud() {
-    return crudService.loadMatrix();
-  }
-
-  @RequestMapping("/designdoc/data/crud2")
-  public CrudResponseDto crud2() {
+  public CrudResponseDto crud() {
     CrudMatrix crud = crudService.loadMatrix();
     return processor.entity2dto(crud);
   }

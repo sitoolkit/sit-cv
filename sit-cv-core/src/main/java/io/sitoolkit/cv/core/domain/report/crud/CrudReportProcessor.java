@@ -5,7 +5,11 @@ import io.sitoolkit.cv.core.domain.report.Report;
 
 public class CrudReportProcessor {
 
-    public Report<?> process(CrudMatrix crudMatrix) {
-        return Report.builder().path("datamodel/crud/crud.js").content(crudMatrix).build();
-    }
+  // TODO to be refactored.
+  DataModelProcessor processor = new DataModelProcessor();
+
+  public Report<?> process(CrudMatrix crudMatrix) {
+    CrudResponseDto dto = processor.entity2dto(crudMatrix);
+    return Report.builder().path("datamodel/crud/crud.js").content(dto).build();
+  }
 }
