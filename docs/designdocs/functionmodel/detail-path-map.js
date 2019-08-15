@@ -1,0 +1,1 @@
+postMessage({"path":"functionmodel/detail-path-map.js","content":{}}, '*');
