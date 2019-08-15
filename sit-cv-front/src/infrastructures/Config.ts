@@ -14,10 +14,10 @@ class Config {
   }
   
   public get endpoint() : string {
-    if (process) {
-      return  process.env.VUE_APP_ENDPOINT || `${location.protocol}//${location.host}`
+    if (process && process.env.VUE_APP_ENDPOINT) {
+      return  process.env.VUE_APP_ENDPOINT;
     }
-    return 'NA';
+    return `${location.protocol}//${location.host}`;
   }
 }
 

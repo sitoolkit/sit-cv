@@ -4,6 +4,7 @@ import FunctionModelDetail from './FunctionModelDetail';
 import CrudMatrix from './CrudMatrix';
 import ScriptLoader from '@/infrastructures/ScriptLoader';
 import { AsyncSubject } from 'rxjs';
+import Config from '@/infrastructures/Config';
 
 class DesignDocServiceLocalImpl implements DesignDocService {
   private static INSTANDE: DesignDocServiceLocalImpl;
@@ -15,7 +16,9 @@ class DesignDocServiceLocalImpl implements DesignDocService {
   public static get instance() {
     if (!this.INSTANDE) {
       this.INSTANDE = new DesignDocServiceLocalImpl();
-      this.INSTANDE.loadFunctionModelDetailPathMap();
+      if (!Config.isServerMode) {
+        this.INSTANDE.loadFunctionModelDetailPathMap();
+      }
     }
     return this.INSTANDE;
   }

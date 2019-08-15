@@ -4,10 +4,6 @@ import DesignDocServiceLocalImpl from './DesignDocServiceLocalImpl';
 
 export default class DesignDocServiceFactory {
   public static getService() {
-    if (Config.isServerMode) {
-      return DesignDocServiceServerImpl;
-    } else {
-      return DesignDocServiceLocalImpl;
-    }
+    return Config.isServerMode ? DesignDocServiceServerImpl : DesignDocServiceLocalImpl;
   }
 }
