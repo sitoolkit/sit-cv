@@ -15,36 +15,36 @@ import io.sitoolkit.cv.core.domain.project.ProjectManager;
 @Configuration
 public class BaseConfig {
 
-    @Bean
-    @ConfigurationProperties(prefix = SitCvApplicationOption.PREFIX)
-    public ApplicationConfig applicationConfig() {
-        return new ApplicationConfig();
-    }
+  @Bean
+  @ConfigurationProperties(prefix = SitCvApplicationOption.PREFIX)
+  public ApplicationConfig applicationConfig() {
+    return new ApplicationConfig();
+  }
 
-    @Bean
-    public ServiceFactory serviceFactory(ApplicationConfig appilcationConfig) {
-        return ServiceFactory.create(Paths.get(appilcationConfig.getProject()));
-    }
+  @Bean
+  public ServiceFactory serviceFactory(ApplicationConfig appilcationConfig) {
+    return ServiceFactory.create(Paths.get(appilcationConfig.getProject()), true);
+  }
 
-    @Bean
-    public FunctionModelService functionModelService(ServiceFactory serviceFacotry) {
-        return serviceFacotry.getFunctionModelService();
+  @Bean
+  public FunctionModelService functionModelService(ServiceFactory serviceFacotry) {
+    return serviceFacotry.getFunctionModelService();
 
-    }
+  }
 
-    @Bean
-    public DesignDocService designDocService(ServiceFactory serviceFacotry) {
-        return serviceFacotry.getDesignDocService();
+  @Bean
+  public DesignDocService designDocService(ServiceFactory serviceFacotry) {
+    return serviceFacotry.getDesignDocService();
 
-    }
+  }
 
-    @Bean
-    public ProjectManager projectManager(ServiceFactory serviceFactory) {
-        return serviceFactory.getProjectManager();
-    }
+  @Bean
+  public ProjectManager projectManager(ServiceFactory serviceFactory) {
+    return serviceFactory.getProjectManager();
+  }
 
-    @Bean
-    public CrudService crudService(ServiceFactory serviceFactory) {
-        return serviceFactory.getCrudService();
-    }
+  @Bean
+  public CrudService crudService(ServiceFactory serviceFactory) {
+    return serviceFactory.getCrudService();
+  }
 }

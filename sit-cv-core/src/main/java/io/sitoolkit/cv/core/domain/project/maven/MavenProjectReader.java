@@ -18,49 +18,49 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MavenProjectReader implements ProjectReader {
 
-    @NonNull
-    private SqlLogProcessor sqlLogProcessor;
+  @NonNull
+  private SqlLogProcessor sqlLogProcessor;
 
-    public static void main(String[] args) {
-        Path projectDir = Paths.get(args[0]);
-        SitCvConfigReader configReader = new SitCvConfigReader();
-        SitCvConfig config = configReader.read(projectDir);
-        ServiceFactory factory = ServiceFactory.create(projectDir);
-        Project project = factory.getProjectManager().getCurrentProject();
-        new MavenProjectReader(new SqlLogProcessor()).generateSqlLog(project, config);
+  public static void main(String[] args) {
+    Path projectDir = Paths.get(args[0]);
+    SitCvConfigReader configReader = new SitCvConfigReader();
+    SitCvConfig config = configReader.read(projectDir, false);
+    ServiceFactory factory = ServiceFactory.create(projectDir, false);
+    Project project = factory.getProjectManager().getCurrentProject();
+    new MavenProjectReader(new SqlLogProcessor()).generateSqlLog(project, config);
+  }
+
+  @Override
+  public Optional<Project> read(Path projectDir) {
+
+    MavenProject mvnPrj = MavenProject.load(projectDir);
+
+    if (!mvnPrj.available()) {
+      return Optional.empty();
     }
 
-    @Override
-    public Optional<Project> read(Path projectDir) {
+    MavenProjectInfoListener listener = new MavenProjectInfoListener(projectDir);
 
-        MavenProject mvnPrj = MavenProject.load(projectDir);
+    mvnPrj.mvnw("compile", "-X").stdout(listener).execute();
 
-        if (!mvnPrj.available()) {
-            return Optional.empty();
-        }
+    return Optional.of(listener.getProject());
+  }
 
-        MavenProjectInfoListener listener = new MavenProjectInfoListener(projectDir);
+  @Override
+  public boolean generateSqlLog(Project project, SitCvConfig sitCvConfig) {
+    MavenProject mvnPrj = MavenProject.load(project.getDir());
 
-        mvnPrj.mvnw("compile", "-X").stdout(listener).execute();
-
-        return Optional.of(listener.getProject());
+    if (!mvnPrj.available()) {
+      return false;
     }
 
-    @Override
-    public boolean generateSqlLog(Project project, SitCvConfig sitCvConfig) {
-        MavenProject mvnPrj = MavenProject.load(project.getDir());
+    SitCvToolsManager.initialize(project.getWorkDir());
+    Path agentJar = SitCvToolsManager.getInstance().getJarPath();
 
-        if (!mvnPrj.available()) {
-            return false;
-        }
-
-        SitCvToolsManager.initialize(project.getWorkDir());
-        Path agentJar = SitCvToolsManager.getInstance().getJarPath();
-
-        sqlLogProcessor.process("maven", sitCvConfig, agentJar, project, (String agentParam) -> {
-            return mvnPrj.mvnw("test", "-DargLine=" + agentParam);
-        });
-        return true;
-    }
+    sqlLogProcessor.process("maven", sitCvConfig, agentJar, project, (String agentParam) -> {
+      return mvnPrj.mvnw("test", "-DargLine=" + agentParam);
+    });
+    return true;
+  }
 
 }

@@ -19,47 +19,46 @@ import io.sitoolkit.cv.core.app.config.ServiceFactory;
 @SpringBootApplication
 public class SitCvApplication {
 
-    @Autowired
-    private ApplicationContext appCtx;
+  @Autowired
+  private ApplicationContext appCtx;
 
-    public static void main(String[] args) {
-        ApplicationArguments appArgs = new DefaultApplicationArguments(args);
+  public static void main(String[] args) {
+    ApplicationArguments appArgs = new DefaultApplicationArguments(args);
 
-        if (appArgs.containsOption(SitCvApplicationOption.ANALYZE_SQL.getKey())) {
-            executeAnalyzeSqlMode(appArgs);
-        }
-
-        if (appArgs.containsOption(SitCvApplicationOption.REPORT.getKey())) {
-            executeReportMode(appArgs);
-        } else {
-            SpringApplication.run(SitCvApplication.class, args);
-        }
+    if (appArgs.containsOption(SitCvApplicationOption.ANALYZE_SQL.getKey())) {
+      executeAnalyzeSqlMode(appArgs);
     }
 
-    private static Path getProjectDir(ApplicationArguments appArgs) {
-        List<String> projects = appArgs.getOptionValues(SitCvApplicationOption.PROJECT.getKey());
-        return projects == null || projects.isEmpty() ? Paths.get(".")
-                : Paths.get(projects.get(0));
+    if (appArgs.containsOption(SitCvApplicationOption.REPORT.getKey())) {
+      executeReportMode(appArgs);
+    } else {
+      SpringApplication.run(SitCvApplication.class, args);
     }
+  }
 
-    private static void executeReportMode(ApplicationArguments appArgs) {
-        ServiceFactory.createAndInitialize(getProjectDir(appArgs)).getReportService().export();
-    }
+  private static Path getProjectDir(ApplicationArguments appArgs) {
+    List<String> projects = appArgs.getOptionValues(SitCvApplicationOption.PROJECT.getKey());
+    return projects == null || projects.isEmpty() ? Paths.get(".") : Paths.get(projects.get(0));
+  }
 
-    private static void executeAnalyzeSqlMode(ApplicationArguments appArgs) {
-        ServiceFactory.create(getProjectDir(appArgs)).getCrudService().analyzeSql();
-    }
+  private static void executeReportMode(ApplicationArguments appArgs) {
+    ServiceFactory.createAndInitialize(getProjectDir(appArgs), false).getReportService().export();
+  }
 
-    /**
-     * Initialize the service before the screen is reloaded by LiveReload of
-     * spring-boot-devtools. The screen reload process is triggered when
-     * ContextRefreshedEvent is notified.
-     *
-     * @see org.springframework.boot.devtools.autoconfigure.LocalDevToolsAutoConfiguration
-     */
-    @PostConstruct
-    public void initialize() {
-        appCtx.getBean(ServiceFactory.class).initialize();
-    }
+  private static void executeAnalyzeSqlMode(ApplicationArguments appArgs) {
+    ServiceFactory.create(getProjectDir(appArgs), false).getCrudService().analyzeSql();
+  }
+
+  /**
+   * Initialize the service before the screen is reloaded by LiveReload of
+   * spring-boot-devtools. The screen reload process is triggered when
+   * ContextRefreshedEvent is notified.
+   *
+   * @see org.springframework.boot.devtools.autoconfigure.LocalDevToolsAutoConfiguration
+   */
+  @PostConstruct
+  public void initialize() {
+    appCtx.getBean(ServiceFactory.class).initialize();
+  }
 
 }

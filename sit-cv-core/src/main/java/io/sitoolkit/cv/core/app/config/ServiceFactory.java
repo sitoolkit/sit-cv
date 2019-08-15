@@ -44,113 +44,110 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ServiceFactory {
 
-    @Getter
-    private FunctionModelService functionModelService;
+  @Getter
+  private FunctionModelService functionModelService;
 
-    @Getter
-    private DesignDocService designDocService;
+  @Getter
+  private DesignDocService designDocService;
 
-    @Getter
-    private CrudService crudService;
+  @Getter
+  private CrudService crudService;
 
-    @Getter
-    private ReportService reportService;
+  @Getter
+  private ReportService reportService;
 
-    @Getter
-    private ProjectManager projectManager;
+  @Getter
+  private ProjectManager projectManager;
 
-    private ServiceFactory() {
+  private ServiceFactory() {
+  }
+
+  public static ServiceFactory create(Path projectDir, boolean watch) {
+    return new ServiceFactory().createServices(projectDir, watch);
+  }
+
+  public static ServiceFactory createAndInitialize(Path projectDir, boolean watch) {
+    return new ServiceFactory().createServices(projectDir, watch).initialize();
+  }
+
+  public ServiceFactory initialize() {
+    try {
+      functionModelService.analyze();
+    } catch (Exception e) {
+      log.error("Exception initializing Code Visualizer", e);
     }
+    return this;
+  }
 
-    public static ServiceFactory create(Path projectDir) {
-        return new ServiceFactory().createServices(projectDir);
-    }
+  protected ServiceFactory createServices(Path projectDir, boolean watch) {
+    SitCvConfigReader configReader = new SitCvConfigReader();
+    SitCvConfig config = configReader.read(projectDir, watch);
 
-    public static ServiceFactory createAndInitialize(Path projectDir) {
-        return new ServiceFactory().createServices(projectDir).initialize();
-    }
+    projectManager = createProjectManager(config);
+    projectManager.load(projectDir);
 
-    public ServiceFactory initialize() {
-        try {
-            functionModelService.analyze();
-        } catch (Exception e) {
-            log.error("Exception initializing Code Visualizer", e);
-        }
-        return this;
-    }
+    functionModelService = createFunctionModelService(config, configReader, projectManager);
 
-    protected ServiceFactory createServices(Path projectDir) {
-        SitCvConfigReader configReader = new SitCvConfigReader();
-        SitCvConfig config = configReader.read(projectDir);
+    designDocService = createDesignDocService(functionModelService);
 
-        projectManager = createProjectManager(config);
-        projectManager.load(projectDir);
+    crudService = createCrudService(functionModelService, projectManager);
 
-        functionModelService = createFunctionModelService(config, configReader, projectManager);
+    reportService = createReportService(functionModelService, designDocService, crudService,
+        projectManager);
 
-        designDocService = createDesignDocService(functionModelService);
+    return this;
+  }
 
-        crudService = createCrudService(functionModelService, projectManager);
+  protected ProjectManager createProjectManager(SitCvConfig config) {
+    SqlLogProcessor sqlLogProcessor = new SqlLogProcessor();
+    List<ProjectReader> readers = Arrays.asList(new MavenProjectReader(sqlLogProcessor),
+        new GradleProjectReader(sqlLogProcessor));
 
-        reportService = createReportService(functionModelService, designDocService, crudService,
-                projectManager);
+    return new ProjectManager(readers, config);
+  }
 
-        return this;
-    }
-    
-    protected ProjectManager createProjectManager(SitCvConfig config) {
-        SqlLogProcessor sqlLogProcessor = new SqlLogProcessor();
-        List<ProjectReader> readers = Arrays.asList(new MavenProjectReader(sqlLogProcessor),
-                    new GradleProjectReader(sqlLogProcessor));
+  protected FunctionModelService createFunctionModelService(SitCvConfig config,
+      SitCvConfigReader configReader, ProjectManager projectManager) {
+    ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
+    ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
+        projectManager, config);
+    SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(config);
+    ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
+    GraphvizManager.initialize();
+    PlantUmlWriter plantumlWriter = new PlantUmlWriter();
+    DiagramWriter<SequenceDiagram> sequenceWriter = new SequenceDiagramWriterPlantUmlImpl(
+        plantumlWriter);
+    DiagramWriter<ClassDiagram> classWriter = new ClassDiagramWriterPlantUmlImpl(plantumlWriter);
+    InputSourceWatcher watcher = new FileInputSourceWatcher();
 
-        return new ProjectManager(readers, config);
-    }
+    return new FunctionModelService(classDefReader, sequenceProcessor, classProcessor,
+        sequenceWriter, classWriter, classDefRepository, watcher, projectManager, configReader);
 
-    protected FunctionModelService createFunctionModelService(SitCvConfig config,
-            SitCvConfigReader configReader, ProjectManager projectManager) {
-        ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
-        ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
-                projectManager, config);
-        SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(config);
-        ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
-        GraphvizManager.initialize();
-        PlantUmlWriter plantumlWriter = new PlantUmlWriter();
-        DiagramWriter<SequenceDiagram> sequenceWriter = new SequenceDiagramWriterPlantUmlImpl(
-                plantumlWriter);
-        DiagramWriter<ClassDiagram> classWriter = new ClassDiagramWriterPlantUmlImpl(
-                plantumlWriter);
-        InputSourceWatcher watcher = new FileInputSourceWatcher();
+  }
 
-        return new FunctionModelService(classDefReader, sequenceProcessor, classProcessor,
-                sequenceWriter, classWriter, classDefRepository, watcher, projectManager,
-                configReader);
+  protected DesignDocService createDesignDocService(FunctionModelService functionModelService) {
+    DesignDocMenuBuilder menuBuilder = new DesignDocMenuBuilder();
+    return new DesignDocService(functionModelService, menuBuilder);
+  }
 
-    }
+  protected CrudService createCrudService(FunctionModelService functionModelService,
+      ProjectManager projectManager) {
+    CrudFinder crudFinder = new CrudFinderJsqlparserImpl();
+    CrudProcessor crudProcessor = new CrudProcessor(crudFinder);
 
-    protected DesignDocService createDesignDocService(FunctionModelService functionModelService) {
-        DesignDocMenuBuilder menuBuilder = new DesignDocMenuBuilder();
-        return new DesignDocService(functionModelService, menuBuilder);
-    }
+    return new CrudService(functionModelService, crudProcessor, projectManager);
+  }
 
-    protected CrudService createCrudService(FunctionModelService functionModelService,
-            ProjectManager projectManager) {
-        CrudFinder crudFinder = new CrudFinderJsqlparserImpl();
-        CrudProcessor crudProcessor = new CrudProcessor(crudFinder);
+  protected ReportService createReportService(FunctionModelService functionModelService,
+      DesignDocService designDocService, CrudService crudService, ProjectManager projectManager) {
+    FunctionModelReportProcessor functionModelReportProcessor = new FunctionModelReportProcessor();
+    DesignDocReportProcessor designDocReportProcessor = new DesignDocReportProcessor();
+    CrudReportProcessor crudReportProcessor = new CrudReportProcessor();
+    ReportWriter reportWriter = new ReportWriter();
 
-        return new CrudService(functionModelService, crudProcessor, projectManager);
-    }
-
-    protected ReportService createReportService(FunctionModelService functionModelService,
-            DesignDocService designDocService, CrudService crudService,
-            ProjectManager projectManager) {
-        FunctionModelReportProcessor functionModelReportProcessor = new FunctionModelReportProcessor();
-        DesignDocReportProcessor designDocReportProcessor = new DesignDocReportProcessor();
-        CrudReportProcessor crudReportProcessor = new CrudReportProcessor();
-        ReportWriter reportWriter = new ReportWriter();
-
-        return new ReportService(functionModelReportProcessor, designDocReportProcessor,
-                crudReportProcessor, reportWriter, functionModelService, designDocService,
-                crudService, projectManager);
-    }
+    return new ReportService(functionModelReportProcessor, designDocReportProcessor,
+        crudReportProcessor, reportWriter, functionModelService, designDocService, crudService,
+        projectManager);
+  }
 
 }

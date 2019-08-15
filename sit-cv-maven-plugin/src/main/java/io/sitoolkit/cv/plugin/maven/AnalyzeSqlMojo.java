@@ -10,13 +10,13 @@ import io.sitoolkit.cv.core.app.config.ServiceFactory;
 @Mojo(name = "analyze-sql")
 public class AnalyzeSqlMojo extends AbstractMojo {
 
-    @Parameter(defaultValue = "${project}", readonly = true, required = true)
-    private MavenProject project;
+  @Parameter(defaultValue = "${project}", readonly = true, required = true)
+  private MavenProject project;
 
-    @Override
-    public void execute() {
-	ServiceFactory.createAndInitialize(project.getBasedir().toPath()).getCrudService()
-		.analyzeSql();
-    }
+  @Override
+  public void execute() {
+    ServiceFactory.createAndInitialize(project.getBasedir().toPath(), false).getCrudService()
+        .analyzeSql();
+  }
 
 }

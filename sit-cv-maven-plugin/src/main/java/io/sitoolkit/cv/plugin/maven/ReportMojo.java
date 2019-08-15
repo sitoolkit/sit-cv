@@ -10,21 +10,22 @@ import io.sitoolkit.cv.core.app.config.ServiceFactory;
 @Mojo(name = "report")
 public class ReportMojo extends AbstractMojo {
 
-    @Parameter(property = RunApplicationMojo.ANALYZE_SQL_OPTION, defaultValue = "false")
-    private boolean analyzeSql;
+  @Parameter(property = RunApplicationMojo.ANALYZE_SQL_OPTION, defaultValue = "false")
+  private boolean analyzeSql;
 
-    @Parameter(defaultValue = "${project}", readonly = true, required = true)
-    private MavenProject project;
+  @Parameter(defaultValue = "${project}", readonly = true, required = true)
+  private MavenProject project;
 
-    @Override
-    public void execute() {
-        ServiceFactory factory = ServiceFactory.createAndInitialize(project.getBasedir().toPath());
+  @Override
+  public void execute() {
+    ServiceFactory factory = ServiceFactory.createAndInitialize(project.getBasedir().toPath(),
+        false);
 
-        if (analyzeSql) {
-            factory.getCrudService().analyzeSql();
-        }
-
-        factory.getReportService().export();
+    if (analyzeSql) {
+      factory.getCrudService().analyzeSql();
     }
+
+    factory.getReportService().export();
+  }
 
 }

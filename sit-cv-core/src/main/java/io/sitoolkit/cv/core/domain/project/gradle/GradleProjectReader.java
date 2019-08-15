@@ -24,70 +24,69 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GradleProjectReader implements ProjectReader {
 
-    private static final String PROJECT_INFO_SCRIPT_NAME = "project-info.gradle";
+  private static final String PROJECT_INFO_SCRIPT_NAME = "project-info.gradle";
 
-    @NonNull
-    private SqlLogProcessor sqlLogProcessor;
+  @NonNull
+  private SqlLogProcessor sqlLogProcessor;
 
-    public static void main(String[] args) {
-        Path projectDir = Paths.get(args[0]);
-        SitCvConfigReader configReader = new SitCvConfigReader();
-        SitCvConfig config = configReader.read(projectDir);
-        ServiceFactory factory = ServiceFactory.create(projectDir);
-        Project project = factory.getProjectManager().getCurrentProject();
-        new GradleProjectReader(new SqlLogProcessor()).generateSqlLog(project, config);
+  public static void main(String[] args) {
+    Path projectDir = Paths.get(args[0]);
+    SitCvConfigReader configReader = new SitCvConfigReader();
+    SitCvConfig config = configReader.read(projectDir, false);
+    ServiceFactory factory = ServiceFactory.create(projectDir, false);
+    Project project = factory.getProjectManager().getCurrentProject();
+    new GradleProjectReader(new SqlLogProcessor()).generateSqlLog(project, config);
+  }
+
+  @Override
+  public Optional<Project> read(Path projectDir) {
+
+    GradleProject gradleProject = GradleProject.load(projectDir);
+
+    if (!gradleProject.available()) {
+      return Optional.empty();
     }
 
-    @Override
-    public Optional<Project> read(Path projectDir) {
+    GradleProjectInfoListener listener = new GradleProjectInfoListener(projectDir);
 
-        GradleProject gradleProject = GradleProject.load(projectDir);
+    log.info("project: {} is a gradle project - finding depending jars... ", projectDir);
 
-        if (!gradleProject.available()) {
-            return Optional.empty();
-        }
+    Path initScript = projectDir.resolve(PROJECT_INFO_SCRIPT_NAME);
+    SitResourceUtils.res2file(this, PROJECT_INFO_SCRIPT_NAME, initScript);
 
-        GradleProjectInfoListener listener = new GradleProjectInfoListener(projectDir);
+    try {
 
-        log.info("project: {} is a gradle project - finding depending jars... ", projectDir);
+      gradleProject.gradlew("--no-daemon", "--init-script", initScript.toString(), "projectInfo")
+          .stdout(listener).execute();
 
-        Path initScript = projectDir.resolve(PROJECT_INFO_SCRIPT_NAME);
-        SitResourceUtils.res2file(this, PROJECT_INFO_SCRIPT_NAME, initScript);
-
-        try {
-
-            gradleProject
-                    .gradlew("--no-daemon", "--init-script", initScript.toString(), "projectInfo")
-                    .stdout(listener).execute();
-
-        } finally {
-            try {
-                Files.deleteIfExists(initScript);
-            } catch (IOException e) {
-                log.warn(e.getMessage());
-            }
-        }
-
-        return Optional.of(listener.getProject());
+    } finally {
+      try {
+        Files.deleteIfExists(initScript);
+      } catch (IOException e) {
+        log.warn(e.getMessage());
+      }
     }
 
-    @Override
-    public boolean generateSqlLog(Project project, SitCvConfig sitCvConfig) {
-        GradleProject gradleProject = GradleProject.load(project.getDir());
+    return Optional.of(listener.getProject());
+  }
 
-        if (!gradleProject.available()) {
-            return false;
-        }
+  @Override
+  public boolean generateSqlLog(Project project, SitCvConfig sitCvConfig) {
+    GradleProject gradleProject = GradleProject.load(project.getDir());
 
-        SitCvToolsManager.initialize(project.getWorkDir());
-        Path agentJar = SitCvToolsManager.getInstance().getJarPath();
-
-        sqlLogProcessor.process("gradle", sitCvConfig, agentJar, project, (String agentParam) -> {
-            ProcessCommand command = gradleProject.gradlew("--no-daemon", "--rerun-tasks", "test");
-            command.getEnv().put("JAVA_TOOL_OPTIONS", agentParam);
-            return command;
-        });
-
-        return true;
+    if (!gradleProject.available()) {
+      return false;
     }
+
+    SitCvToolsManager.initialize(project.getWorkDir());
+    Path agentJar = SitCvToolsManager.getInstance().getJarPath();
+
+    sqlLogProcessor.process("gradle", sitCvConfig, agentJar, project, (String agentParam) -> {
+      ProcessCommand command = gradleProject.gradlew("--no-daemon", "--rerun-tasks", "test");
+      command.getEnv().put("JAVA_TOOL_OPTIONS", agentParam);
+      return command;
+    });
+
+    return true;
+  }
 }
