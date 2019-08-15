@@ -19,59 +19,61 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CrudService {
 
-    @NonNull
-    FunctionModelService functionModelService;
+  @NonNull
+  FunctionModelService functionModelService;
 
-    @NonNull
-    private CrudProcessor processor;
+  @NonNull
+  private CrudProcessor processor;
 
-    @NonNull
-    ProjectManager projectManager;
+  @NonNull
+  ProjectManager projectManager;
 
-    public CrudMatrix loadMatrix() {
-        Optional<CrudMatrix> crudMatrixOpt = JsonUtils
-                .file2obj(projectManager.getCurrentProject().getCrudPath(), CrudMatrix.class);
-
-        if (!crudMatrixOpt.isPresent()) {
-            return generateMatrix();
-        }
-
-        CrudMatrix crudMatrix = crudMatrixOpt.get();
-        File sqlLogFile = projectManager.getCurrentProject().getSqlLogPath().toFile();
-
-        if (!sqlLogFile.exists() || crudMatrix.getSqlLogLastModified() == sqlLogFile.lastModified()) {
-            return crudMatrix;
-        }
-
-        return generateMatrix();
+  public Optional<CrudMatrix> loadMatrix() {
+    if (!projectManager.getCurrentProject().existsWorkDir()) {
+      return Optional.empty();
     }
 
-    public CrudMatrix generateMatrix() {
-        Optional<List<SqlPerMethod>> sqlPerMethodList = projectManager.getSqlLog();
+    Optional<CrudMatrix> crudMatrixOpt = JsonUtils
+        .file2obj(projectManager.getCurrentProject().getCrudPath(), CrudMatrix.class);
 
-        if (!sqlPerMethodList.isPresent()) {
-            log.warn(
-                    "SQL log file not found. If you need a CRUD matrix, please run analyze-sql first.");
-            return new CrudMatrix();
-        }
-
-        CrudMatrix methodCrud = processor.buildMatrix(sqlPerMethodList.get());
-
-        List<ClassDef> entryPointClasses = functionModelService.getAllEntryPointClasses();
-
-        CrudMatrix entryPointCrud = processor.adjustAxis(entryPointClasses, methodCrud);
-
-        long lastModified = projectManager.getCurrentProject().getSqlLogPath().toFile()
-                .lastModified();
-        entryPointCrud.setSqlLogLastModified(lastModified);
-
-        JsonUtils.obj2file(entryPointCrud, projectManager.getCurrentProject().getCrudPath());
-
-        return entryPointCrud;
+    if (!crudMatrixOpt.isPresent()) {
+      return generateMatrix();
     }
 
-    public void analyzeSql() {
-        projectManager.generateSqlLog();
+    CrudMatrix crudMatrix = crudMatrixOpt.get();
+    File sqlLogFile = projectManager.getCurrentProject().getSqlLogPath().toFile();
+
+    if (!sqlLogFile.exists() || crudMatrix.getSqlLogLastModified() == sqlLogFile.lastModified()) {
+      return crudMatrixOpt;
     }
+
+    return generateMatrix();
+  }
+
+  public Optional<CrudMatrix> generateMatrix() {
+    Optional<List<SqlPerMethod>> sqlPerMethodList = projectManager.getSqlLog();
+
+    if (!sqlPerMethodList.isPresent()) {
+      log.warn("SQL log file not found. If you need a CRUD matrix, please run analyze-sql first.");
+      return Optional.empty();
+    }
+
+    CrudMatrix methodCrud = processor.buildMatrix(sqlPerMethodList.get());
+
+    List<ClassDef> entryPointClasses = functionModelService.getAllEntryPointClasses();
+
+    CrudMatrix entryPointCrud = processor.adjustAxis(entryPointClasses, methodCrud);
+
+    long lastModified = projectManager.getCurrentProject().getSqlLogPath().toFile().lastModified();
+    entryPointCrud.setSqlLogLastModified(lastModified);
+
+    JsonUtils.obj2file(entryPointCrud, projectManager.getCurrentProject().getCrudPath());
+
+    return Optional.of(entryPointCrud);
+  }
+
+  public void analyzeSql() {
+    projectManager.generateSqlLog();
+  }
 
 }

@@ -1,5 +1,7 @@
 package io.sitoolkit.cv.app.pres.datamodel;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +22,7 @@ public class DataModelController {
 
   @RequestMapping("/designdoc/data/crud")
   public CrudResponseDto crud() {
-    CrudMatrix crud = crudService.loadMatrix();
-    return processor.entity2dto(crud);
+    Optional<CrudMatrix> crud = crudService.loadMatrix();
+    return crud.isPresent() ? processor.entity2dto(crud.get()) : new CrudResponseDto();
   }
 }
