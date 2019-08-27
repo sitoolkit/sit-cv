@@ -25,7 +25,7 @@ These report files can be accessed with browser as local files and also publishe
 
 ## Required Software
 
-* JDK v1.8
+* JDK v11
 * Graphviz(https://www.graphviz.org/) 
   * For Windows, Graphviz is installed automatically
   * For macOS or Linux, you need to install manually with following commands.
