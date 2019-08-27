@@ -30,3 +30,6 @@ pluginBundle {
     vcsUrl = 'https://github.com/sitoolkit/sit-cv' 
     tags = ['java', 'uml', 'SI-Toolkit'] 
 }
+
+sourceCompatibility = '11'
+targetCompatibility = '11'

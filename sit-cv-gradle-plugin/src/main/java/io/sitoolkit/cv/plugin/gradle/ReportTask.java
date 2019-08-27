@@ -8,22 +8,22 @@ import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
 public class ReportTask extends DefaultTask {
 
-    private boolean analyzeSql;
+  private boolean analyzeSql;
 
-    @Option(option = RunTask.ANALYZE_SQL_OPTION, description = RunTask.ANALYZE_SQL_DESCRIPTION)
-    public void setAnalyzeSql(boolean analyzeSql) {
-        this.analyzeSql = analyzeSql;
+  @Option(option = RunTask.ANALYZE_SQL_OPTION, description = RunTask.ANALYZE_SQL_DESCRIPTION)
+  public void setAnalyzeSql(boolean analyzeSql) {
+    this.analyzeSql = analyzeSql;
+  }
+
+  @TaskAction
+  public void export() {
+    ServiceFactory factory = ServiceFactory
+        .createAndInitialize(getProject().getProjectDir().toPath(), false);
+
+    if (analyzeSql) {
+      factory.getCrudService().analyzeSql();
     }
 
-    @TaskAction
-    public void export() {
-        ServiceFactory factory = ServiceFactory
-                .createAndInitialize(getProject().getProjectDir().toPath());
-
-        if (analyzeSql) {
-            factory.getCrudService().analyzeSql();
-        }
-
-        factory.getReportService().export();
-    }
+    factory.getReportService().export();
+  }
 }

@@ -13,90 +13,88 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
 
-    private Delomboker delomboker = new Delomboker();
-    private Project project;
+  private Delomboker delomboker = new Delomboker();
+  private Project project;
 
-    public static Optional<PreProcessor> of(Project project) {
+  public static Optional<PreProcessor> of(Project project) {
 
-        if (isDelombokProject(project) && isDelombokExecutable()) {
-            return Optional.of(new DelombokProcessor(project));
+    if (isDelombokProject(project)) {
+      // if (isDelombokProject(project) && isDelombokExecutable()) {
+      return Optional.of(new DelombokProcessor(project));
 
-        } else {
-            return Optional.empty();
-        }
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  static boolean isDelombokProject(Project project) {
+    Optional<Path> delombokClasspath = project.getClasspaths().stream()
+        .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-")).findFirst();
+
+    if (project.getBuildDir() == null) {
+      log.debug("build directory not found in {}", project.getDir());
+      return false;
     }
 
-    static boolean isDelombokProject(Project project) {
-        Optional<Path> delombokClasspath = project.getClasspaths().stream()
-                .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-"))
-                .findFirst();
+    if (delombokClasspath.isPresent()) {
+      log.debug("Lombok dependency found in {} : {}", project.getDir(), delombokClasspath.get());
+    } else {
+      log.debug("Lombok dependency not found in {}", project.getDir());
+    }
+    return delombokClasspath.isPresent();
+  }
 
-        if (project.getBuildDir() == null) {
-            log.debug("build directory not found in {}", project.getDir());
-            return false;
-        }
+  static boolean isDelombokExecutable() {
+    if (JdkUtils.isJdkToolsJarLoaded()) {
+      return true;
+    }
+    boolean jdkToolsJarLoaded = JdkUtils.loadJdkToosJar();
 
-        if (delombokClasspath.isPresent()) {
-            log.debug("Lombok dependency found in {} : {}", project.getDir(),
-                    delombokClasspath.get());
-        } else {
-            log.debug("Lombok dependency not found in {}", project.getDir());
-        }
-        return delombokClasspath.isPresent();
+    if (!jdkToolsJarLoaded) {
+      log.warn("The project using Lombok needs to be executed with JDK (not JRE)");
+    }
+    return jdkToolsJarLoaded;
+  }
+
+  public static void main(String[] args) {
+    System.out.println(System.getProperties());
+  }
+
+  private DelombokProcessor(Project project) {
+    this.project = project;
+  }
+
+  @Override
+  public Path getPreProcessedPath(Path original) {
+
+    Optional<Path> enclosingSrcDir = project.getSrcDirs().stream()
+        .filter(dir -> original.startsWith(original)).findFirst();
+
+    if (enclosingSrcDir.isPresent()) {
+      Path relativized = enclosingSrcDir.get().relativize(original);
+      return getDelombokTargetDir().resolve(relativized.toString()).normalize();
+
+    } else {
+      throw new IllegalArgumentException(original.toAbsolutePath() + " is not_in source directory");
     }
 
-    static boolean isDelombokExecutable() {
-        if (JdkUtils.isJdkToolsJarLoaded()) {
-            return true;
-        }
-        boolean jdkToolsJarLoaded = JdkUtils.loadJdkToosJar();
+  }
 
-        if (!jdkToolsJarLoaded) {
-            log.warn("The project using Lombok needs to be executed with JDK (not JRE)");
-        }
-        return jdkToolsJarLoaded;
-    }
+  @Override
+  public void execute() {
+    project.getSrcDirs().forEach(this::executeDelombok);
+  }
 
-    public static void main(String[] args) {
-        System.out.println(System.getProperties());
-    }
+  void executeDelombok(Path srcDir) {
+    DelombokParameter param = DelombokParameter.builder().src(srcDir).target(getDelombokTargetDir())
+        .encoding("UTF-8").classpath(project.getClasspaths()).sourcepath(project.getSrcDirs())
+        .build();
 
-    private DelombokProcessor(Project project) {
-        this.project = project;
-    }
+    delomboker.execute(param);
+  }
 
-    @Override
-    public Path getPreProcessedPath(Path original) {
-
-        Optional<Path> enclosingSrcDir = project.getSrcDirs().stream()
-                .filter(dir -> original.startsWith(original)).findFirst();
-
-        if (enclosingSrcDir.isPresent()) {
-            Path relativized = enclosingSrcDir.get().relativize(original);
-            return getDelombokTargetDir().resolve(relativized.toString()).normalize();
-
-        } else {
-            throw new IllegalArgumentException(
-                    original.toAbsolutePath() + " is not_in source directory");
-        }
-
-    }
-
-    @Override
-    public void execute() {
-        project.getSrcDirs().forEach(this::executeDelombok);
-    }
-
-    void executeDelombok(Path srcDir) {
-        DelombokParameter param = DelombokParameter.builder().src(srcDir)
-                .target(getDelombokTargetDir()).encoding("UTF-8").classpath(project.getClasspaths())
-                .sourcepath(project.getSrcDirs()).build();
-
-        delomboker.execute(param);
-    }
-
-    Path getDelombokTargetDir() {
-        return project.getBuildDir().resolve("generated-sources/sit-cv/delombok");
-    }
+  Path getDelombokTargetDir() {
+    return project.getBuildDir().resolve("generated-sources/sit-cv/delombok");
+  }
 
 }
