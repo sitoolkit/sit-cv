@@ -76,7 +76,7 @@
     <dependency>
       <groupId>io.sitoolkit.util.bth</groupId>
       <artifactId>sit-util-bth</artifactId>
-      <version>1.0.0-alpha.7</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
@@ -130,6 +130,13 @@
         <directory>${project.basedir}/../sit-cv-tools/target/</directory>
         <includes>
           <include>sit-cv-tools-${project.version}-jar-with-dependencies.jar</include>
+        </includes>
+        <targetPath>${project.build.directory}/classes/lib</targetPath>
+      </resource>
+      <resource>
+        <directory>${project.basedir}/../sit-cv-tools/target-1_8</directory>
+        <includes>
+          <include>sit-cv-tools-1_8-${project.version}-jar-with-dependencies.jar</include>
         </includes>
         <targetPath>${project.build.directory}/classes/lib</targetPath>
       </resource>

@@ -15,10 +15,16 @@ import lombok.Setter;
 @Data
 public class Project {
 
+  private static final String WORK_DIR = "sit-cv";
+  private static final String SQL_LOG_FILE = "sit-cv-repository-vs-sql.json";
+  private static final String CRUD_FILE = "crud.json";
+
   @Setter(AccessLevel.NONE)
   private Path dir;
 
   private Path buildDir;
+
+  private String javaVersion;
 
   private Set<Path> srcDirs = new HashSet<>();
 
@@ -27,10 +33,6 @@ public class Project {
   private Set<Project> subProjects = new HashSet<>();
 
   private PreProcessor preProcessor = PreProcessor.DO_NOTHING;
-
-  private static final String WORK_DIR = "sit-cv";
-  private static final String SQL_LOG_FILE = "sit-cv-repository-vs-sql.json";
-  private static final String CRUD_FILE = "crud.json";
 
   public Project(Path dir) {
     super();

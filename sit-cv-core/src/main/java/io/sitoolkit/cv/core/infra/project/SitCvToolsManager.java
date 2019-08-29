@@ -2,38 +2,36 @@ package io.sitoolkit.cv.core.infra.project;
 
 import java.nio.file.Path;
 
+import org.apache.commons.lang3.StringUtils;
+
 import io.sitoolkit.cv.core.infra.util.PackageUtils;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SitCvToolsManager {
 
-    @Getter
-    private static SitCvToolsManager instance;
+  private static final String ARTIFACT_ID = "sit-cv-tools";
 
-    private static final String ARTIFACT_ID = "sit-cv-tools";
-    private static final String JAR_NAME = String.format("%s-%s-%s.jar", ARTIFACT_ID,
-            PackageUtils.getVersion(), "jar-with-dependencies");
+  public static Path install(Path workDir, String javaVersion) {
+    String jarName = resolveJarName(javaVersion);
+    Path jarPath = workDir.resolve(jarName);
 
-    @Getter
-    private Path jarPath;
+    log.info("Installing {}", ARTIFACT_ID);
+    SitResourceUtils.res2file(SitCvToolsManager.class, "/lib/" + jarName, jarPath);
 
-    public static void initialize(Path workDir) {
-        if (instance != null) {
-            return;
-        }
+    return jarPath;
+  }
 
-        instance = new SitCvToolsManager();
-        instance.install(workDir);
+  static String resolveJarName(String javaVersion) {
+    return String.format("%s-%s-%s.jar", resolveArtifactId(javaVersion), PackageUtils.getVersion(),
+        "jar-with-dependencies");
+  }
+
+  static String resolveArtifactId(String javaVersion) {
+    if (StringUtils.startsWith(javaVersion, "1.8")) {
+      return ARTIFACT_ID + "-1_8";
     }
-
-    private void install(Path workDir) {
-        jarPath = workDir.resolve(JAR_NAME);
-
-        log.info("Installing {}", ARTIFACT_ID);
-        SitResourceUtils.res2file(SitCvToolsManager.class, "/lib/" + JAR_NAME, jarPath);
-    }
-
+    return ARTIFACT_ID;
+  }
 }

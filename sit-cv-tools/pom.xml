@@ -2,7 +2,8 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>sit-cv-tools</artifactId>
+  <artifactId>sit-cv-tools-parent</artifactId>
+  <packaging>pom</packaging>
 
   <dependencies>
     <dependency>
@@ -45,6 +46,11 @@
     <artifactId>sit-cv</artifactId>
     <version>1.0.0-beta.5-SNAPSHOT</version>
   </parent>
+
+  <modules>
+    <module>./pom-1_8.xml</module>
+    <module>./pom-11.xml</module>
+  </modules>
 
   <build>
     <resources>

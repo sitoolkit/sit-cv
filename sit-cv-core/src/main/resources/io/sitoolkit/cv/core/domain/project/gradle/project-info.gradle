@@ -9,6 +9,7 @@ allprojects {
           configurations.compile.each { println "sitCvClasspath:${it}" }
           configurations.compileOnly.each { println "sitCvClasspath:${it}" }
         }
+      println "javaVersion:${JavaVersion.current()}"
       }
     }
   }

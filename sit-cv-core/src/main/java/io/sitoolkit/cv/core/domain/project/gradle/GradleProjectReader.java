@@ -78,8 +78,7 @@ public class GradleProjectReader implements ProjectReader {
       return false;
     }
 
-    SitCvToolsManager.initialize(project.getWorkDir());
-    Path agentJar = SitCvToolsManager.getInstance().getJarPath();
+    Path agentJar = SitCvToolsManager.install(project.getWorkDir(), project.getJavaVersion());
 
     sqlLogProcessor.process("gradle", sitCvConfig, agentJar, project, (String agentParam) -> {
       ProcessCommand command = gradleProject.gradlew("--no-daemon", "--rerun-tasks", "test");
