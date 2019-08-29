@@ -34,6 +34,8 @@
       <arg value="--fail-at-end" />
       <arg value="--activate-profiles" />
       <arg value="analyze" />
+      <arg value="--projects" />
+      <arg value="!sit-cv-tools/pom-1_8.xml" />
     </exec>
   </target>
   
