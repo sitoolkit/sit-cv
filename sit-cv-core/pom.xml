@@ -16,7 +16,7 @@
     <dependency>
       <groupId>net.sourceforge.plantuml</groupId>
       <artifactId>plantuml</artifactId>
-      <version>1.2018.14</version>
+      <version>1.2019.9</version>
     </dependency>
 
     <dependency>
@@ -70,7 +70,7 @@
     <dependency>
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
-      <version>4.4</version>
+      <version>4.6</version>
     </dependency>
 
     <dependency>
@@ -79,22 +79,11 @@
       <version>1.0.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>com.github.jsqlparser</groupId>
       <artifactId>jsqlparser</artifactId>
-      <version>1.1</version>
+      <version>3.0</version>
     </dependency>
   </dependencies>
 
@@ -104,21 +93,8 @@
     <version>1.0.0-beta.5-SNAPSHOT</version>
   </parent>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${spring.boot.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <properties>
     <javaparser.version>3.6.27</javaparser.version>
-    <tools.jar.path>${java.home}/../lib/tools.jar</tools.jar.path>
   </properties>
 
   <build>
@@ -155,20 +131,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-
-    <profile>
-      <id>missing-tools.jar</id>
-      <activation>
-        <file>
-          <missing>${tools.jar.path}</missing>
-        </file>
-      </activation>
-      <properties>
-        <tools.jar.path>${java.home}/lib/tools.jar</tools.jar.path>
-      </properties>
-    </profile>
-  </profiles>
 
 </project>
