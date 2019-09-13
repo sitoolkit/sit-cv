@@ -1,42 +1,28 @@
 {
-  "entryPointFilter": {
-    "include":[
-      {
-        "name": ".*Controller.*"
-      }
-    ],
-    "exclude":[]
-  },
-  "sequenceDiagramFilter": {
-    "include": [
-      {
-        "name": ".*Controller.*"
-      },
-      {
-        "name": ".*Service.*"
-      },
-      {
-        "name": ".*Processor.*"
-      },
-      {
-        "name": ".*Validator.*"
-      },
-      {
-        "name": ".*Repository.*"
-      }
-    ],
-    "exclude": []
-  },
-  "repositoryFilter": {
-    "include": [
-      {
-        "name": ".*Repository.*",
-        "annotation": ".*(Repository|Named)"
-      }
-    ],
-    "exclude": []
-  },
-  "sqlEnclosureFilter": {
+  "override": false,
+  "lifelines": [
+    {
+      "name": ".*Controller.*",
+      "entryPoint": true
+    },
+    {
+      "name": ".*Service.*"
+    },
+    {
+      "name": ".*Repository.*",
+      "annotation": ".*(Repository|Named)",
+      "dbAccess": true
+    },
+    {
+      "name": ".*Factory.*",
+      "lifelineOnly": true
+    },
+    {
+      "name": ".*Specification.*",
+      "lifelineOnly": true
+    }
+  ],
+  "sqlLogPattern": {
     "start": ".*org.hibernate.SQL.*",
     "end": "^[0-9]{4}-.*"
   }

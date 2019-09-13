@@ -1,51 +1,43 @@
 {
-  "entryPointFilter": {
-    "include":[
-      {
-        "name": ".*Controller.*"
-      },
-      {
-        "name": ".*Publisher.*"
-      },
-      {
-        "name": ".*Application"
-      }
-    ],
-    "exclude":[]
-  },
-  "sequenceDiagramFilter": {
-    "include": [
-      {
-        "name": ".*Controller.*"
-      },
-      {
-        "name": ".*Service.*"
-      },
-      {
-        "name": ".*Processor.*"
-      },
-      {
-        "name": ".*Validator.*"
-      },
-      {
-        "name": ".*Repository.*"
-      },
-      {
-        "name": ".*Factory.*"
-      },
-      {
-        "name": ".*Writer.*"
-      },
-      {
-        "name": ".*Reader.*"
-      },
-      {
-        "name": ".*Watcher.*"
-      },
-      {
-        "name": ".*Manager.*"
-      }
-    ],
-    "exclude": []
-  }
+  "lifelines": [
+    {
+      "name": ".*Controller.*",
+      "entryPoint": true
+    },
+    {
+      "name": ".*Publisher.*",
+      "entryPoint": true
+    },
+    {
+      "name": ".*Application",
+      "entryPoint": true
+    },
+    {
+      "name": ".*Service.*"
+    },
+    {
+      "name": ".*Processor.*"
+    },
+    {
+      "name": ".*Validator.*"
+    },
+    {
+      "name": ".*Repository.*"
+    },
+    {
+      "name": ".*Factory.*"
+    },
+    {
+      "name": ".*Writer.*"
+    },
+    {
+      "name": ".*Reader.*"
+    },
+    {
+      "name": ".*Watcher.*"
+    },
+    {
+      "name": ".*Manager.*"
+    }
+  ]
 }
