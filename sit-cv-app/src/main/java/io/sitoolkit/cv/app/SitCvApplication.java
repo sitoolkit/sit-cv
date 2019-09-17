@@ -51,13 +51,13 @@ public class SitCvApplication {
     SpringApplicationBuilder builder = new SpringApplicationBuilder(SitCvApplication.class);
     builder.headless(false).run(args);
 
-    if (hasOpenOption(appArgs)) {
+    if (hasOpenBrowserOption(appArgs)) {
       BrowserUtils.open("http://localhost:8080");
     }
   }
 
-  private static boolean hasOpenOption(ApplicationArguments appArgs) {
-    List<String> openValues = appArgs.getOptionValues(SitCvApplicationOption.OPEN.getKey());
+  private static boolean hasOpenBrowserOption(ApplicationArguments appArgs) {
+    List<String> openValues = appArgs.getOptionValues(SitCvApplicationOption.OPEN_BROWSER.getKey());
     return openValues == null || openValues.size() <= 0 || openValues.get(0).equals("true");
   }
 

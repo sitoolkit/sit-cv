@@ -1,7 +1,7 @@
 package io.sitoolkit.cv.app.infra.config;
 
 public enum SitCvApplicationOption {
-    REPORT, PROJECT, ANALYZE_SQL("analyze-sql"), OPEN;
+    REPORT, PROJECT, ANALYZE_SQL("analyze-sql"), OPEN_BROWSER("open");
 
     public static final String PREFIX = "cv";
 

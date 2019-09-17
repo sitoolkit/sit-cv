@@ -1,5 +1,8 @@
 package io.sitoolkit.cv.plugin.maven;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,9 +17,14 @@ import io.sitoolkit.cv.app.SitCvApplication;
 public class RunApplicationMojo extends AbstractMojo {
 
     public static final String ANALYZE_SQL_OPTION = "analyze-sql";
+
+    private static final String OPEN_BROWSER_OPTION = "open";
     
     @Parameter(property = ANALYZE_SQL_OPTION, defaultValue = "false")
     private boolean analyzeSql;
+
+    @Parameter(property = OPEN_BROWSER_OPTION, defaultValue = "true")
+    private boolean openBrowser;
     
     @Parameter
     private String cvArgs;
@@ -43,10 +51,18 @@ public class RunApplicationMojo extends AbstractMojo {
     }
 
     private String[] getArgsAsArray() {
-        String args = StringUtils.defaultString(cvArgs);
-        String analyzeSqlOption = analyzeSql ? (" --cv." + ANALYZE_SQL_OPTION) : "";
+        String[] cvArgsArray = StringUtils.defaultString(cvArgs).split(" ");
+        List<String> args = new ArrayList<>(Arrays.asList(cvArgsArray));
 
-        return (args + analyzeSqlOption).trim().split(" ");
+        if(analyzeSql) {
+          args.add(" --cv." + ANALYZE_SQL_OPTION);
+        }
+
+        if(!openBrowser) {
+          args.add("--cv." + OPEN_BROWSER_OPTION + "=false");
+        }
+
+        return args.toArray(new String[] {});
     }
 
 }
