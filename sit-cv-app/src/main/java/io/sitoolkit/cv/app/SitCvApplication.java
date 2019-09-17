@@ -3,17 +3,15 @@ package io.sitoolkit.cv.app;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.DefaultApplicationArguments;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
-
 import io.sitoolkit.cv.app.infra.config.SitCvApplicationOption;
+import io.sitoolkit.cv.app.infra.utils.BrowserUtils;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
 @SpringBootApplication
@@ -32,7 +30,7 @@ public class SitCvApplication {
     if (appArgs.containsOption(SitCvApplicationOption.REPORT.getKey())) {
       executeReportMode(appArgs);
     } else {
-      SpringApplication.run(SitCvApplication.class, args);
+      executeServerMode(args, appArgs);
     }
   }
 
@@ -47,6 +45,20 @@ public class SitCvApplication {
 
   private static void executeAnalyzeSqlMode(ApplicationArguments appArgs) {
     ServiceFactory.create(getProjectDir(appArgs), false).getCrudService().analyzeSql();
+  }
+
+  private static void executeServerMode(String[] args, ApplicationArguments appArgs) {
+    SpringApplicationBuilder builder = new SpringApplicationBuilder(SitCvApplication.class);
+    builder.headless(false).run(args);
+
+    if (hasOpenOption(appArgs)) {
+      BrowserUtils.open("http://localhost:8080");
+    }
+  }
+
+  private static boolean hasOpenOption(ApplicationArguments appArgs) {
+    List<String> openValues = appArgs.getOptionValues(SitCvApplicationOption.OPEN.getKey());
+    return openValues == null || openValues.size() <= 0 || openValues.get(0).equals("true");
   }
 
   /**
