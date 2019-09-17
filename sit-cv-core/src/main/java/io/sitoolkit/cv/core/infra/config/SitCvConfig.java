@@ -42,7 +42,7 @@ public class SitCvConfig {
 	}
 	
 	private FilterConditionGroup toFilterConditionGroup(List<LifelineClasses> lifelines) {
-		var fcg = new FilterConditionGroup();
+		FilterConditionGroup fcg = new FilterConditionGroup();
 		fcg.setInclude(lifelines.stream().map(LifelineClasses::getCondition).collect(toList()));
 		return fcg;
 	}
