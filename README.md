@@ -46,13 +46,15 @@ sudo apt install graphviz
 ## Demo
 
 If you want to know how Code Visualizer works, try to run it for DDD Sample app (https://github.com/citerus/dddsample-core).
-You can run Code Visualizer on Windows and macOS using following commands of each OS.
+You can run Code Visualizer on Windows and macOS using following commands of each OS. Before you try it, install JDK8 for DDD Sample app.
 
 * Windows
 
 ```
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
+git checkout f01db3d2d8be14233403f363f128645b633d2952
+1>.env echo JAVA_HOME=C:\\path\u0020to\\jdk1.8
 start http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.4/sit-cv-app-1.0.0-beta.4-exec.jar
 move %USERPROFILE%\Downloads\sit-cv-app-1.0.0-beta.4-exec.jar .
 java -jar sit-cv-app-1.0.0-beta.4-exec.jar --cv.analyze-sql
@@ -63,6 +65,8 @@ java -jar sit-cv-app-1.0.0-beta.4-exec.jar --cv.analyze-sql
 ```
 git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
+git checkout f01db3d2d8be14233403f363f128645b633d2952
+echo JAVA_HOME=/path/to/jdk1.8 > .env
 curl -o sit-cv-app-1.0.0-beta.4-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.4/sit-cv-app-1.0.0-beta.4-exec.jar
 java -jar sit-cv-app-1.0.0-beta.4-exec.jar --cv.analyze-sql
 ```
