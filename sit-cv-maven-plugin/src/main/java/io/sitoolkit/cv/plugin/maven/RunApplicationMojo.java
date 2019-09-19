@@ -55,7 +55,7 @@ public class RunApplicationMojo extends AbstractMojo {
         List<String> args = new ArrayList<>(Arrays.asList(cvArgsArray));
 
         if(analyzeSql) {
-          args.add(" --cv." + ANALYZE_SQL_OPTION);
+          args.add("--cv." + ANALYZE_SQL_OPTION);
         }
 
         if(!openBrowser) {

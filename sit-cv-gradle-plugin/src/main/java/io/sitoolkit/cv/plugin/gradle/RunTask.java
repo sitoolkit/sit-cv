@@ -19,12 +19,16 @@ public class RunTask extends JavaExec {
 
     public static final String ANALYZE_SQL_DESCRIPTION = "Run tests and analyze SQL logs to generate a CRUD matrix";
 
+    private static final String OPEN_BROWSER_OPTION = "open";
+    
     private String stopKey = "x";
 
     private String cvArgs;
 
     private boolean analyzeSql;
 
+    private String openBrowser;
+    
     @Input
     @Optional
     public String getCvArgs() {
@@ -41,6 +45,11 @@ public class RunTask extends JavaExec {
         this.analyzeSql = analyzeSql;
     }
 
+    @Option(option = OPEN_BROWSER_OPTION, description = "Set false to not open the browser at startup")
+    public void setOpenBrowser(String openBrowser) {
+        this.openBrowser = openBrowser;
+    }
+    
     private List<String> getCvArgsAsList() {
         List<String> args = new ArrayList<>();
 
@@ -50,6 +59,10 @@ public class RunTask extends JavaExec {
 
         if (analyzeSql) {
             args.add("--cv." + ANALYZE_SQL_OPTION);
+        }
+
+        if (!StringUtils.isEmpty(openBrowser) && openBrowser.equals("false")) {
+          args.add("--cv." + OPEN_BROWSER_OPTION + "=false");
         }
 
         return args;
