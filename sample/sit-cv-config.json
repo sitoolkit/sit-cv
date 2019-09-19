@@ -1,27 +1,22 @@
 {
-  "entryPointFilter": {
-    "include":[
+  "lifelines":[
       {
-        "name": ".*Controller.*"
+        "name": ".*Controller.*",
+        "entryPoint": true
       },
       {
-        "name": ".*Publisher.*"
+        "name": ".*Publisher.*",
+        "entryPoint": true
       },
       {
-        "name": ".*Service.*"
-      }
-    ],
-    "exclude":[]
-  },
-  "sequenceDiagramFilter": {
-    "include": [
+        "name": ".*Service.*",
+        "entryPoint": true
+      },
       {
         "name": ".*Processor"
       },
       {
         "name": ".*Repository.*"
       }
-    ],
-    "exclude": []
-  }
+  ]
 }

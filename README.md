@@ -213,44 +213,49 @@ If you want to customize filter condition to draw classes on diagrams, put sit-c
 It's JSON structure is as follows.
 
 * sit-cv-config.json
-
 ```json
 {
-  "entryPointFilter": {
-    "include":[
-      {
-        "name": ".*Controller"
-      },
-      {
-        "annotation": "*.Controller"
-      },
-      {
-        "name": ".*Controller",
-        "annotation": ""
-      },
-    ]
-  },
-  "sequenceDiagramFilter": {
-    "include": []
-  },
-  "repositoryFilter": {
-    "include": []
-  },
-  "sqlEnclosureFilter": {
+  "lifelines": [
+    {
+      "name": ".*Controller.*",
+      "annotation": ".*Controller",
+      "entryPoint": true,
+      "lifelineOnly": true
+    },
+    {
+      "name": ".*Service.*"
+    },
+    {
+      "name": ".*Repository.*",
+      "annotation": ".*(Repository|Named)",
+      "dbAccess": true
+    },
+    {
+      "name": ".*Factory.*",
+      "lifelineOnly": true
+    },
+    {
+      "name": ".*Specification.*",
+      "lifelineOnly": true
+    }
+  ],
+  "sqlLogPattern": {
     "start": ".*Pattern before SQL starts.*",
     "end": ".*Pattern after SQL ends.*"
-  }
+  },
+  "override": false
 }
 ```
 
-|          Key          |                                   Description                                    |
-| --------------------- | -------------------------------------------------------------------------------- |
-| entoryPointFilter     | Filter rule to recognize as entry point i.e. left end class of sequence diagram. |
-| include               | Include classes that match one of these rules for processing.                    |
-| name                  | Pattern to match class qualified name.                                           |
-| annotation            | Pattern to match qualified annotation name of class.                             |
-| sequenceDiagramFilter | Filter rule to draw sequence diagram.                                            |
-| repositoryFilter      | Filter rule to find repository classes. This is used to generate CRUD matrix.    |
-| sqlEnclosureFilter    | Filter rule to find SQL from test log. This is used to generate CRUD matrix.     |
-| start                 | Pattern to match the line just before SQL starts.                                |
-| end                   | Pattern to match the line just after SQL ends.                                   |
+| Key                 | Description                                                                        | Default value |
+|---------------------|------------------------------------------------------------------------------------|---------------|
+| lifelines           | Specify classes to draw as a lifeline in the sequence diagram.                     |               |
+| &emsp; name         | Pattern to match class qualified name.                                             |               |
+| &emsp; annotation   | Pattern to match qualified annotation name of class.                               |               |
+| &emsp; entryPoint   | Set true to recognize as a entry point, i.e. left end class of sequence diagram.   | false         |
+| &emsp; dbAccess     | Set true to recognize as a repository class. This is used to generate CRUD matrix. | false         |
+| &emsp; lifelineOnly | (unimplemented)                                                                    | false         |
+| sqlLogPattern       | Filter rule to find SQL from test log. This is used to generate CRUD matrix.       |               |
+| &emsp; start        | Pattern to match the line just before SQL starts.                                  |               |
+| &emsp; end          | Pattern to match the line just after SQL ends.                                     |               |
+| override            | (unimplemented)                                                                    | false         |
