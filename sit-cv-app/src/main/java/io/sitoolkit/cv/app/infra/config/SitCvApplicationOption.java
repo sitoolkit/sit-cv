@@ -1,5 +1,8 @@
 package io.sitoolkit.cv.app.infra.config;
 
+import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
+
 public enum SitCvApplicationOption {
     REPORT, PROJECT, ANALYZE_SQL("analyze-sql"), OPEN_BROWSER("open");
 
@@ -17,5 +20,9 @@ public enum SitCvApplicationOption {
 
     public String getKey() {
         return PREFIX + "." + key;
+    }
+
+    public static String getOptionValue(List<String> args, String defaultValue) {
+      return CollectionUtils.isEmpty(args) ? defaultValue : args.get(0);
     }
 }

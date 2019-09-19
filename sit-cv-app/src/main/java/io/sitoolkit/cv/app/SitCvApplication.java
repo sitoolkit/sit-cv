@@ -10,11 +10,14 @@ import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import io.sitoolkit.cv.app.infra.config.SitCvApplicationOption;
 import io.sitoolkit.cv.app.infra.utils.BrowserUtils;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootApplication
+@Slf4j
 public class SitCvApplication {
 
   @Autowired
@@ -35,8 +38,9 @@ public class SitCvApplication {
   }
 
   private static Path getProjectDir(ApplicationArguments appArgs) {
-    List<String> projects = appArgs.getOptionValues(SitCvApplicationOption.PROJECT.getKey());
-    return projects == null || projects.isEmpty() ? Paths.get(".") : Paths.get(projects.get(0));
+    List<String> values = appArgs.getOptionValues(SitCvApplicationOption.PROJECT.getKey());
+    String projectPath = SitCvApplicationOption.getOptionValue(values, ".");
+    return Paths.get(projectPath);
   }
 
   private static void executeReportMode(ApplicationArguments appArgs) {
@@ -49,16 +53,28 @@ public class SitCvApplication {
 
   private static void executeServerMode(String[] args, ApplicationArguments appArgs) {
     SpringApplicationBuilder builder = new SpringApplicationBuilder(SitCvApplication.class);
-    builder.headless(false).run(args);
+    ApplicationContext appCtx = builder.headless(false).run(args);
 
-    if (hasOpenBrowserOption(appArgs)) {
-      BrowserUtils.open("http://localhost:8080");
+    if (needsOpenBrowser(appArgs)) {
+      openBrowser(appCtx);
     }
   }
 
-  private static boolean hasOpenBrowserOption(ApplicationArguments appArgs) {
-    List<String> openValues = appArgs.getOptionValues(SitCvApplicationOption.OPEN_BROWSER.getKey());
-    return openValues == null || openValues.size() <= 0 || openValues.get(0).equals("true");
+  private static boolean needsOpenBrowser(ApplicationArguments appArgs) {
+    List<String> values = appArgs.getOptionValues(SitCvApplicationOption.OPEN_BROWSER.getKey());
+    String openValue = SitCvApplicationOption.getOptionValue(values, "true");
+    return !openValue.equals("false");
+  }
+
+  private static void openBrowser(ApplicationContext appCtx) {
+    Environment env = appCtx.getBean(Environment.class);
+    String port = env.getProperty("local.server.port");
+
+    try {
+      BrowserUtils.open("http://localhost:" + port);
+    } catch (Exception e) {
+      log.error("Exception opening browser", e);
+    }
   }
 
   /**
