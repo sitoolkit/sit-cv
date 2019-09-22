@@ -10,8 +10,7 @@ import java.util.function.Consumer;
 
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
-import io.sitoolkit.cv.core.infra.watcher.FileInputSourceWatcher;
-import io.sitoolkit.cv.core.infra.watcher.InputSourceWatcher;
+import io.sitoolkit.cv.core.infra.watcher.FileWatcher;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -22,7 +21,7 @@ public class SitCvConfigReader {
 
   private volatile Path baseDir;
   private List<Consumer<SitCvConfig>> configListeners = new ArrayList<>();
-  private InputSourceWatcher watcher = new FileInputSourceWatcher();
+  private FileWatcher watcher = new FileWatcher();
 
   public SitCvConfig read(Path dir, boolean watch) {
     if (config == null) {
@@ -67,9 +66,8 @@ public class SitCvConfigReader {
       return;
     }
 
-    watcher.setContinue(true);
-    watcher.watch(configFilePath.toAbsolutePath().toString());
-    watcher.start(inputSources -> {
+    watcher.add(configFilePath);
+    watcher.addListener(modifiedFiles -> {
       List<Consumer<SitCvConfig>> listeners;
       reload();
       synchronized (this) {
@@ -78,6 +76,7 @@ public class SitCvConfigReader {
       log.debug("config listeners: {}", listeners.toString());
       listeners.forEach(listener -> listener.accept(config));
     });
+    watcher.start();
   }
 
   public synchronized void addChangeListener(Consumer<SitCvConfig> listener) {

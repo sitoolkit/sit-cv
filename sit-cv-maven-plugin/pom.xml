@@ -27,13 +27,13 @@
       <groupId>io.sitoolkit.cv</groupId>
       <artifactId>sit-cv-app</artifactId>
       <version>${project.version}</version>
-      <exclusions>
+<!--       <exclusions>
         <exclusion>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+ -->    </dependency>
 
     <dependency>
       <groupId>org.apache.maven</groupId>
