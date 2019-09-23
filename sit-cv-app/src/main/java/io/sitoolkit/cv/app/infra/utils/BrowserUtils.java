@@ -12,9 +12,9 @@ public class BrowserUtils {
     try {
       Desktop.getDesktop().browse(new URI(uri));
     } catch (IOException e) {
-      new UncheckedIOException(e);
+      throw new UncheckedIOException(e);
     } catch (URISyntaxException e) {
-      new RuntimeException(e);
+      throw new RuntimeException(e);
     }
   }
 
