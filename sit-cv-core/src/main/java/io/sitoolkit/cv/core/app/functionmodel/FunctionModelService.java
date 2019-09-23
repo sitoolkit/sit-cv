@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
-import io.sitoolkit.cv.core.app.designdoc.DesignDocChangeEventListener;
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
@@ -32,8 +31,6 @@ import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
-import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
-import io.sitoolkit.cv.core.infra.watcher.FileWatcher;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,13 +58,7 @@ public class FunctionModelService {
   private ClassDefRepository classDefRepository;
 
   @NonNull
-  private FileWatcher watcher;
-
-  @NonNull
   private ProjectManager projectManager;
-
-  @NonNull
-  private SitCvConfigReader configReader;
 
   /**
    * key:classDef.sourceId, value:entrypoint
@@ -81,32 +72,24 @@ public class FunctionModelService {
     log.info("Analysis finished in {}", stopWatch);
   }
 
-  public void watchDir(Path srcDir, DesignDocChangeEventListener listener) {
+  public AnalysisResult analyze(Set<Path> srcFiles) {
 
-    watcher.add(srcDir);
-    watcher.addListener(modifiedFiles -> {
-      int entryPoitSizeBefore = classDefRepository.getEntryPoints().size();
+    AnalysisResult result = new AnalysisResult();
 
-      readSources(modifiedFiles).forEach(listener::onDesignDocChange);
+    Set<String> entryPoitsBefore = new HashSet<>(classDefRepository.getEntryPoints());
 
-      if (classDefRepository.getEntryPoints().size() != entryPoitSizeBefore) {
-        listener.onDesignDocListChange();
-      }
+    result.setEffectedSourceIds(readSources(srcFiles));
 
-    });
-    watcher.start();
+    Set<String> entryPoitsAfter = new HashSet<>(classDefRepository.getEntryPoints());
+
+    result.setEntryPointModified(!entryPoitsBefore.equals(entryPoitsAfter));
+
+    return result;
   }
 
-  public void watchConfig(DesignDocChangeEventListener listener) {
-
-    configReader.addChangeListener(newConfig -> {
-      Set<String> entryPoints;
-      synchronized (entryPointMap) {
-        entryPoints = entryPointMap.values().stream().filter(Objects::nonNull).flatMap(Set::stream)
-            .distinct().collect(Collectors.toSet());
-      }
-      entryPoints.forEach(listener::onDesignDocChange);
-    });
+  public synchronized Set<String> getEntryPoints() {
+    return entryPointMap.values().stream().filter(Objects::nonNull).flatMap(Set::stream).distinct()
+        .collect(Collectors.toSet());
   }
 
   /**

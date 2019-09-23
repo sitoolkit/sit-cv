@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.sun.nio.file.SensitivityWatchEventModifier;
 
@@ -132,7 +133,7 @@ public class FileWatcher {
     }
 
     for (WatchEvent<?> event : watchKey.pollEvents()) {
-      log.debug("Poll event:{} of wachable:{}", event.kind(), watchKey.watchable());
+      log.info("Poll watchEvent:{} of wachable:{}", event.kind(), watchKey.watchable());
 
       Path watchingPath = (Path) watchKey.watchable();
       Path effectedPath = watchingPath.resolve((Path) event.context());
@@ -152,6 +153,13 @@ public class FileWatcher {
   }
 
   private void handleChangeEvent() {
+
+    try {
+      TimeUnit.MILLISECONDS.sleep(300);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+
     modifiedFiles.getChangedFilesWithinLast(300).ifPresent(files -> {
 
       fileEventListeners.forEach(listener -> {

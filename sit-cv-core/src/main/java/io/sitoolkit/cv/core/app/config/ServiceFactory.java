@@ -36,7 +36,6 @@ import io.sitoolkit.cv.core.domain.uml.plantuml.SequenceDiagramWriterPlantUmlImp
 import io.sitoolkit.cv.core.infra.config.SitCvConfig;
 import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
 import io.sitoolkit.cv.core.infra.graphviz.GraphvizManager;
-import io.sitoolkit.cv.core.infra.watcher.FileWatcher;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -85,7 +84,7 @@ public class ServiceFactory {
     projectManager = createProjectManager(config);
     projectManager.load(projectDir);
 
-    functionModelService = createFunctionModelService(config, configReader, projectManager);
+    functionModelService = createFunctionModelService(config, projectManager);
 
     designDocService = createDesignDocService(functionModelService);
 
@@ -106,7 +105,7 @@ public class ServiceFactory {
   }
 
   protected FunctionModelService createFunctionModelService(SitCvConfig config,
-      SitCvConfigReader configReader, ProjectManager projectManager) {
+      ProjectManager projectManager) {
     ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
     ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
         projectManager, config);
@@ -117,10 +116,9 @@ public class ServiceFactory {
     DiagramWriter<SequenceDiagram> sequenceWriter = new SequenceDiagramWriterPlantUmlImpl(
         plantumlWriter);
     DiagramWriter<ClassDiagram> classWriter = new ClassDiagramWriterPlantUmlImpl(plantumlWriter);
-    FileWatcher watcher = new FileWatcher();
 
     return new FunctionModelService(classDefReader, sequenceProcessor, classProcessor,
-        sequenceWriter, classWriter, classDefRepository, watcher, projectManager, configReader);
+        sequenceWriter, classWriter, classDefRepository, projectManager);
 
   }
 

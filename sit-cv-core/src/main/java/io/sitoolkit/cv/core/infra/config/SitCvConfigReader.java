@@ -18,7 +18,6 @@ public class SitCvConfigReader {
 
   private static final String CONFIG_FILE_NAME = "sit-cv-config.json";
   private static SitCvConfig config;
-
   private volatile Path baseDir;
   private List<Consumer<SitCvConfig>> configListeners = new ArrayList<>();
   private FileWatcher watcher = new FileWatcher();

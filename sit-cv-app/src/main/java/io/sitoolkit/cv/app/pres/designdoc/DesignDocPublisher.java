@@ -8,54 +8,35 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import io.sitoolkit.cv.core.app.designdoc.DesignDocChangeEventListener;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
-import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
-import io.sitoolkit.cv.core.domain.project.ProjectManager;
 
 @Controller
-public class DesignDocPublisher implements DesignDocChangeEventListener {
+public class DesignDocPublisher implements DesignDocTreeEventListener {
 
-    @Autowired
-    FunctionModelService functionModelService;
+  @Autowired
+  DesignDocService designDocService;
 
-    @Autowired
-    DesignDocService designDocService;
+  @Autowired
+  SimpMessagingTemplate template;
 
-    @Autowired
-    SimpMessagingTemplate template;
+  @PostConstruct
+  public void init() {
+    publishDesingDocList();
+  }
 
-    @Autowired
-    ProjectManager projectManager;
+  @MessageMapping("/designdoc/list")
+  public void publishDesingDocList() {
+    template.convertAndSend("/topic/designdoc/list", designDocService.buildMenu());
+  }
 
-    @PostConstruct
-    public void init() {
-        publishDesingDocList();
+  @RequestMapping("")
+  public String index() {
+    return "index.html";
+  }
 
-        projectManager.getCurrentProject().getAllSrcDirs().stream().forEach(srcDir -> {
-            functionModelService.watchDir(srcDir, this);
-        });
-
-        functionModelService.watchConfig(this);
-    }
-
-    @MessageMapping("/designdoc/list")
-    public void publishDesingDocList() {
-        template.convertAndSend("/topic/designdoc/list", designDocService.buildMenu());
-    }
-
-    @RequestMapping("")
-    public String index() {
-        return "index.html";
-    }
-
-    @Override
-    public void onDesignDocChange(String designDocId) {
-    }
-
-    @Override
-    public void onDesignDocListChange() {
-        publishDesingDocList();
-    }
+  @Override
+  public void onModified() {
+    publishDesingDocList();
+  }
 
 }
