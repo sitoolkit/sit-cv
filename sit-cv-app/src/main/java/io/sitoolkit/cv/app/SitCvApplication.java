@@ -1,5 +1,7 @@
 package io.sitoolkit.cv.app;
 
+import java.awt.Desktop;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -12,7 +14,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import io.sitoolkit.cv.app.infra.config.SitCvApplicationOption;
-import io.sitoolkit.cv.app.infra.utils.BrowserUtils;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,7 +72,8 @@ public class SitCvApplication {
     String port = env.getProperty("local.server.port");
 
     try {
-      BrowserUtils.open("http://localhost:" + port);
+      URI uri = new URI("http://localhost:" + port);
+      Desktop.getDesktop().browse(uri);
     } catch (Exception e) {
       log.error("Exception opening browser", e);
     }
