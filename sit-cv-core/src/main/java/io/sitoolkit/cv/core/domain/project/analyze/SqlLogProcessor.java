@@ -37,24 +37,24 @@ public class SqlLogProcessor {
 
     private String buildAgentParameter(Path agentJar, String projectType, URL configUrl, FilterConditionGroup repositoryFilter) {
         Map<String, String> agentArgsMap = new HashMap<>();
-		putRepositoryFilter(agentArgsMap, repositoryFilter);
-		agentArgsMap.put("projectType", projectType);
-		agentArgsMap.put("repositoryMethodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
+        putRepositoryFilter(agentArgsMap, repositoryFilter);
+        agentArgsMap.put("projectType", projectType);
+        agentArgsMap.put("repositoryMethodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
         String agentArgs = agentArgsMap.entrySet().stream()
                 .map((e) -> e.getKey() + "=" + e.getValue())
                 .collect(Collectors.joining(";", "=", ""));
         return "-javaagent:" + agentJar.toString() + agentArgs;
     }
     
-    private void putRepositoryFilter(Map<String, String> agentArgsMap, FilterConditionGroup repositoryFilter){
-		List<FilterCondition> include = repositoryFilter.getInclude();
-		int index = 0;
-		for (FilterCondition filterCondition : include) {
-			index++;
-			String annotation = filterCondition.getAnnotation();
-			String name = filterCondition.getName();
-			agentArgsMap.put("repositoryFilter" + index + ".annotation", StringUtils.defaultString(annotation));
-			agentArgsMap.put("repositoryFilter" + index + ".name", StringUtils.defaultString(name));
-		}
+    private void putRepositoryFilter(Map<String, String> agentArgsMap, FilterConditionGroup repositoryFilter) {
+        List<FilterCondition> include = repositoryFilter.getInclude();
+        int index = 0;
+        for (FilterCondition filterCondition : include) {
+            index++;
+            String annotation = filterCondition.getAnnotation();
+            String name = filterCondition.getName();
+            agentArgsMap.put("repositoryFilter" + index + ".annotation", StringUtils.defaultString(annotation));
+            agentArgsMap.put("repositoryFilter" + index + ".name", StringUtils.defaultString(name));
+        }
     }
 }

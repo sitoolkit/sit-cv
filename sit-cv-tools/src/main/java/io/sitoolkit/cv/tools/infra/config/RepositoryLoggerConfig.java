@@ -23,20 +23,20 @@ public class RepositoryLoggerConfig {
     
     private FilterConditionGroup repositoryFilter;
 
-	public FilterConditionGroup getRepositoryFilter() {
-		if (repositoryFilter != null) {
-			return repositoryFilter;
-			
-		} else {
-			List<LifelineClasses> repositories = lifelines.stream().filter(LifelineClasses::isDbAccess)
-					.collect(toList());
-			return toFilterConditionGroup(repositories);
-		}
-	}
+    public FilterConditionGroup getRepositoryFilter() {
+        if (repositoryFilter != null) {
+            return repositoryFilter;
 
-	private FilterConditionGroup toFilterConditionGroup(List<LifelineClasses> lifelines) {
-		FilterConditionGroup fcg = new FilterConditionGroup();
-		fcg.setInclude(lifelines.stream().map(LifelineClasses::getCondition).collect(toList()));
-		return fcg;
-	}
+        } else {
+            List<LifelineClasses> repositories = lifelines.stream().filter(LifelineClasses::isDbAccess)
+                    .collect(toList());
+            return toFilterConditionGroup(repositories);
+        }
+    }
+
+    private FilterConditionGroup toFilterConditionGroup(List<LifelineClasses> lifelines) {
+        FilterConditionGroup fcg = new FilterConditionGroup();
+        fcg.setInclude(lifelines.stream().map(LifelineClasses::getCondition).collect(toList()));
+        return fcg;
+    }
 }
