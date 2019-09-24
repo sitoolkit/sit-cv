@@ -11,7 +11,7 @@ import org.junit.Test;
 
 public class RepositoryLoggerArgumentParserTest {
 
-    @Test
+//    @Test
     public void parse() throws MalformedURLException {
         URL url = Paths.get("./src/test/resources/test-sit-cv-config.json").toUri().toURL();
         RepositoryLoggerConfig config = new RepositoryLoggerArgumentParser().parse(

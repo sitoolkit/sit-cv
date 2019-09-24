@@ -20,10 +20,18 @@ public class RepositoryLoggerConfig {
     private List<LifelineClasses> lifelines = new ArrayList<>();
 
     private String projectType;
+    
+    private FilterConditionGroup repositoryFilter;
 
 	public FilterConditionGroup getRepositoryFilter() {
-		List<LifelineClasses> repositories = lifelines.stream().filter(LifelineClasses::isDbAccess).collect(toList());
-		return toFilterConditionGroup(repositories);
+		if (repositoryFilter != null) {
+			return repositoryFilter;
+			
+		} else {
+			List<LifelineClasses> repositories = lifelines.stream().filter(LifelineClasses::isDbAccess)
+					.collect(toList());
+			return toFilterConditionGroup(repositories);
+		}
 	}
 
 	private FilterConditionGroup toFilterConditionGroup(List<LifelineClasses> lifelines) {
