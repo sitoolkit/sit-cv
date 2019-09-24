@@ -48,7 +48,7 @@ public class RepositoryLoggerArgumentParser {
     private Optional<FilterCondition> getSingleRepositoryFilter(Map<String, String> valueMap, int index) {
         String annotation = valueMap.get("repositoryFilter" + index + ".annotation");
         String name = valueMap.get("repositoryFilter" + index + ".name");
-        if (annotation == null || name == null) {
+        if (annotation == null && name == null) {
             return Optional.empty();
         } else {
             return Optional.of(new FilterCondition(name, annotation));
