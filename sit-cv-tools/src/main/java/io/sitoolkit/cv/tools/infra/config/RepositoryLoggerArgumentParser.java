@@ -1,15 +1,10 @@
 package io.sitoolkit.cv.tools.infra.config;
 
-import java.io.UncheckedIOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import io.sitoolkit.cv.tools.infra.util.JsonUtils;
 
 public class RepositoryLoggerArgumentParser {
 
@@ -19,7 +14,6 @@ public class RepositoryLoggerArgumentParser {
     public RepositoryLoggerConfig parse(String args) {
         Map<String, String> valueMap = parseArgs(args);
 
-//        RepositoryLoggerConfig config = readConfig(valueMap.get("configUrl"));
         RepositoryLoggerConfig config = new RepositoryLoggerConfig();
         config.setRepositoryFilter(getRepositoryFilter(valueMap));
         config.setRepositoryMethodMarker(valueMap.get("repositoryMethodMarker"));
@@ -67,14 +61,4 @@ public class RepositoryLoggerArgumentParser {
         
         return valueMap;
     }
-    
-    private RepositoryLoggerConfig readConfig(String configUrl) {
-        try {
-            URL url = new URL(configUrl);
-            return JsonUtils.url2obj(url, RepositoryLoggerConfig.class);
-        } catch (MalformedURLException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
 }
