@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.project.lombok;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -9,12 +10,14 @@ import io.sitoolkit.cv.core.infra.lombok.DelombokParameter;
 import io.sitoolkit.cv.core.infra.lombok.Delomboker;
 import io.sitoolkit.cv.core.infra.util.JdkUtils;
 import lombok.extern.slf4j.Slf4j;
+import net.sourceforge.plantuml.Run;
 
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
 
   private Delomboker delomboker = new Delomboker();
   private Project project;
+  private Path delombokClasspath;
 
   public static Optional<PreProcessor> of(Project project) {
 
@@ -62,6 +65,8 @@ public class DelombokProcessor implements PreProcessor {
 
   private DelombokProcessor(Project project) {
     this.project = project;
+    this.delombokClasspath = project.getClasspaths().stream()
+            .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-")).findFirst().get();
   }
 
   @Override
@@ -86,11 +91,26 @@ public class DelombokProcessor implements PreProcessor {
   }
 
   void executeDelombok(Path srcDir) {
-    DelombokParameter param = DelombokParameter.builder().src(srcDir).target(getDelombokTargetDir())
-        .encoding("UTF-8").classpath(project.getClasspaths()).sourcepath(project.getSrcDirs())
-        .build();
-
-    delomboker.execute(param);
+    String srcPath = srcDir.toFile().getAbsolutePath();
+    String targetPath = getDelombokTargetDir().toFile().getAbsolutePath();
+    log.debug("Delomboking {} ...", srcPath);
+    try {
+      ProcessBuilder processBuilder =
+              new ProcessBuilder("java", "-jar", delombokClasspath.toFile().getAbsolutePath(),
+                      "delombok", "-f", "pretty", srcPath, "-d",
+                      targetPath);
+      processBuilder.directory(project.getBuildDir().toFile());
+      Process process = processBuilder.start();
+      // プロセス終了を待つ
+      int ret = process.waitFor();
+      if (ret == 0) {
+        log.info("Delomboked in {} to {}", srcPath, targetPath);
+      } else {
+        throw new RuntimeException();
+      }
+    } catch (InterruptedException | IOException | RuntimeException e) {
+      log.warn("Delombok failed : {}", srcPath, targetPath);
+    }
   }
 
   Path getDelombokTargetDir() {
