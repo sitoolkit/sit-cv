@@ -2,6 +2,7 @@ package io.sitoolkit.cv.app.infra.config;
 
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.boot.ApplicationArguments;
 
 public enum SitCvApplicationOption {
     REPORT, PROJECT, ANALYZE_SQL("analyze-sql"), OPEN_BROWSER("open");
@@ -22,7 +23,8 @@ public enum SitCvApplicationOption {
         return PREFIX + "." + key;
     }
 
-    public static String getOptionValue(List<String> args, String defaultValue) {
-      return CollectionUtils.isEmpty(args) ? defaultValue : args.get(0);
+    public String getValue(ApplicationArguments appArgs, String defaultValue) {
+      List<String> args = appArgs.getOptionValues(this.getKey());
+      return CollectionUtils.isEmpty(args) ? defaultValue : args.get(0);     
     }
 }
