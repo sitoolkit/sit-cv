@@ -99,7 +99,6 @@ public class DelombokProcessor implements PreProcessor {
               new ProcessBuilder("java", "-jar", delombokClasspath.toFile().getAbsolutePath(),
                       "delombok", "-f", "pretty", srcPath, "-d",
                       targetPath);
-      processBuilder.directory(project.getBuildDir().toFile());
       Process process = processBuilder.start();
       // プロセス終了を待つ
       int ret = process.waitFor();
