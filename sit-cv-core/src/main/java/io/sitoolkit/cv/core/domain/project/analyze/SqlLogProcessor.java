@@ -1,6 +1,5 @@
 package io.sitoolkit.cv.core.domain.project.analyze;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +24,7 @@ public class SqlLogProcessor {
 
         SitFileUtils.createDirectories(project.getSqlLogPath().getParent());
 
-        String javaAgentParameter = buildAgentParameter(agentJar, projectType,
-                config.getSourceUrl(), config.getRepositoryFilter());
+        String javaAgentParameter = buildAgentParameter(agentJar, projectType, config.getRepositoryFilter());
         SqlLogListener sqlLogListener = new SqlLogListener(config.getSqlEnclosureFilter());
 
         ProcessCommand command = commandBuilder.apply(javaAgentParameter);
@@ -35,7 +33,7 @@ public class SqlLogProcessor {
         JsonUtils.obj2file(sqlLogListener.getSqlLogs(), project.getSqlLogPath());
     }
 
-    private String buildAgentParameter(Path agentJar, String projectType, URL configUrl, FilterConditionGroup repositoryFilter) {
+    private String buildAgentParameter(Path agentJar, String projectType, FilterConditionGroup repositoryFilter) {
         Map<String, String> agentArgsMap = new HashMap<>();
         putRepositoryFilter(agentArgsMap, repositoryFilter);
         agentArgsMap.put("projectType", projectType);
