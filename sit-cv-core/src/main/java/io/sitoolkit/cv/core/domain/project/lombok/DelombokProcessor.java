@@ -1,21 +1,17 @@
 package io.sitoolkit.cv.core.domain.project.lombok;
 
-import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
-
 import io.sitoolkit.cv.core.domain.project.PreProcessor;
 import io.sitoolkit.cv.core.domain.project.Project;
-import io.sitoolkit.cv.core.infra.lombok.DelombokParameter;
-import io.sitoolkit.cv.core.infra.lombok.Delomboker;
 import io.sitoolkit.cv.core.infra.util.JdkUtils;
+import io.sitoolkit.cv.core.infra.util.ProcessUtils;
 import lombok.extern.slf4j.Slf4j;
-import net.sourceforge.plantuml.Run;
 
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
 
-  private Delomboker delomboker = new Delomboker();
   private Project project;
   private Path delombokClasspath;
 
@@ -66,14 +62,15 @@ public class DelombokProcessor implements PreProcessor {
   private DelombokProcessor(Project project) {
     this.project = project;
     this.delombokClasspath = project.getClasspaths().stream()
-            .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-")).findFirst().get();
+        .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-")).findFirst()
+        .get();
   }
 
   @Override
   public Path getPreProcessedPath(Path original) {
 
-    Optional<Path> enclosingSrcDir = project.getSrcDirs().stream()
-        .filter(dir -> original.startsWith(original)).findFirst();
+    Optional<Path> enclosingSrcDir =
+        project.getSrcDirs().stream().filter(dir -> original.startsWith(original)).findFirst();
 
     if (enclosingSrcDir.isPresent()) {
       Path relativized = enclosingSrcDir.get().relativize(original);
@@ -93,22 +90,22 @@ public class DelombokProcessor implements PreProcessor {
   void executeDelombok(Path srcDir) {
     String srcPath = srcDir.toFile().getAbsolutePath();
     String targetPath = getDelombokTargetDir().toFile().getAbsolutePath();
+    List<String> command = List.of("java", "-jar", delombokClasspath.toFile().getAbsolutePath(),
+        "delombok", "-f", "pretty", srcPath, "-d", targetPath);
     log.debug("Delomboking {} ...", srcPath);
+    int ret = 0;
     try {
-      ProcessBuilder processBuilder =
-              new ProcessBuilder("java", "-jar", delombokClasspath.toFile().getAbsolutePath(),
-                      "delombok", "-f", "pretty", srcPath, "-d",
-                      targetPath);
-      Process process = processBuilder.start();
-      // プロセス終了を待つ
-      int ret = process.waitFor();
-      if (ret == 0) {
-        log.info("Delomboked in {} to {}", srcPath, targetPath);
-      } else {
-        throw new RuntimeException();
+      ret = ProcessUtils.run(command);
+      if (ret != 0) {
+        throw new Exception();
       }
-    } catch (InterruptedException | IOException | RuntimeException e) {
-      log.warn("Delombok failed : {}", srcPath, targetPath);
+      log.info("Delomboked in {} to {}", srcPath, targetPath);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } catch (Exception e) {
+      log.error("Delombok failed : {}", srcPath, targetPath);
+      System.err.println(ret);
+      System.exit(ret);
     }
   }
 
