@@ -1,25 +1,13 @@
 {
+  "override": false,
   "lifelines":[
-      {
-        "name": ".*Controller.*",
-        "entryPoint": true
-      },
       {
         "name": ".*Publisher.*",
         "entryPoint": true
       },
       {
-        "name": ".*Service.*"
-      },
-      {
-        "name": ".*Specification.*",
-        "lifelineOnly": true
-      },
-      {
-        "name": ".*Processor"
-      },
-      {
-        "name": ".*Repository.*"
+        "name": ".*Processor",
+        "entryPoint": false
       }
   ]
 }
