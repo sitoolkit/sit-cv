@@ -6,4 +6,8 @@ public class ProcessExecutionException extends RuntimeException {
         super(cause);
     }
 
+    public ProcessExecutionException(int retCode) {
+        super(String.format("Return code: %d", retCode));
+    }
+
 }
