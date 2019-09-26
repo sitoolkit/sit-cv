@@ -90,22 +90,10 @@ public class DelombokProcessor implements PreProcessor {
   void executeDelombok(Path srcDir) {
     String srcPath = srcDir.toFile().getAbsolutePath();
     String targetPath = getDelombokTargetDir().toFile().getAbsolutePath();
-    List<String> command = List.of("java", "-jar", delombokClasspath.toFile().getAbsolutePath(),
-        "delombok", "-f", "pretty", srcPath, "-d", targetPath);
     log.debug("Delomboking {} ...", srcPath);
-    int ret = 0;
-    try {
-      ret = ProcessUtils.run(command);
-      if (ret != 0) {
-        throw new Exception();
-      }
-      log.info("Delomboked in {} to {}", srcPath, targetPath);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    } catch (Exception e) {
-      log.error("Delombok failed : {}", srcPath, targetPath);
-      System.exit(ret);
-    }
+    ProcessUtils.start("java", "-jar", delombokClasspath.toFile().getAbsolutePath(),
+            "delombok", "-f", "pretty", srcPath, "-d", targetPath);
+    log.info("Delomboked in {} to {}", srcPath, targetPath);
   }
 
   Path getDelombokTargetDir() {

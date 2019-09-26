@@ -1,14 +1,22 @@
 package io.sitoolkit.cv.core.infra.util;
 
-import java.io.IOException;
-import java.util.List;
+import io.sitoolkit.cv.core.infra.exception.ProcessExecutionException;
 
 public class ProcessUtils {
 
-  public static int run(List<String> command) throws IOException, InterruptedException {
+  public static void start(String... command) {
     ProcessBuilder processBuilder = new ProcessBuilder(command);
-    Process process = processBuilder.start();
-    return process.waitFor();
+    try {
+      Process process = processBuilder.start();
+      int ret = process.waitFor();
+      if (ret != 0) {
+        throw new Exception();
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } catch (Exception e) {
+      throw new ProcessExecutionException(e);
+    }
   }
 
 }
