@@ -10,7 +10,7 @@ public class ProcessUtils {
       Process process = processBuilder.start();
       int ret = process.waitFor();
       if (ret != 0) {
-        throw new Exception("Return code: " + ret);
+        throw new Exception(String.format("Processing return code: %d", ret));
       }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
