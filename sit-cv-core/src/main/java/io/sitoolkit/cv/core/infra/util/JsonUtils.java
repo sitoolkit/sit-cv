@@ -52,14 +52,6 @@ public class JsonUtils {
         }
     }
 
-    public static <T> T url2obj(URL url, Object obj) {
-        try {
-            return MAPPER.readerForUpdating(obj).readValue(url);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     public static void obj2file(Object obj, Path path) {
         log.info("Write object to file: {}", formatPath(path));
 
