@@ -1,7 +1,6 @@
 package io.sitoolkit.cv.core.domain.project.lombok;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 import io.sitoolkit.cv.core.domain.project.PreProcessor;
 import io.sitoolkit.cv.core.domain.project.Project;
