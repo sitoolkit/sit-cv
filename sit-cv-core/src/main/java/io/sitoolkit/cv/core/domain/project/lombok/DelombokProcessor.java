@@ -104,7 +104,6 @@ public class DelombokProcessor implements PreProcessor {
       Thread.currentThread().interrupt();
     } catch (Exception e) {
       log.error("Delombok failed : {}", srcPath, targetPath);
-      System.err.println(ret);
       System.exit(ret);
     }
   }

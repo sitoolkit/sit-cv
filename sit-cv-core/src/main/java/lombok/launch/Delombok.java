@@ -24,10 +24,10 @@ public class Delombok {
     private final Method setSourcepath;
 
     public Delombok() throws ClassNotFoundException, InstantiationException, IllegalAccessException,
-            NoSuchMethodException, SecurityException {
+            NoSuchMethodException, SecurityException, InvocationTargetException {
         final ClassLoader shadowClassLoader = Main.getShadowClassLoader();
         final Class<?> delombokClass = shadowClassLoader.loadClass("lombok.delombok.Delombok");
-        this.delombokInstance = delombokClass.newInstance();
+        this.delombokInstance = delombokClass.getDeclaredConstructor().newInstance();
         this.addDirectory = delombokClass.getMethod("addDirectory", File.class);
         this.delombok = delombokClass.getMethod("delombok");
         this.setCharset = delombokClass.getMethod("setCharset", String.class);
