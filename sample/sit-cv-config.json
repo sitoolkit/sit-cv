@@ -9,8 +9,11 @@
         "entryPoint": true
       },
       {
-        "name": ".*Service.*",
-        "entryPoint": true
+        "name": ".*Service.*"
+      },
+      {
+        "name": ".*Specification.*",
+        "lifelineOnly": true
       },
       {
         "name": ".*Processor"
