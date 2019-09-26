@@ -1,5 +1,6 @@
 package a.b.c;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,9 @@ public class AServiceImpl implements AService {
 
     @Autowired
     ARepository aRepository;
+
+    @Autowired
+    ASpecification aSpecification;
 
     @Autowired
     BProcessor processor;
@@ -53,6 +57,8 @@ public class AServiceImpl implements AService {
      */
     @Override
     public int save(XEntity entity) {
+        
+        aSpecification.isSatisfiedByList(Collections.singletonList(entity));
 
         return aRepository.save(entity);
     }

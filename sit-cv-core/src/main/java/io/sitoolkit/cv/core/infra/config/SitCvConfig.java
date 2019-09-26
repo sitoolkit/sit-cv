@@ -33,6 +33,12 @@ public class SitCvConfig {
     return toFilterConditionGroup(entryPoints);
   }
 
+  public FilterConditionGroup getLifelineOnlyFilter() {
+      List<LifelineClasses> repositories = lifelines.stream().filter(LifelineClasses::isLifelineOnly)
+          .collect(toList());
+      return toFilterConditionGroup(repositories);
+  }
+  
   public FilterConditionGroup getSequenceDiagramFilter() {
     return toFilterConditionGroup(lifelines);
   }

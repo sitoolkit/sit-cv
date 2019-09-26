@@ -3,6 +3,7 @@ package io.sitoolkit.cv.core.domain.classdef;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,5 +35,13 @@ public class MethodCallStack {
 
     boolean equalsAsMethod(MethodDef m1, MethodDef m2) {
         return StringUtils.equals(m1.getQualifiedSignature(), m2.getQualifiedSignature());
+    }
+    
+    public Optional<MethodDef> findLastCalled() {
+        if (methodList == null || methodList.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(methodList.get(methodList.size() - 1));
+        }
     }
 }
