@@ -3,6 +3,8 @@ package io.sitoolkit.cv.core.infra.util;
 import io.sitoolkit.cv.core.infra.exception.ProcessExecutionException;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+
 @Slf4j
 public class ProcessUtils {
 
@@ -19,7 +21,7 @@ public class ProcessUtils {
       }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-    } catch (Exception e) {
+    } catch (IOException e) {
       throw new ProcessExecutionException(e);
     }
   }
