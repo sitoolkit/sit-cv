@@ -8,7 +8,7 @@ public class ProcessUtils {
 
   public static void start(String... command) {
     ProcessBuilder processBuilder = new ProcessBuilder(command);
-    log.info("Starting process with command... {}",
+    log.info("Starting process with command {}",
             processBuilder.command().stream()
                     .reduce((s1, s2) -> String.join(" ", s1, s2)).orElse(""));
     try {
