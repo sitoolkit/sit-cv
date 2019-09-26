@@ -74,6 +74,7 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
 
         FilterConditionGroup entryPointFilterGroup = config.getEntryPointFilter();
         FilterConditionGroup classFilterGroup = config.getSequenceDiagramFilter();
+        FilterConditionGroup lifelineOnlyFilterGroup = config.getLifelineOnlyFilter();
 
         if (methodCall.getClassDef() == null) {
             return Optional.empty();
@@ -85,7 +86,14 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
                 && !ClassDefFilter.match(methodImpl.getClassDef(), classFilterGroup)) {
             return Optional.empty();
         }
-
+        
+        if (ClassDefFilter.match(methodImpl.getClassDef(), lifelineOnlyFilterGroup)) {
+            Optional<ClassDef> callingClass = callStack.findLastCalled().map(MethodDef::getClassDef);
+            if (callingClass.isPresent() && methodImpl.getClassDef().equals(callingClass.get())) {
+                return Optional.empty();
+            }
+        }
+        
         if (callStack.contains(methodImpl)) {
             log.debug("method: {} is called recursively", methodImpl.getQualifiedSignature());
             return Optional.empty();
