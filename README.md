@@ -215,6 +215,7 @@ It's JSON structure is as follows.
 * sit-cv-config.json
 ```json
 {
+  "override": false,
   "lifelines": [
     {
       "name": ".*Controller.*",
@@ -241,13 +242,12 @@ It's JSON structure is as follows.
   "sqlLogPattern": {
     "start": ".*Pattern before SQL starts.*",
     "end": ".*Pattern after SQL ends.*"
-  },
-  "override": false
+  }
 }
 ```
-
 | Key                 | Description                                                                        | Default value |
 |---------------------|------------------------------------------------------------------------------------|---------------|
+| override            | Ignore [default configuration](sit-cv-core/src/main/resources/io/sitoolkit/cv/core/infra/config/sit-cv-config.json). | false         |
 | lifelines           | Specify classes to draw as a lifeline in the sequence diagram.                     |               |
 | &emsp; name         | Pattern to match class qualified name.                                             |               |
 | &emsp; annotation   | Pattern to match qualified annotation name of class.                               |               |
@@ -257,4 +257,3 @@ It's JSON structure is as follows.
 | sqlLogPattern       | Filter rule to find SQL from test log. This is used to generate CRUD matrix.       |               |
 | &emsp; start        | Pattern to match the line just before SQL starts.                                  |               |
 | &emsp; end          | Pattern to match the line just after SQL ends.                                     |               |
-| override            | (unimplemented)                                                                    | false         |
