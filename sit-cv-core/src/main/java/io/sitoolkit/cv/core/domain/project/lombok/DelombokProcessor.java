@@ -2,19 +2,17 @@ package io.sitoolkit.cv.core.domain.project.lombok;
 
 import java.nio.file.Path;
 import java.util.Optional;
-
 import io.sitoolkit.cv.core.domain.project.PreProcessor;
 import io.sitoolkit.cv.core.domain.project.Project;
-import io.sitoolkit.cv.core.infra.lombok.DelombokParameter;
-import io.sitoolkit.cv.core.infra.lombok.Delomboker;
 import io.sitoolkit.cv.core.infra.util.JdkUtils;
+import io.sitoolkit.cv.core.infra.util.ProcessUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
 
-  private Delomboker delomboker = new Delomboker();
   private Project project;
+  private Path delombokClasspath;
 
   public static Optional<PreProcessor> of(Project project) {
 
@@ -62,13 +60,16 @@ public class DelombokProcessor implements PreProcessor {
 
   private DelombokProcessor(Project project) {
     this.project = project;
+    this.delombokClasspath = project.getClasspaths().stream()
+        .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-")).findFirst()
+        .get();
   }
 
   @Override
   public Path getPreProcessedPath(Path original) {
 
-    Optional<Path> enclosingSrcDir = project.getSrcDirs().stream()
-        .filter(dir -> original.startsWith(original)).findFirst();
+    Optional<Path> enclosingSrcDir =
+        project.getSrcDirs().stream().filter(dir -> original.startsWith(original)).findFirst();
 
     if (enclosingSrcDir.isPresent()) {
       Path relativized = enclosingSrcDir.get().relativize(original);
@@ -86,11 +87,10 @@ public class DelombokProcessor implements PreProcessor {
   }
 
   void executeDelombok(Path srcDir) {
-    DelombokParameter param = DelombokParameter.builder().src(srcDir).target(getDelombokTargetDir())
-        .encoding("UTF-8").classpath(project.getClasspaths()).sourcepath(project.getSrcDirs())
-        .build();
-
-    delomboker.execute(param);
+    String srcPath = srcDir.toFile().getAbsolutePath();
+    String targetPath = getDelombokTargetDir().toFile().getAbsolutePath();
+    ProcessUtils.start("java", "-jar", delombokClasspath.toFile().getAbsolutePath(),
+            "delombok", "-f", "pretty", srcPath, "-d", targetPath);
   }
 
   Path getDelombokTargetDir() {
