@@ -2,22 +2,22 @@ package io.sitoolkit.cv.core.domain.project.lombok;
 
 import java.nio.file.Path;
 import java.util.Optional;
+
 import io.sitoolkit.cv.core.domain.project.PreProcessor;
 import io.sitoolkit.cv.core.domain.project.Project;
-import io.sitoolkit.cv.core.infra.util.JdkUtils;
-import io.sitoolkit.cv.core.infra.util.ProcessUtils;
+import io.sitoolkit.cv.core.infra.exception.ProcessExecutionException;
+import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
 
   private Project project;
-  private Path delombokClasspath;
+  private Path lombokJarPath;
 
   public static Optional<PreProcessor> of(Project project) {
 
-    if (isDelombokProject(project)) {
-      // if (isDelombokProject(project) && isDelombokExecutable()) {
+    if (isLombokUsed(project)) {
       return Optional.of(new DelombokProcessor(project));
 
     } else {
@@ -25,7 +25,7 @@ public class DelombokProcessor implements PreProcessor {
     }
   }
 
-  static boolean isDelombokProject(Project project) {
+  static boolean isLombokUsed(Project project) {
     Optional<Path> delombokClasspath = project.getClasspaths().stream()
         .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-")).findFirst();
 
@@ -42,34 +42,18 @@ public class DelombokProcessor implements PreProcessor {
     return delombokClasspath.isPresent();
   }
 
-  static boolean isDelombokExecutable() {
-    if (JdkUtils.isJdkToolsJarLoaded()) {
-      return true;
-    }
-    boolean jdkToolsJarLoaded = JdkUtils.loadJdkToosJar();
-
-    if (!jdkToolsJarLoaded) {
-      log.warn("The project using Lombok needs to be executed with JDK (not JRE)");
-    }
-    return jdkToolsJarLoaded;
-  }
-
-  public static void main(String[] args) {
-    System.out.println(System.getProperties());
-  }
-
-  private DelombokProcessor(Project project) {
+  DelombokProcessor(Project project) {
     this.project = project;
-    this.delombokClasspath = project.getClasspaths().stream()
+    project.getClasspaths().stream()
         .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-")).findFirst()
-        .get();
+        .ifPresent(lombokJar -> this.lombokJarPath = lombokJar);
   }
 
   @Override
   public Path getPreProcessedPath(Path original) {
 
-    Optional<Path> enclosingSrcDir =
-        project.getSrcDirs().stream().filter(dir -> original.startsWith(original)).findFirst();
+    Optional<Path> enclosingSrcDir = project.getSrcDirs().stream()
+        .filter(dir -> original.startsWith(original)).findFirst();
 
     if (enclosingSrcDir.isPresent()) {
       Path relativized = enclosingSrcDir.get().relativize(original);
@@ -89,8 +73,16 @@ public class DelombokProcessor implements PreProcessor {
   void executeDelombok(Path srcDir) {
     String srcPath = srcDir.toFile().getAbsolutePath();
     String targetPath = getDelombokTargetDir().toFile().getAbsolutePath();
-    ProcessUtils.start("java", "-jar", delombokClasspath.toFile().getAbsolutePath(),
-            "delombok", "-f", "pretty", srcPath, "-d", targetPath);
+
+    int exitCode = new ProcessCommand().command("java")
+        .args("-jar", lombokJarPath.toFile().getAbsolutePath(), "delombok", "-f", "pretty", srcPath,
+            "-d", targetPath)
+        .execute();
+
+    if (exitCode != 0) {
+      throw new ProcessExecutionException(exitCode);
+    }
+
   }
 
   Path getDelombokTargetDir() {
