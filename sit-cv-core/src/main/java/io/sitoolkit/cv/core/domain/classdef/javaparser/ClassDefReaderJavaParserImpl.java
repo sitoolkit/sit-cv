@@ -50,307 +50,302 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class ClassDefReaderJavaParserImpl implements ClassDefReader {
-    private JavaParserFacade jpf;
+  private JavaParserFacade jpf;
 
-    private StatementVisitor statementVisitor;
+  private StatementVisitor statementVisitor;
 
-    @NonNull
-    private ClassDefRepository reposiotry;
+  @NonNull
+  private ClassDefRepository reposiotry;
 
-    @NonNull
-    private ProjectManager projectManager;
+  @NonNull
+  private ProjectManager projectManager;
 
-    @NonNull
-    private SitCvConfig config;
+  @NonNull
+  private SitCvConfig config;
 
-    @Override
-    public ClassDefReader readDir() {
+  @Override
+  public ClassDefReader readDir() {
 
-        if (jpf == null) {
-            throw new IllegalStateException("Reader has not been initialized yet");
+    if (jpf == null) {
+      throw new IllegalStateException("Reader has not been initialized yet");
+    }
+
+    Pattern p = Pattern.compile(config.getJavaFilePattern());
+
+    projectManager.getCurrentProject().getAllPreProcessedDirs().stream().forEach(srcDir -> {
+      try {
+        List<Path> files = Files.walk(srcDir)
+            .filter(file -> p.matcher(file.toFile().getName()).matches())
+            .collect(Collectors.toList());
+
+        int readCount = 0;
+        for (Path javaFile : files) {
+
+          readJava(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
+
+          readCount++;
+          if (readCount % 10 == 0 || readCount == files.size()) {
+            log.info("Processed java files : {} / {} in {}", readCount, files.size(), srcDir);
+          }
         }
 
-        Pattern p = Pattern.compile(config.getJavaFilePattern());
+        // JavaParserFacade seems to be NOT thread-safe
+        // files.stream().parallel().forEach(javaFile -> {
+        // readJava(javaFile).ifPresent(classDef ->
+        // dictionary.add(classDef));
+        // });
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
+    });
 
-        projectManager.getCurrentProject().getAllPreProcessedDirs().stream().forEach(srcDir -> {
-            try {
-                List<Path> files = Files.walk(srcDir)
-                        .filter(file -> p.matcher(file.toFile().getName()).matches())
-                        .collect(Collectors.toList());
+    reposiotry.solveReferences();
+    statementVisitor.clearCache();
 
-                int readCount = 0;
-                for (Path javaFile : files) {
+    return this;
+  }
 
-                    readJava(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
+  @Override
+  public Optional<ClassDef> readJava(Path javaFile) {
+    log.debug("Read java : {}", javaFile);
 
-                    readCount++;
-                    if (readCount % 10 == 0 || readCount == files.size()) {
-                        log.info("Processed java files : {} / {} in {}", readCount, files.size(),
-                                srcDir);
-                    }
+    try {
+      CompilationUnit compilationUnit = JavaParser.parse(javaFile);
+      ClassDef classDef = new ClassDef();
+      classDef.setSourceId(javaFile.toFile().getAbsolutePath());
+      String typeName = compilationUnit.getPrimaryTypeName().get();
+      classDef.setName(typeName);
+      classDef.setPkg(compilationUnit.getPackageDeclaration().get().getNameAsString());
+
+      compilationUnit.getClassByName(typeName).ifPresent(clazz -> {
+        classDef.setType(ClassType.CLASS);
+        classDef.setMethods(readMethodDefs(clazz));
+        classDef.setFields(readFieldDefs(clazz));
+        classDef.setImplInterfaces(readInterfaces(clazz));
+        classDef.setAnnotations(readAnnotations(clazz));
+      });
+
+      compilationUnit.getInterfaceByName(typeName).ifPresent(interfaze -> {
+        classDef.setType(ClassType.INTERFACE);
+        classDef.setMethods(readMethodDefs(interfaze));
+        classDef.setFields(readFieldDefs(interfaze));
+        classDef.setAnnotations(readAnnotations(interfaze));
+      });
+
+      compilationUnit.getEnumByName(typeName).ifPresent(enumz -> {
+        classDef.setType(ClassType.ENUM);
+      });
+
+      classDef.getMethods().stream().forEach(method -> method.setClassDef(classDef));
+
+      log.debug("Read class : {}", classDef);
+
+      return Optional.of(classDef);
+    } catch (IOException e) {
+      log.warn("IOException", e);
+      return Optional.empty();
+    }
+  }
+
+  private Set<String> readInterfaces(ClassOrInterfaceDeclaration typeDec) {
+    Set<String> interfaces = new HashSet<>();
+
+    try {
+      interfaces = jpf.getTypeDeclaration(typeDec).getAllAncestors().stream()
+          .map(ResolvedReferenceType::getTypeDeclaration)
+          .filter(ResolvedReferenceTypeDeclaration::isInterface)
+          .map(ResolvedReferenceTypeDeclaration::getQualifiedName).collect(Collectors.toSet());
+
+      log.debug("{} implements interfaces: {}", typeDec.getNameAsString(), interfaces);
+
+    } catch (Exception e) {
+      log.debug("Unsolved : Ancestors of '{}', {}", typeDec.getName(), e);
+
+    }
+
+    return interfaces;
+  }
+
+  Set<String> readAnnotations(ClassOrInterfaceDeclaration typeDec) {
+
+    Set<String> annotations = typeDec.getAnnotations().stream().map(AnnotationExpr::getNameAsString)
+        .collect(Collectors.toSet());
+    log.debug("{} has annotations : {}", typeDec.getNameAsString(), annotations);
+    return annotations;
+  }
+
+  List<MethodDef> readMethodDefs(ClassOrInterfaceDeclaration typeDec) {
+
+    List<MethodDef> methodDefs = new ArrayList<>();
+
+    String classActionPath = getActionPath(typeDec);
+
+    jpf.getTypeDeclaration(typeDec).getDeclaredMethods()
+        .forEach((ResolvedMethodDeclaration declaredMethod) -> {
+          JavaParserMethodDeclaration jpDeclaredMethod = (JavaParserMethodDeclaration) declaredMethod;
+
+          try {
+            MethodDef methodDef = new MethodDef();
+
+            methodDef.setPublic(declaredMethod.accessSpecifier() == AccessSpecifier.PUBLIC);
+            methodDef.setName(declaredMethod.getName());
+            methodDef.setSignature(declaredMethod.getSignature());
+            methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
+            methodDef.setReturnType(TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
+            methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
+            methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
+            methodDefs.add(methodDef);
+
+            if (!typeDec.isInterface()) {
+              typeDec.getMethods().stream().forEach(method -> {
+                if (equalMethods(declaredMethod, method)) {
+                  method.accept(statementVisitor, VisitContext.of(methodDef));
+                  methodDef.setActionPath(classActionPath + getActionPath(method));
                 }
-
-                // JavaParserFacade seems to be NOT thread-safe
-                // files.stream().parallel().forEach(javaFile -> {
-                // readJava(javaFile).ifPresent(classDef ->
-                // dictionary.add(classDef));
-                // });
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
+              });
             }
+
+            log.debug("Add method declaration : {}", methodDef);
+
+          } catch (Exception e) {
+            log.debug("Unsolved: '{}()' in '{}', {}", declaredMethod.getName(), typeDec.getName(),
+                e);
+          }
+
         });
 
-        reposiotry.solveReferences();
+    return methodDefs;
+  }
 
-        return this;
+  boolean equalMethods(ResolvedMethodDeclaration m1, MethodDeclaration m2) {
+    if (!m1.getName().equals(m2.getNameAsString())) {
+      return false;
     }
 
-    @Override
-    public Optional<ClassDef> readJava(Path javaFile) {
-        log.debug("Read java : {}", javaFile);
+    if (m1.getNumberOfParams() != m2.getParameters().size()) {
+      return false;
+    }
 
-        try {
-            CompilationUnit compilationUnit = JavaParser.parse(javaFile);
-            ClassDef classDef = new ClassDef();
-            classDef.setSourceId(javaFile.toFile().getAbsolutePath());
-            String typeName = compilationUnit.getPrimaryTypeName().get();
-            classDef.setName(typeName);
-            classDef.setPkg(compilationUnit.getPackageDeclaration().get().getNameAsString());
+    for (int i = 0; i < m1.getNumberOfParams(); i++) {
+      ResolvedParameterDeclaration p1 = m1.getParam(i);
+      Parameter p2 = m2.getParameter(i);
 
-            compilationUnit.getClassByName(typeName).ifPresent(clazz -> {
-                classDef.setType(ClassType.CLASS);
-                classDef.setMethods(readMethodDefs(clazz));
-                classDef.setFields(readFieldDefs(clazz));
-                classDef.setImplInterfaces(readInterfaces(clazz));
-                classDef.setAnnotations(readAnnotations(clazz));
-            });
+      if (!p1.getName().endsWith(p2.getNameAsString())) {
+        return false;
+      }
+      if (!equalTypes(p1.getType(), p2.getType())) {
+        return false;
+      }
+    }
 
-            compilationUnit.getInterfaceByName(typeName).ifPresent(interfaze -> {
-                classDef.setType(ClassType.INTERFACE);
-                classDef.setMethods(readMethodDefs(interfaze));
-                classDef.setFields(readFieldDefs(interfaze));
-                classDef.setAnnotations(readAnnotations(interfaze));
-            });
+    return true;
+  }
 
-            compilationUnit.getEnumByName(typeName).ifPresent(enumz -> {
-                classDef.setType(ClassType.ENUM);
-            });
+  boolean equalTypes(ResolvedType t1, Type t2) {
+    String str1 = t1.describe();
+    String str2 = t2.asString();
+    boolean result = StringUtils.equals(removePackageName(str1), removePackageName(str2));
+    log.debug("t1.describe={}, t2.asString={}, t1.equals(t2)={}", str1, str2, result);
+    return result;
+  }
 
-            classDef.getMethods().stream().forEach(method -> method.setClassDef(classDef));
+  String removePackageName(String typeString) {
+    return typeString.replaceAll("[^.,<>]+\\.", "");
+  }
 
-            log.debug("Read class : {}", classDef);
+  private static final String[] ACTION_ANNOTATION_NAMES = new String[] { "RequestMapping",
+      "PostMapping", "GetMapping" };
 
-            return Optional.of(classDef);
-        } catch (IOException e) {
-            log.warn("IOException", e);
-            return Optional.empty();
+  String getActionPath(NodeWithAnnotations<?> nwa) {
+
+    for (String annotationName : ACTION_ANNOTATION_NAMES) {
+      Optional<AnnotationExpr> annotation = nwa.getAnnotationByName(annotationName);
+      if (annotation.isPresent()) {
+        return retrive(annotation.get());
+      }
+    }
+
+    return "";
+  }
+
+  String retrive(AnnotationExpr annotation) {
+
+    StringBuilder actionPath = new StringBuilder();
+
+    annotation.toNormalAnnotationExpr().ifPresent(nae -> {
+      nae.getPairs().forEach(mvp -> {
+        if (StringUtils.equals(mvp.getNameAsString(), "path")) {
+          actionPath.append(adjust(mvp.getValue().toString()));
         }
+      });
+    });
+
+    annotation.toSingleMemberAnnotationExpr().ifPresent(smae -> {
+      actionPath.append(adjust(smae.getMemberValue().toString()));
+    });
+    return actionPath.toString();
+  }
+
+  String adjust(String path) {
+    if (StringUtils.isEmpty(path)) {
+      return "";
+    }
+    String adjust = StringUtils.strip(path, "\"");
+    if (adjust.startsWith("/")) {
+      return adjust;
+    } else {
+      return "/" + adjust;
+    }
+  }
+
+  List<FieldDef> readFieldDefs(ClassOrInterfaceDeclaration typeDec) {
+    return jpf.getTypeDeclaration(typeDec).getDeclaredFields().stream().map(declaredField -> {
+
+      try {
+        FieldDef fieldDef = new FieldDef();
+        fieldDef.setName(declaredField.getName());
+
+        ResolvedType type = declaredField.getType();
+        fieldDef.setType(TypeProcessor.createTypeDef(type));
+        return fieldDef;
+
+      } catch (Exception e) {
+        log.debug("Unsolved : '{}' in '{}', {}", declaredField.getName(), typeDec.getName(), e);
+        return null;
+      }
+
+    }).filter(Objects::nonNull).collect(Collectors.toList());
+  }
+
+  ApiDocDef readApiDocDef(JavaParserMethodDeclaration declaredMethod) {
+    String qualifiedClassName = declaredMethod.getPackageName() + "."
+        + declaredMethod.getClassName();
+
+    Optional<Javadoc> javadoc = declaredMethod.getWrappedNode().getJavadoc();
+    List<String> contents = new ArrayList<>();
+    if (javadoc.isPresent()) {
+      contents.add(javadoc.get().getDescription().toText());
+      List<String> tagContents = javadoc.get().getBlockTags().stream().map(JavadocBlockTag::toText)
+          .collect(Collectors.toList());
+      contents.addAll(tagContents);
+    } else {
+      contents.add("No API Document.");
     }
 
-    private Set<String> readInterfaces(ClassOrInterfaceDeclaration typeDec) {
-        Set<String> interfaces = new HashSet<>();
+    return ApiDocDef.builder().qualifiedClassName(qualifiedClassName)
+        .annotations(declaredMethod.getWrappedNode().getAnnotations().stream()
+            .map(AnnotationExpr::toString).collect(Collectors.toList()))
+        .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString())
+        .contents(contents).build();
+  }
 
-        try {
-            interfaces = jpf.getTypeDeclaration(typeDec).getAllAncestors().stream()
-                    .map(ResolvedReferenceType::getTypeDeclaration)
-                    .filter(ResolvedReferenceTypeDeclaration::isInterface)
-                    .map(ResolvedReferenceTypeDeclaration::getQualifiedName)
-                    .collect(Collectors.toSet());
+  @Override
+  public ClassDefReader init() {
+    Project project = projectManager.getCurrentProject();
 
-            log.debug("{} implements interfaces: {}", typeDec.getNameAsString(), interfaces);
+    jpf = JavaParserFacadeBuilder.build(project);
+    statementVisitor = StatementVisitor.build(jpf);
 
-        } catch (Exception e) {
-            log.debug("Unsolved : Ancestors of '{}', {}", typeDec.getName(), e);
-
-        }
-
-        return interfaces;
-    }
-
-    Set<String> readAnnotations(ClassOrInterfaceDeclaration typeDec) {
-
-        Set<String> annotations = typeDec.getAnnotations().stream()
-                .map(AnnotationExpr::getNameAsString).collect(Collectors.toSet());
-        log.debug("{} has annotations : {}", typeDec.getNameAsString(), annotations);
-        return annotations;
-    }
-
-    List<MethodDef> readMethodDefs(ClassOrInterfaceDeclaration typeDec) {
-
-        List<MethodDef> methodDefs = new ArrayList<>();
-
-        String classActionPath = getActionPath(typeDec);
-
-        jpf.getTypeDeclaration(typeDec).getDeclaredMethods()
-                .forEach((ResolvedMethodDeclaration declaredMethod) -> {
-                    JavaParserMethodDeclaration jpDeclaredMethod = (JavaParserMethodDeclaration) declaredMethod;
-
-                    try {
-                        MethodDef methodDef = new MethodDef();
-
-                        methodDef.setPublic(
-                                declaredMethod.accessSpecifier() == AccessSpecifier.PUBLIC);
-                        methodDef.setName(declaredMethod.getName());
-                        methodDef.setSignature(declaredMethod.getSignature());
-                        methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
-                        methodDef.setReturnType(
-                                TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
-                        methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
-                        methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
-                        methodDefs.add(methodDef);
-
-                        if (!typeDec.isInterface()) {
-                            typeDec.getMethods().stream().forEach(method -> {
-                                if (equalMethods(declaredMethod, method)) {
-                                    method.accept(statementVisitor, VisitContext.of(methodDef));
-                                    methodDef
-                                            .setActionPath(classActionPath + getActionPath(method));
-                                }
-                            });
-                        }
-
-                        log.debug("Add method declaration : {}", methodDef);
-
-                    } catch (Exception e) {
-                        log.debug("Unsolved: '{}()' in '{}', {}", declaredMethod.getName(),
-                                typeDec.getName(), e);
-                    }
-
-                });
-
-        return methodDefs;
-    }
-
-    boolean equalMethods(ResolvedMethodDeclaration m1, MethodDeclaration m2) {
-        if (!m1.getName().equals(m2.getNameAsString())) {
-            return false;
-        }
-
-        if (m1.getNumberOfParams() != m2.getParameters().size()) {
-            return false;
-        }
-
-        for (int i = 0; i < m1.getNumberOfParams(); i++) {
-            ResolvedParameterDeclaration p1 = m1.getParam(i);
-            Parameter p2 = m2.getParameter(i);
-
-            if (!p1.getName().endsWith(p2.getNameAsString())) {
-                return false;
-            }
-            if (!equalTypes(p1.getType(), p2.getType())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    boolean equalTypes(ResolvedType t1, Type t2) {
-        String str1 = t1.describe();
-        String str2 = t2.asString();
-        boolean result = StringUtils.equals(removePackageName(str1), removePackageName(str2));
-        log.debug("t1.describe={}, t2.asString={}, t1.equals(t2)={}", str1, str2, result);
-        return result;
-    }
-
-    String removePackageName(String typeString) {
-        return typeString.replaceAll("[^.,<>]+\\.", "");
-    }
-
-    private static final String[] ACTION_ANNOTATION_NAMES = new String[] { "RequestMapping",
-            "PostMapping", "GetMapping" };
-
-    String getActionPath(NodeWithAnnotations<?> nwa) {
-
-        for (String annotationName : ACTION_ANNOTATION_NAMES) {
-            Optional<AnnotationExpr> annotation = nwa.getAnnotationByName(annotationName);
-            if (annotation.isPresent()) {
-                return retrive(annotation.get());
-            }
-        }
-
-        return "";
-    }
-
-    String retrive(AnnotationExpr annotation) {
-
-        StringBuilder actionPath = new StringBuilder();
-
-        annotation.toNormalAnnotationExpr().ifPresent(nae -> {
-            nae.getPairs().forEach(mvp -> {
-                if (StringUtils.equals(mvp.getNameAsString(), "path")) {
-                    actionPath.append(adjust(mvp.getValue().toString()));
-                }
-            });
-        });
-
-        annotation.toSingleMemberAnnotationExpr().ifPresent(smae -> {
-            actionPath.append(adjust(smae.getMemberValue().toString()));
-        });
-        return actionPath.toString();
-    }
-
-    String adjust(String path) {
-        if (StringUtils.isEmpty(path)) {
-            return "";
-        }
-        String adjust = StringUtils.strip(path, "\"");
-        if (adjust.startsWith("/")) {
-            return adjust;
-        } else {
-            return "/" + adjust;
-        }
-    }
-
-    List<FieldDef> readFieldDefs(ClassOrInterfaceDeclaration typeDec) {
-        return jpf.getTypeDeclaration(typeDec).getDeclaredFields().stream().map(declaredField -> {
-
-            try {
-                FieldDef fieldDef = new FieldDef();
-                fieldDef.setName(declaredField.getName());
-
-                ResolvedType type = declaredField.getType();
-                fieldDef.setType(TypeProcessor.createTypeDef(type));
-                return fieldDef;
-
-            } catch (Exception e) {
-                log.debug("Unsolved : '{}' in '{}', {}", declaredField.getName(), typeDec.getName(),
-                        e);
-                return null;
-            }
-
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-    }
-
-    ApiDocDef readApiDocDef(JavaParserMethodDeclaration declaredMethod) {
-        String qualifiedClassName = declaredMethod.getPackageName() + "."
-                + declaredMethod.getClassName();
-
-        Optional<Javadoc> javadoc = declaredMethod.getWrappedNode().getJavadoc();
-        List<String> contents = new ArrayList<>();
-        if (javadoc.isPresent()) {
-            contents.add(javadoc.get().getDescription().toText());
-            List<String> tagContents = javadoc.get().getBlockTags().stream()
-                    .map(JavadocBlockTag::toText).collect(Collectors.toList());
-            contents.addAll(tagContents);
-        } else {
-            contents.add("No API Document.");
-        }
-
-        return ApiDocDef.builder().qualifiedClassName(qualifiedClassName)
-                .annotations(declaredMethod.getWrappedNode().getAnnotations().stream()
-                        .map(AnnotationExpr::toString).collect(Collectors.toList()))
-                .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString())
-                .contents(contents).build();
-    }
-
-    @Override
-    public ClassDefReader init() {
-        Project project = projectManager.getCurrentProject();
-
-        jpf = JavaParserFacadeBuilder.build(project);
-        statementVisitor = StatementVisitor.build(jpf);
-
-        return this;
-    }
+    return this;
+  }
 }
