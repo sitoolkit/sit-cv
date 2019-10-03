@@ -10,7 +10,6 @@
     },
     {
       "name": ".*Repository.*",
-      "annotation": ".*(Repository|Named)",
       "dbAccess": true
     },
     {
