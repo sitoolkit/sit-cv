@@ -1,2 +1,8 @@
 pom.xml.versionsBackup
-/target/
+target
+
+.project
+.classpath
+.settings
+
+.vscode
