@@ -20,6 +20,7 @@ public class SitCvConfig {
   private String javaFilePattern = ".*\\.(java|class)$";
 
   private boolean override = false;
+  private boolean drawingException = true;
   private List<LifelineClasses> lifelines = new ArrayList<>();
   private EnclosureFilterCondition sqlLogPattern;
 
@@ -29,6 +30,7 @@ public class SitCvConfig {
     newInstance.jarList = original.jarList;
     newInstance.javaFilePattern = original.javaFilePattern;
     newInstance.override = original.override;
+    newInstance.drawingException = original.drawingException;
     newInstance.lifelines.addAll(original.lifelines);
     newInstance.sqlLogPattern = original.sqlLogPattern;
     return newInstance;
@@ -43,6 +45,7 @@ public class SitCvConfig {
     merged.jarList = overwriting.jarList;
     merged.javaFilePattern = overwriting.javaFilePattern;
     merged.override = overwriting.override;
+    merged.drawingException = overwriting.drawingException;
     if (overwriting.lifelines != null) {
       merged.lifelines.addAll(overwriting.lifelines);
     }
@@ -57,6 +60,7 @@ public class SitCvConfig {
     this.jarList = other.jarList;
     this.javaFilePattern = other.javaFilePattern;
     this.override = other.override;
+    this.drawingException = other.drawingException;
     this.lifelines = other.lifelines;
     this.sqlLogPattern = other.sqlLogPattern;
   }

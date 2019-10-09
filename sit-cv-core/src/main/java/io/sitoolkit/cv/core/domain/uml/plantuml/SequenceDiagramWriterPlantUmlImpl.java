@@ -89,25 +89,9 @@ public class SequenceDiagramWriterPlantUmlImpl
                         + message.getRequestQualifiedSignature() + "} "
                         + idFormatter.format(buildRequestName(message)) + "]]");
 
-        List<TypeDef> throwingExceptionTypes = message.getThrowingExceptionTypes();
-        List<TypeDef> processingExceptionTypes = message.getProcessingExceptionTypes();
-        if (!throwingExceptionTypes.isEmpty() || !processingExceptionTypes.isEmpty()) {
-            String throwingExceptions =
-                    !throwingExceptionTypes.isEmpty() ?
-                            "Throwing exceptions:\\n" + throwingExceptionTypes.stream()
-                                    .map(TypeDef::getName)
-                                    .reduce((s1, s2) -> String.join(", ", s1, s2))
-                                    .get() : "";
-            String processingExceptions =
-                    !processingExceptionTypes.isEmpty() ?
-                            "Processing exceptions:\\n" + processingExceptionTypes.stream()
-                                    .map(TypeDef::getName)
-                                    .reduce((s1, s2) -> String.join(", ", s1, s2))
-                                    .get() : "";
-            String note = Stream.of(throwingExceptions, processingExceptions).filter(x -> StringUtils.isNotEmpty(x))
-                    .reduce((x1, x2) -> String.join("\\n\\n", x1, x2))
-                    .get();
-            list.add(1, " note right : " + note);
+        String note = buildExceptionComment(message);
+        if (StringUtils.isNotEmpty(note)) {
+            list.add(1, "note right : " + note);
         }
 
         String responseName = type2Str(message.getResponseType());
@@ -127,6 +111,30 @@ public class SequenceDiagramWriterPlantUmlImpl
                     .collect(Collectors.joining("," + separator));
         }
         return message.getRequestName() + "(" + paramNames + ")";
+    }
+
+    protected String buildExceptionComment(MessageDef messageDef) {
+        String note = "";
+        List<TypeDef> throwingExceptionTypes = messageDef.getThrowingExceptionTypes();
+        List<TypeDef> processingExceptionTypes = messageDef.getProcessingExceptionTypes();
+        if (!throwingExceptionTypes.isEmpty() || !processingExceptionTypes.isEmpty()) {
+            String throwingExceptions =
+                    !throwingExceptionTypes.isEmpty() ?
+                            "Throwing exceptions:\\n" + throwingExceptionTypes.stream()
+                                    .map(TypeDef::getName)
+                                    .reduce((s1, s2) -> String.join(", ", s1, s2))
+                                    .get() : "";
+            String processingExceptions =
+                    !processingExceptionTypes.isEmpty() ?
+                            "Processing exceptions:\\n" + processingExceptionTypes.stream()
+                                    .map(TypeDef::getName)
+                                    .reduce((s1, s2) -> String.join(", ", s1, s2))
+                                    .get() : "";
+            note = Stream.of(throwingExceptions, processingExceptions).filter(x -> StringUtils.isNotEmpty(x))
+                    .reduce((x1, x2) -> String.join("\\n\\n", x1, x2))
+                    .get();
+        }
+        return note;
     }
 
     protected String type2Str(TypeDef type) {

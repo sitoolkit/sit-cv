@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,6 +63,8 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         MessageDef message = new MessageDef();
         message.setRequestName(method.getName());
         message.setRequestParamTypes(method.getParamTypes());
+        message.setProcessingExceptionTypes(config.isDrawingException() ? method.getProcessingExceptionTypes() : Collections.EMPTY_LIST);
+        message.setThrowingExceptionTypes(config.isDrawingException() ? method.getThrowingExceptionTypes() : Collections.EMPTY_LIST);
         message.setRequestQualifiedSignature(method.getQualifiedSignature());
         message.setTarget(lifeLine);
         message.setResponseType(method.getReturnType());
@@ -103,8 +106,8 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         MessageDef message = new MessageDef();
         message.setRequestName(methodImpl.getName());
         message.setRequestParamTypes(methodImpl.getParamTypes());
-        message.setProcessingExceptionTypes(methodImpl.getProcessingExceptionTypes());
-        message.setThrowingExceptionTypes(methodImpl.getThrowingExceptionTypes());
+        message.setProcessingExceptionTypes(config.isDrawingException() ? methodImpl.getProcessingExceptionTypes() : Collections.EMPTY_LIST);
+        message.setThrowingExceptionTypes(config.isDrawingException() ? methodImpl.getThrowingExceptionTypes() : Collections.EMPTY_LIST);
         message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl, pushedStack));
         message.setResponseType(methodCall.getReturnType());
