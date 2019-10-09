@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -87,6 +88,27 @@ public class SequenceDiagramWriterPlantUmlImpl
                 sourceName + "-> " + target.getObjectName() + " :" + "[[#{"
                         + message.getRequestQualifiedSignature() + "} "
                         + idFormatter.format(buildRequestName(message)) + "]]");
+
+        List<TypeDef> throwingExceptionTypes = message.getThrowingExceptionTypes();
+        List<TypeDef> processingExceptionTypes = message.getProcessingExceptionTypes();
+        if (!throwingExceptionTypes.isEmpty() || !processingExceptionTypes.isEmpty()) {
+            String throwingExceptions =
+                    !throwingExceptionTypes.isEmpty() ?
+                            "Throwing exceptions:\\n" + throwingExceptionTypes.stream()
+                                    .map(TypeDef::getName)
+                                    .reduce((s1, s2) -> String.join(", ", s1, s2))
+                                    .get() : "";
+            String processingExceptions =
+                    !processingExceptionTypes.isEmpty() ?
+                            "Processing exceptions:\\n" + processingExceptionTypes.stream()
+                                    .map(TypeDef::getName)
+                                    .reduce((s1, s2) -> String.join(", ", s1, s2))
+                                    .get() : "";
+            String note = Stream.of(throwingExceptions, processingExceptions).filter(x -> StringUtils.isNotEmpty(x))
+                    .reduce((x1, x2) -> String.join("\\n\\n", x1, x2))
+                    .get();
+            list.add(1, " note right : " + note);
+        }
 
         String responseName = type2Str(message.getResponseType());
         if (!StringUtils.equals(responseName, "void")) {

@@ -103,6 +103,8 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         MessageDef message = new MessageDef();
         message.setRequestName(methodImpl.getName());
         message.setRequestParamTypes(methodImpl.getParamTypes());
+        message.setProcessingExceptionTypes(methodImpl.getProcessingExceptionTypes());
+        message.setThrowingExceptionTypes(methodImpl.getThrowingExceptionTypes());
         message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl, pushedStack));
         message.setResponseType(methodCall.getReturnType());
