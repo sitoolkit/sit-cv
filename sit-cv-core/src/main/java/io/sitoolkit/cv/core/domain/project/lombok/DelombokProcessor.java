@@ -1,13 +1,15 @@
 package io.sitoolkit.cv.core.domain.project.lombok;
 
-import java.nio.file.Path;
-import java.util.Optional;
-
 import io.sitoolkit.cv.core.domain.project.PreProcessor;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.infra.exception.ProcessExecutionException;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
@@ -73,16 +75,19 @@ public class DelombokProcessor implements PreProcessor {
   void executeDelombok(Path srcDir) {
     String srcPath = srcDir.toFile().getAbsolutePath();
     String targetPath = getDelombokTargetDir().toFile().getAbsolutePath();
+    String classPath = project.getClasspaths().stream()
+        .map(Path::toAbsolutePath)
+        .map(Path::toString)
+        .collect(Collectors.joining(File.pathSeparator));
 
     int exitCode = new ProcessCommand().command("java")
-        .args("-jar", lombokJarPath.toFile().getAbsolutePath(), "delombok", "-f", "pretty", srcPath,
-            "-d", targetPath)
-        .execute();
+            .args("-jar", lombokJarPath.toFile().getAbsolutePath(),
+                    "delombok", "-e", "UTF-8", "-c", classPath, srcPath, "-d", targetPath)
+            .stdout(log::info).stderr(log::warn).execute();
 
     if (exitCode != 0) {
       throw new ProcessExecutionException(exitCode);
     }
-
   }
 
   Path getDelombokTargetDir() {
