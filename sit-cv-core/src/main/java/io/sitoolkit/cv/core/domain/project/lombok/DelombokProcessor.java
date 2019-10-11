@@ -87,8 +87,8 @@ public class DelombokProcessor implements PreProcessor {
 
     StdoutListener stdoutListener = new StringBuilderStdoutListener();
     StdoutListener stderrListener = new StringBuilderStdoutListener();
-    command.getStdoutListeners().add(stdoutListener);
-    command.getStderrListeners().add(stderrListener);
+    command.stdout(stdoutListener);
+    command.stderr(stderrListener);
 
     ProcessConversation conversation = command.command("java")
         .args("-jar", lombokJarPath.toFile().getAbsolutePath(),
