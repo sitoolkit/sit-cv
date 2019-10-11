@@ -4,11 +4,7 @@ import io.sitoolkit.cv.core.domain.project.PreProcessor;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.infra.exception.ProcessExecutionException;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
-import io.sitoolkit.util.buildtoolhelper.process.ProcessConversation;
-import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
-import io.sitoolkit.util.buildtoolhelper.process.StringBuilderStdoutListener;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -83,33 +79,13 @@ public class DelombokProcessor implements PreProcessor {
         .map(Path::toString)
         .collect(Collectors.joining(";"));
 
-    ProcessCommand command = new ProcessCommand();
+    int exitCode = new ProcessCommand().command("java")
+            .args("-jar", lombokJarPath.toFile().getAbsolutePath(),
+                    "delombok", "-e", "UTF-8", "-c", classPath, srcPath, "-d", targetPath)
+            .stdout(log::info).stderr(log::warn).execute();
 
-    StdoutListener stdoutListener = new StringBuilderStdoutListener();
-    StdoutListener stderrListener = new StringBuilderStdoutListener();
-    command.stdout(stdoutListener);
-    command.stderr(stderrListener);
-
-    ProcessConversation conversation = command.command("java")
-        .args("-jar", lombokJarPath.toFile().getAbsolutePath(),
-            "delombok", "-e", "UTF-8", "-c", classPath, srcPath, "-d", targetPath)
-        .executeAsync();
-
-    try {
-      int exitCode = conversation.getProcess().waitFor();
-      if (exitCode != 0) {
-        throw new ProcessExecutionException(exitCode);
-      }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
-    if (StringUtils.isNotEmpty(stdoutListener.toString())) {
-      log.info("System out: {}", stdoutListener.toString());
-    }
-
-    if (StringUtils.isNotEmpty(stderrListener.toString())) {
-      log.error("System error: {}", stderrListener.toString());
+    if (exitCode != 0) {
+      throw new ProcessExecutionException(exitCode);
     }
   }
 
