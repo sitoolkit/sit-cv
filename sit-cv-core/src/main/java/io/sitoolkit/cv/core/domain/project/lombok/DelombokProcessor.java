@@ -7,11 +7,12 @@ import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessConversation;
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import io.sitoolkit.util.buildtoolhelper.process.StringBuilderStdoutListener;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
@@ -91,7 +92,7 @@ public class DelombokProcessor implements PreProcessor {
 
     ProcessConversation conversation = command.command("java")
         .args("-jar", lombokJarPath.toFile().getAbsolutePath(),
-            "delombok", "--encoding", "UTF-8", "--classpath", classPath, srcPath, "-d", targetPath)
+            "delombok", "-e", "UTF-8", "-c", classPath, srcPath, "-d", targetPath)
         .executeAsync();
 
     try {
