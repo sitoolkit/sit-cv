@@ -6,6 +6,7 @@ import io.sitoolkit.cv.core.infra.exception.ProcessExecutionException;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -77,7 +78,7 @@ public class DelombokProcessor implements PreProcessor {
     String classPath = project.getClasspaths().stream()
         .map(Path::toAbsolutePath)
         .map(Path::toString)
-        .collect(Collectors.joining(";"));
+        .collect(Collectors.joining(File.pathSeparator));
 
     int exitCode = new ProcessCommand().command("java")
             .args("-jar", lombokJarPath.toFile().getAbsolutePath(),
