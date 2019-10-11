@@ -1,14 +1,17 @@
 package io.sitoolkit.cv.core.domain.project.lombok;
 
-import java.nio.file.Path;
-import java.util.Optional;
-
 import io.sitoolkit.cv.core.domain.project.PreProcessor;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.infra.exception.ProcessExecutionException;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
+import io.sitoolkit.util.buildtoolhelper.process.ProcessConversation;
+import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
+import io.sitoolkit.util.buildtoolhelper.process.StringBuilderStdoutListener;
+import java.nio.file.Path;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
@@ -79,14 +82,34 @@ public class DelombokProcessor implements PreProcessor {
         .map(Path::toString)
         .collect(Collectors.joining(";"));
 
-    int exitCode = new ProcessCommand().command("java")
-        .args("-jar", lombokJarPath.toFile().getAbsolutePath(), "delombok", "--classpath", classPath, srcPath, "-d", targetPath)
-        .execute();
+    ProcessCommand command = new ProcessCommand();
 
-    if (exitCode != 0) {
-      throw new ProcessExecutionException(exitCode);
+    StdoutListener stdoutListener = new StringBuilderStdoutListener();
+    StdoutListener stderrListener = new StringBuilderStdoutListener();
+    command.getStdoutListeners().add(stdoutListener);
+    command.getStderrListeners().add(stderrListener);
+
+    ProcessConversation conversation = command.command("java")
+        .args("-jar", lombokJarPath.toFile().getAbsolutePath(),
+            "delombok", "--encoding", "UTF-8", "--classpath", classPath, srcPath, "-d", targetPath)
+        .executeAsync();
+
+    try {
+      int exitCode = conversation.getProcess().waitFor();
+      if (exitCode != 0) {
+        throw new ProcessExecutionException(exitCode);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
     }
 
+    if (StringUtils.isNotEmpty(stdoutListener.toString())) {
+      log.info("System out: {}", stdoutListener.toString());
+    }
+
+    if (StringUtils.isNotEmpty(stderrListener.toString())) {
+      log.error("System error: {}", stderrListener.toString());
+    }
   }
 
   Path getDelombokTargetDir() {
