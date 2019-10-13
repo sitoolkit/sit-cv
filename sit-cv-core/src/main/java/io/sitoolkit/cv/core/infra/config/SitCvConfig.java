@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonMerge;
 
 import lombok.Data;
 
@@ -20,37 +21,12 @@ public class SitCvConfig {
   private String javaFilePattern = ".*\\.(java|class)$";
 
   private boolean override = false;
+  @JsonMerge
   private List<LifelineClasses> lifelines = new ArrayList<>();
   private EnclosureFilterCondition sqlLogPattern;
 
-  public static SitCvConfig newInstance(SitCvConfig original) {
-    SitCvConfig newInstance = new SitCvConfig();
-    newInstance.sourcePath = original.sourcePath;
-    newInstance.jarList = original.jarList;
-    newInstance.javaFilePattern = original.javaFilePattern;
-    newInstance.override = original.override;
-    newInstance.lifelines.addAll(original.lifelines);
-    newInstance.sqlLogPattern = original.sqlLogPattern;
-    return newInstance;
-  }
-
-  public static SitCvConfig merge(SitCvConfig overwritten, SitCvConfig overwriting) {
-    if (overwriting.override) {
-      return newInstance(overwriting);
-    }
-    SitCvConfig merged = newInstance(overwritten);
-    merged.sourcePath = overwriting.sourcePath;
-    merged.jarList = overwriting.jarList;
-    merged.javaFilePattern = overwriting.javaFilePattern;
-    merged.override = overwriting.override;
-    if (overwriting.lifelines != null) {
-      merged.lifelines.addAll(overwriting.lifelines);
-    }
-    if (overwriting.sqlLogPattern != null) {
-      merged.sqlLogPattern = overwriting.sqlLogPattern;
-    }
-    return merged;
-  }
+  @JsonMerge
+  private List<String> asyncAnnotations = new ArrayList<>();
 
   public void updateBy(SitCvConfig other) {
     this.sourcePath = other.sourcePath;
@@ -68,11 +44,11 @@ public class SitCvConfig {
   }
 
   public FilterConditionGroup getLifelineOnlyFilter() {
-      List<LifelineClasses> repositories = lifelines.stream().filter(LifelineClasses::isLifelineOnly)
-          .collect(toList());
-      return toFilterConditionGroup(repositories);
+    List<LifelineClasses> repositories = lifelines.stream().filter(LifelineClasses::isLifelineOnly)
+        .collect(toList());
+    return toFilterConditionGroup(repositories);
   }
-  
+
   public FilterConditionGroup getSequenceDiagramFilter() {
     return toFilterConditionGroup(lifelines);
   }

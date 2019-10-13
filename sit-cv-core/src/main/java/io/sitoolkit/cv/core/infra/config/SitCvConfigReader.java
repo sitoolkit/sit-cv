@@ -1,7 +1,5 @@
 package io.sitoolkit.cv.core.infra.config;
 
-import java.io.UncheckedIOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -39,12 +37,18 @@ public class SitCvConfigReader {
 
   private SitCvConfig readConfig(Path baseDir) {
     Optional<Path> configFilePath = findConfigPath(baseDir);
-    if (configFilePath.isPresent()) {
-      SitCvConfig projConfig = readConfig(getConfigURL(configFilePath.get()));
-      projConfig.setSourcePath(configFilePath.get());
-      return SitCvConfig.merge(readDefaultConfig(), projConfig);
-    } else {
+
+    if (configFilePath.isEmpty()) {
       return readDefaultConfig();
+    }
+
+    SitCvConfig projectConfig = JsonUtils.file2obj(configFilePath.orElseThrow(), SitCvConfig.class)
+        .orElseThrow();
+
+    if (projectConfig.isOverride()) {
+      return projectConfig;
+    } else {
+      return JsonUtils.merge(projectConfig, getDefaultConfigURL());
     }
   }
 
@@ -67,28 +71,20 @@ public class SitCvConfigReader {
     return SitResourceUtils.getResourceUrl(SitCvConfig.class, CONFIG_FILE_NAME);
   }
 
-  private URL getConfigURL(Path configFilePath) {
-     try {
-      return configFilePath.toAbsolutePath().normalize().toUri().toURL();
-    } catch (MalformedURLException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-  
   private void startWatch() {
     findConfigPath(baseDir).ifPresent(configFilePath -> {
-          
-        watcher.add(configFilePath);
-        watcher.addListener(modifiedFiles -> {
-          List<Consumer<SitCvConfig>> listeners;
-          reload();
-          synchronized (this) {
-            listeners = this.configListeners;
-          }
-          log.debug("config listeners: {}", listeners.toString());
-          listeners.forEach(listener -> listener.accept(config));
-        });
-        watcher.start();
+
+      watcher.add(configFilePath);
+      watcher.addListener(modifiedFiles -> {
+        List<Consumer<SitCvConfig>> listeners;
+        reload();
+        synchronized (this) {
+          listeners = this.configListeners;
+        }
+        log.debug("config listeners: {}", listeners.toString());
+        listeners.forEach(listener -> listener.accept(config));
+      });
+      watcher.start();
     });
   }
 
@@ -99,14 +95,13 @@ public class SitCvConfigReader {
   private synchronized void reload() {
     config.updateBy(readConfig(baseDir));
   }
-  
-  private Optional<Path> findConfigPath(Path baseDir) {
-      Path path = baseDir.resolve(CONFIG_FILE_NAME);
-      if (path.toFile().exists()) {
-          return Optional.of(path);
-      } else {
-          return Optional.empty();
-      }
-  }
 
+  private Optional<Path> findConfigPath(Path baseDir) {
+    Path path = baseDir.resolve(CONFIG_FILE_NAME);
+    if (path.toFile().exists()) {
+      return Optional.of(path);
+    } else {
+      return Optional.empty();
+    }
+  }
 }

@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.not;
@@ -8,23 +9,18 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
+import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ClassDefReaderJavaParserImplTest {
 
-  static ClassDefReaderJavaParserImpl reader;
-
-  @BeforeClass
-  public static void init() {
-    reader = ClassDefReaderJavaParserImplFactory.create(".");
-  }
-
   @Test
   public void testProcessingTime() {
+
+    ClassDefReaderJavaParserImpl reader = readerForSitCv();
 
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
@@ -42,4 +38,24 @@ public class ClassDefReaderJavaParserImplTest {
         not(greaterThan(targetTime)));
   }
 
+  @Test
+  public void testAsync() {
+    ClassDef asyncService = readerForSample()
+        .readJava(Paths.get("../sample/src/main/java/a/b/c/AsyncService.java")).orElseThrow();
+
+    assertThat("this method is expected to be async",
+        asyncService.findMethodBySignature("asyncWithoutResult(int)").orElseThrow().isAsync(),
+        is(true));
+    assertThat("this method is expected to be async",
+        asyncService.findMethodBySignature("asyncWithResult(int)").orElseThrow().isAsync(),
+        is(true));
+  }
+
+  private ClassDefReaderJavaParserImpl readerForSitCv() {
+    return ClassDefReaderJavaParserImplFactory.create(".");
+  }
+
+  private ClassDefReaderJavaParserImpl readerForSample() {
+    return ClassDefReaderJavaParserImplFactory.create("../sample");
+  }
 }

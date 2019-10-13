@@ -12,22 +12,23 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MessageDef extends SequenceElement {
-    private MessageType type = MessageType.SYNC;
-    private String requestName;
-    private List<TypeDef> requestParamTypes = new ArrayList<>();
-    private String requestQualifiedSignature;
-    private LifeLineDef target;
-    private TypeDef responseType;
-    private MethodDef methodDef;
+  private MessageType type = MessageType.SYNC;
+  private String requestName;
+  private List<TypeDef> requestParamTypes = new ArrayList<>();
+  private String requestQualifiedSignature;
+  private LifeLineDef target;
+  private TypeDef responseType;
+  private MethodDef methodDef;
+  private boolean isAsync;
 
-    @Override
-    public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
-        return writer.write(lifeLine, this);
-    }
+  @Override
+  public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
+    return writer.write(lifeLine, this);
+  }
 
-    @Override
-    public Stream<MessageDef> getMessagesRecursively() {
-        Stream<MessageDef> messages = getTarget().getMessagesRecursively();
-        return Stream.concat(Stream.of(this), messages);
-    }
+  @Override
+  public Stream<MessageDef> getMessagesRecursively() {
+    Stream<MessageDef> messages = getTarget().getMessagesRecursively();
+    return Stream.concat(Stream.of(this), messages);
+  }
 }

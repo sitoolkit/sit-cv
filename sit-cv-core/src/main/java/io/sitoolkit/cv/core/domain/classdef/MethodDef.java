@@ -18,68 +18,69 @@ import lombok.extern.slf4j.Slf4j;
 @ToString(exclude = { "classDef", "methodCalls", "statements" })
 public class MethodDef implements CvStatement {
 
-    private String name;
-    private String signature;
-    private String qualifiedSignature;
-    private boolean isPublic;
-    private String actionPath;
-    private ClassDef classDef;
-    private List<TypeDef> paramTypes;
-    private TypeDef returnType;
-    private Set<MethodCallDef> methodCalls = new HashSet<>();
-    private List<CvStatement> statements = new ArrayList<>();
-    private ApiDocDef apiDoc;
+  private String name;
+  private String signature;
+  private String qualifiedSignature;
+  private boolean isPublic;
+  private boolean isAsync;
+  private String actionPath;
+  private ClassDef classDef;
+  private List<TypeDef> paramTypes;
+  private TypeDef returnType;
+  private Set<MethodCallDef> methodCalls = new HashSet<>();
+  private List<CvStatement> statements = new ArrayList<>();
+  private ApiDocDef apiDoc;
 
-    @Override
-    public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {
-        return processor.process(this);
+  @Override
+  public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {
+    return processor.process(this);
+  }
+
+  @Override
+  public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
+    return processor.process(this, context);
+  }
+
+  public MethodDef findImplementation() {
+    ClassDef clazz = getClassDef();
+
+    if (clazz == null) {
+      return this;
     }
 
-    @Override
-    public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
-        return processor.process(this, context);
+    ClassDef impleClass = clazz.findImplementation();
+    Optional<MethodDef> methodImpl = impleClass.findMethodBySignature(getSignature());
+    if (methodImpl.isPresent()) {
+      return methodImpl.get();
     }
 
-    public MethodDef findImplementation() {
-        ClassDef clazz = getClassDef();
+    return this;
+  }
 
-        if (clazz == null) {
-            return this;
-        }
+  public Stream<MethodDef> collectCalledMethodsRecursively() {
+    return Stream.concat(Stream.of(this),
+        collectCalledMethodsRecursively(getMethodCalls(), MethodCallStack.getBlank()));
+  }
 
-        ClassDef impleClass = clazz.findImplementation();
-        Optional<MethodDef> methodImpl = impleClass.findMethodBySignature(getSignature());
-        if (methodImpl.isPresent()) {
-            return methodImpl.get();
-        }
+  private Stream<MethodDef> collectCalledMethodsRecursively(MethodCallDef method,
+      MethodCallStack callStack) {
 
-        return this;
+    MethodDef methodImpl = method.findImplementation();
+
+    if (callStack.contains(methodImpl)) {
+      log.debug("method: {} is called recursively", methodImpl.getQualifiedSignature());
+      return Stream.empty();
     }
+    MethodCallStack pushedStack = callStack.push(methodImpl);
 
-    public Stream<MethodDef> collectCalledMethodsRecursively() {
-        return Stream.concat(Stream.of(this),
-                collectCalledMethodsRecursively(getMethodCalls(), MethodCallStack.getBlank()));
-    }
+    return Stream.concat(Stream.of(methodImpl),
+        collectCalledMethodsRecursively(methodImpl.getMethodCalls(), pushedStack));
+  }
 
-    private Stream<MethodDef> collectCalledMethodsRecursively(MethodCallDef method,
-            MethodCallStack callStack) {
-
-        MethodDef methodImpl = method.findImplementation();
-
-        if (callStack.contains(methodImpl)) {
-            log.debug("method: {} is called recursively", methodImpl.getQualifiedSignature());
-            return Stream.empty();
-        }
-        MethodCallStack pushedStack = callStack.push(methodImpl);
-
-        return Stream.concat(Stream.of(methodImpl),
-                collectCalledMethodsRecursively(methodImpl.getMethodCalls(), pushedStack));
-    }
-
-    private Stream<MethodDef> collectCalledMethodsRecursively(Set<MethodCallDef> methodCalls,
-            MethodCallStack callStack) {
-        return methodCalls.stream().flatMap((method) -> {
-            return collectCalledMethodsRecursively(method, callStack);
-        });
-    }
+  private Stream<MethodDef> collectCalledMethodsRecursively(Set<MethodCallDef> methodCalls,
+      MethodCallStack callStack) {
+    return methodCalls.stream().flatMap((method) -> {
+      return collectCalledMethodsRecursively(method, callStack);
+    });
+  }
 }

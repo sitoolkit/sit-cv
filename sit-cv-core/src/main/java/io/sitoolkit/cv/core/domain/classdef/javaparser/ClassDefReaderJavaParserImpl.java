@@ -201,6 +201,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 if (equalMethods(declaredMethod, method)) {
                   method.accept(statementVisitor, VisitContext.of(methodDef));
                   methodDef.setActionPath(classActionPath + getActionPath(method));
+                  methodDef.setAsync(
+                      JavaParserUtils.hasAnyAnnotation(method, config.getAsyncAnnotations()));
                 }
               });
             }
