@@ -2,9 +2,12 @@ package io.sitoolkit.cv.core.infra.config;
 
 import static java.util.stream.Collectors.toList;
 
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.beanutils.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonMerge;
@@ -12,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonMerge;
 import lombok.Data;
 
 @Data
-public class SitCvConfig {
+public class CvConfig {
 
   @JsonIgnore
   private Path sourcePath;
@@ -28,13 +31,12 @@ public class SitCvConfig {
   @JsonMerge
   private List<String> asyncAnnotations = new ArrayList<>();
 
-  public void updateBy(SitCvConfig other) {
-    this.sourcePath = other.sourcePath;
-    this.jarList = other.jarList;
-    this.javaFilePattern = other.javaFilePattern;
-    this.override = other.override;
-    this.lifelines = other.lifelines;
-    this.sqlLogPattern = other.sqlLogPattern;
+  public void update(CvConfig other) {
+    try {
+      BeanUtils.copyProperties(this, other);
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   public FilterConditionGroup getEntryPointFilter() {

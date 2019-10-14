@@ -1,15 +1,12 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
-import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
 import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
-import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.project.SitCvToolsManager;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
 import lombok.NonNull;
@@ -20,15 +17,6 @@ public class MavenProjectReader implements ProjectReader {
 
   @NonNull
   private SqlLogProcessor sqlLogProcessor;
-
-  public static void main(String[] args) {
-    Path projectDir = Paths.get(args[0]);
-    SitCvConfigReader configReader = new SitCvConfigReader();
-    SitCvConfig config = configReader.read(projectDir, false);
-    ServiceFactory factory = ServiceFactory.create(projectDir, false);
-    Project project = factory.getProjectManager().getCurrentProject();
-    new MavenProjectReader(new SqlLogProcessor()).generateSqlLog(project, config);
-  }
 
   @Override
   public Optional<Project> read(Path projectDir) {
@@ -47,7 +35,7 @@ public class MavenProjectReader implements ProjectReader {
   }
 
   @Override
-  public boolean generateSqlLog(Project project, SitCvConfig sitCvConfig) {
+  public boolean generateSqlLog(Project project, CvConfig sitCvConfig) {
     MavenProject mvnPrj = MavenProject.load(project.getDir());
 
     if (!mvnPrj.available()) {

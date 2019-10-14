@@ -13,8 +13,8 @@ import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
 import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
-import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
+import io.sitoolkit.cv.core.infra.config.CvConfigService;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 
 public class ClassDefReaderJavaParserImplFactory {
 
@@ -28,8 +28,8 @@ public class ClassDefReaderJavaParserImplFactory {
 
     Path projectPathObj = Paths.get(projectPath);
 
-    SitCvConfigReader configReader = new SitCvConfigReader();
-    SitCvConfig config = configReader.read(projectPathObj, false);
+    CvConfigService configService = new CvConfigService();
+    CvConfig config = configService.read(projectPathObj, false);
 
     ClassDefRepository reposiotry = new ClassDefRepositoryMemImpl(config);
     List<ProjectReader> readers = Arrays.asList(new MavenProjectReader(new SqlLogProcessor()));

@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     private Map<String, MethodDef> methodDefMap = new HashMap<>();
 
     @NonNull
-    private SitCvConfig config;
+    private CvConfig config;
 
     @Override
     public void save(ClassDef classDef) {

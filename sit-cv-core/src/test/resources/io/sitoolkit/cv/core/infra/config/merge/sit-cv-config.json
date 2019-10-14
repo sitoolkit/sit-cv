@@ -1,0 +1,10 @@
+{
+	"lifelines": [
+		{
+			"name": "NewName"
+		}
+	],
+	"asyncAnnotations": [
+		"NewOne"
+	]
+}

@@ -42,7 +42,7 @@ import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +61,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
   private ProjectManager projectManager;
 
   @NonNull
-  private SitCvConfig config;
+  private CvConfig config;
 
   @Override
   public ClassDefReader readDir() {
