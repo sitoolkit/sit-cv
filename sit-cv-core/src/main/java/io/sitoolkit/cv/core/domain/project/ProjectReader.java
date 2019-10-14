@@ -7,7 +7,7 @@ import io.sitoolkit.cv.core.infra.config.CvConfig;
 
 public interface ProjectReader {
 
-    Optional<Project> read(Path projectDir);
+  Optional<Project> read(Path projectDir);
 
-    boolean generateSqlLog(Project project, CvConfig sitCvConfig);
+  boolean generateSqlLog(Project project, CvConfig cvConfig);
 }

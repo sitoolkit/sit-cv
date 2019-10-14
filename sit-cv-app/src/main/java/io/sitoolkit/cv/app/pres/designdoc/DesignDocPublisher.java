@@ -35,7 +35,7 @@ public class DesignDocPublisher implements DesignDocTreeEventListener {
   }
 
   @Override
-  public void onModified() {
+  public void onModify() {
     publishDesingDocList();
   }
 

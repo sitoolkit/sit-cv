@@ -51,10 +51,10 @@ public class SourceFileEventHandler implements FileWatchEventListener {
 
     AnalysisResult result = functionModelService.analyze(srcFiles);
 
-    result.getEffectedSourceIds().forEach(functionModelEventListener::onModified);
+    result.getEffectedSourceIds().forEach(functionModelEventListener::onModify);
 
     if (result.isEntryPointModified()) {
-      designDocTreeEventListener.onModified();
+      designDocTreeEventListener.onModify();
     }
   }
 

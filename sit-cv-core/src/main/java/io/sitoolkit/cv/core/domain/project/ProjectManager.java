@@ -22,7 +22,7 @@ public class ProjectManager {
 
   @NonNull
   @Getter
-  private CvConfig sitCvConfig;
+  private CvConfig cvConfig;
 
   @Getter
   private Project currentProject;
@@ -51,8 +51,7 @@ public class ProjectManager {
   }
 
   public void generateSqlLog() {
-    readers.stream().filter(reader -> reader.generateSqlLog(currentProject, sitCvConfig))
-        .findFirst();
+    readers.stream().filter(reader -> reader.generateSqlLog(currentProject, cvConfig)).findFirst();
   }
 
 }

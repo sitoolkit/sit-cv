@@ -12,7 +12,9 @@ import org.apache.commons.beanutils.BeanUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonMerge;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 
 @Data
 public class CvConfig {
@@ -27,9 +29,11 @@ public class CvConfig {
   @JsonMerge
   private List<LifelineClasses> lifelines = new ArrayList<>();
   private EnclosureFilterCondition sqlLogPattern;
-
   @JsonMerge
   private List<String> asyncAnnotations = new ArrayList<>();
+  @JsonIgnore
+  @Setter(AccessLevel.NONE)
+  private List<CvConfigEventListener> eventListeners = new ArrayList<>();
 
   public void update(CvConfig other) {
     try {
@@ -63,6 +67,10 @@ public class CvConfig {
 
   public EnclosureFilterCondition getSqlEnclosureFilter() {
     return sqlLogPattern;
+  }
+
+  public void addEventListener(CvConfigEventListener eventListener) {
+    eventListeners.add(eventListener);
   }
 
   private FilterConditionGroup toFilterConditionGroup(List<LifelineClasses> lifelines) {

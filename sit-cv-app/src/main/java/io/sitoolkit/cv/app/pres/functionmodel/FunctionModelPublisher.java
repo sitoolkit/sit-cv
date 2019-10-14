@@ -36,7 +36,7 @@ public class FunctionModelPublisher implements FunctionModelEventListener {
   }
 
   @Override
-  public void onModified(String souceId) {
+  public void onModify(String souceId) {
     publishDetail(souceId);
   }
 
