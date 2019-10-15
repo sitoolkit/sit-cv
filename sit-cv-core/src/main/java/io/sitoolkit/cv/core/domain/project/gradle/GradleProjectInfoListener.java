@@ -25,7 +25,7 @@ public class GradleProjectInfoListener implements StdoutListener {
   public void nextLine(String line) {
 
     log.debug(line);
-    
+
     String javaBaseDirStr = StringUtils.substringAfter(line, "sitCvProjectDir:");
     if (StringUtils.isNotEmpty(javaBaseDirStr)) {
       recordBaseDirStr(javaBaseDirStr);
