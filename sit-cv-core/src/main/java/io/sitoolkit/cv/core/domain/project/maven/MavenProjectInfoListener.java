@@ -1,17 +1,17 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
+import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
-import io.sitoolkit.cv.core.domain.project.Project;
-import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MavenProjectInfoListener implements StdoutListener {
@@ -55,6 +55,11 @@ public class MavenProjectInfoListener implements StdoutListener {
     String javaVersion = StringUtils.substringBetween(line, "Java version: ", ",");
     if (StringUtils.isNotEmpty(javaVersion)) {
       project.setJavaVersion(javaVersion);
+    }
+
+    String sourceEncoding = StringUtils.substringBetween(line, "project.build.sourceEncoding=", ",");
+    if (StringUtils.isNotEmpty(sourceEncoding)) {
+      project.setSourceEncoding(Charset.forName(sourceEncoding));
     }
   }
 
