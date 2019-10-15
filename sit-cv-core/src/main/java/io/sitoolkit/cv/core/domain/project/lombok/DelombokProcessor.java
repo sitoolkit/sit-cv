@@ -73,6 +73,7 @@ public class DelombokProcessor implements PreProcessor {
   }
 
   void executeDelombok(Path srcDir) {
+    String encoding = project.getSourceEncoding().name();
     String srcPath = srcDir.toFile().getAbsolutePath();
     String targetPath = getDelombokTargetDir().toFile().getAbsolutePath();
     String classPath = project.getClasspaths().stream()
@@ -82,7 +83,7 @@ public class DelombokProcessor implements PreProcessor {
 
     int exitCode = new ProcessCommand().command("java")
             .args("-jar", lombokJarPath.toFile().getAbsolutePath(),
-                    "delombok", "-e", "UTF-8", "-c", classPath, srcPath, "-d", targetPath)
+                    "delombok", "-e", encoding, "-c", classPath, srcPath, "-d", targetPath)
             .stdout(log::info).stderr(log::warn).execute();
 
     if (exitCode != 0) {
