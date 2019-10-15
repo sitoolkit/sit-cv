@@ -3,6 +3,7 @@ allprojects {
     task projectInfo {
       doLast {
         if (project.hasProperty('sourceSets') && project.sourceSets.main.hasProperty('java')) {
+          println "javaEncoding:${compileJava.options.encoding}"
           println "sitCvProjectDir:${project.projectDir}"
           println "sitCvBuildDir:${project.buildDir}"
           project.sourceSets.main.java.srcDirs.each{println "sitCvJavaSrcDir:${it}"}
