@@ -1,14 +1,14 @@
 package io.sitoolkit.cv.core.domain.project.gradle;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Slf4j
 public class GradleProjectInfoListener implements StdoutListener {
@@ -49,6 +49,11 @@ public class GradleProjectInfoListener implements StdoutListener {
     String javaVersion = StringUtils.substringAfter(line, "javaVersion:");
     if (StringUtils.isNotEmpty(javaVersion)) {
       project.setJavaVersion(javaVersion);
+    }
+
+    String encoding =  StringUtils.substringAfter(line, "javaEncoding:");
+    if (StringUtils.isNotEmpty(encoding)) {
+      project.setSourceEncoding(Charset.forName(encoding));
     }
   }
 

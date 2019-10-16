@@ -33,8 +33,8 @@ import io.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
 import io.sitoolkit.cv.core.domain.uml.plantuml.ClassDiagramWriterPlantUmlImpl;
 import io.sitoolkit.cv.core.domain.uml.plantuml.PlantUmlWriter;
 import io.sitoolkit.cv.core.domain.uml.plantuml.SequenceDiagramWriterPlantUmlImpl;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
-import io.sitoolkit.cv.core.infra.config.SitCvConfigReader;
+import io.sitoolkit.cv.core.infra.config.CvConfigService;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.graphviz.GraphvizManager;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -78,8 +78,8 @@ public class ServiceFactory {
   }
 
   protected ServiceFactory createServices(Path projectDir, boolean watch) {
-    SitCvConfigReader configReader = new SitCvConfigReader();
-    SitCvConfig config = configReader.read(projectDir, watch);
+    CvConfigService configService = new CvConfigService();
+    CvConfig config = configService.read(projectDir, watch);
 
     projectManager = createProjectManager(config);
     projectManager.load(projectDir);
@@ -96,7 +96,7 @@ public class ServiceFactory {
     return this;
   }
 
-  protected ProjectManager createProjectManager(SitCvConfig config) {
+  protected ProjectManager createProjectManager(CvConfig config) {
     SqlLogProcessor sqlLogProcessor = new SqlLogProcessor();
     List<ProjectReader> readers = Arrays.asList(new MavenProjectReader(sqlLogProcessor),
         new GradleProjectReader(sqlLogProcessor));
@@ -104,7 +104,7 @@ public class ServiceFactory {
     return new ProjectManager(readers, config);
   }
 
-  protected FunctionModelService createFunctionModelService(SitCvConfig config,
+  protected FunctionModelService createFunctionModelService(CvConfig config,
       ProjectManager projectManager) {
     ClassDefRepository classDefRepository = new ClassDefRepositoryMemImpl(config);
     ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,

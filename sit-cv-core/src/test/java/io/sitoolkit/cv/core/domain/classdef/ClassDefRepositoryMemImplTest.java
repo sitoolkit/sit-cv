@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 
 public class ClassDefRepositoryMemImplTest {
 
@@ -16,7 +16,7 @@ public class ClassDefRepositoryMemImplTest {
 
     @BeforeClass
     public static void init() {
-        repository = new ClassDefRepositoryMemImpl(new SitCvConfig());
+        repository = new ClassDefRepositoryMemImpl(new CvConfig());
     }
 
     @Test

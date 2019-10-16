@@ -12,14 +12,14 @@ import org.apache.commons.lang3.StringUtils;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.infra.config.FilterCondition;
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.SitFileUtils;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
 
 public class SqlLogProcessor {
 
-    public void process(String projectType, SitCvConfig config, Path agentJar, Project project,
+    public void process(String projectType, CvConfig config, Path agentJar, Project project,
             Function<String, ProcessCommand> commandBuilder) {
 
         SitFileUtils.createDirectories(project.getSqlLogPath().getParent());

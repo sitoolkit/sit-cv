@@ -1,37 +1,61 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.not;
 
+import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Test;
 
-import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
-import io.sitoolkit.cv.core.domain.classdef.ClassDefRepositoryMemImpl;
-import io.sitoolkit.cv.core.domain.project.ProjectManager;
-import io.sitoolkit.cv.core.domain.project.ProjectReader;
-import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
-import io.sitoolkit.cv.core.domain.project.maven.MavenProjectReader;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.domain.classdef.ClassDef;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ClassDefReaderJavaParserImplTest {
 
   @Test
-  public void test() {
-    SitCvConfig config = new SitCvConfig();
-    ClassDefRepository reposiotry = new ClassDefRepositoryMemImpl(config);
-    List<ProjectReader> readers = Arrays.asList(new MavenProjectReader(new SqlLogProcessor()));
-    ProjectManager projectManager = new ProjectManager(readers, config);
+  public void testProcessingTime() {
 
-    projectManager.load(Paths.get("."));
+    ClassDefReaderJavaParserImpl reader = readerForSitCv();
 
-    ClassDefReaderJavaParserImpl parser = new ClassDefReaderJavaParserImpl(reposiotry,
-        projectManager, config);
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
 
-    parser.init();
+    // StatementVisitor.java takes the longest processing time.
+    reader.readJava(Paths.get(
+        "src/main/java/io/sitoolkit/cv/core/domain/classdef/javaparser/StatementVisitor.java"));
 
-    parser.readJava(Paths.get(
-        "/Users/yuichi_kuwahara/Documents/eclipse_workspace/sit-cv/sit-cv-core/src/main/java/io/sitoolkit/cv/core/domain/classdef/javaparser/StatementVisitor.java"));
+    log.info("Proccessing time of readJava: {}", stopWatch);
 
+    // TODO The target time is wanted to be less than 5 sec...
+    long targetTime = 20L;
+
+    assertThat("Exceeded target time", stopWatch.getTime(TimeUnit.SECONDS),
+        not(greaterThan(targetTime)));
+  }
+
+  @Test
+  public void testAsync() {
+    ClassDef asyncService = readerForSample()
+        .readJava(Paths.get("../sample/src/main/java/a/b/c/AsyncService.java")).orElseThrow();
+
+    assertThat("this method is expected to be async",
+        asyncService.findMethodBySignature("asyncWithoutResult(int)").orElseThrow().isAsync(),
+        is(true));
+    assertThat("this method is expected to be async",
+        asyncService.findMethodBySignature("asyncWithResult(int)").orElseThrow().isAsync(),
+        is(true));
+  }
+
+  private ClassDefReaderJavaParserImpl readerForSitCv() {
+    return ClassDefReaderJavaParserImplFactory.create(".");
+  }
+
+  private ClassDefReaderJavaParserImpl readerForSample() {
+    return ClassDefReaderJavaParserImplFactory.create("../sample");
   }
 }

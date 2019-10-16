@@ -15,8 +15,7 @@ public class MessageDef extends SequenceElement {
     private MessageType type = MessageType.SYNC;
     private String requestName;
     private List<TypeDef> requestParamTypes = new ArrayList<>();
-    private List<TypeDef> processingExceptionTypes = new ArrayList<>();
-    private List<TypeDef> throwingExceptionTypes = new ArrayList<>();
+    private List<TypeDef> exceptionTypes = new ArrayList<>();
     private String requestQualifiedSignature;
     private LifeLineDef target;
     private TypeDef responseType;

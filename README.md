@@ -239,6 +239,10 @@ It's JSON structure is as follows.
       "lifelineOnly": true
     }
   ],
+  "asyncAnnotations": [
+    "Async",
+    "Asynchronous"
+  ],
   "sqlLogPattern": {
     "start": ".*Pattern before SQL starts.*",
     "end": ".*Pattern after SQL ends.*"
@@ -254,6 +258,7 @@ It's JSON structure is as follows.
 | &emsp; entryPoint   | Set true to recognize as a entry point, i.e. left end class of sequence diagram.   | false         |
 | &emsp; lifelineOnly | Set true to hide internal processing, i.e. messages to itself.                     | false         |
 | &emsp; dbAccess     | Set true to recognize as a repository class. This is used to generate CRUD matrix. | false         |
+| asyncAnnotations    | Annotaion names to recognize as asynchronous method.                               |               |
 | sqlLogPattern       | Filter rule to find SQL from test log. This is used to generate CRUD matrix.       |               |
 | &emsp; start        | Pattern to match the line just before SQL starts.                                  |               |
 | &emsp; end          | Pattern to match the line just after SQL ends.                                     |               |

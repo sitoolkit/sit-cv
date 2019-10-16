@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.lombok.DelombokProcessor;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import lombok.Getter;
 import lombok.NonNull;
@@ -22,7 +22,7 @@ public class ProjectManager {
 
   @NonNull
   @Getter
-  private SitCvConfig sitCvConfig;
+  private CvConfig cvConfig;
 
   @Getter
   private Project currentProject;
@@ -51,8 +51,7 @@ public class ProjectManager {
   }
 
   public void generateSqlLog() {
-    readers.stream().filter(reader -> reader.generateSqlLog(currentProject, sitCvConfig))
-        .findFirst();
+    readers.stream().filter(reader -> reader.generateSqlLog(currentProject, cvConfig)).findFirst();
   }
 
 }

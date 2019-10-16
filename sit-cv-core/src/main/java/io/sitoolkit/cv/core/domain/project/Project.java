@@ -1,5 +1,10 @@
 package io.sitoolkit.cv.core.domain.project;
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
+
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -7,10 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
 
 @Data
 public class Project {
@@ -25,6 +26,8 @@ public class Project {
   private Path buildDir;
 
   private String javaVersion;
+
+  private Charset sourceEncoding = Charset.defaultCharset();
 
   private Set<Path> srcDirs = new HashSet<>();
 
