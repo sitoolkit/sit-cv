@@ -20,7 +20,7 @@ public class FilterCondition {
     private String annotation;
     private boolean withDetail = true;
     
-    // TODO use FilterPattern　class
+    // TODO use FilterPattern class
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Pattern namePattern;
