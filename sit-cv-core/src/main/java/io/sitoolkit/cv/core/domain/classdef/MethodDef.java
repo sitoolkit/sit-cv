@@ -1,16 +1,12 @@
 package io.sitoolkit.cv.core.domain.classdef;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @Data
@@ -22,10 +18,11 @@ public class MethodDef implements CvStatement {
     private String signature;
     private String qualifiedSignature;
     private boolean isPublic;
+    private boolean isAsync;
     private String actionPath;
     private ClassDef classDef;
     private List<TypeDef> paramTypes;
-    private List<TypeDef> exceptionTypes;
+    private List<String> exceptions;
     private TypeDef returnType;
     private Set<MethodCallDef> methodCalls = new HashSet<>();
     private List<CvStatement> statements = new ArrayList<>();

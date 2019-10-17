@@ -1,32 +1,19 @@
 package io.sitoolkit.cv.core.domain.uml.plantuml;
 
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
+import io.sitoolkit.cv.core.domain.functionmodel.Diagram;
+import io.sitoolkit.cv.core.domain.uml.*;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-
-import io.sitoolkit.cv.core.domain.classdef.TypeDef;
-import io.sitoolkit.cv.core.domain.functionmodel.Diagram;
-import io.sitoolkit.cv.core.domain.uml.BranchSequenceElement;
-import io.sitoolkit.cv.core.domain.uml.CatchSequenceGroup;
-import io.sitoolkit.cv.core.domain.uml.ConditionalSequenceGroup;
-import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
-import io.sitoolkit.cv.core.domain.uml.FinallySequenceGroup;
-import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
-import io.sitoolkit.cv.core.domain.uml.LoopSequenceGroup;
-import io.sitoolkit.cv.core.domain.uml.MessageDef;
-import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
-import io.sitoolkit.cv.core.domain.uml.SequenceElement;
-import io.sitoolkit.cv.core.domain.uml.SequenceElementWriter;
-import io.sitoolkit.cv.core.domain.uml.TrySequenceGroup;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -91,7 +78,7 @@ public class SequenceDiagramWriterPlantUmlImpl
 
         String note = buildExceptionComment(message);
         if (StringUtils.isNotEmpty(note)) {
-            list.add(1, "note right : " + note);
+            list.add(1, " note right : " + note);
         }
 
         String responseName = type2Str(message.getResponseType());
@@ -114,26 +101,10 @@ public class SequenceDiagramWriterPlantUmlImpl
     }
 
     protected String buildExceptionComment(MessageDef messageDef) {
-        String note = "";
-        List<TypeDef> throwingExceptionTypes = messageDef.getThrowingExceptionTypes();
-        List<TypeDef> processingExceptionTypes = messageDef.getProcessingExceptionTypes();
-        if (!throwingExceptionTypes.isEmpty() || !processingExceptionTypes.isEmpty()) {
-            String throwingExceptions =
-                    !throwingExceptionTypes.isEmpty() ?
-                            "Throwing exceptions:\\n" + throwingExceptionTypes.stream()
-                                    .map(TypeDef::getName)
-                                    .reduce((s1, s2) -> String.join(", ", s1, s2))
-                                    .get() : "";
-            String processingExceptions =
-                    !processingExceptionTypes.isEmpty() ?
-                            "Processing exceptions:\\n" + processingExceptionTypes.stream()
-                                    .map(TypeDef::getName)
-                                    .reduce((s1, s2) -> String.join(", ", s1, s2))
-                                    .get() : "";
-            note = Stream.of(throwingExceptions, processingExceptions).filter(x -> StringUtils.isNotEmpty(x))
-                    .reduce((x1, x2) -> String.join("\\n\\n", x1, x2))
-                    .get();
-        }
+        String note = messageDef.getExceptions().stream()
+                .filter(StringUtils::isNotEmpty)
+                .reduce((x1, x2) -> String.join("\\n", x1, x2))
+                .orElse("");
         return note;
     }
 

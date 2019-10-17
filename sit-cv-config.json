@@ -1,4 +1,5 @@
 {
+  "drawingException": false,
   "lifelines": [
     {
       "name": ".*Controller.*",

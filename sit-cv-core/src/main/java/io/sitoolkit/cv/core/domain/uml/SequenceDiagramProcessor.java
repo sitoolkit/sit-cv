@@ -1,38 +1,24 @@
 package io.sitoolkit.cv.core.domain.uml;
 
-import java.util.Collections;
+import io.sitoolkit.cv.core.domain.classdef.*;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
+import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
-import io.sitoolkit.cv.core.domain.classdef.CatchStatement;
-import io.sitoolkit.cv.core.domain.classdef.ClassDef;
-import io.sitoolkit.cv.core.domain.classdef.ClassDefFilter;
-import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
-import io.sitoolkit.cv.core.domain.classdef.CvStatement;
-import io.sitoolkit.cv.core.domain.classdef.CvStatementDefaultImpl;
-import io.sitoolkit.cv.core.domain.classdef.FinallyStatement;
-import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
-import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodCallStack;
-import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.domain.classdef.StatementProcessor;
-import io.sitoolkit.cv.core.domain.classdef.TryStatement;
-import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
-import io.sitoolkit.cv.core.infra.config.SitCvConfig;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @RequiredArgsConstructor
 public class SequenceDiagramProcessor implements StatementProcessor<SequenceElement, MethodCallStack> {
 
-    @NonNull
-    private SitCvConfig config;
+  @NonNull
+  private CvConfig config;
 
     public LifeLineDef process(ClassDef clazz, MethodDef method) {
         return process(clazz, method, MethodCallStack.getBlank());
@@ -63,7 +49,9 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         MessageDef message = new MessageDef();
         message.setRequestName(method.getName());
         message.setRequestParamTypes(method.getParamTypes());
-        message.setExceptionTypes(config.isDrawingException() ? method.getExceptionTypes() : Collections.EMPTY_LIST);
+        if (config.isDrawingException()) {
+            message.setExceptions(method.getExceptions());
+        }
         message.setRequestQualifiedSignature(method.getQualifiedSignature());
         message.setTarget(lifeLine);
         message.setResponseType(method.getReturnType());
@@ -105,7 +93,9 @@ public class SequenceDiagramProcessor implements StatementProcessor<SequenceElem
         MessageDef message = new MessageDef();
         message.setRequestName(methodImpl.getName());
         message.setRequestParamTypes(methodImpl.getParamTypes());
-        message.setExceptionTypes(config.isDrawingException() ? methodImpl.getExceptionTypes() : Collections.EMPTY_LIST);
+        if (config.isDrawingException()) {
+            message.setExceptions(methodImpl.getExceptions());
+        }
         message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
         message.setTarget(process(methodImpl.getClassDef(), methodImpl, pushedStack));
         message.setResponseType(methodCall.getReturnType());

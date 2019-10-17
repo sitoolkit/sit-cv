@@ -1,14 +1,13 @@
 package io.sitoolkit.cv.core.infra.config;
 
-import static java.util.stream.Collectors.toList;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.Data;
+import static java.util.stream.Collectors.toList;
 
 @Data
 public class SitCvConfig {

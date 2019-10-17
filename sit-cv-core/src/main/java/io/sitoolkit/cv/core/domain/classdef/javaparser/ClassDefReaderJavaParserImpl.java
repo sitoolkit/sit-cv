@@ -1,19 +1,5 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
@@ -32,20 +18,21 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
-
-import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
-import io.sitoolkit.cv.core.domain.classdef.ClassDef;
-import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
-import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
-import io.sitoolkit.cv.core.domain.classdef.ClassType;
-import io.sitoolkit.cv.core.domain.classdef.FieldDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import io.sitoolkit.cv.core.domain.classdef.*;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.CvConfig;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -193,12 +180,12 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
             methodDef.setReturnType(TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
             methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
-            methodDef.setProcessingExceptionTypes(new ArrayList<>() /** TODO 処理中の例外を記述 */);
-            methodDef.setThrowingExceptionTypes(TypeProcessor.collectThrowingExceptionTypes(declaredMethod));
+            methodDef.setExceptions(TypeProcessor.collectThrowingExceptions(declaredMethod));
             methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
             methodDefs.add(methodDef);
 
             if (!typeDec.isInterface()) {
+
               typeDec.getMethods().stream().forEach(method -> {
                 if (equalMethods(declaredMethod, method)) {
                   method.accept(statementVisitor, VisitContext.of(methodDef));
@@ -208,6 +195,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 }
               });
             }
+
 
             log.debug("Add method declaration : {}", methodDef);
 

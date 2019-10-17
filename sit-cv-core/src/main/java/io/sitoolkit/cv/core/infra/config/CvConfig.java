@@ -1,20 +1,18 @@
 package io.sitoolkit.cv.core.infra.config;
 
-import static java.util.stream.Collectors.toList;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonMerge;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
+import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanUtils;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonMerge;
-
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
+import static java.util.stream.Collectors.toList;
 
 @Data
 public class CvConfig {
@@ -26,6 +24,7 @@ public class CvConfig {
   private String javaFilePattern = ".*\\.(java|class)$";
 
   private boolean override = false;
+  private boolean drawingException = true;
   @JsonMerge
   private List<LifelineClasses> lifelines = new ArrayList<>();
   private EnclosureFilterCondition sqlLogPattern;

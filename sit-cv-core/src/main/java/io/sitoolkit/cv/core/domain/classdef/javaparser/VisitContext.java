@@ -1,26 +1,15 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.util.Stack;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.stmt.CatchClause;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.TryStmt;
-
-import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
-import io.sitoolkit.cv.core.domain.classdef.CatchStatement;
-import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
-import io.sitoolkit.cv.core.domain.classdef.CvStatement;
-import io.sitoolkit.cv.core.domain.classdef.CvStatementDefaultImpl;
-import io.sitoolkit.cv.core.domain.classdef.FinallyStatement;
-import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
-import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.domain.classdef.TryStatement;
+import io.sitoolkit.cv.core.domain.classdef.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Stack;
 
 @Slf4j
 public class VisitContext {
@@ -111,6 +100,14 @@ public class VisitContext {
             ((MethodDef) currentMethod).getMethodCalls().add(methodCallDef);
         }
         addChild(getCurrent(), methodCallDef);
+    }
+
+    public void addThrowingException(String throwExpr) {
+        log.debug("{}Add ThrowingException {} to {}", getLogLeftPadding(), throwExpr, getCurrent());
+        CvStatement currentMethod = getCurrentMethod();
+        if (currentMethod != null) {
+            ((MethodDef) currentMethod).getExceptions().add(throwExpr);
+        }
     }
 
     public boolean isInLoop() {
