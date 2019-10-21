@@ -21,6 +21,14 @@ public class TypeProcessor {
                 .map(TypeProcessor::createTypeDef).collect(Collectors.toList());
     }
 
+    public static List<String> collectThrowTypeNames(ResolvedMethodDeclaration declaredMethod) {
+        return IntStream.range(0, declaredMethod.getNumberOfSpecifiedExceptions())
+                .mapToObj(declaredMethod::getSpecifiedException)
+                .map(TypeProcessor::createTypeDef)
+                .map(TypeDef::getName)
+                .collect(Collectors.toList());
+    }
+
     public static TypeDef createTypeDef(ResolvedParameterDeclaration param) {
         TypeDef typeDef = createTypeDef(param.getType());
         typeDef.setVariable(param.getName());

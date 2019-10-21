@@ -90,6 +90,11 @@ public class SequenceDiagramWriterPlantUmlImpl
             + message.getRequestQualifiedSignature() + "} "
             + idFormatter.format(buildRequestName(message)) + "]]");
 
+    String note = buildExceptionComment(message);
+    if (StringUtils.isNotEmpty(note)) {
+        list.add(1, " note right : " + note);
+    }
+
     String responseName = type2Str(message.getResponseType());
     if (!StringUtils.equals(responseName, "void")) {
       list.add(list.size() - 1,
@@ -107,6 +112,14 @@ public class SequenceDiagramWriterPlantUmlImpl
           .collect(Collectors.joining("," + separator));
     }
     return message.getRequestName() + "(" + paramNames + ")";
+  }
+
+  protected String buildExceptionComment(MessageDef messageDef) {
+    String note = messageDef.getExceptions().stream()
+            .filter(StringUtils::isNotEmpty)
+            .reduce((x1, x2) -> String.join("\\n", x1, x2))
+            .orElse("");
+    return note;
   }
 
   protected String type2Str(TypeDef type) {
