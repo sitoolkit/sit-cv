@@ -61,6 +61,9 @@ public class SequenceDiagramProcessor
     MessageDef message = new MessageDef();
     message.setRequestName(method.getName());
     message.setRequestParamTypes(method.getParamTypes());
+    if (config.isException()) {
+      message.setExceptions(method.getExceptions());
+    }
     message.setRequestQualifiedSignature(method.getQualifiedSignature());
     message.setTarget(lifeLine);
     message.setResponseType(method.getReturnType());
@@ -102,6 +105,9 @@ public class SequenceDiagramProcessor
     MessageDef message = new MessageDef();
     message.setRequestName(methodImpl.getName());
     message.setRequestParamTypes(methodImpl.getParamTypes());
+    if (config.isException()) {
+      message.setExceptions(methodImpl.getExceptions());
+    }
     message.setRequestQualifiedSignature(methodImpl.getQualifiedSignature());
     message.setTarget(process(methodImpl.getClassDef(), methodImpl, pushedStack));
     message.setResponseType(methodCall.getReturnType());

@@ -113,6 +113,14 @@ public class VisitContext {
         addChild(getCurrent(), methodCallDef);
     }
 
+    public void addThrowExpression(String throwExpr) {
+        log.debug("{}Add ThrowExpression {} to {}", getLogLeftPadding(), throwExpr, getCurrent());
+        CvStatement currentMethod = getCurrentMethod();
+        if (currentMethod != null) {
+            ((MethodDef) currentMethod).getExceptions().add(throwExpr);
+        }
+    }
+
     public boolean isInLoop() {
         return getCurrent() instanceof LoopStatement;
     }

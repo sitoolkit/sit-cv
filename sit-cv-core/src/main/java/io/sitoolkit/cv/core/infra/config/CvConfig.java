@@ -26,6 +26,7 @@ public class CvConfig {
   private String javaFilePattern = ".*\\.(java|class)$";
 
   private boolean override = false;
+  private boolean exception = true;
   @JsonMerge
   private List<LifelineClasses> lifelines = new ArrayList<>();
   private EnclosureFilterCondition sqlLogPattern;

@@ -193,6 +193,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
             methodDef.setReturnType(TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
             methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
+            methodDef.setExceptions(TypeProcessor.collectThrowTypeNames(declaredMethod));
             methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
             methodDefs.add(methodDef);
 
