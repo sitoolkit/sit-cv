@@ -5,9 +5,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.not;
 
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+
+import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Test;
 
@@ -49,6 +55,40 @@ public class ClassDefReaderJavaParserImplTest {
     assertThat("this method is expected to be async",
         asyncService.findMethodBySignature("asyncWithResult(int)").orElseThrow().isAsync(),
         is(true));
+  }
+
+  @Test
+  public void testParseThrowExpressions() {
+    ClassDefReaderJavaParserImpl reader = readerForSitCv();
+
+    Path javaFile = Paths.get("../sample/src/test/java/sample/ExceptionOfSeqMethod1.java");
+    ClassDef classDef = reader.readJava(javaFile).get();
+
+    List<MethodDef> methodDefs = classDef.getMethods();
+    MethodDef methodDef = methodDefs.stream()
+        .filter(m -> StringUtils.equals(m.getName(), "throwExceptions1"))
+        .findFirst().get();
+
+    int exceptionCnt = methodDef.getExceptions().size();
+
+    assertThat(exceptionCnt, is(5));
+  }
+
+  @Test
+  public void testParseThrowExceptions() {
+    ClassDefReaderJavaParserImpl reader = readerForSitCv();
+
+    Path javaFile = Paths.get("../sample/src/test/java/sample/ExceptionOfSeqMethod1.java");
+    ClassDef classDef = reader.readJava(javaFile).get();
+
+    List<MethodDef> methodDefs = classDef.getMethods();
+    MethodDef methodDef = methodDefs.stream()
+        .filter(m -> StringUtils.equals(m.getName(), "throwExceptions2"))
+        .findFirst().get();
+
+    int exceptionCnt = methodDef.getExceptions().size();
+
+    assertThat(exceptionCnt, is(3));
   }
 
   private ClassDefReaderJavaParserImpl readerForSitCv() {

@@ -26,7 +26,7 @@ public class MethodDef implements CvStatement {
   private String actionPath;
   private ClassDef classDef;
   private List<TypeDef> paramTypes;
-  private List<String> exceptions;
+  private Set<String> exceptions;
   private TypeDef returnType;
   private Set<MethodCallDef> methodCalls = new HashSet<>();
   private List<CvStatement> statements = new ArrayList<>();

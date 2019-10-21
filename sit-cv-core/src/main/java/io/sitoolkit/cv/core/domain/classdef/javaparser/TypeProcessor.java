@@ -1,6 +1,7 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -21,12 +22,12 @@ public class TypeProcessor {
                 .map(TypeProcessor::createTypeDef).collect(Collectors.toList());
     }
 
-    public static List<String> collectThrowTypeNames(ResolvedMethodDeclaration declaredMethod) {
+    public static Set<String> collectThrowTypeNames(ResolvedMethodDeclaration declaredMethod) {
         return IntStream.range(0, declaredMethod.getNumberOfSpecifiedExceptions())
                 .mapToObj(declaredMethod::getSpecifiedException)
                 .map(TypeProcessor::createTypeDef)
                 .map(TypeDef::getName)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     public static TypeDef createTypeDef(ResolvedParameterDeclaration param) {
