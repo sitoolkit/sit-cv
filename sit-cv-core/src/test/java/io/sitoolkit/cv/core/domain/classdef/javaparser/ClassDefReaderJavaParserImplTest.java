@@ -58,7 +58,7 @@ public class ClassDefReaderJavaParserImplTest {
   }
 
   @Test
-  public void testParseThrowExpressions() {
+  public void testParsingExceptions() {
     ClassDefReaderJavaParserImpl reader = readerForSitCv();
 
     Path javaFile = Paths.get("../sample/src/test/java/sample/ExceptionOfSeqMethod1.java");
@@ -66,29 +66,12 @@ public class ClassDefReaderJavaParserImplTest {
 
     List<MethodDef> methodDefs = classDef.getMethods();
     MethodDef methodDef = methodDefs.stream()
-        .filter(m -> StringUtils.equals(m.getName(), "throwExceptions1"))
+        .filter(m -> StringUtils.equals(m.getName(), "throwExceptions"))
         .findFirst().get();
 
     int exceptionCnt = methodDef.getExceptions().size();
 
-    assertThat(exceptionCnt, is(5));
-  }
-
-  @Test
-  public void testParseThrowExceptions() {
-    ClassDefReaderJavaParserImpl reader = readerForSitCv();
-
-    Path javaFile = Paths.get("../sample/src/test/java/sample/ExceptionOfSeqMethod1.java");
-    ClassDef classDef = reader.readJava(javaFile).get();
-
-    List<MethodDef> methodDefs = classDef.getMethods();
-    MethodDef methodDef = methodDefs.stream()
-        .filter(m -> StringUtils.equals(m.getName(), "throwExceptions2"))
-        .findFirst().get();
-
-    int exceptionCnt = methodDef.getExceptions().size();
-
-    assertThat(exceptionCnt, is(3));
+    assertThat(exceptionCnt, is(8));
   }
 
   private ClassDefReaderJavaParserImpl readerForSitCv() {

@@ -1,19 +1,29 @@
 package sample;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import org.springframework.util.StringUtils;
+
 public class ExceptionOfSeqMethod1 {
 
-    public void throwExceptions1(int n) {
-        switch (n) {
-            case 1: throw new ArithmeticException();
-            case 2: throw new ArrayIndexOutOfBoundsException();
-            case 3: throw new NullPointerException();
-            case 4: throw new NumberFormatException();
-            default: throw new RuntimeException();
-        }
+  public void throwExceptions(String className)
+      throws IllegalAccessException, ClassNotFoundException, NoSuchMethodException,
+      InvocationTargetException, InstantiationException {
+
+    if (StringUtils.isEmpty(className)) {
+      throw className == null ? new NullPointerException() : new RuntimeException("EMPTY");
     }
 
-    public void throwExceptions2()
-        throws ArithmeticException, ArrayIndexOutOfBoundsException, NumberFormatException {
-        // Empty
+    Object obj = Class.forName(className).getConstructor().newInstance();
+
+    if (obj instanceof List && (((List) obj).size() == 0)) {
+      throw new ArrayIndexOutOfBoundsException();
     }
+
+    try {
+      Thread.sleep(1);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
