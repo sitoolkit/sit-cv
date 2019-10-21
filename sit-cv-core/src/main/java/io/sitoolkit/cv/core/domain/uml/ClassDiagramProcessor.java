@@ -158,7 +158,7 @@ public class ClassDiagramProcessor {
 
 
     private Set<RelationDef> getClassRelation(ClassDef clazz) {
-        // TODO is-a 関係の抽出
+        // TODO extract is-a relation
         return Collections.emptySet();
     }
 

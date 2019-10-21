@@ -2,7 +2,7 @@ allprojects {
 
     task projectInfo {
       doLast {
-        if (compileJava.options.encoding != null) {
+        if (project.hasProperty('compileJava') && compileJava.options.encoding != null) {
           println "javaEncoding:${compileJava.options.encoding}"
         }
         if (project.hasProperty('sourceSets') && project.sourceSets.main.hasProperty('java')) {

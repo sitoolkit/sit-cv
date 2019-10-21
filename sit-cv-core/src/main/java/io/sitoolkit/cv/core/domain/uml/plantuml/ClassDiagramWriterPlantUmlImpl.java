@@ -45,13 +45,13 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
 
     private String method2str(MethodDef method) {
         return String.format("%s%s : %s", method.isPublic() ? "+" : "", // TODO
-                                                                        // public以外のアクセス制御子
+                                                                        // access modifier except public
                 idFormatter.format(method.getSignature()),
                 idFormatter.format(method.getReturnType().toString()));
     }
 
     private String field2str(FieldDef field) {
-        return String.format("%s%s : %s", "", // TODO アクセス制御子
+        return String.format("%s%s : %s", "", // TODO access modifier
                 field.getName(), idFormatter.format(field.getType().toString()));
     }
 

@@ -1,12 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>sit-cv-tools</artifactId>
+  <artifactId>sit-cv-tools-1_8</artifactId>
 
   <parent>
     <groupId>io.sitoolkit.cv</groupId>
     <artifactId>sit-cv-tools-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-beta.5-SNAPSHOT</version>
     <relativePath>./</relativePath>
   </parent>
 
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+  
+  <build>
+    <directory>${project.basedir}/target-1_8</directory>
+  </build>
 </project>
