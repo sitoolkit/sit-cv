@@ -1,7 +1,6 @@
 package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
