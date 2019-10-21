@@ -114,7 +114,7 @@ public class VisitContext {
     }
 
     public void addThrowExpression(String throwExpr) {
-        log.debug("{}Add ThrowingException {} to {}", getLogLeftPadding(), throwExpr, getCurrent());
+        log.debug("{}Add ThrowExpression {} to {}", getLogLeftPadding(), throwExpr, getCurrent());
         CvStatement currentMethod = getCurrentMethod();
         if (currentMethod != null) {
             ((MethodDef) currentMethod).getExceptions().add(throwExpr);

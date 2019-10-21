@@ -134,7 +134,6 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
   public void visit(ThrowStmt throwStmt, VisitContext context) {
     addThrowStatement(throwStmt, context);
     super.visit(throwStmt, context);
-    context.endContext();
   }
 
   @Override
