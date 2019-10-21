@@ -1,15 +1,16 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
+
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Slf4j
 public class TypeProcessor {
@@ -20,7 +21,7 @@ public class TypeProcessor {
                 .map(TypeProcessor::createTypeDef).collect(Collectors.toList());
     }
 
-    public static List<String> collectThrowingExceptions(ResolvedMethodDeclaration declaredMethod) {
+    public static List<String> collectThrowTypeNames(ResolvedMethodDeclaration declaredMethod) {
         return IntStream.range(0, declaredMethod.getNumberOfSpecifiedExceptions())
                 .mapToObj(declaredMethod::getSpecifiedException)
                 .map(TypeProcessor::createTypeDef)

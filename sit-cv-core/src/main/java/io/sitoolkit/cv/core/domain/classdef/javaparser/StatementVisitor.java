@@ -1,19 +1,29 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
-import com.github.javaparser.ast.stmt.*;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.CatchClause;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.ForeachStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.stmt.ThrowStmt;
+import com.github.javaparser.ast.stmt.TryStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -75,6 +85,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
   @Override
   public void visit(MethodCallExpr methodCallExpr, VisitContext context) {
+
     if (isInIfCondition(methodCallExpr)) {
       log.debug(
           "{}Method calls in if (...) are not supported (not drawn in sequence diagram) : \"{}\"",
@@ -121,7 +132,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
   @Override
   public void visit(ThrowStmt throwStmt, VisitContext context) {
-    addThrowExpression(throwStmt, context);
+    addThrowStatement(throwStmt, context);
     super.visit(throwStmt, context);
     context.endContext();
   }
@@ -233,9 +244,9 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     context.addConditionalContext(stmt, "else", false);
   }
 
-  void addThrowExpression(ThrowStmt throwStmt, VisitContext context) {
+  void addThrowStatement(ThrowStmt throwStmt, VisitContext context) {
     String throwExpr = throwStmt.getExpression().getTokenRange()
-            .map(Object::toString).orElse("");
-    context.addThrowingException(throwExpr);
+        .map(Object::toString).orElse("");
+    context.addThrowExpression(throwExpr);
   }
 }
