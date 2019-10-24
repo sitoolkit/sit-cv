@@ -19,6 +19,10 @@
     {
       "name": ".*Specification.*",
       "lifelineOnly": true
+    },
+    {
+      "name": "HibernateRepository",
+      "exclude": true
     }
   ],
   "asyncAnnotations": [

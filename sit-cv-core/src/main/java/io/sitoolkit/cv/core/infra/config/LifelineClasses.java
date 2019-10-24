@@ -7,13 +7,14 @@ import lombok.Data;
 @Data
 public class LifelineClasses {
 	
-    @JsonIgnore
+	@JsonIgnore
 	private FilterCondition condition = new FilterCondition();
 	private boolean entryPoint = false;
 	private boolean dbAccess = false;
 	private boolean lifelineOnly = false;
+	private boolean exclude = false;
 	
-    public String getName() {
+	public String getName() {
 		return condition.getName();
 	}
 	public void setName(String name) {

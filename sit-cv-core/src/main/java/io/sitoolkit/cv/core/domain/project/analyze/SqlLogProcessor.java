@@ -25,7 +25,7 @@ public class SqlLogProcessor {
         SitFileUtils.createDirectories(project.getSqlLogPath().getParent());
 
         String javaAgentParameter = buildAgentParameter(agentJar, projectType, config.getRepositoryFilter());
-        SqlLogListener sqlLogListener = new SqlLogListener(config.getSqlEnclosureFilter());
+        SqlLogListener sqlLogListener = new SqlLogListener(config);
 
         ProcessCommand command = commandBuilder.apply(javaAgentParameter);
         command.stdout(sqlLogListener).execute();
