@@ -25,7 +25,11 @@ public class SqlLogListenerTest {
         lifeline1.setName("HibernateRepository");
         lifeline1.setExclude(true);
 
-        List<LifelineClasses> lifelines = List.of(lifeline1);
+        LifelineClasses lifeline2 = new LifelineClasses();
+        lifeline2.setName("BController");
+        lifeline2.setExclude(true);
+
+        List<LifelineClasses> lifelines = List.of(lifeline1, lifeline2);
 
         config.setSqlLogPattern(condition);
         config.setLifelines(lifelines);
@@ -47,7 +51,7 @@ public class SqlLogListenerTest {
         logs.add("[RepositoryMethod]a.b.c.HibernateRepository.find2(Arg1)");
         logs.add("2019-01-11 17:02:01.934 DEBUG 1740 --- [           main] not.sql.log  : ");
         logs.add("select5");
-        logs.add("    [RepositoryMethod]HibernateRepository.find3(Arg1)");
+        logs.add("    [RepositoryMethod]abc.def.BController.find3(Arg1)");
         logs.add("    2019-01-11 17:02:01.934 DEBUG 1740 --- [           main] org.hibernate.SQL  : ");
         logs.add("    select6");
         logs.add("[RepositoryMethod]a.HibernateRepositoryImpl.find4(Arg1)");
