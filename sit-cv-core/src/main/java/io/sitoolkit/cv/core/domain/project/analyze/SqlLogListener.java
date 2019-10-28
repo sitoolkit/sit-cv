@@ -1,25 +1,17 @@
 package io.sitoolkit.cv.core.domain.project.analyze;
 
+import io.sitoolkit.cv.core.domain.classdef.ClassDefFilter;
+import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.infra.config.CvConfig;
-import io.sitoolkit.cv.core.infra.config.FilterCondition;
-import io.sitoolkit.cv.core.infra.config.LifelineClasses;
-
+import io.sitoolkit.cv.core.infra.config.EnclosureFilterCondition;
+import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
+import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-
-import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
-import io.sitoolkit.cv.core.infra.config.EnclosureFilterCondition;
-import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class SqlLogListener implements StdoutListener {
@@ -35,14 +27,11 @@ public class SqlLogListener implements StdoutListener {
     private String readingRepositoryMethod = "";
     private boolean sqlLogging = false;
     private EnclosureFilterCondition sqlEnclosureFilter;
-    private List<FilterCondition> filterConditions;
+    private FilterConditionGroup filterConditions;
 
     public SqlLogListener(CvConfig config) {
       this.sqlEnclosureFilter = config.getSqlEnclosureFilter();
-      this.filterConditions = config.getLifelines().stream()
-          .filter(LifelineClasses::isExclude)
-          .map(LifelineClasses::getCondition)
-          .collect(Collectors.toList());
+      this.filterConditions = config.getRepositoryFilter();
     }
 
     @Override
@@ -51,7 +40,7 @@ public class SqlLogListener implements StdoutListener {
         System.out.println(line);
 
         boolean isMarkerLine = MARKER_PATTERN.matcher(line).matches();
-        
+
         if (sqlLogging) {
 
             if (isMarkerLine || sqlEnclosureFilter.matchEnd(line)) {
@@ -78,7 +67,8 @@ public class SqlLogListener implements StdoutListener {
 
         if (isMarkerLine) {
             String repositoryMethod = StringUtils.substringAfter(line, REPOSITORY_METHOD_MARKER);
-            if (!StringUtils.isEmpty(repositoryMethod) && !matchExclude(repositoryMethod)) {
+            if (!StringUtils.isEmpty(repositoryMethod)
+                && !ClassDefFilter.matchExcludeCondition(repositoryMethod, filterConditions)) {
                 readingRepositoryMethod = repositoryMethod;
             }
         }
@@ -86,24 +76,6 @@ public class SqlLogListener implements StdoutListener {
         if (!StringUtils.isEmpty(readingRepositoryMethod) && sqlEnclosureFilter.matchStart(line)) {
             sqlLogging = true;
         }
-    }
-
-    private boolean matchExclude(String method) {
-      if (filterConditions.isEmpty()) return false;
-
-      String beforeMethodArgs = StringUtils.substringBefore(method, "(");
-
-      Deque<String> fullNameDeq = new LinkedList<>(Arrays.asList(beforeMethodArgs.split("\\.")));
-      Iterator<String> names = fullNameDeq.descendingIterator();
-
-      boolean exclude = false;
-      while(names.hasNext() && !exclude) {
-        String name = names.next();
-        exclude = filterConditions.stream()
-            .filter(x -> x.matchName(name)).findFirst().isPresent();
-      }
-
-      return exclude;
     }
 
 }
