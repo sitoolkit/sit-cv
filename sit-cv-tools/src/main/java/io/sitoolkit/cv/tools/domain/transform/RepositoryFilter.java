@@ -1,21 +1,26 @@
 package io.sitoolkit.cv.tools.domain.transform;
 
-import java.util.Arrays;
-
 import io.sitoolkit.cv.tools.infra.config.FilterCondition;
 import io.sitoolkit.cv.tools.infra.config.FilterConditionGroup;
+import java.util.Arrays;
 import javassist.CtClass;
 
 public class RepositoryFilter {
 
     public static boolean match(CtClass ctClass, FilterConditionGroup filterConditions) {
 
-        return filterConditions.getInclude().stream()
-                .anyMatch(filterCondition -> matchCondition(ctClass, filterCondition));
+        boolean include = filterConditions.getInclude().stream()
+            .anyMatch(filterCondition -> matchCondition(ctClass, filterCondition));
+
+        boolean exclude = filterConditions.getExclude().stream()
+            .anyMatch(filterCondition -> matchCondition(ctClass, filterCondition));
+
+        return include && !exclude;
     }
 
     private static boolean matchCondition(CtClass ctClass, FilterCondition filterCondition) {
-        boolean matchClassName = filterCondition.matchName(ctClass.getName());
+        boolean matchClassName = filterCondition.matchName(ctClass.getName())
+            || filterCondition.matchName(ctClass.getSimpleName());
 
         if (filterCondition.getAnnotationPattern().isEmpty()) {
             return matchClassName;

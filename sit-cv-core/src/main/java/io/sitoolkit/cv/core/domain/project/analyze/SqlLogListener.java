@@ -1,17 +1,16 @@
 package io.sitoolkit.cv.core.domain.project.analyze;
 
-import io.sitoolkit.cv.core.domain.classdef.ClassDefFilter;
-import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
-import io.sitoolkit.cv.core.infra.config.CvConfig;
-import io.sitoolkit.cv.core.infra.config.EnclosureFilterCondition;
-import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
-import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+
+import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
+import io.sitoolkit.cv.core.infra.config.EnclosureFilterCondition;
+import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class SqlLogListener implements StdoutListener {
@@ -27,11 +26,9 @@ public class SqlLogListener implements StdoutListener {
     private String readingRepositoryMethod = "";
     private boolean sqlLogging = false;
     private EnclosureFilterCondition sqlEnclosureFilter;
-    private FilterConditionGroup filterConditions;
 
-    public SqlLogListener(CvConfig config) {
-      this.sqlEnclosureFilter = config.getSqlEnclosureFilter();
-      this.filterConditions = config.getRepositoryFilter();
+    public SqlLogListener(EnclosureFilterCondition sqlEnclosureFilter) {
+        this.sqlEnclosureFilter = sqlEnclosureFilter;
     }
 
     @Override
@@ -67,8 +64,7 @@ public class SqlLogListener implements StdoutListener {
 
         if (isMarkerLine) {
             String repositoryMethod = StringUtils.substringAfter(line, REPOSITORY_METHOD_MARKER);
-            if (!StringUtils.isEmpty(repositoryMethod)
-                && !ClassDefFilter.matchExcludeCondition(repositoryMethod, filterConditions)) {
+            if (!StringUtils.isEmpty(repositoryMethod)) {
                 readingRepositoryMethod = repositoryMethod;
             }
         }

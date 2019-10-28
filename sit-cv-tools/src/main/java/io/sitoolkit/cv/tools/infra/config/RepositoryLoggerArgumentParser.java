@@ -25,23 +25,29 @@ public class RepositoryLoggerArgumentParser {
     private FilterConditionGroup getRepositoryFilter(Map<String, String> valueMap) {
         FilterConditionGroup fcg = new FilterConditionGroup();
         List<FilterCondition> include = new ArrayList<>();
+        List<FilterCondition> exclude = new ArrayList<>();
         fcg.setInclude(include);
+        fcg.setExclude(exclude);
 
         int index = 0;
-        Optional<FilterCondition> gotFilter;
+        Optional<FilterCondition> gotIncludeFilter;
+        Optional<FilterCondition> gotExcludeFilter;
         do {
             index++;
-            gotFilter = getSingleRepositoryFilter(valueMap, index);
-            gotFilter.ifPresent(include::add);
+            gotIncludeFilter = getSingleRepositoryFilter("include.", valueMap, index);
+            gotIncludeFilter.ifPresent(include::add);
 
-        } while (gotFilter.isPresent());
+            gotExcludeFilter = getSingleRepositoryFilter("exclude.", valueMap, index);
+            gotExcludeFilter.ifPresent(exclude::add);
+
+        } while (gotIncludeFilter.isPresent() || gotExcludeFilter.isPresent());
 
         return fcg;
     }
 
-    private Optional<FilterCondition> getSingleRepositoryFilter(Map<String, String> valueMap, int index) {
-        String annotation = valueMap.get("repositoryFilter" + index + ".annotation");
-        String name = valueMap.get("repositoryFilter" + index + ".name");
+    private Optional<FilterCondition> getSingleRepositoryFilter(String prefix, Map<String, String> valueMap, int index) {
+        String annotation = valueMap.get(prefix + "repositoryFilter" + index + ".annotation");
+        String name = valueMap.get(prefix + "repositoryFilter" + index + ".name");
         if (annotation == null && name == null) {
             return Optional.empty();
         } else {
@@ -58,7 +64,7 @@ public class RepositoryLoggerArgumentParser {
             String value = keyValue.length == 1 ? null : keyValue[1];
             valueMap.put(key, value);
         }
-        
+
         return valueMap;
     }
 }
