@@ -24,10 +24,12 @@ public class SqlLogListenerTest {
         LifelineClasses lifeline1 = new LifelineClasses();
         lifeline1.setName("HibernateRepository");
         lifeline1.setExclude(true);
+        lifeline1.setDbAccess(true);
 
         LifelineClasses lifeline2 = new LifelineClasses();
         lifeline2.setName("BController");
         lifeline2.setExclude(true);
+        lifeline2.setDbAccess(true);
 
         List<LifelineClasses> lifelines = List.of(lifeline1, lifeline2);
 
