@@ -78,8 +78,9 @@ Download the configuration file to project root.
 - Windows
 
 ```
-start https://raw.githubusercontent.com/Xenuzever/sit-cv-config-dddsample-core/master/sit-cv-config-dddsample-core.json
-move %USERPROFILE%\Downloads\sit-cv-config-dddsample-core.json .\sit-cv-config.json
+git clone https://github.com/Xenuzever/sit-cv-config-dddsample-core
+move sit-cv-config-dddsample-core\sit-cv-config-dddsample-core.json .\sit-cv-config.json
+rd /s /q sit-cv-config-dddsample-core
 ```
 
 - macOS, Linux
