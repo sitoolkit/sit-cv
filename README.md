@@ -270,14 +270,14 @@ It's JSON structure is as follows.
 | Key                 | Description                                                                        | Default value |
 |---------------------|------------------------------------------------------------------------------------|---------------|
 | override            | Ignore [default configuration](sit-cv-core/src/main/resources/io/sitoolkit/cv/core/infra/config/sit-cv-config.json). | false         |
-| lifelines           | Specify classes to draw as a lifeline in the sequence diagram.                                                       |               |
-| &emsp; name         | Pattern to match class qualified name.                                                                               |               |
-| &emsp; annotation   | Pattern to match qualified annotation name of class.                                                                 |               |
-| &emsp; entryPoint   | Set true to recognize as a entry point, i.e. left end class of sequence diagram.                                     | false         |
-| &emsp; lifelineOnly | Set true to hide internal processing, i.e. messages to itself.                                                       | false         |
-| &emsp; dbAccess     | Set true to recognize as a repository class. This is used to generate CRUD matrix.                                   | false         |
-| &emsp; exclude      | Excludes methods owned by classes matching the pattern from the CRUD matrix.                                         | false         |
-| asyncAnnotations    | Annotaion names to recognize as asynchronous method.                                                                 |               |
-| sqlLogPattern       | Filter rule to find SQL from test log. This is used to generate CRUD matrix.                                         |               |
-| &emsp; start        | Pattern to match the line just before SQL starts.                                                                    |               |
-| &emsp; end          | Pattern to match the line just after SQL ends.                                                                       |               |
+| lifelines           | Specify classes to draw as a lifeline in the sequence diagram.                     |               |
+| &emsp; name         | Pattern to match class qualified name.                                             |               |
+| &emsp; annotation   | Pattern to match qualified annotation name of class.                               |               |
+| &emsp; entryPoint   | Set true to recognize as a entry point, i.e. left end class of sequence diagram.   | false         |
+| &emsp; lifelineOnly | Set true to hide internal processing, i.e. messages to itself.                     | false         |
+| &emsp; dbAccess     | Set true to recognize as a repository class. This is used to generate CRUD matrix. | false         |
+| &emsp; exclude      | Excludes methods owned by classes matching the pattern from the CRUD matrix.       | false         |
+| asyncAnnotations    | Annotaion names to recognize as asynchronous method.                               |               |
+| sqlLogPattern       | Filter rule to find SQL from test log. This is used to generate CRUD matrix.       |               |
+| &emsp; start        | Pattern to match the line just before SQL starts.                                  |               |
+| &emsp; end          | Pattern to match the line just after SQL ends.                                     |               |
