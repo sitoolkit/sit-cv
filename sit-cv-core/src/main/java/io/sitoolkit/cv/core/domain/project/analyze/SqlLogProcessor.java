@@ -43,16 +43,20 @@ public class SqlLogProcessor {
                 .collect(Collectors.joining(";", "=", ""));
         return "-javaagent:" + agentJar.toString() + agentArgs;
     }
-    
+
     private void putRepositoryFilter(Map<String, String> agentArgsMap, FilterConditionGroup repositoryFilter) {
-        List<FilterCondition> include = repositoryFilter.getInclude();
+        putRepositoryFilter("include.", agentArgsMap, repositoryFilter.getInclude());
+        putRepositoryFilter("exclude.", agentArgsMap, repositoryFilter.getExclude());
+    }
+
+    private void putRepositoryFilter(String prefix, Map<String, String> agentArgsMap, List<FilterCondition> conditions) {
         int index = 0;
-        for (FilterCondition filterCondition : include) {
+        for (FilterCondition filterCondition : conditions) {
             index++;
             String annotation = filterCondition.getAnnotation();
             String name = filterCondition.getName();
-            agentArgsMap.put("repositoryFilter" + index + ".annotation", StringUtils.defaultString(annotation));
-            agentArgsMap.put("repositoryFilter" + index + ".name", StringUtils.defaultString(name));
+            agentArgsMap.put(prefix + "repositoryFilter" + index + ".annotation", StringUtils.defaultString(annotation));
+            agentArgsMap.put(prefix + "repositoryFilter" + index + ".name", StringUtils.defaultString(name));
         }
     }
 }

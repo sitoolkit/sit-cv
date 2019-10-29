@@ -78,7 +78,19 @@ public class CvConfig {
 
   private FilterConditionGroup toFilterConditionGroup(List<LifelineClasses> lifelines) {
     FilterConditionGroup fcg = new FilterConditionGroup();
-    fcg.setInclude(lifelines.stream().map(LifelineClasses::getCondition).collect(toList()));
+    List<FilterCondition> include = new ArrayList<>();
+    List<FilterCondition> exclude = new ArrayList<>();
+
+    fcg.setInclude(include);
+    fcg.setExclude(exclude);
+
+    lifelines.forEach(lifeLine -> {
+      include.add(lifeLine.getCondition());
+      if (lifeLine.isExclude()) {
+        exclude.add(lifeLine.getCondition());
+      }
+    });
+
     return fcg;
   }
 }
