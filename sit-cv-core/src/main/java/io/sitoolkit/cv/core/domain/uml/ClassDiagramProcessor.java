@@ -1,5 +1,10 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.uncapitalize;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,12 +22,19 @@ import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.RelationDef;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ClassDiagramProcessor {
 
+    @NonNull
+    private CvConfig config;
+    
     public ClassDiagram process(LifeLineDef lifeLine) {
         return process(lifeLine.getEntryMessage().getRequestQualifiedSignature(),
                 lifeLine.getSequenceMethodsRecursively().collect(Collectors.toSet()));
@@ -31,8 +43,9 @@ public class ClassDiagramProcessor {
     public ClassDiagram process(String signature, Set<MethodDef> sequenceMethods) {
 
         Set<ClassDef> pickedClasses = pickClasses(sequenceMethods);
+        Set<ClassDef> processedClasses = pickedClasses.stream().map(this::processClass).collect(toSet());
 
-        return process(signature + "(classDiagram)", pickedClasses,
+        return process(signature + "(classDiagram)", processedClasses,
                 relation -> pickedClasses.contains(relation.getOther()));
     }
 
@@ -56,8 +69,74 @@ public class ClassDiagramProcessor {
         return Stream.of(instanceRels, classRels, dependencies).flatMap(Function.identity())
                 .distinct();
     }
+    
+    private ClassDef processClass(ClassDef classDef) {
+        
+        if (!config.isAccessorMethod()) {
+            return filterAccessor(classDef);
+            
+         } else {
+            return classDef;
+         }
+    }
 
-    private Set<ClassDef> pickClasses(Set<MethodDef> sequenceMethods) {
+    private ClassDef filterAccessor(ClassDef classDef) {
+        List<MethodDef> filteredMethods = classDef.getMethods().stream()
+                .filter(method -> !isMethodAccesor(method, classDef))
+                .collect(toList());
+        ClassDef filtered = newInstance(classDef);
+        filtered.setMethods(filteredMethods);
+        return filtered;
+    }
+
+    private boolean isMethodAccesor(MethodDef method, ClassDef classDef) {
+        return findFieldFromGetter(method)
+                .or(() -> findFieldFromSetter(method))
+                .filter(classDef.getFields()::contains)
+                .isPresent();
+    }
+
+  private Optional<FieldDef> findFieldFromGetter(MethodDef method) {
+
+    Optional<String> fieldname = findFieldNameFromGetter(method.getName());
+    Optional<TypeDef> type = findFieldTypeFromGetter(method);
+
+    if (fieldname.isPresent() && type.isPresent()) {
+      return Optional.of(createFieldDef(type.get(), fieldname.get()));
+    } else {
+      return Optional.empty();
+    }
+  }
+  
+  private FieldDef createFieldDef(TypeDef type, String name) {
+      FieldDef field = new FieldDef();
+      field.setType(type);
+      field.setName(name);
+      return field;
+  }
+
+  private Optional<TypeDef> findFieldTypeFromGetter(MethodDef method) {
+    if (method.getParamTypes() != null && !method.getParamTypes().isEmpty()) {
+      return Optional.empty();
+    }
+    return Optional.ofNullable(method.getReturnType());
+  }
+
+  private Optional<String> findFieldNameFromGetter(String name) {
+      String prefix = "get";
+      if(!name.startsWith(prefix)) {
+          return Optional.empty();
+      }
+      return Optional.ofNullable(uncapitalize(substringAfter(name, prefix)));
+  }
+  
+  private Optional<FieldDef> findFieldFromSetter(MethodDef method){
+      //TODO implementation
+        return Optional.empty();
+    }
+    
+
+  private Set<ClassDef> pickClasses(Set<MethodDef> sequenceMethods) {
 
         Set<ClassDef> paramClasses = sequenceMethods.stream()
                 .map(MethodDef::getParamTypes)
@@ -167,5 +246,20 @@ public class ClassDiagramProcessor {
     class TypeWithCardinality{
         TypeDef type;
         String cardinality;
+    }
+    
+    
+    ClassDef newInstance(ClassDef original){
+        ClassDef instance = new ClassDef();
+        instance.setAnnotations(original.getAnnotations());
+        instance.setFields(original.getFields());
+        instance.setImplInterfaces(original.getImplInterfaces());
+        instance.setKnownImplClasses(original.getKnownImplClasses());
+        instance.setMethods(original.getMethods());
+        instance.setName(original.getName());
+        instance.setPkg(original.getPkg());
+        instance.setSourceId(original.getSourceId());
+        instance.setType(original.getType());
+        return instance;
     }
 }

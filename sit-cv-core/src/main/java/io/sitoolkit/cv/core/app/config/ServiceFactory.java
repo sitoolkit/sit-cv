@@ -110,7 +110,7 @@ public class ServiceFactory {
     ClassDefReader classDefReader = new ClassDefReaderJavaParserImpl(classDefRepository,
         projectManager, config);
     SequenceDiagramProcessor sequenceProcessor = new SequenceDiagramProcessor(config);
-    ClassDiagramProcessor classProcessor = new ClassDiagramProcessor();
+    ClassDiagramProcessor classProcessor = new ClassDiagramProcessor(config);
     GraphvizManager.initialize();
     PlantUmlWriter plantumlWriter = new PlantUmlWriter();
     DiagramWriter<SequenceDiagram> sequenceWriter = new SequenceDiagramWriterPlantUmlImpl(
