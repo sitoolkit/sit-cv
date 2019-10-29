@@ -37,7 +37,7 @@ public class SqlLogListener implements StdoutListener {
         System.out.println(line);
 
         boolean isMarkerLine = MARKER_PATTERN.matcher(line).matches();
-        
+
         if (sqlLogging) {
 
             if (isMarkerLine || sqlEnclosureFilter.matchEnd(line)) {
