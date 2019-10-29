@@ -55,8 +55,7 @@ git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
 git checkout f01db3d2d8be14233403f363f128645b633d2952
 1>.env echo JAVA_HOME=C:\\path\u0020to\\jdk1.8
-start http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.5/sit-cv-app-1.0.0-beta.5-exec.jar
-move %USERPROFILE%\Downloads\sit-cv-app-1.0.0-beta.5-exec.jar .
+curl -o sit-cv-app-1.0.0-beta.5-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.5/sit-cv-app-1.0.0-beta.5-exec.jar
 java -jar sit-cv-app-1.0.0-beta.5-exec.jar --cv.analyze-sql
 ```
 
@@ -71,19 +70,9 @@ curl -o sit-cv-app-1.0.0-beta.5-exec.jar -G http://repo1.maven.org/maven2/io/sit
 java -jar sit-cv-app-1.0.0-beta.5-exec.jar --cv.analyze-sql
 ```
 
-Exclude methods owned by the repository's parent class (HibernateRepository) from the CRUD matrix, because all repository methods converge to the same CRUD.
+Exclude methods owned by the parent repository class (HibernateRepository) from the CRUD matrix, because all　methods based this class converge to the same CRUD.
 
 Download the configuration file to project root.
-
-- Windows
-
-```
-git clone https://github.com/Xenuzever/sit-cv-config-dddsample-core
-move sit-cv-config-dddsample-core\sit-cv-config-dddsample-core.json .\sit-cv-config.json
-rd /s /q sit-cv-config-dddsample-core
-```
-
-- macOS, Linux
 
 ```
 curl -o sit-cv-config.json -G https://raw.githubusercontent.com/Xenuzever/sit-cv-config-dddsample-core/master/sit-cv-config-dddsample-core.json
