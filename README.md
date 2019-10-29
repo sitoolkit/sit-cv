@@ -70,7 +70,7 @@ curl -o sit-cv-app-1.0.0-beta.5-exec.jar -G http://repo1.maven.org/maven2/io/sit
 java -jar sit-cv-app-1.0.0-beta.5-exec.jar --cv.analyze-sql
 ```
 
-Exclude methods owned by the parent repository class (HibernateRepository) from the CRUD matrix, because all　methods based this class converge to the same CRUD.
+Exclude methods owned by the parent repository class (HibernateRepository) from the CRUD matrix, because all methods based this class converge to the same CRUD.
 
 Download the configuration file to project root.
 
