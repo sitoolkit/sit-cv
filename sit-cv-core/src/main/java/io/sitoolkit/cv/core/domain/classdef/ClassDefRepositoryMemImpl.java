@@ -120,8 +120,9 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
     @Override
     public List<String> getEntryPoints() {
-        return getFilteredEntryPointClasses().map(ClassDef::getMethods).flatMap(List::stream)
-                .map(MethodDef::getQualifiedSignature).sorted().collect(Collectors.toList());
+      return getFilteredEntryPointClasses().map(ClassDef::getMethods).flatMap(List::stream)
+          .filter(MethodDef::isPublic).map(MethodDef::getQualifiedSignature)
+          .sorted().collect(Collectors.toList());
     }
 
     @Override
