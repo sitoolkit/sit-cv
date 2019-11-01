@@ -29,5 +29,5 @@
     "start": ".*org.hibernate.SQL.*",
     "end": "^[0-9]{4}-.*"
   },
-  "accessorMethod" : false
+  "showAccessor" : false
 }

@@ -27,7 +27,7 @@ public class CvConfig {
 
   private boolean override = false;
   private boolean exception = true;
-  private boolean accessorMethod = false;
+  private boolean showAccessor = false;
   
   @JsonMerge
   private List<LifelineClasses> lifelines = new ArrayList<>();

@@ -73,7 +73,7 @@ public class ClassDiagramProcessor {
     }
     
     private ClassDef processClass(ClassDef classDef) {
-        if (!config.isAccessorMethod()) {
+        if (!config.isShowAccessor()) {
             return removeAccessor(classDef);
             
          } else {

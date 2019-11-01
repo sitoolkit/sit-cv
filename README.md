@@ -254,7 +254,7 @@ It's JSON structure is as follows.
     "start": ".*Pattern before SQL starts.*",
     "end": ".*Pattern after SQL ends.*"
   },
-  "accessorMethod": false
+  "showAccessor": false
 }
 ```
 | Key                 | Description                                                                           | Default value |
@@ -271,4 +271,4 @@ It's JSON structure is as follows.
 | sqlLogPattern       | Filter rule to find SQL from test log. This is used to generate CRUD matrix.          |               |
 | &emsp; start        | Pattern to match the line just before SQL starts.                                     |               |
 | &emsp; end          | Pattern to match the line just after SQL ends.                                        |               |
-| accessorMethod      | Set true to show setter and getter method in the class diagram.                       | false         |
+| showAccessor        | Set true to show setter and getter method in the class diagram.                       | false         |
