@@ -90,8 +90,8 @@ public class ClassDiagramProcessor {
     }
 
     private boolean isMethodAccesor(MethodDef method, ClassDef classDef) {
-        return findFieldFromGetter(method)
-                .or(() -> findFieldFromSetter(method))
+        return findFieldFromSetter(method)
+                .or(() -> findFieldFromGetter(method))
                 .filter(classDef.getFields()::contains)
                 .isPresent();
     }
@@ -108,20 +108,6 @@ public class ClassDiagramProcessor {
     }
   }
   
-  private FieldDef createFieldDef(TypeDef type, String name) {
-      FieldDef field = new FieldDef();
-      field.setType(type);
-      field.setName(name);
-      return field;
-  }
-
-  private Optional<TypeDef> findFieldTypeFromGetter(MethodDef method) {
-    if (method.getParamTypes() != null && !method.getParamTypes().isEmpty()) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(method.getReturnType());
-  }
-
   private Optional<String> findFieldNameFromGetter(String name) {
       String prefix = "get";
       if(!name.startsWith(prefix)) {
@@ -129,12 +115,54 @@ public class ClassDiagramProcessor {
       }
       return Optional.ofNullable(uncapitalize(substringAfter(name, prefix)));
   }
+  private Optional<TypeDef> findFieldTypeFromGetter(MethodDef method) {
+      if (method.getParamTypes() != null && !method.getParamTypes().isEmpty()) {
+        return Optional.empty();
+      }
+      return Optional.ofNullable(method.getReturnType());
+    }
   
   private Optional<FieldDef> findFieldFromSetter(MethodDef method){
-      //TODO implementation
+      Optional<String> fieldname = findFieldNameFromSetter(method.getName());
+      Optional<TypeDef> type = findFieldTypeFromSetter(method);
+
+      if (fieldname.isPresent() && type.isPresent()) {
+        return Optional.of(createFieldDef(type.get(), fieldname.get()));
+      } else {
         return Optional.empty();
+      }
     }
-    
+
+  private Optional<String> findFieldNameFromSetter(String name) {
+      String prefix = "set";
+      if(!name.startsWith(prefix)) {
+          return Optional.empty();
+      }
+      return Optional.ofNullable(uncapitalize(substringAfter(name, prefix)));
+  }
+  
+  private Optional<TypeDef> findFieldTypeFromSetter(MethodDef method) {
+      
+    if (method.getReturnType().getName().equals("void")
+            && method.getParamTypes().size() == 1) {
+      return Optional.ofNullable(method.getParamTypes().get(0));
+    } else {
+      return Optional.empty();
+    }
+  }
+
+private FieldDef createFieldDef(TypeDef type, String name) {
+      FieldDef field = new FieldDef();
+      TypeDef typeDef = new TypeDef();
+      typeDef.setClassRef(type.getClassRef());
+      typeDef.setName(type.getName());
+      typeDef.setTypeParamList(type.getTypeParamList());
+      typeDef.setVariable(null); // fieldDef's type don't have variable
+      field.setType(typeDef);
+      field.setName(name);
+      return field;
+  }
+
 
   private Set<ClassDef> pickClasses(Set<MethodDef> sequenceMethods) {
 
