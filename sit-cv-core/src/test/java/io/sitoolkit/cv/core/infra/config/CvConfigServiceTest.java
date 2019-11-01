@@ -46,11 +46,11 @@ public class CvConfigServiceTest {
   public void testProjectConfig() throws URISyntaxException {
     CvConfig config = service.read(mergeConfigFile.getParent(), false);
 
-    assertThat(config.getAsyncAnnotations(), is(List.of("NewOne", "Async", "Asynchronous")));
+    assertThat(config.getAsyncAnnotations(), is(List.of("Async", "Asynchronous", "NewOne")));
     List<LifelineClasses> lifelines = config.getLifelines();
     assertThat(lifelines.size(), is(6));
-    assertThat(lifelines.get(0).getName(), is("NewName"));
-    assertThat(lifelines.get(1).getName(), is(".*Controller.*"));
+    assertThat(lifelines.get(0).getName(), is(".*Controller.*"));
+    assertThat(lifelines.get(5).getName(), is("NewName"));
   }
 
   @Test
