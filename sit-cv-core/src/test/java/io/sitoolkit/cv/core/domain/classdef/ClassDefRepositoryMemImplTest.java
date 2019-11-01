@@ -3,7 +3,10 @@ package io.sitoolkit.cv.core.domain.classdef;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import io.sitoolkit.cv.core.infra.config.LifelineClasses;
 import java.util.ArrayList;
+
+import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,11 +15,49 @@ import io.sitoolkit.cv.core.infra.config.CvConfig;
 
 public class ClassDefRepositoryMemImplTest {
 
+    static CvConfig config;
+
     static ClassDefRepository repository;
 
     @BeforeClass
     public static void init() {
-        repository = new ClassDefRepositoryMemImpl(new CvConfig());
+        config = new CvConfig();
+        repository = new ClassDefRepositoryMemImpl(config);
+    }
+
+    @Test
+    public void entryPointsOnlyPublicMethod() {
+        LifelineClasses lifelineClasses = new LifelineClasses();
+        lifelineClasses.setName(".*Controller.*");
+        lifelineClasses.setEntryPoint(true);
+
+        config.setLifelines(List.of(lifelineClasses));
+
+        ClassDef clazz = createClassDef("a.b.c", "Controller");
+
+        MethodDef publicMethod1 = createMethodDef(clazz, "publicMethod1()");
+        MethodDef publicMethod2 = createMethodDef(clazz, "publicMethod2()");
+        MethodDef publicMethod3 = createMethodDef(clazz, "publicMethod3()");
+        MethodDef privateMethod1 = createMethodDef(clazz, "privateMethod1()");
+        MethodDef privateMethod2 = createMethodDef(clazz, "privateMethod2()");
+
+        publicMethod1.setPublic(true);
+        publicMethod2.setPublic(true);
+        publicMethod3.setPublic(true);
+        privateMethod1.setPublic(false);
+        privateMethod2.setPublic(false);
+
+        clazz.getMethods().addAll(
+            List.of(publicMethod1, publicMethod2, publicMethod3, privateMethod1, privateMethod2));
+
+        repository.save(clazz);
+
+        List<String> entryPoints = repository.getEntryPoints();
+
+        assertThat(entryPoints.size(), is(3));
+        assertThat(entryPoints.get(0), is("a.b.c.Controller.publicMethod1()"));
+        assertThat(entryPoints.get(1), is("a.b.c.Controller.publicMethod2()"));
+        assertThat(entryPoints.get(2), is("a.b.c.Controller.publicMethod3()"));
     }
 
     @Test
