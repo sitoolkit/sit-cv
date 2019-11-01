@@ -17,6 +17,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
@@ -71,100 +73,84 @@ public class ClassDiagramProcessor {
     }
     
     private ClassDef processClass(ClassDef classDef) {
-        
         if (!config.isAccessorMethod()) {
-            return filterAccessor(classDef);
+            return removeAccessor(classDef);
             
          } else {
             return classDef;
          }
     }
 
-    private ClassDef filterAccessor(ClassDef classDef) {
-        List<MethodDef> filteredMethods = classDef.getMethods().stream()
+    private ClassDef removeAccessor(ClassDef classDef) {
+        List<MethodDef> methods = classDef.getMethods().stream()
                 .filter(method -> !isMethodAccesor(method, classDef))
                 .collect(toList());
-        ClassDef filtered = newInstance(classDef);
-        filtered.setMethods(filteredMethods);
-        return filtered;
+        ClassDef accessorRemoved = newInstance(classDef);
+        accessorRemoved.setMethods(methods);
+        return accessorRemoved;
     }
 
     private boolean isMethodAccesor(MethodDef method, ClassDef classDef) {
-        return findFieldFromSetter(method)
-                .or(() -> findFieldFromGetter(method))
+        return findFieldFromGetter(method)
+                .or(() -> findFieldFromSetter(method))
                 .filter(classDef.getFields()::contains)
                 .isPresent();
     }
+    
+    private Optional<FieldDef> findFieldFromGetter(MethodDef method) {
+        Optional<String> fieldName = findFieldName(method.getName(), "get");
+        Optional<TypeDef> fieldType = fieldName.flatMap(f -> findFieldTypeFromGetter(method));
 
-  private Optional<FieldDef> findFieldFromGetter(MethodDef method) {
-
-    Optional<String> fieldname = findFieldNameFromGetter(method.getName());
-    Optional<TypeDef> type = findFieldTypeFromGetter(method);
-
-    if (fieldname.isPresent() && type.isPresent()) {
-      return Optional.of(createFieldDef(type.get(), fieldname.get()));
-    } else {
-      return Optional.empty();
-    }
-  }
-  
-  private Optional<String> findFieldNameFromGetter(String name) {
-      String prefix = "get";
-      if(!name.startsWith(prefix)) {
-          return Optional.empty();
-      }
-      return Optional.ofNullable(uncapitalize(substringAfter(name, prefix)));
-  }
-  private Optional<TypeDef> findFieldTypeFromGetter(MethodDef method) {
-      if (method.getParamTypes() != null && !method.getParamTypes().isEmpty()) {
-        return Optional.empty();
-      }
-      return Optional.ofNullable(method.getReturnType());
-    }
-  
-  private Optional<FieldDef> findFieldFromSetter(MethodDef method){
-      Optional<String> fieldname = findFieldNameFromSetter(method.getName());
-      Optional<TypeDef> type = findFieldTypeFromSetter(method);
-
-      if (fieldname.isPresent() && type.isPresent()) {
-        return Optional.of(createFieldDef(type.get(), fieldname.get()));
-      } else {
-        return Optional.empty();
-      }
+        return fieldType.map(t -> createFieldDef(t, fieldName.get()));
     }
 
-  private Optional<String> findFieldNameFromSetter(String name) {
-      String prefix = "set";
-      if(!name.startsWith(prefix)) {
-          return Optional.empty();
-      }
-      return Optional.ofNullable(uncapitalize(substringAfter(name, prefix)));
-  }
-  
-  private Optional<TypeDef> findFieldTypeFromSetter(MethodDef method) {
-      
-    if (method.getReturnType().getName().equals("void")
-            && method.getParamTypes().size() == 1) {
-      return Optional.ofNullable(method.getParamTypes().get(0));
-    } else {
-      return Optional.empty();
+    private Optional<FieldDef> findFieldFromSetter(MethodDef method) {
+        Optional<String> fieldName = findFieldName(method.getName(), "set");
+        Optional<TypeDef> fieldType = fieldName.flatMap(f -> findFieldTypeFromSetter(method));
+
+        return fieldType.map(t -> createFieldDef(t, fieldName.get()));
     }
-  }
 
-private FieldDef createFieldDef(TypeDef type, String name) {
-      FieldDef field = new FieldDef();
-      TypeDef typeDef = new TypeDef();
-      typeDef.setClassRef(type.getClassRef());
-      typeDef.setName(type.getName());
-      typeDef.setTypeParamList(type.getTypeParamList());
-      typeDef.setVariable(null); // fieldDef's type don't have variable
-      field.setType(typeDef);
-      field.setName(name);
-      return field;
-  }
+    private Optional<TypeDef> findFieldTypeFromGetter(MethodDef method) {
+        List<TypeDef> paramTypes = method.getParamTypes();
+        TypeDef returnType = method.getReturnType();
+        if (paramTypes != null && !paramTypes.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(returnType);
+    }
 
+    private Optional<TypeDef> findFieldTypeFromSetter(MethodDef method) {
+        List<TypeDef> paramTypes = method.getParamTypes();
+        TypeDef returnType = method.getReturnType();
+        if (returnType != null && StringUtils.equals(returnType.getName(), "void") && paramTypes != null
+                && paramTypes.size() == 1) {
+            return Optional.ofNullable(paramTypes.get(0));
+        } else {
+            return Optional.empty();
+        }
+    }
 
-  private Set<ClassDef> pickClasses(Set<MethodDef> sequenceMethods) {
+    private Optional<String> findFieldName(String methodName, String prefix) {
+        if (!methodName.startsWith(prefix)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(uncapitalize(substringAfter(methodName, prefix)));
+    }
+
+    private FieldDef createFieldDef(TypeDef type, String name) {
+        FieldDef field = new FieldDef();
+        TypeDef typeDef = new TypeDef();
+        typeDef.setClassRef(type.getClassRef());
+        typeDef.setName(type.getName());
+        typeDef.setTypeParamList(type.getTypeParamList());
+        typeDef.setVariable(null); // fieldDef's type don't have variable
+        field.setType(typeDef);
+        field.setName(name);
+        return field;
+    }
+
+    private Set<ClassDef> pickClasses(Set<MethodDef> sequenceMethods) {
 
         Set<ClassDef> paramClasses = sequenceMethods.stream()
                 .map(MethodDef::getParamTypes)
