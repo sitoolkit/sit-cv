@@ -91,16 +91,24 @@ public class ClassDiagramProcessor {
     }
 
     private boolean isMethodAccesor(MethodDef method, ClassDef classDef) {
-        return findFieldFromGetter(method)
-                .or(() -> findFieldFromSetter(method))
+        return findFieldFromSetter(method)
+                .or(() -> findFieldFromNormalGetter(method))
+                .or(() -> findFieldFromBooleanGetter(method))
                 .filter(classDef.getFields()::contains)
                 .isPresent();
     }
     
-    private Optional<FieldDef> findFieldFromGetter(MethodDef method) {
+    private Optional<FieldDef> findFieldFromNormalGetter(MethodDef method) {
         Optional<String> fieldName = findFieldName(method.getName(), "get");
-        Optional<TypeDef> fieldType = fieldName.flatMap(f -> findFieldTypeFromGetter(method));
-
+        Optional<TypeDef> fieldType = fieldName.flatMap(f -> findFieldTypeFromNormalGetter(method));
+        
+        return fieldType.map(t -> createFieldDef(t, fieldName.get()));
+    }
+    
+    private Optional<FieldDef> findFieldFromBooleanGetter(MethodDef method) {
+        Optional<String> fieldName = findFieldName(method.getName(), "is");
+        Optional<TypeDef> fieldType = fieldName.flatMap(f -> findFieldTypeFromBooleanGetter(method));
+        
         return fieldType.map(t -> createFieldDef(t, fieldName.get()));
     }
 
@@ -111,20 +119,30 @@ public class ClassDiagramProcessor {
         return fieldType.map(t -> createFieldDef(t, fieldName.get()));
     }
 
-    private Optional<TypeDef> findFieldTypeFromGetter(MethodDef method) {
+    private Optional<TypeDef> findFieldTypeFromNormalGetter(MethodDef method) {
         List<TypeDef> paramTypes = method.getParamTypes();
         TypeDef returnType = method.getReturnType();
-        if (paramTypes != null && !paramTypes.isEmpty()) {
-            return Optional.empty();
+        if (paramTypes != null && paramTypes.isEmpty()) {
+            return Optional.ofNullable(returnType);
         }
-        return Optional.ofNullable(returnType);
+        return Optional.empty();
+    }
+    
+    private Optional<TypeDef> findFieldTypeFromBooleanGetter(MethodDef method) {
+        List<TypeDef> paramTypes = method.getParamTypes();
+        TypeDef returnType = method.getReturnType();
+        if (returnType != null && StringUtils.equals(returnType.getName(), "boolean") 
+                && paramTypes != null && paramTypes.isEmpty()) {
+            return Optional.ofNullable(returnType);
+        }
+        return Optional.empty();
     }
 
     private Optional<TypeDef> findFieldTypeFromSetter(MethodDef method) {
         List<TypeDef> paramTypes = method.getParamTypes();
         TypeDef returnType = method.getReturnType();
-        if (returnType != null && StringUtils.equals(returnType.getName(), "void") && paramTypes != null
-                && paramTypes.size() == 1) {
+        if (returnType != null && StringUtils.equals(returnType.getName(), "void")
+                && paramTypes != null && paramTypes.size() == 1) {
             return Optional.ofNullable(paramTypes.get(0));
         } else {
             return Optional.empty();
