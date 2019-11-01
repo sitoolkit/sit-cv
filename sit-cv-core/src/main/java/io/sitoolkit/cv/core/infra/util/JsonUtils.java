@@ -98,11 +98,11 @@ public class JsonUtils {
     return path.toAbsolutePath().normalize();
   }
 
-  public static <T> T merge(T original, URL url) {
+  public static <T> T merge(T original, Path path) {
     ObjectReader reader = MAPPER.readerForUpdating(original);
 
     try {
-      return reader.readValue(url);
+      return reader.readValue(path.toFile());
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
