@@ -1,3 +1,5 @@
+import { statSync } from 'fs';
+
 class Config {
 
   private static INCETANCE : Config;
@@ -10,7 +12,12 @@ class Config {
   }
 
   public get isServerMode() {
-    return this.endpoint.startsWith('http');
+    try {
+      statSync("assets");
+      return true;
+    } catch(err) {
+      if(err.code === 'ENOENT') return false;
+    }
   }
   
   public get endpoint() : string {
