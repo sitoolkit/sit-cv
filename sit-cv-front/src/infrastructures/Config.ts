@@ -1,4 +1,4 @@
-import { statSync } from 'fs';
+import request from 'sync-request';
 
 class Config {
 
@@ -12,11 +12,12 @@ class Config {
   }
 
   public get isServerMode() {
-    try {
-      statSync("assets");
-      return true;
-    } catch(err) {
-      if(err.code === 'ENOENT') return false;
+    if (this.endpoint.startsWith('http')) {
+      var response = request("GET", this.endpoint + "/assets/designdoc-list.js");
+      return response.statusCode !== 200;
+
+    } else {
+      return false;
     }
   }
   
