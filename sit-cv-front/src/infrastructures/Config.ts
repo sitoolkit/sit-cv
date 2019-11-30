@@ -1,3 +1,5 @@
+import request from 'sync-request';
+
 class Config {
 
   private static INCETANCE : Config;
@@ -10,7 +12,13 @@ class Config {
   }
 
   public get isServerMode() {
-    return this.endpoint.startsWith('http');
+    if (this.endpoint.startsWith('http')) {
+      var response = request("GET", this.endpoint + "/assets/designdoc-list.js");
+      return response.statusCode !== 200;
+
+    } else {
+      return false;
+    }
   }
   
   public get endpoint() : string {
