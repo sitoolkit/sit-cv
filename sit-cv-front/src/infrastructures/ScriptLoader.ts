@@ -3,7 +3,7 @@ import Config from './Config';
 class ScriptLoader {
   private static INSTANCE: ScriptLoader;
 
-  private callbacks = new Map<string, (data:any) => void>();
+  private callbacks = new Map<string, Array<(data:any) => void>>();
 
   public static get incetance() {
     if (!this.INSTANCE) {
@@ -25,7 +25,10 @@ class ScriptLoader {
     script.src = scriptPath;
     document.body.appendChild(script);
 
-    this.callbacks.set(scriptPath, callback);
+    if (!this.callbacks.has(scriptPath)) {
+      this.callbacks.set(scriptPath, []);
+    }
+    this.callbacks.get(scriptPath)!.push(callback);
   }
 
   setMessageListener() {
@@ -37,10 +40,12 @@ class ScriptLoader {
       const loadedData = event.data;
       console.log("Receive postMessage ", loadedData);
 
-      const callback = this.callbacks.get(loadedData.path);
-      if (callback) {
-        console.log(callback);
-        callback(loadedData.content);
+      const callbacks = this.callbacks.get(loadedData.path);
+      if (callbacks) {
+        callbacks.forEach((callback) => {
+          console.log(callback);
+          callback(loadedData.content);
+        });
         this.callbacks.delete(loadedData.path);
       }
     });
