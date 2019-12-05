@@ -23,6 +23,7 @@ public class MessageDef extends SequenceElement {
   private TypeDef responseType;
   private MethodDef methodDef;
   private boolean isAsync;
+  private List<String> args = new ArrayList<>();
 
   @Override
   public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {

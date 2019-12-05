@@ -33,8 +33,7 @@ public class SequenceDiagramWriterPlantUmlImpl
     implements DiagramWriter<SequenceDiagram>, SequenceElementWriter {
   private final String PARAM_INDENT = "  ";
 
-  @NonNull
-  PlantUmlWriter plantumlWriter;
+  @NonNull PlantUmlWriter plantumlWriter;
 
   IdentiferFormatter idFormatter = new IdentiferFormatter();
 
@@ -42,8 +41,12 @@ public class SequenceDiagramWriterPlantUmlImpl
     List<String> lines = new ArrayList<>();
     lines.add("@startuml");
 
-    lines.addAll(diagrams.stream().map(diagram -> lifeline2str(diagram.getEntryLifeLine()))
-        .flatMap(List::stream).collect(Collectors.toList()));
+    lines.addAll(
+        diagrams
+            .stream()
+            .map(diagram -> lifeline2str(diagram.getEntryLifeLine()))
+            .flatMap(List::stream)
+            .collect(Collectors.toList()));
 
     lines.add("@enduml");
 
@@ -71,9 +74,13 @@ public class SequenceDiagramWriterPlantUmlImpl
   }
 
   protected List<String> lifeline2str(LifeLineDef lifeLine) {
-    List<String> lifeLineStrings = lifeLine.getElements().stream()
-        .map(element -> element.write(lifeLine, this)).flatMap(List::stream)
-        .collect(Collectors.toList());
+    List<String> lifeLineStrings =
+        lifeLine
+            .getElements()
+            .stream()
+            .map(element -> element.write(lifeLine, this))
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
     lifeLineStrings.add(0, "activate " + lifeLine.getObjectName());
     lifeLineStrings.add("deactivate " + lifeLine.getObjectName());
     return lifeLineStrings;
@@ -85,19 +92,27 @@ public class SequenceDiagramWriterPlantUmlImpl
 
     String arrow = message.isAsync() ? "->> " : "-> ";
 
-    list.add(0,
-        sourceName + arrow + target.getObjectName() + " :" + "[[#{"
-            + message.getRequestQualifiedSignature() + "} "
-            + idFormatter.format(buildRequestName(message)) + "]]");
+    list.add(
+        0,
+        sourceName
+            + arrow
+            + target.getObjectName()
+            + " :"
+            + "[[#{"
+            + message.getRequestQualifiedSignature()
+            + "} "
+            + idFormatter.format(buildRequestName(message))
+            + "]]");
 
     String note = buildExceptionComment(message);
     if (StringUtils.isNotEmpty(note)) {
-        list.add(1, " note right : " + note);
+      list.add(1, " note right : " + note);
     }
 
     String responseName = type2Str(message.getResponseType());
     if (!StringUtils.equals(responseName, "void")) {
-      list.add(list.size() - 1,
+      list.add(
+          list.size() - 1,
           sourceName + "<-- " + target.getObjectName() + " :" + idFormatter.format(responseName));
     }
 
@@ -106,16 +121,19 @@ public class SequenceDiagramWriterPlantUmlImpl
 
   protected String buildRequestName(MessageDef message) {
     String paramNames = "";
-    if (message.getRequestParamTypes().size() > 0) {
+    if (!message.getArgs().isEmpty()) {
       String separator = plantumlWriter.LINE_SEPARATOR + PARAM_INDENT;
-      paramNames = separator + message.getRequestParamTypes().stream().map(this::type2Str)
-          .collect(Collectors.joining("," + separator));
+      paramNames =
+          separator + message.getArgs().stream().collect(Collectors.joining("," + separator));
     }
     return message.getRequestName() + "(" + paramNames + ")";
   }
 
   protected String buildExceptionComment(MessageDef messageDef) {
-    String note = messageDef.getExceptions().stream()
+    String note =
+        messageDef
+            .getExceptions()
+            .stream()
             .filter(StringUtils::isNotEmpty)
             .reduce((x1, x2) -> String.join("\\n", x1, x2))
             .orElse("");
@@ -138,10 +156,13 @@ public class SequenceDiagramWriterPlantUmlImpl
     }
   }
 
-  private List<String> elements2str(LifeLineDef lifeLine,
-      List<? extends SequenceElement> elements) {
-    return elements.stream().map(childElement -> childElement.write(lifeLine, this))
-        .flatMap(List::stream).collect(Collectors.toList());
+  private List<String> elements2str(
+      LifeLineDef lifeLine, List<? extends SequenceElement> elements) {
+    return elements
+        .stream()
+        .map(childElement -> childElement.write(lifeLine, this))
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
   }
 
   @Override

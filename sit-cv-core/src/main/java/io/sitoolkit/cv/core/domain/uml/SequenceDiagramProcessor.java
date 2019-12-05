@@ -20,8 +20,8 @@ import io.sitoolkit.cv.core.domain.classdef.MethodCallStack;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.StatementProcessor;
 import io.sitoolkit.cv.core.domain.classdef.TryStatement;
-import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import io.sitoolkit.cv.core.infra.config.CvConfig;
+import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SequenceDiagramProcessor
     implements StatementProcessor<SequenceElement, MethodCallStack> {
 
-  @NonNull
-  private CvConfig config;
+  @NonNull private CvConfig config;
 
   public LifeLineDef process(ClassDef clazz, MethodDef method) {
     return process(clazz, method, MethodCallStack.getBlank());
@@ -48,8 +47,13 @@ public class SequenceDiagramProcessor
     FilterConditionGroup classFilterGroup = config.getSequenceDiagramFilter();
     if (ClassDefFilter.needsDetail(clazz, classFilterGroup)) {
       lifeLine.setElements(
-          method.getStatements().stream().map(statement -> statement.process(this, callStack))
-              .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList()));
+          method
+              .getStatements()
+              .stream()
+              .map(statement -> statement.process(this, callStack))
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .collect(Collectors.toList()));
     }
 
     log.debug("Add lifeline {} -> {}", clazz.getName(), lifeLine);
@@ -113,15 +117,20 @@ public class SequenceDiagramProcessor
     message.setResponseType(methodCall.getReturnType());
     message.setMethodDef(methodCall);
     message.setAsync(methodImpl.isAsync());
+    message.setArgs(methodCall.getArgs());
 
     return Optional.of(message);
-
   }
 
-  List<SequenceElement> processChildren(CvStatementDefaultImpl statement,
-      MethodCallStack callStack) {
-    return statement.getChildren().stream().map(child -> child.process(this, callStack))
-        .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+  List<SequenceElement> processChildren(
+      CvStatementDefaultImpl statement, MethodCallStack callStack) {
+    return statement
+        .getChildren()
+        .stream()
+        .map(child -> child.process(this, callStack))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -147,22 +156,29 @@ public class SequenceDiagramProcessor
   @Override
   public Optional<SequenceElement> process(BranchStatement statement, MethodCallStack callStack) {
 
-    List<ConditionalSequenceGroup> conditions = statement.getConditions().stream()
-        .map(childStatement -> childStatement.process(this, callStack)).filter(Optional::isPresent)
-        .map(Optional::get).map(ConditionalSequenceGroup.class::cast).collect(Collectors.toList());
+    List<ConditionalSequenceGroup> conditions =
+        statement
+            .getConditions()
+            .stream()
+            .map(childStatement -> childStatement.process(this, callStack))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(ConditionalSequenceGroup.class::cast)
+            .collect(Collectors.toList());
 
-    Optional<ConditionalSequenceGroup> notEmptyCondition = conditions.stream()
-        .filter((c) -> !c.getElements().isEmpty()).findAny();
-    return notEmptyCondition.map((condition) -> {
-      BranchSequenceElement group = new BranchSequenceElement();
-      group.getConditions().addAll(conditions);
-      return group;
-    });
+    Optional<ConditionalSequenceGroup> notEmptyCondition =
+        conditions.stream().filter((c) -> !c.getElements().isEmpty()).findAny();
+    return notEmptyCondition.map(
+        (condition) -> {
+          BranchSequenceElement group = new BranchSequenceElement();
+          group.getConditions().addAll(conditions);
+          return group;
+        });
   }
 
   @Override
-  public Optional<SequenceElement> process(ConditionalStatement statement,
-      MethodCallStack callStack) {
+  public Optional<SequenceElement> process(
+      ConditionalStatement statement, MethodCallStack callStack) {
 
     List<SequenceElement> groupElements = processChildren(statement, callStack);
 
@@ -177,18 +193,26 @@ public class SequenceDiagramProcessor
   public Optional<SequenceElement> process(TryStatement statement, MethodCallStack callStack) {
 
     List<SequenceElement> groupElements = processChildren(statement, callStack);
-    List<CatchSequenceGroup> catchGroups = statement.getCatchStatements().stream()
-        .map(childStatement -> childStatement.process(this, callStack)).filter(Optional::isPresent)
-        .map(Optional::get).map(CatchSequenceGroup.class::cast).collect(Collectors.toList());
+    List<CatchSequenceGroup> catchGroups =
+        statement
+            .getCatchStatements()
+            .stream()
+            .map(childStatement -> childStatement.process(this, callStack))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(CatchSequenceGroup.class::cast)
+            .collect(Collectors.toList());
     FinallySequenceGroup finallyGroup = null;
     if (statement.getFinallyStatement() != null) {
-      finallyGroup = (FinallySequenceGroup) statement.getFinallyStatement().process(this, callStack)
-          .get();
+      finallyGroup =
+          (FinallySequenceGroup) statement.getFinallyStatement().process(this, callStack).get();
     }
 
-    Optional<? extends SequenceGroup> notEmptyGroup = Stream
-        .concat(catchGroups.stream(), Stream.of(finallyGroup)).filter(Objects::nonNull)
-        .filter((c) -> !c.getElements().isEmpty()).findAny();
+    Optional<? extends SequenceGroup> notEmptyGroup =
+        Stream.concat(catchGroups.stream(), Stream.of(finallyGroup))
+            .filter(Objects::nonNull)
+            .filter((c) -> !c.getElements().isEmpty())
+            .findAny();
     if (!groupElements.isEmpty() || notEmptyGroup.isPresent()) {
       TrySequenceGroup group = new TrySequenceGroup();
       group.getElements().addAll(groupElements);
@@ -270,5 +294,4 @@ public class SequenceDiagramProcessor
   public Optional<SequenceElement> process(MethodCallDef statement) {
     return process(statement, MethodCallStack.getBlank());
   }
-
 }
