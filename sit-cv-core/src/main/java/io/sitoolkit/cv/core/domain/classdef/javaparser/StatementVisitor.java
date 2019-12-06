@@ -1,10 +1,12 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
@@ -29,8 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
-  private static final Pattern STREAM_METHOD_PATTERN = Pattern
-      .compile("java\\.util\\.stream\\.Stream\\..*");
+  private static final Pattern STREAM_METHOD_PATTERN =
+      Pattern.compile("java\\.util\\.stream\\.Stream\\..*");
 
   private final MethodResolver methodResolver;
 
@@ -89,7 +91,8 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     if (isInIfCondition(methodCallExpr)) {
       log.debug(
           "{}Method calls in if (...) are not supported (not drawn in sequence diagram) : \"{}\"",
-          context.getLogLeftPadding(), methodCallExpr);
+          context.getLogLeftPadding(),
+          methodCallExpr);
       super.visit(methodCallExpr, context);
       return;
     }
@@ -105,9 +108,14 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
     } else {
       super.visit(methodCallExpr, context);
       if (!isStreamStartMethod(methodCallExpr)) {
-        methodResolver.resolve(methodCallExpr)
-            .map(resolvedMethodDeclaration -> DeclationProcessor
-                .createMethodCall(resolvedMethodDeclaration, methodCallExpr.getParentNode()))
+        methodResolver
+            .resolve(methodCallExpr)
+            .map(
+                resolvedMethodDeclaration ->
+                    DeclationProcessor.createMethodCall(
+                        resolvedMethodDeclaration,
+                        methodCallExpr.getParentNode(),
+                        methodCallExpr.getArguments()))
             .ifPresent(context::addMethodCall);
       }
     }
@@ -124,8 +132,12 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
   public void visit(MethodReferenceExpr methodReferenceExpr, VisitContext context) {
     if (context.isInLoop()) {
       super.visit(methodReferenceExpr, context);
-      methodResolver.resolve(methodReferenceExpr)
-          .map((m) -> DeclationProcessor.createMethodCall(m, Optional.empty()))
+      methodResolver
+          .resolve(methodReferenceExpr)
+          .map(
+              m ->
+                  DeclationProcessor.createMethodCall(
+                      m, Optional.empty(), NodeList.nodeList(Collections.emptyList())))
           .ifPresent(context::addMethodCall);
     }
   }
@@ -171,15 +183,16 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
 
   @Override
   public void visit(CatchClause catchClause, VisitContext context) {
-    context.startCatchContext(catchClause,
+    context.startCatchContext(
+        catchClause,
         catchClause.getParameter().getType().getTokenRange().map(Object::toString).orElse(""));
     super.visit(catchClause, context);
     context.endContext();
   }
 
   boolean isFinally(Statement stmt) {
-    Optional<TryStmt> parentTry = stmt.getParentNode().filter(TryStmt.class::isInstance)
-        .map(TryStmt.class::cast);
+    Optional<TryStmt> parentTry =
+        stmt.getParentNode().filter(TryStmt.class::isInstance).map(TryStmt.class::cast);
     if (parentTry.isPresent()) {
       Optional<BlockStmt> finallyStmt = parentTry.get().getFinallyBlock();
       return finallyStmt.isPresent() && finallyStmt.get() == stmt;
@@ -188,8 +201,8 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
   }
 
   boolean isIfElse(Statement stmt) {
-    Optional<IfStmt> parentIf = stmt.getParentNode().filter(IfStmt.class::isInstance)
-        .map(IfStmt.class::cast);
+    Optional<IfStmt> parentIf =
+        stmt.getParentNode().filter(IfStmt.class::isInstance).map(IfStmt.class::cast);
     if (parentIf.isPresent()) {
       Optional<Statement> elseStmt = parentIf.get().getElseStmt();
       return elseStmt.isPresent() && elseStmt.get() == stmt;
@@ -211,27 +224,35 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
   }
 
   boolean isStreamMethod(MethodCallExpr n) {
-    return methodResolver.resolve(n)
+    return methodResolver
+        .resolve(n)
         .map(method -> STREAM_METHOD_PATTERN.matcher(method.getQualifiedName()).matches())
         .orElse(false);
   }
 
   boolean isStreamStartMethod(MethodCallExpr n) {
-    return methodResolver.resolve(n)
+    return methodResolver
+        .resolve(n)
         .map(method -> "java.util.Collection.stream".equals(method.getQualifiedName()))
         .orElse(false);
   }
 
   String buildStreamLoopScope(MethodCallExpr n) {
-    return n.getScope().filter((s) -> s.isMethodCallExpr() && isStreamMethod(n)).map((scope) -> {
-      return buildStreamLoopScope(scope.asMethodCallExpr());
-    }).orElseGet(() -> n.getTokenRange().map(Object::toString).orElse(""));
+    return n.getScope()
+        .filter((s) -> s.isMethodCallExpr() && isStreamMethod(n))
+        .map(
+            (scope) -> {
+              return buildStreamLoopScope(scope.asMethodCallExpr());
+            })
+        .orElseGet(() -> n.getTokenRange().map(Object::toString).orElse(""));
   }
 
   String buildForLoopScope(Node node, String delimiter, String prefix, String suffix) {
-    return node.getChildNodes().stream().filter((c) -> !(c instanceof BlockStmt))
-        .map(Object::toString).collect(Collectors.joining(delimiter, prefix, suffix));
-
+    return node.getChildNodes()
+        .stream()
+        .filter((c) -> !(c instanceof BlockStmt))
+        .map(Object::toString)
+        .collect(Collectors.joining(delimiter, prefix, suffix));
   }
 
   void addConditionalStatement(IfStmt parentIf, VisitContext context, boolean isFirst) {
@@ -244,8 +265,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
   }
 
   void addThrowStatement(ThrowStmt throwStmt, VisitContext context) {
-    String throwExpr = throwStmt.getExpression().getTokenRange()
-        .map(Object::toString).orElse("");
+    String throwExpr = throwStmt.getExpression().getTokenRange().map(Object::toString).orElse("");
     context.addThrowExpression(throwExpr);
   }
 }
