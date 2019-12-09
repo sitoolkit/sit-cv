@@ -1,0 +1,12 @@
+{
+  "lifelines": [
+    {
+      "name": ".*Service",
+      "entryPoint": true,
+      "dbAccess": true
+    },
+    {
+      "name": ".*Mapper"
+    }
+  ]
+}

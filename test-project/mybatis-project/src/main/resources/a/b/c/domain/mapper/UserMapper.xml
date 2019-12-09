@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="a.b.c.domain.mapper.UserMapper">
+  <resultMap type="User" id="userResult">
+    <result column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="companyId" property="companyId" />
+  </resultMap>
+
+  <select id="selectById" resultType="User" resultMap="userResult">
+    select * from "user" where id = #{id}
+  </select>
+
+  <insert id="insert">
+    insert into "user" (id, name, companyId)
+    values (#{id}, #{name}, #{companyId})
+  </insert>
+
+  <update id="updateNameById">
+    update "user" set name = #{name} where id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    delete from "user" where id = #{id}
+  </delete>
+</mapper>

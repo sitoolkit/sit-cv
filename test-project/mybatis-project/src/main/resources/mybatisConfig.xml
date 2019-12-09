@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  <typeAliases>
+    <typeAlias
+      type="a.b.c.domain.User"
+      alias="User" />
+  </typeAliases>
+
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="org.apache.derby.jdbc.ClientDriver"/>
+        <property name="url" value="jdbc:derby://localhost:1527/testdb"/>
+        <property name="username" value="derby"/>
+        <property name="password" value="derby"/>
+      </dataSource>
+    </environment>
+  </environments>
+  <mappers>
+    <mapper resource="a/b/c/domain/mapper/UserMapper.xml"/>
+  </mappers>
+</configuration>
