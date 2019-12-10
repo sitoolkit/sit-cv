@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MybatisLogListener implements StdoutListener {
 
-  private static final String REPOSITORY_METHOD_MARKER = "[RepositoryMethod]";
+  public static String REPOSITORY_METHOD_MARKER = "[RepositoryMethod]";
   private static final Pattern MARKER_PATTERN =
       Pattern.compile("^\\s*" + Pattern.quote(REPOSITORY_METHOD_MARKER) + ".*");
 

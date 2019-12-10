@@ -19,8 +19,7 @@ import lombok.Setter;
 @Data
 public class CvConfig {
 
-  @JsonIgnore
-  private Path sourcePath;
+  @JsonIgnore private Path sourcePath;
 
   private String jarList = "jar-list.txt";
   private String javaFilePattern = ".*\\.(java|class)$";
@@ -28,12 +27,12 @@ public class CvConfig {
   private boolean override = false;
   private boolean exception = true;
   private boolean showAccessor = false;
-  
-  @JsonMerge
-  private List<LifelineClasses> lifelines = new ArrayList<>();
+  private boolean analyzeMybatis = false;
+
+  @JsonMerge private List<LifelineClasses> lifelines = new ArrayList<>();
   private EnclosureFilterCondition sqlLogPattern;
-  @JsonMerge
-  private List<String> asyncAnnotations = new ArrayList<>();
+  @JsonMerge private List<String> asyncAnnotations = new ArrayList<>();
+
   @JsonIgnore
   @Setter(AccessLevel.NONE)
   private List<CvConfigEventListener> eventListeners = new ArrayList<>();
@@ -47,14 +46,14 @@ public class CvConfig {
   }
 
   public FilterConditionGroup getEntryPointFilter() {
-    List<LifelineClasses> entryPoints = lifelines.stream().filter(LifelineClasses::isEntryPoint)
-        .collect(toList());
+    List<LifelineClasses> entryPoints =
+        lifelines.stream().filter(LifelineClasses::isEntryPoint).collect(toList());
     return toFilterConditionGroup(entryPoints);
   }
 
   public FilterConditionGroup getLifelineOnlyFilter() {
-    List<LifelineClasses> repositories = lifelines.stream().filter(LifelineClasses::isLifelineOnly)
-        .collect(toList());
+    List<LifelineClasses> repositories =
+        lifelines.stream().filter(LifelineClasses::isLifelineOnly).collect(toList());
     return toFilterConditionGroup(repositories);
   }
 
@@ -63,8 +62,8 @@ public class CvConfig {
   }
 
   public FilterConditionGroup getRepositoryFilter() {
-    List<LifelineClasses> repositories = lifelines.stream().filter(LifelineClasses::isDbAccess)
-        .collect(toList());
+    List<LifelineClasses> repositories =
+        lifelines.stream().filter(LifelineClasses::isDbAccess).collect(toList());
     return toFilterConditionGroup(repositories);
   }
 
@@ -84,12 +83,13 @@ public class CvConfig {
     fcg.setInclude(include);
     fcg.setExclude(exclude);
 
-    lifelines.forEach(lifeLine -> {
-      include.add(lifeLine.getCondition());
-      if (lifeLine.isExclude()) {
-        exclude.add(lifeLine.getCondition());
-      }
-    });
+    lifelines.forEach(
+        lifeLine -> {
+          include.add(lifeLine.getCondition());
+          if (lifeLine.isExclude()) {
+            exclude.add(lifeLine.getCondition());
+          }
+        });
 
     return fcg;
   }

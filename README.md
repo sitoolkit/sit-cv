@@ -254,7 +254,8 @@ It's JSON structure is as follows.
     "start": ".*Pattern before SQL starts.*",
     "end": ".*Pattern after SQL ends.*"
   },
-  "showAccessor": false
+  "showAccessor": false,
+  "analyzeMybatis": false
 }
 ```
 | Key                 | Description                                                                           | Default value |
@@ -272,3 +273,4 @@ It's JSON structure is as follows.
 | &emsp; start        | Pattern to match the line just before SQL starts.                                     |               |
 | &emsp; end          | Pattern to match the line just after SQL ends.                                        |               |
 | showAccessor        | Set true to show setter and getter method in the class diagram.                       | false         |
+| analyzeMybatis      | Set true to analyze Mybatis log. This is prioritized than sqlLogPattern.              | false         |

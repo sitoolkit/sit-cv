@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.config.FilterCondition;
@@ -16,6 +17,7 @@ import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.SitFileUtils;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
+import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 
 public class SqlLogProcessor {
 
@@ -28,23 +30,38 @@ public class SqlLogProcessor {
 
     SitFileUtils.createDirectories(project.getSqlLogPath().getParent());
 
+    StdoutListener listener;
+    String repositoryMethodMaker;
+    List<SqlPerMethod> sqlLogs;
+    if (config.isAnalyzeMybatis()) {
+      listener = new MybatisLogListener();
+      repositoryMethodMaker = MybatisLogListener.REPOSITORY_METHOD_MARKER;
+      sqlLogs = ((MybatisLogListener) listener).getSqlLogs();
+    } else {
+      listener = new SqlLogListener(config.getSqlEnclosureFilter());
+      repositoryMethodMaker = SqlLogListener.REPOSITORY_METHOD_MARKER;
+      sqlLogs = ((SqlLogListener) listener).getSqlLogs();
+    }
+
     String javaAgentParameter =
-        buildAgentParameter(agentJar, projectType, config.getRepositoryFilter());
-    SqlLogListener sqlLogListener = new SqlLogListener(config.getSqlEnclosureFilter());
-    MybatisLogListener mybatisLogListener = new MybatisLogListener();
+        buildAgentParameter(
+            agentJar, projectType, config.getRepositoryFilter(), repositoryMethodMaker);
 
     ProcessCommand command = commandBuilder.apply(javaAgentParameter);
-    command.stdout(mybatisLogListener).execute();
+    command.stdout(listener).execute();
 
-    JsonUtils.obj2file(mybatisLogListener.getSqlLogs(), project.getSqlLogPath());
+    JsonUtils.obj2file(sqlLogs, project.getSqlLogPath());
   }
 
   private String buildAgentParameter(
-      Path agentJar, String projectType, FilterConditionGroup repositoryFilter) {
+      Path agentJar,
+      String projectType,
+      FilterConditionGroup repositoryFilter,
+      String repositoryMethodMarker) {
     Map<String, String> agentArgsMap = new HashMap<>();
     putRepositoryFilter(agentArgsMap, repositoryFilter);
     agentArgsMap.put("projectType", projectType);
-    agentArgsMap.put("repositoryMethodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
+    agentArgsMap.put("repositoryMethodMarker", repositoryMethodMarker);
     String agentArgs =
         agentArgsMap
             .entrySet()
