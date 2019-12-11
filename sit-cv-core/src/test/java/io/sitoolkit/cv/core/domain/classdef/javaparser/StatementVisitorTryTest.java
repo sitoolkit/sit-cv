@@ -56,8 +56,10 @@ public class StatementVisitorTryTest extends StatementVisitorTest {
     assertThat(
         catchStatements.get(0).getParameter(),
         is(
-            "FileNotFoundException | NullPointerException | ArrayIndexOutOfBoundsException\r\n"
-                + "                | NumberFormatException"));
+            "FileNotFoundException\r\n"
+                + "        | NullPointerException\r\n"
+                + "        | ArrayIndexOutOfBoundsException\r\n"
+                + "        | NumberFormatException"));
     assertThat(catchStatements.get(1).getParameter(), is("IOException"));
 
     assertThat(
