@@ -8,16 +8,13 @@ import lombok.Value;
 @Builder
 public class RelationDef {
 
-    private ClassDef self;
-    private ClassDef other;
-    private RelationType type;
+  private ClassDef self;
+  private ClassDef other;
+  private RelationType type;
 
-    @Builder.Default
-    private String selfCardinality = "";
+  @Builder.Default private String selfCardinality = "";
 
-    @Builder.Default
-    private String otherCardinality = "";
+  @Builder.Default private String otherCardinality = "";
 
-    @Builder.Default
-    private String description = "";
+  @Builder.Default private String description = "";
 }

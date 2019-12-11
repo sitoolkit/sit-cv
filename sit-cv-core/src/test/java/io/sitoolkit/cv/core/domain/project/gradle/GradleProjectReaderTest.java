@@ -24,15 +24,17 @@ public class GradleProjectReaderTest {
 
   @Test
   public void testMultiProject() {
-    Project project = reader
-        .read(Paths.get("../test-project/gradle-multi").toAbsolutePath().normalize()).get();
+    Project project =
+        reader.read(Paths.get("../test-project/gradle-multi").toAbsolutePath().normalize()).get();
 
-    assertThat(project.getAllSrcDirs(),
-        containsInAnyOrder(project.getDir().resolve("project-application/src/main/java"),
+    assertThat(
+        project.getAllSrcDirs(),
+        containsInAnyOrder(
+            project.getDir().resolve("project-application/src/main/java"),
             project.getDir().resolve("project-library/src/main/java")));
 
-    Set<String> classpaths = project.getAllClasspaths().stream().map(Path::toString)
-        .collect(Collectors.toSet());
+    Set<String> classpaths =
+        project.getAllClasspaths().stream().map(Path::toString).collect(Collectors.toSet());
 
     assertThat(classpaths, hasItem(endsWith("commons-lang3-3.8.1.jar")));
     assertThat(classpaths, hasItem(containsString("lombok")));
@@ -40,5 +42,4 @@ public class GradleProjectReaderTest {
     Version javaVesion = Version.parse(project.getJavaVersion());
     assertThat(javaVesion.feature(), is(Runtime.version().feature()));
   }
-
 }

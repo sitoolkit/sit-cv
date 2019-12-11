@@ -5,22 +5,21 @@ import java.util.List;
 
 public interface ClassDefRepository {
 
-    void save(ClassDef classDef);
+  void save(ClassDef classDef);
 
-    void remove(String sourceId);
+  void remove(String sourceId);
 
-    Collection<ClassDef> getAllClassDefs();
+  Collection<ClassDef> getAllClassDefs();
 
-    int countClassDefs();
+  int countClassDefs();
 
-    void solveReferences();
+  void solveReferences();
 
-    List<String> getEntryPoints();
+  List<String> getEntryPoints();
 
-    List<ClassDef> getAllEntryPointClasses();
+  List<ClassDef> getAllEntryPointClasses();
 
-    ClassDef findClassByQualifiedName(String qalifiedName);
+  ClassDef findClassByQualifiedName(String qalifiedName);
 
-    MethodDef findMethodByQualifiedSignature(String qualifiedSignature);
-
+  MethodDef findMethodByQualifiedSignature(String qualifiedSignature);
 }

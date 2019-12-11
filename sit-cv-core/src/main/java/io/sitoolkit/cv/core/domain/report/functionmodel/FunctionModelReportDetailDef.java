@@ -10,13 +10,8 @@ import lombok.Data;
 @Data
 public class FunctionModelReportDetailDef {
 
-    /**
-     * key:diagram.id, value:diagram.data
-     */
-    private Map<String, String> diagrams = new LinkedHashMap<>();
-    /**
-     * key:methodSignature
-     */
-    private Map<String, ApiDocDef> apiDocs = new HashMap<>();
-
+  /** key:diagram.id, value:diagram.data */
+  private Map<String, String> diagrams = new LinkedHashMap<>();
+  /** key:methodSignature */
+  private Map<String, ApiDocDef> apiDocs = new HashMap<>();
 }

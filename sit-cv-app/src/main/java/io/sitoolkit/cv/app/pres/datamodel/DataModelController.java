@@ -14,8 +14,7 @@ import io.sitoolkit.cv.core.domain.report.crud.DataModelProcessor;
 @RestController
 public class DataModelController {
 
-  @Autowired
-  CrudService crudService;
+  @Autowired CrudService crudService;
 
   // TODO to be refactored.
   DataModelProcessor processor = new DataModelProcessor();

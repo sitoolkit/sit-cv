@@ -4,5 +4,5 @@ import io.sitoolkit.cv.core.domain.functionmodel.Diagram;
 
 public interface DiagramWriter<T extends DiagramModel> {
 
-    Diagram write(T diagram);
+  Diagram write(T diagram);
 }

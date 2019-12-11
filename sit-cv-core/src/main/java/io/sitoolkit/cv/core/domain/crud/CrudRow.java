@@ -34,21 +34,30 @@ public class CrudRow {
 
   public CrudRow merge(CrudRow mergingCrud) {
 
-    mergingCrud.getCellMap().entrySet().stream().forEach(cellMapEntry -> {
-      Set<CrudType> existingSet = cellMap.computeIfAbsent(cellMapEntry.getKey(),
-          key -> new HashSet<>());
-      existingSet.addAll(cellMapEntry.getValue());
-    });
+    mergingCrud
+        .getCellMap()
+        .entrySet()
+        .stream()
+        .forEach(
+            cellMapEntry -> {
+              Set<CrudType> existingSet =
+                  cellMap.computeIfAbsent(cellMapEntry.getKey(), key -> new HashSet<>());
+              existingSet.addAll(cellMapEntry.getValue());
+            });
 
-    mergingCrud.getSqlTextMap().entrySet().stream().forEach(sqlTextMapEntry -> {
-      Set<String> existingSet = sqlTextMap.computeIfAbsent(sqlTextMapEntry.getKey(),
-          key -> new HashSet<>());
-      existingSet.addAll(sqlTextMapEntry.getValue());
-    });
+    mergingCrud
+        .getSqlTextMap()
+        .entrySet()
+        .stream()
+        .forEach(
+            sqlTextMapEntry -> {
+              Set<String> existingSet =
+                  sqlTextMap.computeIfAbsent(sqlTextMapEntry.getKey(), key -> new HashSet<>());
+              existingSet.addAll(sqlTextMapEntry.getValue());
+            });
 
     repositoryFunctions.addAll(mergingCrud.getRepositoryFunctions());
 
     return mergingCrud;
   }
-
 }

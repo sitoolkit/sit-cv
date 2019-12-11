@@ -9,9 +9,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class FinallySequenceGroup extends SequenceGroup {
 
-    @Override
-    public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
-        return writer.write(lifeLine, this);
-    }
-
+  @Override
+  public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
+    return writer.write(lifeLine, this);
+  }
 }

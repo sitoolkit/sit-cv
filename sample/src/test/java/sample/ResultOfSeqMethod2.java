@@ -1,5 +1,3 @@
 package sample;
 
-public class ResultOfSeqMethod2 {
-
-}
+public class ResultOfSeqMethod2 {}

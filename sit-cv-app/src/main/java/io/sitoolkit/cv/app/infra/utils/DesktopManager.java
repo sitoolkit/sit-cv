@@ -23,5 +23,4 @@ public class DesktopManager {
       log.warn("Exception opening browser", e);
     }
   }
-
 }

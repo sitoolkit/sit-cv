@@ -9,9 +9,7 @@ import org.springframework.stereotype.Service;
 public class AsyncService {
 
   @Async
-  public void asyncWithoutResult(int id) {
-
-  }
+  public void asyncWithoutResult(int id) {}
 
   @Async
   public CompletableFuture<String> asyncWithResult(int id) {

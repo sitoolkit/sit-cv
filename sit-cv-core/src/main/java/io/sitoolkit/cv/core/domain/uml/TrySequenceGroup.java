@@ -12,21 +12,22 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class TrySequenceGroup extends SequenceGroup {
 
-    private List<CatchSequenceGroup> catchGroups = new ArrayList<>();
-    private SequenceGroup finallyGroup;
+  private List<CatchSequenceGroup> catchGroups = new ArrayList<>();
+  private SequenceGroup finallyGroup;
 
-    @Override
-    public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
-        return writer.write(lifeLine, this);
-    }
+  @Override
+  public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
+    return writer.write(lifeLine, this);
+  }
 
-    @Override
-    public Stream<MessageDef> getMessagesRecursively() {
-        Stream<MessageDef> tryMessages = Stream
-                .concat(getCatchGroups().stream(), Stream.of(finallyGroup)).filter(Objects::nonNull)
-                .flatMap(SequenceElement::getMessagesRecursively);
-        return Stream.concat(super.getMessagesRecursively(), tryMessages).filter(Objects::nonNull)
-                .distinct();
-    }
-
+  @Override
+  public Stream<MessageDef> getMessagesRecursively() {
+    Stream<MessageDef> tryMessages =
+        Stream.concat(getCatchGroups().stream(), Stream.of(finallyGroup))
+            .filter(Objects::nonNull)
+            .flatMap(SequenceElement::getMessagesRecursively);
+    return Stream.concat(super.getMessagesRecursively(), tryMessages)
+        .filter(Objects::nonNull)
+        .distinct();
+  }
 }

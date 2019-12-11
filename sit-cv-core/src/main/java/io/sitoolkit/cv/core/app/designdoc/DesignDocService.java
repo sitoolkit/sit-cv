@@ -11,13 +11,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DesignDocService {
 
-    @NonNull
-    FunctionModelService functionModelService;
+  @NonNull FunctionModelService functionModelService;
 
-    @NonNull
-    DesignDocMenuBuilder menuBuilder;
+  @NonNull DesignDocMenuBuilder menuBuilder;
 
-    public List<MenuItem> buildMenu() {
-        return menuBuilder.build(functionModelService.getAllIds());
-    }
+  public List<MenuItem> buildMenu() {
+    return menuBuilder.build(functionModelService.getAllIds());
+  }
 }

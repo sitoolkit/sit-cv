@@ -7,20 +7,19 @@ import org.junit.Test;
 
 public class FilterConditionTest {
 
-    @Test
-    public void match() {
-        FilterCondition condition = new FilterCondition(".*name", "@annotation.*");
+  @Test
+  public void match() {
+    FilterCondition condition = new FilterCondition(".*name", "@annotation.*");
 
-        assertThat(condition.matchName("match-name"), is(true));
-        assertThat(condition.matchAnnotation("not-match-@annotation"), is(false));
-    }
+    assertThat(condition.matchName("match-name"), is(true));
+    assertThat(condition.matchAnnotation("not-match-@annotation"), is(false));
+  }
 
-    @Test
-    public void emptyPattern() {
-        FilterCondition emptyCondition = new FilterCondition("", null);
+  @Test
+  public void emptyPattern() {
+    FilterCondition emptyCondition = new FilterCondition("", null);
 
-        assertThat(emptyCondition.matchName("nomatch"), is(true));
-        assertThat(emptyCondition.matchAnnotation(""), is(true));
-    }
-
+    assertThat(emptyCondition.matchName("nomatch"), is(true));
+    assertThat(emptyCondition.matchAnnotation(""), is(true));
+  }
 }

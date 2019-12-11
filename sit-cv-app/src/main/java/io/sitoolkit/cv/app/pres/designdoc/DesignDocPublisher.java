@@ -13,11 +13,9 @@ import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 @Controller
 public class DesignDocPublisher implements DesignDocTreeEventListener {
 
-  @Autowired
-  DesignDocService designDocService;
+  @Autowired DesignDocService designDocService;
 
-  @Autowired
-  SimpMessagingTemplate template;
+  @Autowired SimpMessagingTemplate template;
 
   @PostConstruct
   public void init() {
@@ -38,5 +36,4 @@ public class DesignDocPublisher implements DesignDocTreeEventListener {
   public void onModify() {
     publishDesingDocList();
   }
-
 }

@@ -20,17 +20,13 @@ import io.sitoolkit.cv.core.infra.watcher.FileWatcher;
 @Component
 public class SourceFileEventHandler implements FileWatchEventListener {
 
-  @Autowired
-  DesignDocTreeEventListener designDocTreeEventListener;
+  @Autowired DesignDocTreeEventListener designDocTreeEventListener;
 
-  @Autowired
-  FunctionModelEventListener functionModelEventListener;
+  @Autowired FunctionModelEventListener functionModelEventListener;
 
-  @Autowired
-  FunctionModelService functionModelService;
+  @Autowired FunctionModelService functionModelService;
 
-  @Autowired
-  ProjectManager projectManager;
+  @Autowired ProjectManager projectManager;
 
   FileWatcher watcher = new FileWatcher();
 
@@ -57,5 +53,4 @@ public class SourceFileEventHandler implements FileWatchEventListener {
       designDocTreeEventListener.onModify();
     }
   }
-
 }

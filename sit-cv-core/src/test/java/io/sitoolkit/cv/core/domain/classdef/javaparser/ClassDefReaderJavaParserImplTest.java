@@ -32,27 +32,32 @@ public class ClassDefReaderJavaParserImplTest {
     stopWatch.start();
 
     // StatementVisitor.java takes the longest processing time.
-    reader.readJava(Paths.get(
-        "src/main/java/io/sitoolkit/cv/core/domain/classdef/javaparser/StatementVisitor.java"));
+    reader.readJava(
+        Paths.get(
+            "src/main/java/io/sitoolkit/cv/core/domain/classdef/javaparser/StatementVisitor.java"));
 
     log.info("Proccessing time of readJava: {}", stopWatch);
 
     // TODO The target time is wanted to be less than 5 sec...
     long targetTime = 20L;
 
-    assertThat("Exceeded target time", stopWatch.getTime(TimeUnit.SECONDS),
-        not(greaterThan(targetTime)));
+    assertThat(
+        "Exceeded target time", stopWatch.getTime(TimeUnit.SECONDS), not(greaterThan(targetTime)));
   }
 
   @Test
   public void testAsync() {
-    ClassDef asyncService = readerForSample()
-        .readJava(Paths.get("../sample/src/main/java/a/b/c/AsyncService.java")).orElseThrow();
+    ClassDef asyncService =
+        readerForSample()
+            .readJava(Paths.get("../sample/src/main/java/a/b/c/AsyncService.java"))
+            .orElseThrow();
 
-    assertThat("this method is expected to be async",
+    assertThat(
+        "this method is expected to be async",
         asyncService.findMethodBySignature("asyncWithoutResult(int)").orElseThrow().isAsync(),
         is(true));
-    assertThat("this method is expected to be async",
+    assertThat(
+        "this method is expected to be async",
         asyncService.findMethodBySignature("asyncWithResult(int)").orElseThrow().isAsync(),
         is(true));
   }
@@ -65,9 +70,12 @@ public class ClassDefReaderJavaParserImplTest {
     ClassDef classDef = reader.readJava(javaFile).get();
 
     List<MethodDef> methodDefs = classDef.getMethods();
-    MethodDef methodDef = methodDefs.stream()
-        .filter(m -> StringUtils.equals(m.getName(), "throwExceptions"))
-        .findFirst().get();
+    MethodDef methodDef =
+        methodDefs
+            .stream()
+            .filter(m -> StringUtils.equals(m.getName(), "throwExceptions"))
+            .findFirst()
+            .get();
 
     int exceptionCnt = methodDef.getExceptions().size();
 

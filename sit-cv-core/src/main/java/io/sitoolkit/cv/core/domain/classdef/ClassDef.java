@@ -14,58 +14,61 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Data
-@EqualsAndHashCode(of = { "pkg", "name" })
+@EqualsAndHashCode(of = {"pkg", "name"})
 public class ClassDef {
 
-    private String pkg;
-    private String name;
-    private String sourceId;
-    private ClassType type;
-    private List<MethodDef> methods = new ArrayList<>();
-    private List<FieldDef> fields = new ArrayList<>();
-    private Set<String> implInterfaces = new HashSet<>();
-    private Set<ClassDef> knownImplClasses = new HashSet<>();
-    private Set<String> annotations = new HashSet<>();
+  private String pkg;
+  private String name;
+  private String sourceId;
+  private ClassType type;
+  private List<MethodDef> methods = new ArrayList<>();
+  private List<FieldDef> fields = new ArrayList<>();
+  private Set<String> implInterfaces = new HashSet<>();
+  private Set<ClassDef> knownImplClasses = new HashSet<>();
+  private Set<String> annotations = new HashSet<>();
 
-    public boolean isInterface() {
-        return ClassType.INTERFACE.equals(type);
+  public boolean isInterface() {
+    return ClassType.INTERFACE.equals(type);
+  }
+
+  public boolean isClass() {
+    return ClassType.CLASS.equals(type);
+  }
+
+  public String getFullyQualifiedName() {
+    return pkg + "." + name;
+  }
+
+  public ClassDef findImplementation() {
+    if (!isInterface()) {
+      return this;
     }
 
-    public boolean isClass() {
-        return ClassType.CLASS.equals(type);
+    Set<ClassDef> knownImplClasses = getKnownImplClasses();
+    log.debug("Interface {} has KnownImplements : {}", getName(), knownImplClasses);
+
+    if (knownImplClasses.size() == 1) {
+      ClassDef onlyImpl = knownImplClasses.iterator().next();
+      log.debug("{}'s the only known impl found : {} ", getName(), onlyImpl.getName());
+      return onlyImpl;
     }
 
-    public String getFullyQualifiedName() {
-        return pkg + "." + name;
+    return this;
+  }
+
+  public Optional<MethodDef> findMethodBySignature(String signature) {
+    log.debug("Finding '{}' from '{}'", signature, getName());
+    Optional<MethodDef> foundMethod =
+        getMethods()
+            .stream()
+            .filter(m -> StringUtils.equals(signature, m.getSignature()))
+            .findFirst();
+
+    if (foundMethod.isPresent()) {
+      log.debug("Method found : {}", foundMethod.get().getQualifiedSignature());
+    } else {
+      log.debug("'{}' not found from '{}'", signature, getName());
     }
-
-    public ClassDef findImplementation() {
-        if (!isInterface()) {
-            return this;
-        }
-
-        Set<ClassDef> knownImplClasses = getKnownImplClasses();
-        log.debug("Interface {} has KnownImplements : {}", getName(), knownImplClasses);
-
-        if (knownImplClasses.size() == 1) {
-            ClassDef onlyImpl = knownImplClasses.iterator().next();
-            log.debug("{}'s the only known impl found : {} ", getName(), onlyImpl.getName());
-            return onlyImpl;
-        }
-
-        return this;
-    }
-
-    public Optional<MethodDef> findMethodBySignature(String signature) {
-        log.debug("Finding '{}' from '{}'", signature, getName());
-        Optional<MethodDef> foundMethod = getMethods().stream()
-                .filter(m -> StringUtils.equals(signature, m.getSignature())).findFirst();
-
-        if (foundMethod.isPresent()) {
-            log.debug("Method found : {}", foundMethod.get().getQualifiedSignature());
-        } else {
-            log.debug("'{}' not found from '{}'", signature, getName());
-        }
-        return foundMethod;
-    }
+    return foundMethod;
+  }
 }

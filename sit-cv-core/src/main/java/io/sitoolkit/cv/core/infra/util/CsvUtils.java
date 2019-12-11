@@ -13,16 +13,15 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 public class CsvUtils {
 
-    private CsvUtils() {
-    }
+  private CsvUtils() {}
 
-    public static <T> void bean2csv(List<T> beans, Path csvFilePath) {
+  public static <T> void bean2csv(List<T> beans, Path csvFilePath) {
 
-        try (Writer writer = new FileWriter(csvFilePath.toFile())) {
-            StatefulBeanToCsv<T> beanToCsv = new StatefulBeanToCsvBuilder<T>(writer).build();
-            beanToCsv.write(beans);
-        } catch (IOException | CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {
-            throw new IllegalArgumentException(e);
-        }
+    try (Writer writer = new FileWriter(csvFilePath.toFile())) {
+      StatefulBeanToCsv<T> beanToCsv = new StatefulBeanToCsvBuilder<T>(writer).build();
+      beanToCsv.write(beans);
+    } catch (IOException | CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {
+      throw new IllegalArgumentException(e);
     }
+  }
 }

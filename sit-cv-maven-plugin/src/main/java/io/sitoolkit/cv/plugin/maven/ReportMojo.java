@@ -18,8 +18,8 @@ public class ReportMojo extends AbstractMojo {
 
   @Override
   public void execute() {
-    ServiceFactory factory = ServiceFactory.createAndInitialize(project.getBasedir().toPath(),
-        false);
+    ServiceFactory factory =
+        ServiceFactory.createAndInitialize(project.getBasedir().toPath(), false);
 
     if (analyzeSql) {
       factory.getCrudService().analyzeSql();
@@ -27,5 +27,4 @@ public class ReportMojo extends AbstractMojo {
 
     factory.getReportService().export();
   }
-
 }

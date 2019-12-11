@@ -11,16 +11,15 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CatchStatement extends CvStatementDefaultImpl {
 
-    private String parameter;
+  private String parameter;
 
-    @Override
-    public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {
-        return processor.process(this);
-    }
+  @Override
+  public <T, C> Optional<T> process(StatementProcessor<T, C> processor) {
+    return processor.process(this);
+  }
 
-    @Override
-    public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
-        return processor.process(this, context);
-    }
-
+  @Override
+  public <T, C> Optional<T> process(StatementProcessor<T, C> processor, C context) {
+    return processor.process(this, context);
+  }
 }

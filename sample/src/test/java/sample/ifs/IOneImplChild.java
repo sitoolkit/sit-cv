@@ -1,5 +1,3 @@
 package sample.ifs;
 
-public interface IOneImplChild extends IOneImpl{
-
-}
+public interface IOneImplChild extends IOneImpl {}

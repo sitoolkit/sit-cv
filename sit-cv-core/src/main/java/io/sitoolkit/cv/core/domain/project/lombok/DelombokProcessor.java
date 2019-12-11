@@ -28,8 +28,12 @@ public class DelombokProcessor implements PreProcessor {
   }
 
   static boolean isLombokUsed(Project project) {
-    Optional<Path> delombokClasspath = project.getClasspaths().stream()
-        .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-")).findFirst();
+    Optional<Path> delombokClasspath =
+        project
+            .getClasspaths()
+            .stream()
+            .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-"))
+            .findFirst();
 
     if (project.getBuildDir() == null) {
       log.debug("build directory not found in {}", project.getDir());
@@ -46,16 +50,19 @@ public class DelombokProcessor implements PreProcessor {
 
   DelombokProcessor(Project project) {
     this.project = project;
-    project.getClasspaths().stream()
-        .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-")).findFirst()
+    project
+        .getClasspaths()
+        .stream()
+        .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-"))
+        .findFirst()
         .ifPresent(lombokJar -> this.lombokJarPath = lombokJar);
   }
 
   @Override
   public Path getPreProcessedPath(Path original) {
 
-    Optional<Path> enclosingSrcDir = project.getSrcDirs().stream()
-        .filter(dir -> original.startsWith(original)).findFirst();
+    Optional<Path> enclosingSrcDir =
+        project.getSrcDirs().stream().filter(dir -> original.startsWith(original)).findFirst();
 
     if (enclosingSrcDir.isPresent()) {
       Path relativized = enclosingSrcDir.get().relativize(original);
@@ -64,7 +71,6 @@ public class DelombokProcessor implements PreProcessor {
     } else {
       throw new IllegalArgumentException(original.toAbsolutePath() + " is not_in source directory");
     }
-
   }
 
   @Override
@@ -76,15 +82,31 @@ public class DelombokProcessor implements PreProcessor {
     String encoding = project.getSourceEncoding().name();
     String srcPath = srcDir.toFile().getAbsolutePath();
     String targetPath = getDelombokTargetDir().toFile().getAbsolutePath();
-    String classPath = project.getClasspaths().stream()
-        .map(Path::toAbsolutePath)
-        .map(Path::toString)
-        .collect(Collectors.joining(File.pathSeparator));
+    String classPath =
+        project
+            .getClasspaths()
+            .stream()
+            .map(Path::toAbsolutePath)
+            .map(Path::toString)
+            .collect(Collectors.joining(File.pathSeparator));
 
-    int exitCode = new ProcessCommand().command("java")
-            .args("-jar", lombokJarPath.toFile().getAbsolutePath(),
-                    "delombok", "-e", encoding, "-c", classPath, srcPath, "-d", targetPath)
-            .stdout(log::info).stderr(log::warn).execute();
+    int exitCode =
+        new ProcessCommand()
+            .command("java")
+            .args(
+                "-jar",
+                lombokJarPath.toFile().getAbsolutePath(),
+                "delombok",
+                "-e",
+                encoding,
+                "-c",
+                classPath,
+                srcPath,
+                "-d",
+                targetPath)
+            .stdout(log::info)
+            .stderr(log::warn)
+            .execute();
 
     if (exitCode != 0) {
       throw new ProcessExecutionException(exitCode);
@@ -94,5 +116,4 @@ public class DelombokProcessor implements PreProcessor {
   Path getDelombokTargetDir() {
     return project.getBuildDir().resolve("generated-sources/sit-cv/delombok");
   }
-
 }

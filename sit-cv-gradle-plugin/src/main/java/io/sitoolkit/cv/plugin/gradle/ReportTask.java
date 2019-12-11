@@ -17,8 +17,8 @@ public class ReportTask extends DefaultTask {
 
   @TaskAction
   public void export() {
-    ServiceFactory factory = ServiceFactory
-        .createAndInitialize(getProject().getProjectDir().toPath(), false);
+    ServiceFactory factory =
+        ServiceFactory.createAndInitialize(getProject().getProjectDir().toPath(), false);
 
     if (analyzeSql) {
       factory.getCrudService().analyzeSql();

@@ -13,8 +13,7 @@ import java.nio.file.Paths;
 @Slf4j
 public class GradleProjectInfoListener implements StdoutListener {
 
-  @Getter
-  private final Project project;
+  @Getter private final Project project;
   private Project recordingProject;
 
   public GradleProjectInfoListener(Path projectDir) {
@@ -51,7 +50,7 @@ public class GradleProjectInfoListener implements StdoutListener {
       project.setJavaVersion(javaVersion);
     }
 
-    String encoding =  StringUtils.substringAfter(line, "javaEncoding:");
+    String encoding = StringUtils.substringAfter(line, "javaEncoding:");
     if (StringUtils.isNotEmpty(encoding)) {
       project.setSourceEncoding(Charset.forName(encoding));
     }
@@ -85,5 +84,4 @@ public class GradleProjectInfoListener implements StdoutListener {
       recordingProject.getClasspaths().add(Paths.get(classpathStr));
     }
   }
-
 }

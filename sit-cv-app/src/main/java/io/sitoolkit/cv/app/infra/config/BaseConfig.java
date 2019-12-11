@@ -29,13 +29,11 @@ public class BaseConfig {
   @Bean
   public FunctionModelService functionModelService(ServiceFactory serviceFacotry) {
     return serviceFacotry.getFunctionModelService();
-
   }
 
   @Bean
   public DesignDocService designDocService(ServiceFactory serviceFacotry) {
     return serviceFacotry.getDesignDocService();
-
   }
 
   @Bean

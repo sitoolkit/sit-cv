@@ -14,33 +14,27 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 public class CrudMatrix {
 
-    private long sqlLogLastModified;
-    
-    /**
-     * key: function
-     */
-    private Map<String, CrudRow> crudRowMap = new TreeMap<>();
+  private long sqlLogLastModified;
 
-    private SortedSet<TableDef> tableDefs = new TreeSet<>();
+  /** key: function */
+  private Map<String, CrudRow> crudRowMap = new TreeMap<>();
 
-    /**
-     * key: function
-     */
-    private Map<String, ErrorInfo> errorMap = new HashMap<>();
+  private SortedSet<TableDef> tableDefs = new TreeSet<>();
 
-    public void add(String function, TableDef table, CrudType type, String sqlText) {
+  /** key: function */
+  private Map<String, ErrorInfo> errorMap = new HashMap<>();
 
-        log.debug("{}, {}, {}", function, table.getName(), type);
+  public void add(String function, TableDef table, CrudType type, String sqlText) {
 
-        tableDefs.add(table);
+    log.debug("{}, {}, {}", function, table.getName(), type);
 
-        CrudRow row = crudRowMap.computeIfAbsent(function, CrudRow::new);
-        row.add(table, type, sqlText);
-    }
+    tableDefs.add(table);
 
-    public void addError(String function, String sqlText, String errorMessage) {
-        errorMap.put(function, new ErrorInfo(sqlText, errorMessage));
-    }
+    CrudRow row = crudRowMap.computeIfAbsent(function, CrudRow::new);
+    row.add(table, type, sqlText);
+  }
 
+  public void addError(String function, String sqlText, String errorMessage) {
+    errorMap.put(function, new ErrorInfo(sqlText, errorMessage));
+  }
 }
-

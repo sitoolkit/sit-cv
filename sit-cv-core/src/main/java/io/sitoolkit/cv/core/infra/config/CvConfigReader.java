@@ -15,8 +15,8 @@ public class CvConfigReader {
     CvConfig newConfig = JsonUtils.file2obj(configFilePath, CvConfig.class).orElseThrow();
 
     if (!newConfig.isOverride()) {
-        newConfig = readDefaultConfig();
-        JsonUtils.merge(newConfig, configFilePath);
+      newConfig = readDefaultConfig();
+      JsonUtils.merge(newConfig, configFilePath);
     }
     return newConfig;
   }
@@ -37,5 +37,4 @@ public class CvConfigReader {
   private URL getDefaultConfigURL() {
     return SitResourceUtils.getResourceUrl(CvConfig.class, CONFIG_FILE_NAME);
   }
-
 }

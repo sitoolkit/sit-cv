@@ -14,21 +14,21 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 class MethodCallResolver {
 
-    private final JavaParserFacade jpf;
+  private final JavaParserFacade jpf;
 
-    Optional<ResolvedMethodDeclaration> resolve(MethodCallExpr methodCallExpr) {
-        try {
-            SymbolReference<ResolvedMethodDeclaration> ref = jpf.solve(methodCallExpr);
-            if (ref.isSolved()) {
-                ResolvedMethodDeclaration rmd = ref.getCorrespondingDeclaration();
-                return Optional.of(rmd);
-            } else {
-                log.debug("Unsolved method call: {}", methodCallExpr);
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            log.debug("Unsolved method call: {}, {}", methodCallExpr, e.getMessage());
-            return Optional.empty();
-        }
+  Optional<ResolvedMethodDeclaration> resolve(MethodCallExpr methodCallExpr) {
+    try {
+      SymbolReference<ResolvedMethodDeclaration> ref = jpf.solve(methodCallExpr);
+      if (ref.isSolved()) {
+        ResolvedMethodDeclaration rmd = ref.getCorrespondingDeclaration();
+        return Optional.of(rmd);
+      } else {
+        log.debug("Unsolved method call: {}", methodCallExpr);
+        return Optional.empty();
+      }
+    } catch (Exception e) {
+      log.debug("Unsolved method call: {}, {}", methodCallExpr, e.getMessage());
+      return Optional.empty();
     }
+  }
 }

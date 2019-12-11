@@ -15,8 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MavenProjectReader implements ProjectReader {
 
-  @NonNull
-  private SqlLogProcessor sqlLogProcessor;
+  @NonNull private SqlLogProcessor sqlLogProcessor;
 
   @Override
   public Optional<Project> read(Path projectDir) {
@@ -44,10 +43,14 @@ public class MavenProjectReader implements ProjectReader {
 
     Path agentJar = SitCvToolsManager.install(project.getWorkDir(), project.getJavaVersion());
 
-    sqlLogProcessor.process("maven", sitCvConfig, agentJar, project, (String agentParam) -> {
-      return mvnPrj.mvnw("test", "-DargLine=" + agentParam);
-    });
+    sqlLogProcessor.process(
+        "maven",
+        sitCvConfig,
+        agentJar,
+        project,
+        (String agentParam) -> {
+          return mvnPrj.mvnw("test", "-DargLine=" + agentParam);
+        });
     return true;
   }
-
 }

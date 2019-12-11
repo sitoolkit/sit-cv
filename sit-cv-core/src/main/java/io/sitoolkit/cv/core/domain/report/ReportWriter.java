@@ -38,13 +38,17 @@ public class ReportWriter {
   }
 
   void writeReports(Path outputDirPath, List<Report<?>> reports) {
-    reports.stream().forEach((report) -> {
-      try {
-        writeToFile(outputDirPath.resolve(report.getPath()).toFile(), report2javascript(report));
-      } catch (Exception e) {
-        log.warn("Exception writing report: file '{}'", report.getPath(), e);
-      }
-    });
+    reports
+        .stream()
+        .forEach(
+            (report) -> {
+              try {
+                writeToFile(
+                    outputDirPath.resolve(report.getPath()).toFile(), report2javascript(report));
+              } catch (Exception e) {
+                log.warn("Exception writing report: file '{}'", report.getPath(), e);
+              }
+            });
   }
 
   String report2javascript(Report<?> report) {
@@ -62,5 +66,4 @@ public class ReportWriter {
   File buildOutputDir(Path projectDir) {
     return new File(projectDir.toString(), OUTPUT_DIR);
   }
-
 }

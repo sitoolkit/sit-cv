@@ -3,10 +3,8 @@ import lombok.Getter;
 @Getter
 public class XEntity {
 
-    int a;
-    int b;
+  int a;
+  int b;
 
-    public XEntity() {
-    }
-
+  public XEntity() {}
 }

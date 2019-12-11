@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 @EqualsAndHashCode(of = "qualifiedSignature")
-@ToString(exclude = { "classDef", "methodCalls", "statements" })
+@ToString(exclude = {"classDef", "methodCalls", "statements"})
 public class MethodDef implements CvStatement {
 
   private String name;
@@ -59,12 +59,13 @@ public class MethodDef implements CvStatement {
   }
 
   public Stream<MethodDef> collectCalledMethodsRecursively() {
-    return Stream.concat(Stream.of(this),
+    return Stream.concat(
+        Stream.of(this),
         collectCalledMethodsRecursively(getMethodCalls(), MethodCallStack.getBlank()));
   }
 
-  private Stream<MethodDef> collectCalledMethodsRecursively(MethodCallDef method,
-      MethodCallStack callStack) {
+  private Stream<MethodDef> collectCalledMethodsRecursively(
+      MethodCallDef method, MethodCallStack callStack) {
 
     MethodDef methodImpl = method.findImplementation();
 
@@ -74,14 +75,18 @@ public class MethodDef implements CvStatement {
     }
     MethodCallStack pushedStack = callStack.push(methodImpl);
 
-    return Stream.concat(Stream.of(methodImpl),
+    return Stream.concat(
+        Stream.of(methodImpl),
         collectCalledMethodsRecursively(methodImpl.getMethodCalls(), pushedStack));
   }
 
-  private Stream<MethodDef> collectCalledMethodsRecursively(Set<MethodCallDef> methodCalls,
-      MethodCallStack callStack) {
-    return methodCalls.stream().flatMap((method) -> {
-      return collectCalledMethodsRecursively(method, callStack);
-    });
+  private Stream<MethodDef> collectCalledMethodsRecursively(
+      Set<MethodCallDef> methodCalls, MethodCallStack callStack) {
+    return methodCalls
+        .stream()
+        .flatMap(
+            (method) -> {
+              return collectCalledMethodsRecursively(method, callStack);
+            });
   }
 }

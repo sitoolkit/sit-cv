@@ -52,17 +52,20 @@ public class Project {
   }
 
   public Set<Path> getAllClasspaths() {
-    return getAllProjectsStream().flatMap(proj -> proj.classpaths.stream())
+    return getAllProjectsStream()
+        .flatMap(proj -> proj.classpaths.stream())
         .collect(Collectors.toSet());
   }
 
   public Set<Path> getAllSrcDirs() {
-    return getAllProjectsStream().flatMap(proj -> proj.srcDirs.stream())
+    return getAllProjectsStream()
+        .flatMap(proj -> proj.srcDirs.stream())
         .collect(Collectors.toSet());
   }
 
   public Set<Path> getAllPreProcessedDirs() {
-    return getAllProjectsStream().flatMap(proj -> proj.getPreProcessedDirs().stream())
+    return getAllProjectsStream()
+        .flatMap(proj -> proj.getPreProcessedDirs().stream())
         .collect(Collectors.toSet());
   }
 
@@ -84,18 +87,22 @@ public class Project {
   }
 
   public boolean existsWorkDir() {
-    return getBuildDir() != null && getBuildDir().toFile().exists()
+    return getBuildDir() != null
+        && getBuildDir().toFile().exists()
         && getWorkDir().toFile().exists();
   }
 
   Set<Path> getPreProcessedDirs() {
-    return getSrcDirs().stream().map(srcDir -> preProcessor.getPreProcessedPath(srcDir))
-        .filter(srcDir -> srcDir.toFile().exists()).collect(Collectors.toSet());
+    return getSrcDirs()
+        .stream()
+        .map(srcDir -> preProcessor.getPreProcessedPath(srcDir))
+        .filter(srcDir -> srcDir.toFile().exists())
+        .collect(Collectors.toSet());
   }
 
   Stream<Project> getAllProjectsStream() {
-    return Stream.concat(Stream.of(this),
-        subProjects.stream().flatMap(Project::getAllProjectsStream));
+    return Stream.concat(
+        Stream.of(this), subProjects.stream().flatMap(Project::getAllProjectsStream));
   }
 
   Optional<Project> findProjectFromSrc(Path inputFile) {
@@ -103,8 +110,12 @@ public class Project {
       return Optional.of(this);
 
     } else {
-      return subProjects.stream().map(subProject -> subProject.findProjectFromSrc(inputFile))
-          .filter(Optional::isPresent).map(Optional::get).findFirst();
+      return subProjects
+          .stream()
+          .map(subProject -> subProject.findProjectFromSrc(inputFile))
+          .filter(Optional::isPresent)
+          .map(Optional::get)
+          .findFirst();
     }
   }
 

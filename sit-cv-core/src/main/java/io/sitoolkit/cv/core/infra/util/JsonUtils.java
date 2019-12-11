@@ -18,8 +18,7 @@ public class JsonUtils {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  private JsonUtils() {
-  }
+  private JsonUtils() {}
 
   public static String obj2str(Object obj) {
     try {
