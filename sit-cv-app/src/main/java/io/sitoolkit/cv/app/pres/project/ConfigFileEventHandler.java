@@ -14,17 +14,13 @@ import io.sitoolkit.cv.core.infra.config.CvConfigEventListener;
 @Component
 public class ConfigFileEventHandler implements CvConfigEventListener {
 
-  @Autowired
-  FunctionModelService functionModelservice;
+  @Autowired FunctionModelService functionModelservice;
 
-  @Autowired
-  FunctionModelEventListener functionModelEventListener;
+  @Autowired FunctionModelEventListener functionModelEventListener;
 
-  @Autowired
-  DesignDocTreeEventListener designDocTreeEventListener;
+  @Autowired DesignDocTreeEventListener designDocTreeEventListener;
 
-  @Autowired
-  ProjectManager projectManager;
+  @Autowired ProjectManager projectManager;
 
   @PostConstruct
   public void initialize() {
@@ -36,5 +32,4 @@ public class ConfigFileEventHandler implements CvConfigEventListener {
     functionModelservice.getEntryPoints().stream().forEach(functionModelEventListener::onModify);
     designDocTreeEventListener.onModify();
   }
-
 }

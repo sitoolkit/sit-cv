@@ -9,11 +9,10 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class CatchSequenceGroup extends SequenceGroup {
 
-    private String parameter;
+  private String parameter;
 
-    @Override
-    public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
-        return writer.write(lifeLine, this);
-    }
-
+  @Override
+  public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
+    return writer.write(lifeLine, this);
+  }
 }

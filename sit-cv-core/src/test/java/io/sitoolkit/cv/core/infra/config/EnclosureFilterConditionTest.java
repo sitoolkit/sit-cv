@@ -7,20 +7,19 @@ import org.junit.Test;
 
 public class EnclosureFilterConditionTest {
 
-    @Test
-    public void match() {
-        EnclosureFilterCondition condition = new EnclosureFilterCondition(".*start", "end.*");
-        
-        assertThat(condition.matchStart("match-start"), is(true));
-        assertThat(condition.matchEnd("not-match-end"), is(false));
-    }
-    
-    @Test
-    public void emptyPattern() {
-        EnclosureFilterCondition emptyCondition = new EnclosureFilterCondition("", null);
-        
-        assertThat(emptyCondition.matchStart("nomatch"), is(false));
-        assertThat(emptyCondition.matchEnd(""), is(false));
-    }
-    
+  @Test
+  public void match() {
+    EnclosureFilterCondition condition = new EnclosureFilterCondition(".*start", "end.*");
+
+    assertThat(condition.matchStart("match-start"), is(true));
+    assertThat(condition.matchEnd("not-match-end"), is(false));
+  }
+
+  @Test
+  public void emptyPattern() {
+    EnclosureFilterCondition emptyCondition = new EnclosureFilterCondition("", null);
+
+    assertThat(emptyCondition.matchStart("nomatch"), is(false));
+    assertThat(emptyCondition.matchEnd(""), is(false));
+  }
 }

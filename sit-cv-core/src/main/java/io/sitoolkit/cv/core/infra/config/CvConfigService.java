@@ -26,16 +26,16 @@ public class CvConfigService {
 
       watcher.add(configFilePath);
 
-      watcher.addListener(modifiedFiles -> {
-        CvConfig modifiedConfig = reader.read(configFilePath);
-        config.update(modifiedConfig);
-        config.getEventListeners().stream().forEach(CvConfigEventListener::onModify);
-      });
+      watcher.addListener(
+          modifiedFiles -> {
+            CvConfig modifiedConfig = reader.read(configFilePath);
+            config.update(modifiedConfig);
+            config.getEventListeners().stream().forEach(CvConfigEventListener::onModify);
+          });
 
       watcher.start();
     }
 
     return config;
   }
-
 }

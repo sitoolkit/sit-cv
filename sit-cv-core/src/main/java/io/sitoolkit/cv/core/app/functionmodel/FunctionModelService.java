@@ -39,30 +39,21 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class FunctionModelService {
 
-  @NonNull
-  private ClassDefReader classDefReader;
+  @NonNull private ClassDefReader classDefReader;
 
-  @NonNull
-  private SequenceDiagramProcessor sequenceProcessor;
+  @NonNull private SequenceDiagramProcessor sequenceProcessor;
 
-  @NonNull
-  private ClassDiagramProcessor classProcessor;
+  @NonNull private ClassDiagramProcessor classProcessor;
 
-  @NonNull
-  private DiagramWriter<SequenceDiagram> sequenceWriter;
+  @NonNull private DiagramWriter<SequenceDiagram> sequenceWriter;
 
-  @NonNull
-  private DiagramWriter<ClassDiagram> classWriter;
+  @NonNull private DiagramWriter<ClassDiagram> classWriter;
 
-  @NonNull
-  private ClassDefRepository classDefRepository;
+  @NonNull private ClassDefRepository classDefRepository;
 
-  @NonNull
-  private ProjectManager projectManager;
+  @NonNull private ProjectManager projectManager;
 
-  /**
-   * key:classDef.sourceId, value:entrypoint
-   */
+  /** key:classDef.sourceId, value:entrypoint */
   private Map<String, Set<String>> entryPointMap = new HashMap<>();
 
   public void analyze() {
@@ -88,14 +79,17 @@ public class FunctionModelService {
   }
 
   public synchronized Set<String> getEntryPoints() {
-    return entryPointMap.values().stream().filter(Objects::nonNull).flatMap(Set::stream).distinct()
+    return entryPointMap
+        .values()
+        .stream()
+        .filter(Objects::nonNull)
+        .flatMap(Set::stream)
+        .distinct()
         .collect(Collectors.toSet());
   }
 
   /**
-   *
-   * @param sourcePaths
-   *          file paths of source code to read.
+   * @param sourcePaths file paths of source code to read.
    * @return stream of functionIds which are effected by input source.
    */
   private Stream<String> readSources(Collection<Path> sourcePaths) {
@@ -104,27 +98,45 @@ public class FunctionModelService {
     currentProject.executeAllPreProcess();
     classDefReader.init();
 
-    Set<ClassDef> readDefs = sourcePaths.stream().filter(path -> !Files.isDirectory(path))
-        .filter(Files::isReadable).map(currentProject::findParseTarget).filter(Optional::isPresent)
-        .map(Optional::get).map(classDefReader::readJava).filter(Optional::isPresent)
-        .map(Optional::get).collect(Collectors.toSet());
+    Set<ClassDef> readDefs =
+        sourcePaths
+            .stream()
+            .filter(path -> !Files.isDirectory(path))
+            .filter(Files::isReadable)
+            .map(currentProject::findParseTarget)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(classDefReader::readJava)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toSet());
 
     readDefs.forEach(classDefRepository::save);
     readDefs.forEach(clazz -> log.debug("Read {}", clazz));
 
-    Set<String> deletedIds = sourcePaths.stream().filter(s -> !Files.isDirectory(s))
-        .map(Path::toString)
-        .filter(sId -> !readDefs.stream()
-            .anyMatch(clazz -> StringUtils.equals(sId, clazz.getSourceId())))
-        .collect(Collectors.toSet());
+    Set<String> deletedIds =
+        sourcePaths
+            .stream()
+            .filter(s -> !Files.isDirectory(s))
+            .map(Path::toString)
+            .filter(
+                sId ->
+                    !readDefs
+                        .stream()
+                        .anyMatch(clazz -> StringUtils.equals(sId, clazz.getSourceId())))
+            .collect(Collectors.toSet());
     deletedIds.forEach(clazz -> log.debug("Remove {}", clazz));
     deletedIds.forEach(classDefRepository::remove);
 
     classDefRepository.solveReferences();
 
-    return readDefs.stream().map(ClassDef::getSourceId).map(entryPointMap::get)
-        .filter(Objects::nonNull).flatMap(Set::stream).distinct();
-
+    return readDefs
+        .stream()
+        .map(ClassDef::getSourceId)
+        .map(entryPointMap::get)
+        .filter(Objects::nonNull)
+        .flatMap(Set::stream)
+        .distinct();
   }
 
   public List<String> getAllIds() {
@@ -140,13 +152,17 @@ public class FunctionModelService {
     SequenceDiagram sequenceModel = SequenceDiagram.builder().entryLifeLine(lifeLine).build();
     ClassDiagram classModel = classProcessor.process(lifeLine);
 
-    Stream<String> allSourceIds = Stream.of(sequenceModel, classModel)
-        .map(DiagramModel::getAllSourceIds).flatMap(Set::stream).distinct();
+    Stream<String> allSourceIds =
+        Stream.of(sequenceModel, classModel)
+            .map(DiagramModel::getAllSourceIds)
+            .flatMap(Set::stream)
+            .distinct();
 
-    allSourceIds.forEach(sourceId -> {
-      Set<String> entryPoints = entryPointMap.computeIfAbsent(sourceId, key -> new HashSet<>());
-      entryPoints.add(entryPoint.getQualifiedSignature());
-    });
+    allSourceIds.forEach(
+        sourceId -> {
+          Set<String> entryPoints = entryPointMap.computeIfAbsent(sourceId, key -> new HashSet<>());
+          entryPoints.add(entryPoint.getQualifiedSignature());
+        });
 
     Diagram sequenceDiagram = sequenceWriter.write(sequenceModel);
     Diagram classDiagram = classWriter.write(classModel);
@@ -162,14 +178,20 @@ public class FunctionModelService {
   }
 
   public List<FunctionModel> getAll() {
-    List<FunctionModel> functionModels = getAllIds().stream().map((functionId) -> {
-      try {
-        return get(functionId);
-      } catch (Exception e) {
-        log.warn("Exception when create diagram: functionId '{}'", functionId, e);
-        return null;
-      }
-    }).filter(Objects::nonNull).collect(Collectors.toList());
+    List<FunctionModel> functionModels =
+        getAllIds()
+            .stream()
+            .map(
+                (functionId) -> {
+                  try {
+                    return get(functionId);
+                  } catch (Exception e) {
+                    log.warn("Exception when create diagram: functionId '{}'", functionId, e);
+                    return null;
+                  }
+                })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
 
     return functionModels;
   }
@@ -177,5 +199,4 @@ public class FunctionModelService {
   public List<ClassDef> getAllEntryPointClasses() {
     return classDefRepository.getAllEntryPointClasses();
   }
-
 }

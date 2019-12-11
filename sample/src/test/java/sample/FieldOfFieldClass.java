@@ -1,5 +1,3 @@
 package sample;
 
-public class FieldOfFieldClass {
-
-}
+public class FieldOfFieldClass {}

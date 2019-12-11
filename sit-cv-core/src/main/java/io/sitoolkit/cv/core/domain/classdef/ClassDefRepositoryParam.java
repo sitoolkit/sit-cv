@@ -16,17 +16,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ClassDefRepositoryParam {
 
-    private Path projectDir;
+  private Path projectDir;
 
-    @Default
-    private List<Path> srcDirs = new ArrayList<>();
+  @Default private List<Path> srcDirs = new ArrayList<>();
 
-    @Default
-    private List<Path> binDirs = new ArrayList<>();
+  @Default private List<Path> binDirs = new ArrayList<>();
 
-    @Default
-    private List<Path> jarPaths = new ArrayList<>();
+  @Default private List<Path> jarPaths = new ArrayList<>();
 
-    private Path jarList;
-
+  private Path jarList;
 }

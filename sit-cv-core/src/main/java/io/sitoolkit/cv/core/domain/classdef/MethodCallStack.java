@@ -14,34 +14,33 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MethodCallStack {
 
-    @Getter
-    private static final MethodCallStack blank = new MethodCallStack();
+  @Getter private static final MethodCallStack blank = new MethodCallStack();
 
-    private final List<MethodDef> methodList;
+  private final List<MethodDef> methodList;
 
-    private MethodCallStack() {
-        this(Collections.emptyList());
-    }
+  private MethodCallStack() {
+    this(Collections.emptyList());
+  }
 
-    public MethodCallStack push(MethodDef method) {
-        List<MethodDef> newStack = new ArrayList<>(methodList);
-        newStack.add(method);
-        return new MethodCallStack(newStack);
-    }
+  public MethodCallStack push(MethodDef method) {
+    List<MethodDef> newStack = new ArrayList<>(methodList);
+    newStack.add(method);
+    return new MethodCallStack(newStack);
+  }
 
-    public boolean contains(MethodDef method) {
-        return methodList.stream().anyMatch(m -> equalsAsMethod(m, method));
-    }
+  public boolean contains(MethodDef method) {
+    return methodList.stream().anyMatch(m -> equalsAsMethod(m, method));
+  }
 
-    boolean equalsAsMethod(MethodDef m1, MethodDef m2) {
-        return StringUtils.equals(m1.getQualifiedSignature(), m2.getQualifiedSignature());
+  boolean equalsAsMethod(MethodDef m1, MethodDef m2) {
+    return StringUtils.equals(m1.getQualifiedSignature(), m2.getQualifiedSignature());
+  }
+
+  public Optional<MethodDef> findLastCalled() {
+    if (methodList == null || methodList.isEmpty()) {
+      return Optional.empty();
+    } else {
+      return Optional.of(methodList.get(methodList.size() - 1));
     }
-    
-    public Optional<MethodDef> findLastCalled() {
-        if (methodList == null || methodList.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(methodList.get(methodList.size() - 1));
-        }
-    }
+  }
 }

@@ -19,6 +19,5 @@ public class AsyncController {
     CompletableFuture<String> future = service.asyncWithResult(2);
 
     return future.get();
-
   }
 }

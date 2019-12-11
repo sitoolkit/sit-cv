@@ -14,25 +14,22 @@ import lombok.Value;
 @Value
 @Builder
 public class ClassDiagram implements DiagramModel {
-    private Set<ClassDef> classes;
-    private Set<RelationDef> relations;
-    private String id;
+  private Set<ClassDef> classes;
+  private Set<RelationDef> relations;
+  private String id;
 
-    @Override
-    public Set<String> getAllTags() {
-        return classes.stream()
-                .map(ClassDef::getSourceId)
-                .distinct()
-                .collect(Collectors.toSet());
-    }
+  @Override
+  public Set<String> getAllTags() {
+    return classes.stream().map(ClassDef::getSourceId).distinct().collect(Collectors.toSet());
+  }
 
-    @Override
-    public Set<String> getAllSourceIds() {
-        return classes.stream().map(ClassDef::getSourceId).collect(Collectors.toSet());
-    }
+  @Override
+  public Set<String> getAllSourceIds() {
+    return classes.stream().map(ClassDef::getSourceId).collect(Collectors.toSet());
+  }
 
-    @Override
-    public Map<String, ApiDocDef> getAllApiDocs() {
-        return new HashMap<String, ApiDocDef>();
-    }
+  @Override
+  public Map<String, ApiDocDef> getAllApiDocs() {
+    return new HashMap<String, ApiDocDef>();
+  }
 }

@@ -8,9 +8,7 @@ import lombok.Data;
 public class SignatureParser {
 
   private String packageName;
-  /**
-   * class + method + params without package
-   */
+  /** class + method + params without package */
   private String simpleMedhod;
 
   public static SignatureParser parse(String signature) {
@@ -26,8 +24,8 @@ public class SignatureParser {
 
     StringBuilder simpleMedhod = new StringBuilder();
 
-    String classAndMedhod = signature.substring(classStartPeriodIndex + 1,
-        leftRoundBracketsIndex + 1);
+    String classAndMedhod =
+        signature.substring(classStartPeriodIndex + 1, leftRoundBracketsIndex + 1);
     simpleMedhod.append(classAndMedhod);
 
     for (String param : methodParam.split(",")) {

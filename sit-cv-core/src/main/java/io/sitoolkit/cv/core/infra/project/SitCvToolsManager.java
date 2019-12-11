@@ -24,8 +24,9 @@ public class SitCvToolsManager {
   }
 
   static String resolveJarName(String javaVersion) {
-    return String.format("%s-%s-%s.jar", resolveArtifactId(javaVersion), PackageUtils.getVersion(),
-        "jar-with-dependencies");
+    return String.format(
+        "%s-%s-%s.jar",
+        resolveArtifactId(javaVersion), PackageUtils.getVersion(), "jar-with-dependencies");
   }
 
   static String resolveArtifactId(String javaVersion) {

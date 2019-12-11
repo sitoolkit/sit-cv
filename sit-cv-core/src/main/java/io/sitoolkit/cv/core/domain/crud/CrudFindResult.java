@@ -15,18 +15,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CrudFindResult {
-    /**
-     *  key:table
-     */
-    private Map<String, Set<CrudType>> map = new HashMap<>();
-    private String errMsg;
+  /** key:table */
+  private Map<String, Set<CrudType>> map = new HashMap<>();
 
-    public void put(String table, CrudType crud) {
-        Set<CrudType> cruds = map.computeIfAbsent(table, key -> new HashSet<>());
-        cruds.add(crud);
-    }
+  private String errMsg;
 
-    public boolean isError() {
-    	return StringUtils.isNotEmpty(errMsg);
-    }
+  public void put(String table, CrudType crud) {
+    Set<CrudType> cruds = map.computeIfAbsent(table, key -> new HashSet<>());
+    cruds.add(crud);
+  }
+
+  public boolean isError() {
+    return StringUtils.isNotEmpty(errMsg);
+  }
 }

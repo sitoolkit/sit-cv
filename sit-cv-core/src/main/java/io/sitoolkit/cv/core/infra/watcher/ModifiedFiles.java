@@ -37,5 +37,4 @@ class ModifiedFiles {
 
     return Optional.of(result);
   }
-
 }

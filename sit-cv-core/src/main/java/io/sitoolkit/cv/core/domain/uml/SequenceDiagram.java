@@ -13,26 +13,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SequenceDiagram implements DiagramModel{
-    private LifeLineDef entryLifeLine;
+public class SequenceDiagram implements DiagramModel {
+  private LifeLineDef entryLifeLine;
 
-    @Override
-    public String getId() {
-        return entryLifeLine.getEntryMessage().getRequestQualifiedSignature();
-    }
+  @Override
+  public String getId() {
+    return entryLifeLine.getEntryMessage().getRequestQualifiedSignature();
+  }
 
-    @Override
-    public Set<String> getAllTags() {
-        return entryLifeLine.getAllSourceIds();
-    }
+  @Override
+  public Set<String> getAllTags() {
+    return entryLifeLine.getAllSourceIds();
+  }
 
-    @Override
-    public Map<String, ApiDocDef> getAllApiDocs() {
-        return entryLifeLine.getApiDocsRecursively();
-    }
+  @Override
+  public Map<String, ApiDocDef> getAllApiDocs() {
+    return entryLifeLine.getApiDocsRecursively();
+  }
 
-    @Override
-    public Set<String> getAllSourceIds() {
-        return entryLifeLine.getAllSourceIds();
-    }
+  @Override
+  public Set<String> getAllSourceIds() {
+    return entryLifeLine.getAllSourceIds();
+  }
 }

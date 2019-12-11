@@ -4,17 +4,17 @@ import java.util.List;
 
 public interface ARepository {
 
-    /**
-     * ARepository searchBy method
-     *
-     * @return list of XEntity
-     */
-    public List<XEntity> searchBy(SearchCondition condition);
+  /**
+   * ARepository searchBy method
+   *
+   * @return list of XEntity
+   */
+  public List<XEntity> searchBy(SearchCondition condition);
 
-    public List<XEntity> searchByDoubleCondition(SearchCondition conditionFirst,
-            SearchCondition conditionSecond);
+  public List<XEntity> searchByDoubleCondition(
+      SearchCondition conditionFirst, SearchCondition conditionSecond);
 
-    public int save(XEntity entity);
+  public int save(XEntity entity);
 
-    public List<XEntity> filter();
+  public List<XEntity> filter();
 }

@@ -1,5 +1,3 @@
 package sample;
 
-public class FieldOfSeqClass {
-
-}
+public class FieldOfSeqClass {}

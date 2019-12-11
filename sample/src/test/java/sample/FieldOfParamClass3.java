@@ -1,5 +1,3 @@
 package sample;
 
-public class FieldOfParamClass3 {
-
-}
+public class FieldOfParamClass3 {}

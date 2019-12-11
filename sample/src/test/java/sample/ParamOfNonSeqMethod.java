@@ -1,5 +1,3 @@
 package sample;
 
-public class ParamOfNonSeqMethod {
-
-}
+public class ParamOfNonSeqMethod {}

@@ -9,11 +9,11 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class ConditionalSequenceGroup extends SequenceGroup {
 
-    private String condition;
-    private boolean isFirst = false;
+  private String condition;
+  private boolean isFirst = false;
 
-    @Override
-    public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
-        return writer.write(lifeLine, this);
-    }
+  @Override
+  public List<String> write(LifeLineDef lifeLine, SequenceElementWriter writer) {
+    return writer.write(lifeLine, this);
+  }
 }

@@ -23,8 +23,7 @@ public class GradleProjectReader implements ProjectReader {
 
   private static final String PROJECT_INFO_SCRIPT_NAME = "project-info.gradle";
 
-  @NonNull
-  private SqlLogProcessor sqlLogProcessor;
+  @NonNull private SqlLogProcessor sqlLogProcessor;
 
   @Override
   public Optional<Project> read(Path projectDir) {
@@ -44,8 +43,10 @@ public class GradleProjectReader implements ProjectReader {
 
     try {
 
-      gradleProject.gradlew("--no-daemon", "--init-script", initScript.toString(), "projectInfo")
-          .stdout(listener).execute();
+      gradleProject
+          .gradlew("--no-daemon", "--init-script", initScript.toString(), "projectInfo")
+          .stdout(listener)
+          .execute();
 
     } finally {
       try {
@@ -68,11 +69,16 @@ public class GradleProjectReader implements ProjectReader {
 
     Path agentJar = SitCvToolsManager.install(project.getWorkDir(), project.getJavaVersion());
 
-    sqlLogProcessor.process("gradle", sitCvConfig, agentJar, project, (String agentParam) -> {
-      ProcessCommand command = gradleProject.gradlew("--no-daemon", "--rerun-tasks", "test");
-      command.getEnv().put("JAVA_TOOL_OPTIONS", agentParam);
-      return command;
-    });
+    sqlLogProcessor.process(
+        "gradle",
+        sitCvConfig,
+        agentJar,
+        project,
+        (String agentParam) -> {
+          ProcessCommand command = gradleProject.gradlew("--no-daemon", "--rerun-tasks", "test");
+          command.getEnv().put("JAVA_TOOL_OPTIONS", agentParam);
+          return command;
+        });
 
     return true;
   }

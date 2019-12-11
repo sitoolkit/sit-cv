@@ -20,48 +20,51 @@ import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 
 public class StatementVisitorLoopTest extends StatementVisitorTest {
 
-    static CompilationUnit compilationUnit;
+  static CompilationUnit compilationUnit;
 
-    @BeforeClass
-    public static void init() throws IOException {
-        compilationUnit = parseFile("src/main/java/a/b/c/LoopController.java");
-    }
+  @BeforeClass
+  public static void init() throws IOException {
+    compilationUnit = parseFile("src/main/java/a/b/c/LoopController.java");
+  }
 
-    @Test
-    public void simpleFor() throws IOException {
-        testFlatLoop(testName.getMethodName());
-    }
+  @Test
+  public void simpleFor() throws IOException {
+    testFlatLoop(testName.getMethodName());
+  }
 
-    @Test
-    public void forEach() throws IOException {
-        testFlatLoop(testName.getMethodName());
-    }
+  @Test
+  public void forEach() throws IOException {
+    testFlatLoop(testName.getMethodName());
+  }
 
-    @Test
-    public void streamMethodRef() throws IOException {
-        testFlatLoop(testName.getMethodName());
-    }
+  @Test
+  public void streamMethodRef() throws IOException {
+    testFlatLoop(testName.getMethodName());
+  }
 
-    @Test
-    public void streamLambda() throws IOException {
-        testFlatLoop(testName.getMethodName());
-    }
+  @Test
+  public void streamLambda() throws IOException {
+    testFlatLoop(testName.getMethodName());
+  }
 
-    public void testFlatLoop(String method) throws IOException {
-        MethodDef methodDef = getVisitResult(compilationUnit, "LoopController", method);
+  public void testFlatLoop(String method) throws IOException {
+    MethodDef methodDef = getVisitResult(compilationUnit, "LoopController", method);
 
-        List<CvStatement> loopStatements = methodDef.getStatements().stream()
-                .filter(LoopStatement.class::isInstance).collect(Collectors.toList());
+    List<CvStatement> loopStatements =
+        methodDef
+            .getStatements()
+            .stream()
+            .filter(LoopStatement.class::isInstance)
+            .collect(Collectors.toList());
 
-        assertThat(loopStatements.size(), is(1));
+    assertThat(loopStatements.size(), is(1));
 
-        List<CvStatement> statementsInLoop = ((CvStatementDefaultImpl) loopStatements.get(0))
-                .getChildren();
+    List<CvStatement> statementsInLoop =
+        ((CvStatementDefaultImpl) loopStatements.get(0)).getChildren();
 
-        assertThat(statementsInLoop.size(), is(1));
+    assertThat(statementsInLoop.size(), is(1));
 
-        MethodCallDef methodCall = (MethodCallDef) statementsInLoop.get(0);
-        assertThat(methodCall.getName(), is("process"));
-    }
-
+    MethodCallDef methodCall = (MethodCallDef) statementsInLoop.get(0);
+    assertThat(methodCall.getName(), is("process"));
+  }
 }

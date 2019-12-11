@@ -6,5 +6,4 @@ import java.util.Set;
 public interface FileWatchEventListener {
 
   void onModify(Set<Path> files);
-
 }

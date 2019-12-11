@@ -17,38 +17,41 @@ import io.sitoolkit.cv.core.domain.project.Project;
 
 public class StatementVisitorTest {
 
-    static Path projectDir;
+  static Path projectDir;
 
-    static StatementVisitor statementVisitor;
+  static StatementVisitor statementVisitor;
 
-    @Rule
-    public TestName testName = new TestName();
+  @Rule public TestName testName = new TestName();
 
-    @BeforeClass
-    public static void initVisitor() throws IOException {
-        projectDir = Paths.get("../sample");
-        Path srcDir = projectDir.resolve("src/main/java");
+  @BeforeClass
+  public static void initVisitor() throws IOException {
+    projectDir = Paths.get("../sample");
+    Path srcDir = projectDir.resolve("src/main/java");
 
-        Project project = new Project(projectDir);
-        project.getSrcDirs().addAll(Arrays.asList(srcDir));
+    Project project = new Project(projectDir);
+    project.getSrcDirs().addAll(Arrays.asList(srcDir));
 
-        statementVisitor = StatementVisitor.build(JavaParserFacadeBuilder.build(project));
-    }
+    statementVisitor = StatementVisitor.build(JavaParserFacadeBuilder.build(project));
+  }
 
-    public static CompilationUnit parseFile(String path) throws IOException {
-        return JavaParser.parse(projectDir.resolve(path));
-    }
+  public static CompilationUnit parseFile(String path) throws IOException {
+    return JavaParser.parse(projectDir.resolve(path));
+  }
 
-    public static MethodDef getVisitResult(CompilationUnit compilationUnit, String className, String method) throws IOException {
-        MethodDef methodDef = new MethodDef();
+  public static MethodDef getVisitResult(
+      CompilationUnit compilationUnit, String className, String method) throws IOException {
+    MethodDef methodDef = new MethodDef();
 
-        compilationUnit.getClassByName(className).ifPresent(clazz -> {
+    compilationUnit
+        .getClassByName(className)
+        .ifPresent(
+            clazz -> {
+              clazz
+                  .getMethodsByName(method)
+                  .get(0)
+                  .accept(statementVisitor, VisitContext.of(methodDef));
+            });
 
-            clazz.getMethodsByName(method).get(0).accept(statementVisitor,
-                    VisitContext.of(methodDef));
-        });
-
-        return methodDef;
-    }
-
+    return methodDef;
+  }
 }

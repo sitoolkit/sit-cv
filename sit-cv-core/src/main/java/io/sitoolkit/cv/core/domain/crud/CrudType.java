@@ -3,12 +3,14 @@ package io.sitoolkit.cv.core.domain.crud;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum CrudType {
-    CREATE, REFERENCE, UPDATE, DELETE;
+  CREATE,
+  REFERENCE,
+  UPDATE,
+  DELETE;
 
-    @JsonValue
-    @Override
-    public String toString() {
-        return name().substring(0, 1);
-    }
-
+  @JsonValue
+  @Override
+  public String toString() {
+    return name().substring(0, 1);
+  }
 }

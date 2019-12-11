@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class FilterConditionGroup {
 
-    private List<FilterCondition> include;
-    private List<FilterCondition> exclude;
-
+  private List<FilterCondition> include;
+  private List<FilterCondition> exclude;
 }

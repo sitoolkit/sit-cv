@@ -5,9 +5,9 @@ import java.util.Optional;
 
 public interface ClassDefReader {
 
-    ClassDefReader init();
+  ClassDefReader init();
 
-    ClassDefReader readDir();
+  ClassDefReader readDir();
 
-    Optional<ClassDef> readJava(Path javaFile);
+  Optional<ClassDef> readJava(Path javaFile);
 }

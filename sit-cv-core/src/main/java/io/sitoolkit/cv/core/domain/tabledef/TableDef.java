@@ -7,16 +7,15 @@ import lombok.Data;
 @Data
 public class TableDef implements Comparable<TableDef> {
 
-    @JsonValue
-	private String name;
+  @JsonValue private String name;
 
-	@Override
-	public int compareTo(TableDef o) {
-		return this.getName().compareTo(o.getName());
-	}
+  @Override
+  public int compareTo(TableDef o) {
+    return this.getName().compareTo(o.getName());
+  }
 
-	public TableDef(String name) {
-		super();
-		this.name = name;
-	}
+  public TableDef(String name) {
+    super();
+    this.name = name;
+  }
 }

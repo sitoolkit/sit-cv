@@ -6,10 +6,11 @@ import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 
 public class JavaParserUtils {
 
-  public static boolean hasAnyAnnotation(NodeWithAnnotations<?> nodeWithAnnotations,
-      List<String> annotaionNames) {
-    return annotaionNames.stream().anyMatch(
-        annotationName -> nodeWithAnnotations.getAnnotationByName(annotationName).isPresent());
-
+  public static boolean hasAnyAnnotation(
+      NodeWithAnnotations<?> nodeWithAnnotations, List<String> annotaionNames) {
+    return annotaionNames
+        .stream()
+        .anyMatch(
+            annotationName -> nodeWithAnnotations.getAnnotationByName(annotationName).isPresent());
   }
 }

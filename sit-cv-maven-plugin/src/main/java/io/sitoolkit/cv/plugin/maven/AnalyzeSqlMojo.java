@@ -15,8 +15,8 @@ public class AnalyzeSqlMojo extends AbstractMojo {
 
   @Override
   public void execute() {
-    ServiceFactory.createAndInitialize(project.getBasedir().toPath(), false).getCrudService()
+    ServiceFactory.createAndInitialize(project.getBasedir().toPath(), false)
+        .getCrudService()
         .analyzeSql();
   }
-
 }

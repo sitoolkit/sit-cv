@@ -16,8 +16,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MavenProjectInfoListener implements StdoutListener {
 
-  @Getter
-  private final Project project;
+  @Getter private final Project project;
   private Project recordingProject;
 
   public MavenProjectInfoListener(Path projectDir) {
@@ -34,20 +33,20 @@ public class MavenProjectInfoListener implements StdoutListener {
       recordBaseDirStr(javaBaseDirStr);
     }
 
-    String javaBuildDirStr = StringUtils.substringAfterLast(line,
-        "[DEBUG]   (f) buildDirectory = ");
+    String javaBuildDirStr =
+        StringUtils.substringAfterLast(line, "[DEBUG]   (f) buildDirectory = ");
     if (StringUtils.isNotEmpty(javaBuildDirStr)) {
       recordBuildDirStr(javaBuildDirStr);
     }
 
-    String javaSrcDirsStr = StringUtils.substringBetween(line,
-        "[DEBUG]   (f) compileSourceRoots = [", "]");
+    String javaSrcDirsStr =
+        StringUtils.substringBetween(line, "[DEBUG]   (f) compileSourceRoots = [", "]");
     if (StringUtils.isNotEmpty(javaSrcDirsStr)) {
       recordSrcDirsStr(javaSrcDirsStr);
     }
 
-    String classpathsStr = StringUtils.substringBetween(line, "[DEBUG]   (f) classpathElements = [",
-        "]");
+    String classpathsStr =
+        StringUtils.substringBetween(line, "[DEBUG]   (f) classpathElements = [", "]");
     if (StringUtils.isNotEmpty(classpathsStr)) {
       recordClasspathsStr(classpathsStr);
     }
@@ -57,7 +56,8 @@ public class MavenProjectInfoListener implements StdoutListener {
       project.setJavaVersion(javaVersion);
     }
 
-    String sourceEncoding = StringUtils.substringBetween(line, "project.build.sourceEncoding=", ",");
+    String sourceEncoding =
+        StringUtils.substringBetween(line, "project.build.sourceEncoding=", ",");
     if (StringUtils.isNotEmpty(sourceEncoding)) {
       project.setSourceEncoding(Charset.forName(sourceEncoding));
     }
@@ -93,7 +93,10 @@ public class MavenProjectInfoListener implements StdoutListener {
   }
 
   private Set<Path> splitAndTrim(String line) {
-    return Arrays.asList(line.split(",")).stream().map(String::trim).map(Paths::get)
+    return Arrays.asList(line.split(","))
+        .stream()
+        .map(String::trim)
+        .map(Paths::get)
         .collect(Collectors.toSet());
   }
 }

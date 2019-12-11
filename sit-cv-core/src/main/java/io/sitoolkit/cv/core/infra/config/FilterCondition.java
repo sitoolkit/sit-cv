@@ -16,39 +16,40 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FilterCondition {
 
-    private String name;
-    private String annotation;
-    private boolean withDetail = true;
-    
-    // TODO use FilterPattern class
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    private Pattern namePattern;
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    private Pattern annotationPattern;
+  private String name;
+  private String annotation;
+  private boolean withDetail = true;
 
-    public boolean matchName(String name) {
-        if (StringUtils.isEmpty(this.name)) {
-            return true;
-        }
+  // TODO use FilterPattern class
+  @Setter(AccessLevel.NONE)
+  @Getter(AccessLevel.NONE)
+  private Pattern namePattern;
 
-        if (namePattern == null) {
-            namePattern = Pattern.compile(this.name);
-        }
+  @Setter(AccessLevel.NONE)
+  @Getter(AccessLevel.NONE)
+  private Pattern annotationPattern;
 
-        return namePattern.matcher(name).matches();
+  public boolean matchName(String name) {
+    if (StringUtils.isEmpty(this.name)) {
+      return true;
     }
 
-    public boolean matchAnnotation(String annotation) {
-        if (StringUtils.isEmpty(this.annotation)) {
-            return true;
-        }
-
-        if (annotationPattern == null) {
-            annotationPattern = Pattern.compile(this.annotation);
-        }
-
-        return annotationPattern.matcher(annotation).matches();
+    if (namePattern == null) {
+      namePattern = Pattern.compile(this.name);
     }
+
+    return namePattern.matcher(name).matches();
+  }
+
+  public boolean matchAnnotation(String annotation) {
+    if (StringUtils.isEmpty(this.annotation)) {
+      return true;
+    }
+
+    if (annotationPattern == null) {
+      annotationPattern = Pattern.compile(this.annotation);
+    }
+
+    return annotationPattern.matcher(annotation).matches();
+  }
 }

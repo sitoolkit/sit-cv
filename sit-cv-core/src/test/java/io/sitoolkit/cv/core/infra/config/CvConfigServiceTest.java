@@ -27,11 +27,11 @@ public class CvConfigServiceTest {
   public void init() throws URISyntaxException {
     service = new CvConfigService();
 
-    mergeConfigFile = Paths
-        .get(getClass().getResource("merge/" + CvConfigReader.CONFIG_FILE_NAME).toURI());
+    mergeConfigFile =
+        Paths.get(getClass().getResource("merge/" + CvConfigReader.CONFIG_FILE_NAME).toURI());
 
-    overrideConfigFile = Paths
-        .get(getClass().getResource("override/" + CvConfigReader.CONFIG_FILE_NAME).toURI());
+    overrideConfigFile =
+        Paths.get(getClass().getResource("override/" + CvConfigReader.CONFIG_FILE_NAME).toURI());
   }
 
   @Test
@@ -39,7 +39,6 @@ public class CvConfigServiceTest {
     CvConfig config = service.read(Paths.get("no/such/directory"), false);
 
     assertThat(config.getAsyncAnnotations(), is(List.of("Async", "Asynchronous")));
-
   }
 
   @Test
@@ -74,8 +73,8 @@ public class CvConfigServiceTest {
     String newConfigStr = Files.readString(copyConfigFile).replace("NewOne", "AnotherOne");
     Files.writeString(copyConfigFile, newConfigStr);
 
-    Awaitility.await().atMost(Duration.ofSeconds(3))
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(3))
         .until(() -> config.getAsyncAnnotations().equals((List.of("AnotherOne"))));
   }
-
 }

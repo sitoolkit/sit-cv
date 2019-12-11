@@ -5,11 +5,10 @@ import lombok.Getter;
 @Getter
 public class XEntity {
 
-    int a;
-    int b;
+  int a;
+  int b;
 
-    public XEntity() {
-        // TODO Auto-generated constructor stub
-    }
-
+  public XEntity() {
+    // TODO Auto-generated constructor stub
+  }
 }

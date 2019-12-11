@@ -15,9 +15,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuItem {
-    private String id;
-    private String name;
-    private String endpoint;
-    @Default
-    private SortedSet<MenuItem> children = new TreeSet<>(Comparator.comparing(MenuItem::getName));
+  private String id;
+  private String name;
+  private String endpoint;
+
+  @Default
+  private SortedSet<MenuItem> children = new TreeSet<>(Comparator.comparing(MenuItem::getName));
 }

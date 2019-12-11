@@ -43,11 +43,13 @@ public class ReportService {
     List<MenuItem> menuList = designDocService.buildMenu();
     reports.add(designDocReportProcessor.process(menuList));
 
-    crudService.loadMatrix().ifPresent(crudMatrix -> {
-      reports.add(crudReportProcessor.process(crudMatrix));
-    });
+    crudService
+        .loadMatrix()
+        .ifPresent(
+            crudMatrix -> {
+              reports.add(crudReportProcessor.process(crudMatrix));
+            });
 
     reportWriter.write(projectManager.getCurrentProject().getDir(), reports);
   }
-
 }

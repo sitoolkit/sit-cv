@@ -1,5 +1,3 @@
 package sample.ifs;
 
-public interface IResult {
-
-}
+public interface IResult {}

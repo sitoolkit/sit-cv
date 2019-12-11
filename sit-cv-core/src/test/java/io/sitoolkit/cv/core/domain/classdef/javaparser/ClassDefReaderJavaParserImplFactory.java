@@ -37,12 +37,11 @@ public class ClassDefReaderJavaParserImplFactory {
 
     projectManager.load(projectPathObj);
 
-    ClassDefReaderJavaParserImpl reader = new ClassDefReaderJavaParserImpl(reposiotry,
-        projectManager, config);
+    ClassDefReaderJavaParserImpl reader =
+        new ClassDefReaderJavaParserImpl(reposiotry, projectManager, config);
 
     reader.init();
 
     return reader;
   }
-
 }

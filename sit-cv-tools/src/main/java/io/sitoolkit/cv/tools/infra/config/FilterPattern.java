@@ -9,26 +9,25 @@ import lombok.Value;
 @Value
 public class FilterPattern {
 
-    private boolean empty;
-    private Pattern pattern;
-    private boolean resultWhenPatternEmpty;
+  private boolean empty;
+  private Pattern pattern;
+  private boolean resultWhenPatternEmpty;
 
-    public FilterPattern(String patternString, boolean resultWhenPatternEmpty) {
-        empty = StringUtils.isEmpty(patternString);
-        this.resultWhenPatternEmpty = resultWhenPatternEmpty;
-        if (empty) {
-            pattern = null;
-        } else {
-            pattern = Pattern.compile(patternString);
-        }
+  public FilterPattern(String patternString, boolean resultWhenPatternEmpty) {
+    empty = StringUtils.isEmpty(patternString);
+    this.resultWhenPatternEmpty = resultWhenPatternEmpty;
+    if (empty) {
+      pattern = null;
+    } else {
+      pattern = Pattern.compile(patternString);
+    }
+  }
+
+  public boolean match(String value) {
+    if (isEmpty()) {
+      return resultWhenPatternEmpty;
     }
 
-    public boolean match(String value) {
-        if (isEmpty()) {
-            return resultWhenPatternEmpty;
-        }
-
-        return pattern.matcher(value).matches();
-    }
-
+    return pattern.matcher(value).matches();
+  }
 }

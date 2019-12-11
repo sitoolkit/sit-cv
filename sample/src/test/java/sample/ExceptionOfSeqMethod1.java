@@ -8,7 +8,7 @@ public class ExceptionOfSeqMethod1 {
 
   public void throwExceptions(String className)
       throws IllegalAccessException, ClassNotFoundException, NoSuchMethodException,
-      InvocationTargetException, InstantiationException {
+          InvocationTargetException, InstantiationException {
 
     if (StringUtils.isEmpty(className)) {
       throw className == null ? new NullPointerException() : new RuntimeException("EMPTY");

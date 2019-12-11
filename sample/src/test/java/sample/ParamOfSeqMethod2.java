@@ -1,5 +1,3 @@
 package sample;
 
-public class ParamOfSeqMethod2 {
-
-}
+public class ParamOfSeqMethod2 {}

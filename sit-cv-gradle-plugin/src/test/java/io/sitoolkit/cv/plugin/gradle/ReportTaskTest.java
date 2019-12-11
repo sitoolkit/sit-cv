@@ -14,25 +14,24 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class ReportTaskTest {
-    @Rule
-    public final TemporaryFolder tempDir = new TemporaryFolder();
+  @Rule public final TemporaryFolder tempDir = new TemporaryFolder();
 
-    @Test
-    public void testExport() {
-        File testDir = new File("../test-project/gradle-multi");
-        File projectDir = null;
-        try {
-            projectDir = tempDir.newFolder("report");
-            FileUtils.copyDirectory(testDir, projectDir);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withArguments(Arrays.asList("cvReport"))
-                .build();
-
-        assertTrue(new File(projectDir, "docs").exists());
+  @Test
+  public void testExport() {
+    File testDir = new File("../test-project/gradle-multi");
+    File projectDir = null;
+    try {
+      projectDir = tempDir.newFolder("report");
+      FileUtils.copyDirectory(testDir, projectDir);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+
+    GradleRunner.create()
+        .withProjectDir(projectDir)
+        .withArguments(Arrays.asList("cvReport"))
+        .build();
+
+    assertTrue(new File(projectDir, "docs").exists());
+  }
 }

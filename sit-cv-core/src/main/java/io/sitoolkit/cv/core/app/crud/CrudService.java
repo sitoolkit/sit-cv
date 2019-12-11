@@ -19,22 +19,19 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CrudService {
 
-  @NonNull
-  FunctionModelService functionModelService;
+  @NonNull FunctionModelService functionModelService;
 
-  @NonNull
-  private CrudProcessor processor;
+  @NonNull private CrudProcessor processor;
 
-  @NonNull
-  ProjectManager projectManager;
+  @NonNull ProjectManager projectManager;
 
   public Optional<CrudMatrix> loadMatrix() {
     if (!projectManager.getCurrentProject().existsWorkDir()) {
       return Optional.empty();
     }
 
-    Optional<CrudMatrix> crudMatrixOpt = JsonUtils
-        .file2obj(projectManager.getCurrentProject().getCrudPath(), CrudMatrix.class);
+    Optional<CrudMatrix> crudMatrixOpt =
+        JsonUtils.file2obj(projectManager.getCurrentProject().getCrudPath(), CrudMatrix.class);
 
     if (!crudMatrixOpt.isPresent()) {
       return generateMatrix();
@@ -75,5 +72,4 @@ public class CrudService {
   public void analyzeSql() {
     projectManager.generateSqlLog();
   }
-
 }

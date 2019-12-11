@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ErrorInfo {
-	private String sqlText;
-	private String errorMessage;
+  private String sqlText;
+  private String errorMessage;
 }
