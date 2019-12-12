@@ -76,7 +76,7 @@ public class CrudProcessor {
                 CrudRow repositoryMethodCrudRow =
                     repositoryMethodMatrix
                         .getCrudRowMap()
-                        .get(methodCalledByEntryPoint.getQualifiedSignature());
+                        .get(methodCalledByEntryPoint.getQualifiedSignature().replaceAll(" ", ""));
 
                 if (repositoryMethodCrudRow == null) {
                   return;

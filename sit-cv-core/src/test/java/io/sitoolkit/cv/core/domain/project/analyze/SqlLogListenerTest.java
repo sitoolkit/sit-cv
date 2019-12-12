@@ -13,11 +13,12 @@ import io.sitoolkit.cv.core.infra.config.EnclosureFilterCondition;
 
 public class SqlLogListenerTest {
 
-  SqlLogListener listener =
-      new SqlLogListener(new EnclosureFilterCondition(".*org.hibernate.SQL.*", "^\\s*[0-9]{4}-.*"));
-
   @Test
   public void testListen() {
+    SqlLogListener listener =
+        new SqlLogListener(
+            new EnclosureFilterCondition(".*org.hibernate.SQL.*", "^\\s*[0-9]{4}-.*", null, false));
+
     List<String> logs = new ArrayList<>();
     logs.add("select1");
     logs.add("2019-01-11 17:02:01.934 DEBUG 1740 --- [           main] org.hibernate.SQL  : ");
@@ -49,5 +50,31 @@ public class SqlLogListenerTest {
     assertThat(sqlLogs.get(1).getSqlText(), is("    select6\n"));
     assertThat(sqlLogs.get(2).getRepositoryMethod(), is("AController.find4(Arg1)"));
     assertThat(sqlLogs.get(2).getSqlText(), is("select7\n"));
+  }
+
+  @Test
+  public void testListenExistsIgnoreAndSqlStartsWithStartLine() {
+    SqlLogListener listener =
+        new SqlLogListener(
+            new EnclosureFilterCondition(
+                ".* ==>  Preparing: .*", ".* <== .*", ".* ==> Parameters: .*", true));
+
+    List<String> logs = new ArrayList<>();
+    logs.add("[RepositoryMethod]a.b.c.domain.ReposA.method1(Arg1)");
+    logs.add("10:19:28.229 [main] DEBUG a.b.c.domain.ReposA.method1 -  ==>  Preparing: select1");
+    logs.add("10:19:28.229 [main] DEBUG a.b.c.domain.ReposA.method1 -  ==> Parameters: 1(Integer)");
+    logs.add("10:19:28.229 [main] DEBUG a.b.c.domain.ReposA.method1 -  <==      Total: 1");
+    logs.add("[RepositoryMethod]a.b.c.domain.ReposB.method2()");
+    logs.add("10:19:28.229 [main] DEBUG a.b.c.domain.ReposB.method2 -  ==>  Preparing: delete1");
+    logs.add("10:19:28.229 [main] DEBUG a.b.c.domain.ReposB.method2 -  ==> Parameters: 1(Integer)");
+    logs.add("10:19:28.229 [main] DEBUG a.b.c.domain.ReposB.method2 -  <==    Updates: 1");
+    logs.forEach((log) -> listener.nextLine(log));
+
+    List<SqlPerMethod> sqlLogs = listener.getSqlLogs();
+    assertThat(sqlLogs.size(), is(2));
+    assertThat(sqlLogs.get(0).getRepositoryMethod(), is("a.b.c.domain.ReposA.method1(Arg1)"));
+    assertThat(sqlLogs.get(0).getSqlText(), is("select1\n"));
+    assertThat(sqlLogs.get(1).getRepositoryMethod(), is("a.b.c.domain.ReposB.method2()"));
+    assertThat(sqlLogs.get(1).getSqlText(), is("delete1\n"));
   }
 }

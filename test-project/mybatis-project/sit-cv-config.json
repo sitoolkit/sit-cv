@@ -1,0 +1,18 @@
+{
+  "lifelines": [
+    {
+      "name": ".*Service",
+      "entryPoint": true,
+      "dbAccess": true
+    },
+    {
+      "name": ".*Mapper"
+    }
+  ],
+  "sqlLogPattern": {
+    "start": ".* ==>  Preparing: .*",
+    "end": ".* <== .*",
+    "ignore": ".* ==> Parameters: .*",
+    "sqlStartsWithStartLine": true
+  }
+}
