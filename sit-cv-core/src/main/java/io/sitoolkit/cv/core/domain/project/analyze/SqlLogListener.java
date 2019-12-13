@@ -35,47 +35,46 @@ public class SqlLogListener implements StdoutListener {
 
     System.out.println(line);
 
-    if (!sqlEnclosureFilter.matchIgnore(line)) {
-      boolean isMarkerLine = MARKER_PATTERN.matcher(line).matches();
+    boolean isMarkerLine = MARKER_PATTERN.matcher(line).matches();
 
-      if (sqlLogging) {
+    if (sqlLogging) {
 
-        if (isMarkerLine || sqlEnclosureFilter.matchEnd(line)) {
+      if (isMarkerLine || sqlEnclosureFilter.matchEnd(line)) {
 
-          if (StringUtils.isNotEmpty(readingRepositoryMethod)) {
-            SqlPerMethod sqlLog =
-                new SqlPerMethod(readingRepositoryMethod, readingSqlLog.toString());
+        if (StringUtils.isNotEmpty(readingRepositoryMethod)) {
+          SqlPerMethod sqlLog = new SqlPerMethod(readingRepositoryMethod, readingSqlLog.toString());
 
-            log.info("{}", sqlLog);
+          log.info("{}", sqlLog);
 
-            sqlLogs.add(sqlLog);
-          }
-
-          sqlLogging = false;
-          readingSqlLog = new StringBuilder();
-          readingRepositoryMethod = "";
-
-        } else {
-          readingSqlLog.append(line);
-          readingSqlLog.append("\n");
+          sqlLogs.add(sqlLog);
         }
-      }
 
-      if (isMarkerLine) {
-        String repositoryMethod = StringUtils.substringAfter(line, REPOSITORY_METHOD_MARKER);
-        if (!StringUtils.isEmpty(repositoryMethod)) {
-          readingRepositoryMethod = repositoryMethod;
-        }
-      }
+        sqlLogging = false;
+        readingSqlLog = new StringBuilder();
+        readingRepositoryMethod = "";
 
-      if (!StringUtils.isEmpty(readingRepositoryMethod) && sqlEnclosureFilter.matchStart(line)) {
-        sqlLogging = true;
-
-        if (sqlEnclosureFilter.isSqlStartsWithStartLine()) {
-          readingSqlLog.append(sqlEnclosureFilter.substringAfterStart(line));
-          readingSqlLog.append("\n");
-        }
+      } else {
+        readingSqlLog.append(line);
+        readingSqlLog.append("\n");
       }
+    }
+
+    if (isMarkerLine) {
+      String repositoryMethod = StringUtils.substringAfter(line, REPOSITORY_METHOD_MARKER);
+      if (!StringUtils.isEmpty(repositoryMethod)) {
+        readingRepositoryMethod = repositoryMethod;
+      }
+    }
+
+    if (!StringUtils.isEmpty(readingRepositoryMethod) && sqlEnclosureFilter.matchStart(line)) {
+      sqlLogging = true;
+    }
+
+    if (sqlEnclosureFilter.matchRegex(line)) {
+      SqlPerMethod sqlLog =
+          new SqlPerMethod(readingRepositoryMethod, sqlEnclosureFilter.getMatchString(line));
+      log.info("{}", sqlLog);
+      sqlLogs.add(sqlLog);
     }
   }
 }

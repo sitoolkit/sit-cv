@@ -2,17 +2,14 @@
   "lifelines": [
     {
       "name": ".*Service",
-      "entryPoint": true,
-      "dbAccess": true
+      "entryPoint": true
     },
     {
-      "name": ".*Mapper"
+      "name": ".*Repository",
+      "dbAccess": true
     }
   ],
   "sqlLogPattern": {
-    "start": ".* ==>  Preparing: .*",
-    "end": ".* <== .*",
-    "ignore": ".* ==> Parameters: .*",
-    "sqlStartsWithStartLine": true
+    "match": ".* ==>  Preparing: (.*)"
   }
 }

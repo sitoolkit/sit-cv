@@ -1,8 +1,5 @@
 package io.sitoolkit.cv.core.infra.config;
 
-import org.apache.commons.lang3.RegExUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,21 +10,16 @@ public class EnclosureFilterCondition {
 
   private FilterPattern startPattern;
   private FilterPattern endPattern;
-  private FilterPattern ignorePattern;
-  private boolean sqlStartsWithStartLine;
-  private String startStr;
+  private FilterPattern matchPattern;
 
   @JsonCreator
   public EnclosureFilterCondition(
       @JsonProperty("start") String start,
       @JsonProperty("end") String end,
-      @JsonProperty("ignore") String ignore,
-      @JsonProperty("sqlStartsWithStartLine") boolean sqlStartsWithStartLine) {
+      @JsonProperty("match") String match) {
     this.startPattern = new FilterPattern(start, false);
     this.endPattern = new FilterPattern(end, false);
-    this.ignorePattern = new FilterPattern(ignore, false);
-    this.sqlStartsWithStartLine = sqlStartsWithStartLine;
-    this.startStr = start;
+    this.matchPattern = new FilterPattern(match, false);
   }
 
   public boolean matchStart(String value) {
@@ -38,11 +30,11 @@ public class EnclosureFilterCondition {
     return endPattern.match(value);
   }
 
-  public boolean matchIgnore(String value) {
-    return ignorePattern.match(value);
+  public boolean matchRegex(String value) {
+    return matchPattern.match(value);
   }
 
-  public String substringAfterStart(String line) {
-    return StringUtils.substringAfter(line, RegExUtils.removeAll(startStr, "\\.\\*"));
+  public String getMatchString(String value) {
+    return matchPattern.matchString(value);
   }
 }

@@ -17,7 +17,7 @@ public class SqlLogListenerTest {
   public void testListen() {
     SqlLogListener listener =
         new SqlLogListener(
-            new EnclosureFilterCondition(".*org.hibernate.SQL.*", "^\\s*[0-9]{4}-.*", null, false));
+            new EnclosureFilterCondition(".*org.hibernate.SQL.*", "^\\s*[0-9]{4}-.*", null));
 
     List<String> logs = new ArrayList<>();
     logs.add("select1");
@@ -55,9 +55,7 @@ public class SqlLogListenerTest {
   @Test
   public void testListenExistsIgnoreAndSqlStartsWithStartLine() {
     SqlLogListener listener =
-        new SqlLogListener(
-            new EnclosureFilterCondition(
-                ".* ==>  Preparing: .*", ".* <== .*", ".* ==> Parameters: .*", true));
+        new SqlLogListener(new EnclosureFilterCondition(null, null, ".* ==>  Preparing: (.*)"));
 
     List<String> logs = new ArrayList<>();
     logs.add("[RepositoryMethod]a.b.c.domain.ReposA.method1(Arg1)");
@@ -73,8 +71,8 @@ public class SqlLogListenerTest {
     List<SqlPerMethod> sqlLogs = listener.getSqlLogs();
     assertThat(sqlLogs.size(), is(2));
     assertThat(sqlLogs.get(0).getRepositoryMethod(), is("a.b.c.domain.ReposA.method1(Arg1)"));
-    assertThat(sqlLogs.get(0).getSqlText(), is("select1\n"));
+    assertThat(sqlLogs.get(0).getSqlText(), is("select1"));
     assertThat(sqlLogs.get(1).getRepositoryMethod(), is("a.b.c.domain.ReposB.method2()"));
-    assertThat(sqlLogs.get(1).getSqlText(), is("delete1\n"));
+    assertThat(sqlLogs.get(1).getSqlText(), is("delete1"));
   }
 }

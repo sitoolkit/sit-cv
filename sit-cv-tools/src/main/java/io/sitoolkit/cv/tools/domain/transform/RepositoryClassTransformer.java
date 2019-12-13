@@ -14,6 +14,10 @@ import io.sitoolkit.cv.tools.infra.config.RepositoryLoggerConfig;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.NotFoundException;
+import javassist.expr.ExprEditor;
+import javassist.expr.MethodCall;
 
 public class RepositoryClassTransformer implements ClassFileTransformer {
 
@@ -41,13 +45,16 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
 
     Optional<CtClass> ctClass = createCtClass(classfileBuffer, className);
 
-    if (ctClass.isPresent()
-        && RepositoryFilter.match(ctClass.get(), config.getRepositoryFilter())) {
-      System.out.println("Repository class found: " + className);
-      return transformRepositoryMethods(ctClass.get());
-    } else {
-      return null;
+    if (ctClass.isPresent()) {
+      if (RepositoryFilter.match(ctClass.get(), config.getRepositoryFilter())) {
+        System.out.println("Repository class found: " + className);
+        return transformRepositoryMethods(ctClass.get());
+      } else if (RepositoryFilter.match(ctClass.get(), config.getEntrypointFilter())) {
+        System.out.println("Entrypoint class found: " + className);
+        return transformEntrypointMethods(ctClass.get());
+      }
     }
+    return null;
   }
 
   private Optional<CtClass> createCtClass(byte[] classfileBuffer, String className) {
@@ -102,5 +109,52 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
       e.printStackTrace();
       return null;
     }
+  }
+
+  private byte[] transformEntrypointMethods(CtClass ctClass) {
+    Arrays.asList(ctClass.getDeclaredMethods())
+        .stream()
+        .forEach(
+            ctMethod -> {
+              try {
+                ctMethod.instrument(createAddMsgExprEditor(ctMethod));
+              } catch (CannotCompileException e) {
+                System.out.println("Method transform Failed: " + ctMethod.getLongName());
+                e.printStackTrace();
+              }
+            });
+
+    try {
+      return ctClass.toBytecode();
+    } catch (Exception e) {
+      System.out.println("Class transform failed: " + ctClass.getName());
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  private ExprEditor createAddMsgExprEditor(CtMethod ctMethod) {
+    return new ExprEditor() {
+      @Override
+      public void edit(MethodCall methodCall) throws CannotCompileException {
+        try {
+          CtClass calledClass = classPool.get(methodCall.getClassName());
+          if (RepositoryFilter.match(calledClass, config.getRepositoryFilter())) {
+            methodCall.replace(addMsgBeforeMethodCall(methodCall));
+          }
+        } catch (NotFoundException e) {
+          System.out.println("Method transform Failed: " + ctMethod.getLongName());
+          e.printStackTrace();
+        }
+      }
+
+      private String addMsgBeforeMethodCall(MethodCall methodCall) throws NotFoundException {
+        return "System.out.println(\""
+            + config.getRepositoryMethodMarker()
+            + methodCall.getMethod().getLongName()
+            + "\");"
+            + "$_ = $proceed($$);";
+      }
+    };
   }
 }
