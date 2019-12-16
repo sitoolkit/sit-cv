@@ -49,9 +49,9 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
       if (RepositoryFilter.match(ctClass.get(), config.getRepositoryFilter())) {
         System.out.println("Repository class found: " + className);
         return transformRepositoryMethods(ctClass.get());
-      } else if (RepositoryFilter.match(ctClass.get(), config.getEntrypointFilter())) {
-        System.out.println("Entrypoint class found: " + className);
-        return transformEntrypointMethods(ctClass.get());
+
+      } else {
+        return transformCallRepositoryMethods(ctClass.get());
       }
     }
     return null;
@@ -111,7 +111,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
     }
   }
 
-  private byte[] transformEntrypointMethods(CtClass ctClass) {
+  private byte[] transformCallRepositoryMethods(CtClass ctClass) {
     Arrays.asList(ctClass.getDeclaredMethods())
         .stream()
         .forEach(

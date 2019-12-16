@@ -29,8 +29,7 @@ public class SqlLogProcessor {
     SitFileUtils.createDirectories(project.getSqlLogPath().getParent());
 
     String javaAgentParameter =
-        buildAgentParameter(
-            agentJar, projectType, config.getRepositoryFilter(), config.getEntryPointFilter());
+        buildAgentParameter(agentJar, projectType, config.getRepositoryFilter());
     SqlLogListener sqlLogListener = new SqlLogListener(config.getSqlEnclosureFilter());
 
     ProcessCommand command = commandBuilder.apply(javaAgentParameter);
@@ -40,13 +39,9 @@ public class SqlLogProcessor {
   }
 
   private String buildAgentParameter(
-      Path agentJar,
-      String projectType,
-      FilterConditionGroup repositoryFilter,
-      FilterConditionGroup entryPointFilter) {
+      Path agentJar, String projectType, FilterConditionGroup repositoryFilter) {
     Map<String, String> agentArgsMap = new HashMap<>();
     putRepositoryFilter(agentArgsMap, repositoryFilter);
-    putEntrypointFilter(agentArgsMap, entryPointFilter);
     agentArgsMap.put("projectType", projectType);
     agentArgsMap.put("repositoryMethodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
     String agentArgs =
@@ -60,29 +55,22 @@ public class SqlLogProcessor {
 
   private void putRepositoryFilter(
       Map<String, String> agentArgsMap, FilterConditionGroup repositoryFilter) {
-    putFilter("include.", "repositoryFilter", agentArgsMap, repositoryFilter.getInclude());
-    putFilter("exclude.", "repositoryFilter", agentArgsMap, repositoryFilter.getExclude());
+    putRepositoryFilter("include.", agentArgsMap, repositoryFilter.getInclude());
+    putRepositoryFilter("exclude.", agentArgsMap, repositoryFilter.getExclude());
   }
 
-  private void putEntrypointFilter(
-      Map<String, String> agentArgsMap, FilterConditionGroup entrypointFilter) {
-    putFilter("include.", "entrypointFilter", agentArgsMap, entrypointFilter.getInclude());
-    putFilter("exclude.", "entrypointFilter", agentArgsMap, entrypointFilter.getExclude());
-  }
-
-  private void putFilter(
-      String prefix,
-      String type,
-      Map<String, String> agentArgsMap,
-      List<FilterCondition> conditions) {
+  private void putRepositoryFilter(
+      String prefix, Map<String, String> agentArgsMap, List<FilterCondition> conditions) {
     int index = 0;
     for (FilterCondition filterCondition : conditions) {
       index++;
       String annotation = filterCondition.getAnnotation();
       String name = filterCondition.getName();
       agentArgsMap.put(
-          prefix + type + index + ".annotation", StringUtils.defaultString(annotation));
-      agentArgsMap.put(prefix + type + index + ".name", StringUtils.defaultString(name));
+          prefix + "repositoryFilter" + index + ".annotation",
+          StringUtils.defaultString(annotation));
+      agentArgsMap.put(
+          prefix + "repositoryFilter" + index + ".name", StringUtils.defaultString(name));
     }
   }
 }

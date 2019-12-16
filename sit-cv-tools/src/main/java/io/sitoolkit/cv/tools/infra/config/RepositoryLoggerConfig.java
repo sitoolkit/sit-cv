@@ -10,6 +10,4 @@ public class RepositoryLoggerConfig {
   private String projectType;
 
   private FilterConditionGroup repositoryFilter;
-
-  private FilterConditionGroup entrypointFilter;
 }

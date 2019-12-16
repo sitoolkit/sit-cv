@@ -15,15 +15,14 @@ public class RepositoryLoggerArgumentParser {
     Map<String, String> valueMap = parseArgs(args);
 
     RepositoryLoggerConfig config = new RepositoryLoggerConfig();
-    config.setRepositoryFilter(getFilter(valueMap, "repositoryFilter"));
-    config.setEntrypointFilter(getFilter(valueMap, "entrypointFilter"));
+    config.setRepositoryFilter(getRepositoryFilter(valueMap));
     config.setRepositoryMethodMarker(valueMap.get("repositoryMethodMarker"));
     config.setProjectType(valueMap.get("projectType"));
 
     return config;
   }
 
-  private FilterConditionGroup getFilter(Map<String, String> valueMap, String type) {
+  private FilterConditionGroup getRepositoryFilter(Map<String, String> valueMap) {
     FilterConditionGroup fcg = new FilterConditionGroup();
     List<FilterCondition> include = new ArrayList<>();
     List<FilterCondition> exclude = new ArrayList<>();
@@ -35,10 +34,10 @@ public class RepositoryLoggerArgumentParser {
     Optional<FilterCondition> gotExcludeFilter;
     do {
       index++;
-      gotIncludeFilter = getSingleFilter("include.", valueMap, index, type);
+      gotIncludeFilter = getSingleRepositoryFilter("include.", valueMap, index);
       gotIncludeFilter.ifPresent(include::add);
 
-      gotExcludeFilter = getSingleFilter("exclude.", valueMap, index, type);
+      gotExcludeFilter = getSingleRepositoryFilter("exclude.", valueMap, index);
       gotExcludeFilter.ifPresent(exclude::add);
 
     } while (gotIncludeFilter.isPresent() || gotExcludeFilter.isPresent());
@@ -46,10 +45,10 @@ public class RepositoryLoggerArgumentParser {
     return fcg;
   }
 
-  private Optional<FilterCondition> getSingleFilter(
-      String prefix, Map<String, String> valueMap, int index, String type) {
-    String annotation = valueMap.get(prefix + type + index + ".annotation");
-    String name = valueMap.get(prefix + type + index + ".name");
+  private Optional<FilterCondition> getSingleRepositoryFilter(
+      String prefix, Map<String, String> valueMap, int index) {
+    String annotation = valueMap.get(prefix + "repositoryFilter" + index + ".annotation");
+    String name = valueMap.get(prefix + "repositoryFilter" + index + ".name");
     if (annotation == null && name == null) {
       return Optional.empty();
     } else {
