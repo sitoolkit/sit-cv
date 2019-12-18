@@ -1,0 +1,15 @@
+{
+  "lifelines": [
+    {
+      "name": ".*Service",
+      "entryPoint": true
+    },
+    {
+      "name": ".*Repository",
+      "dbAccess": true
+    }
+  ],
+  "sqlLogPattern": {
+    "match": ".* ==>  Preparing: (.*)"
+  }
+}

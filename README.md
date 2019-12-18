@@ -271,4 +271,5 @@ It's JSON structure is as follows.
 | sqlLogPattern       | Filter rule to find SQL from test log. This is used to generate CRUD matrix.          |               |
 | &emsp; start        | Pattern to match the line just before SQL starts.                                     |               |
 | &emsp; end          | Pattern to match the line just after SQL ends.                                        |               |
+| &emsp; match        | Pattern to match the string enclosed in parentheses.                                  |               |
 | showAccessor        | Set true to show setter and getter method in the class diagram.                       | false         |

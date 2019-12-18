@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.config.FilterCondition;
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
-import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.SitFileUtils;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;

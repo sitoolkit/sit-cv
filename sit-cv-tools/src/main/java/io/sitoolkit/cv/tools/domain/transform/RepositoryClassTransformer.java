@@ -15,16 +15,41 @@ import io.sitoolkit.cv.tools.infra.util.ExceptionUtils;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.NotFoundException;
+import javassist.expr.ExprEditor;
+import javassist.expr.MethodCall;
 
 public class RepositoryClassTransformer implements ClassFileTransformer {
 
   private static ClassPool classPool = ClassPool.getDefault();
   private static Path currentProjectPath = Paths.get("").toAbsolutePath();
 
-  private RepositoryLoggerConfig config;
+  private ExprEditor addMsgExprEditor;
 
   public RepositoryClassTransformer(RepositoryLoggerConfig config) {
-    this.config = config;
+    this.addMsgExprEditor =
+        new ExprEditor() {
+          @Override
+          public void edit(MethodCall methodCall) throws CannotCompileException {
+            try {
+              CtClass calledClass = classPool.get(methodCall.getClassName());
+              if (RepositoryFilter.match(calledClass, config.getRepositoryFilter())) {
+                methodCall.replace(addMsgBeforeMethodCall(methodCall));
+              }
+            } catch (NotFoundException e) {
+              System.out.println("Parent Method Not Found: " + methodCall.getMethodName());
+              System.out.println(ExceptionUtils.extractStackTrace(e));
+            }
+          }
+
+          private String addMsgBeforeMethodCall(MethodCall methodCall) throws NotFoundException {
+            return "System.out.println(\""
+                + config.getRepositoryMethodMarker()
+                + methodCall.getMethod().getLongName()
+                + "\");"
+                + "$_ = $proceed($$);";
+          }
+        };
   }
 
   @Override
@@ -42,13 +67,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
 
     Optional<CtClass> ctClass = createCtClass(classfileBuffer, className);
 
-    if (ctClass.isPresent()
-        && RepositoryFilter.match(ctClass.get(), config.getRepositoryFilter())) {
-      System.out.println("Repository class found: " + className);
-      return transformRepositoryMethods(ctClass.get());
-    } else {
-      return null;
-    }
+    return ctClass.isPresent() ? transformCallRepositoryMethods(ctClass.get()) : null;
   }
 
   private Optional<CtClass> createCtClass(byte[] classfileBuffer, String className) {
@@ -74,22 +93,13 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
     }
   }
 
-  private byte[] transformRepositoryMethods(CtClass ctClass) {
+  private byte[] transformCallRepositoryMethods(CtClass ctClass) {
     Arrays.asList(ctClass.getDeclaredMethods())
         .stream()
         .forEach(
-            (ctMethod) -> {
-              if (ctMethod.isEmpty()) {
-                return;
-              }
-
-              System.out.println("Repository method: " + ctMethod.getLongName());
+            ctMethod -> {
               try {
-                ctMethod.insertBefore(
-                    "System.out.println(\""
-                        + config.getRepositoryMethodMarker()
-                        + ctMethod.getLongName()
-                        + "\");");
+                ctMethod.instrument(addMsgExprEditor);
               } catch (CannotCompileException e) {
                 System.out.println("Method transform Failed: " + ctMethod.getLongName());
                 System.out.println(ExceptionUtils.extractStackTrace(e));

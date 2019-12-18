@@ -69,5 +69,12 @@ public class SqlLogListener implements StdoutListener {
     if (!StringUtils.isEmpty(readingRepositoryMethod) && sqlEnclosureFilter.matchStart(line)) {
       sqlLogging = true;
     }
+
+    if (sqlEnclosureFilter.matchRegex(line)) {
+      SqlPerMethod sqlLog =
+          new SqlPerMethod(readingRepositoryMethod, sqlEnclosureFilter.getMatchString(line));
+      log.info("{}", sqlLog);
+      sqlLogs.add(sqlLog);
+    }
   }
 }
