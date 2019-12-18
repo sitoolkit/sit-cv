@@ -15,7 +15,6 @@ import io.sitoolkit.cv.tools.infra.util.ExceptionUtils;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
@@ -25,10 +24,32 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
   private static ClassPool classPool = ClassPool.getDefault();
   private static Path currentProjectPath = Paths.get("").toAbsolutePath();
 
-  private RepositoryLoggerConfig config;
+  private ExprEditor addMsgExprEditor;
 
   public RepositoryClassTransformer(RepositoryLoggerConfig config) {
-    this.config = config;
+    this.addMsgExprEditor =
+        new ExprEditor() {
+          @Override
+          public void edit(MethodCall methodCall) throws CannotCompileException {
+            try {
+              CtClass calledClass = classPool.get(methodCall.getClassName());
+              if (RepositoryFilter.match(calledClass, config.getRepositoryFilter())) {
+                methodCall.replace(addMsgBeforeMethodCall(methodCall));
+              }
+            } catch (NotFoundException e) {
+              System.out.println("Parent Method Not Found: " + methodCall.getMethodName());
+              System.out.println(ExceptionUtils.extractStackTrace(e));
+            }
+          }
+
+          private String addMsgBeforeMethodCall(MethodCall methodCall) throws NotFoundException {
+            return "System.out.println(\""
+                + config.getRepositoryMethodMarker()
+                + methodCall.getMethod().getLongName()
+                + "\");"
+                + "$_ = $proceed($$);";
+          }
+        };
   }
 
   @Override
@@ -78,7 +99,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
         .forEach(
             ctMethod -> {
               try {
-                ctMethod.instrument(createAddMsgExprEditor(ctMethod));
+                ctMethod.instrument(addMsgExprEditor);
               } catch (CannotCompileException e) {
                 System.out.println("Method transform Failed: " + ctMethod.getLongName());
                 System.out.println(ExceptionUtils.extractStackTrace(e));
@@ -92,30 +113,5 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
       System.out.println(ExceptionUtils.extractStackTrace(e));
       return null;
     }
-  }
-
-  private ExprEditor createAddMsgExprEditor(CtMethod ctMethod) {
-    return new ExprEditor() {
-      @Override
-      public void edit(MethodCall methodCall) throws CannotCompileException {
-        try {
-          CtClass calledClass = classPool.get(methodCall.getClassName());
-          if (RepositoryFilter.match(calledClass, config.getRepositoryFilter())) {
-            methodCall.replace(addMsgBeforeMethodCall(methodCall));
-          }
-        } catch (NotFoundException e) {
-          System.out.println("Method transform Failed: " + ctMethod.getLongName());
-          e.printStackTrace();
-        }
-      }
-
-      private String addMsgBeforeMethodCall(MethodCall methodCall) throws NotFoundException {
-        return "System.out.println(\""
-            + config.getRepositoryMethodMarker()
-            + methodCall.getMethod().getLongName()
-            + "\");"
-            + "$_ = $proceed($$);";
-      }
-    };
   }
 }
