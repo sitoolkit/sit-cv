@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import io.sitoolkit.cv.tools.infra.config.RepositoryLoggerConfig;
+import io.sitoolkit.cv.tools.infra.util.ExceptionUtils;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -54,7 +55,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
       return Optional.of(classPool.makeClass(stream));
     } catch (Exception e) {
       System.out.println("Create CtClass failed: " + className);
-      e.printStackTrace();
+      System.out.println(ExceptionUtils.extractStackTrace(e));
       return Optional.empty();
     }
   }
@@ -66,7 +67,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
       return path.startsWith(currentProjectPath);
     } catch (URISyntaxException e) {
       System.out.println("Class check failed: " + className);
-      e.printStackTrace();
+      System.out.println(ExceptionUtils.extractStackTrace(e));
       return false;
     }
   }
@@ -80,7 +81,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
                 ctMethod.instrument(createAddMsgExprEditor(ctMethod));
               } catch (CannotCompileException e) {
                 System.out.println("Method transform Failed: " + ctMethod.getLongName());
-                e.printStackTrace();
+                System.out.println(ExceptionUtils.extractStackTrace(e));
               }
             });
 
@@ -88,7 +89,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
       return ctClass.toBytecode();
     } catch (Exception e) {
       System.out.println("Class transform failed: " + ctClass.getName());
-      e.printStackTrace();
+      System.out.println(ExceptionUtils.extractStackTrace(e));
       return null;
     }
   }
