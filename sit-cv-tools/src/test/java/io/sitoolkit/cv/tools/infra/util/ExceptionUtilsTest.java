@@ -6,7 +6,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 
@@ -16,32 +18,8 @@ public class ExceptionUtilsTest {
   public void testExtractStackTrace() {
     Exception e = new Exception();
     List<String> expectedStackTrace =
-        Arrays.asList(
-            "java.lang.Exception",
-            "io.sitoolkit.cv.tools.infra.util.ExceptionUtilsTest.testExtractStackTrace(",
-            "java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(",
-            "java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(",
-            "java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(",
-            "java.base/java.lang.reflect.Method.invoke(",
-            "org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(",
-            "org.junit.internal.runners.model.ReflectiveCallable.run(",
-            "org.junit.runners.model.FrameworkMethod.invokeExplosively(",
-            "org.junit.internal.runners.statements.InvokeMethod.evaluate(",
-            "org.junit.runners.ParentRunner.runLeaf(",
-            "org.junit.runners.BlockJUnit4ClassRunner.runChild(",
-            "org.junit.runners.BlockJUnit4ClassRunner.runChild(",
-            "org.junit.runners.ParentRunner$3.run(",
-            "org.junit.runners.ParentRunner$1.schedule(",
-            "org.junit.runners.ParentRunner.runChildren(",
-            "org.junit.runners.ParentRunner.access$000(",
-            "org.junit.runners.ParentRunner$2.evaluate(",
-            "org.junit.runners.ParentRunner.run(",
-            "org.eclipse.jdt.internal.junit4.runner.JUnit4TestReference.run(",
-            "org.eclipse.jdt.internal.junit.runner.TestExecution.run(",
-            "org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(",
-            "org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(",
-            "org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.run(",
-            "org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.main(");
+        Stream.of(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList());
+    expectedStackTrace.add(0, e.getClass().getCanonicalName());
 
     List<String> actualStackTrace =
         Arrays.asList(ExceptionUtils.extractStackTrace(e).split(System.lineSeparator()));
