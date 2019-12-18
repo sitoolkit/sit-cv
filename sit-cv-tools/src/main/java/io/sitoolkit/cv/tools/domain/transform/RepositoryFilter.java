@@ -1,8 +1,10 @@
 package io.sitoolkit.cv.tools.domain.transform;
 
+import java.util.Arrays;
+
 import io.sitoolkit.cv.tools.infra.config.FilterCondition;
 import io.sitoolkit.cv.tools.infra.config.FilterConditionGroup;
-import java.util.Arrays;
+import io.sitoolkit.cv.tools.infra.util.ExceptionUtils;
 import javassist.CtClass;
 
 public class RepositoryFilter {
@@ -37,7 +39,7 @@ public class RepositoryFilter {
     try {
       annotations = ctClass.getAnnotations();
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      System.out.println(ExceptionUtils.extractStackTrace(e));
       return false;
     }
 
