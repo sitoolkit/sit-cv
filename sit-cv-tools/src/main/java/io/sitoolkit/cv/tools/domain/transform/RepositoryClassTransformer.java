@@ -45,16 +45,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
 
     Optional<CtClass> ctClass = createCtClass(classfileBuffer, className);
 
-    if (ctClass.isPresent()) {
-      if (RepositoryFilter.match(ctClass.get(), config.getRepositoryFilter())) {
-        System.out.println("Repository class found: " + className);
-        return transformRepositoryMethods(ctClass.get());
-
-      } else {
-        return transformCallRepositoryMethods(ctClass.get());
-      }
-    }
-    return null;
+    return ctClass.isPresent() ? transformCallRepositoryMethods(ctClass.get()) : null;
   }
 
   private Optional<CtClass> createCtClass(byte[] classfileBuffer, String className) {
@@ -77,37 +68,6 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
       System.out.println("Class check failed: " + className);
       e.printStackTrace();
       return false;
-    }
-  }
-
-  private byte[] transformRepositoryMethods(CtClass ctClass) {
-    Arrays.asList(ctClass.getDeclaredMethods())
-        .stream()
-        .forEach(
-            (ctMethod) -> {
-              if (ctMethod.isEmpty()) {
-                return;
-              }
-
-              System.out.println("Repository method: " + ctMethod.getLongName());
-              try {
-                ctMethod.insertBefore(
-                    "System.out.println(\""
-                        + config.getRepositoryMethodMarker()
-                        + ctMethod.getLongName()
-                        + "\");");
-              } catch (CannotCompileException e) {
-                System.out.println("Method transform Failed: " + ctMethod.getLongName());
-                e.printStackTrace();
-              }
-            });
-
-    try {
-      return ctClass.toBytecode();
-    } catch (Exception e) {
-      System.out.println("Class transform failed: " + ctClass.getName());
-      e.printStackTrace();
-      return null;
     }
   }
 
