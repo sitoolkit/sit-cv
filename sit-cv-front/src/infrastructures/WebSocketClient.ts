@@ -9,6 +9,7 @@ class WebSocketClient {
   private stompClient!: Stomp.Client;
   private stompClientSubject: AsyncSubject<Stomp.Frame> = new AsyncSubject();
   private subscriptions = new Map<string, Stomp.Subscription>();
+  private executedCallbacks: Array<(messageBody: string) => void> = [];
 
   private constructor() {}
 
@@ -44,7 +45,10 @@ class WebSocketClient {
   ) {
     this.stompClientSubject.subscribe(() => {
       const subscription = this.stompClient.subscribe(destination, (message) => {
-        callback(message.body);
+        if (!this.executedCallbacks.includes(callback)) {
+          callback(message.body);
+          this.executedCallbacks.push(callback);
+        }
       });
 
       this.subscriptions.set(destination, subscription);
