@@ -13,6 +13,8 @@ class DesignDocServiceLocalImpl implements DesignDocService {
 
   private detailPathMap?: DetailPathMap;
 
+  private menuItems: MenuItem[] = [];
+
   public static get instance() {
     if (!this.INSTANDE) {
       this.INSTANDE = new DesignDocServiceLocalImpl();
@@ -52,6 +54,10 @@ class DesignDocServiceLocalImpl implements DesignDocService {
         resolve(crudMatrix);
       });
     });
+  }
+
+  public getMenuItems() {
+    return this.menuItems;
   }
 }
 

@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import DesignDocService from '@/domains/designdoc/DesignDocService';
 import DesignDocServiceFactory from '@/domains/designdoc/DesignDocServiceFactory';
 import EntryPoint from '@/domains/designdoc/EntryPoint';
@@ -28,10 +28,12 @@ import MenuItem from '@/domains/designdoc/MenuItem';
 export default class Home extends Vue {
   designDocService: DesignDocService = DesignDocServiceFactory.getService();
 
+  menuItems: MenuItem[] = this.designDocService.getMenuItems();
   entryPoints: EntryPoint[] = [];
 
-  created() {
-    this.designDocService.fetchMenuItems((menuItems) => (this.menuItemToEntryPointRecursively(menuItems)));
+  @Watch("menuItems", { deep: true, immediate: true })
+  private updateMenuItems(newVal: MenuItem[]) {
+    this.menuItemToEntryPointRecursively(newVal);
   }
 
   menuItemToEntryPointRecursively(menuItems: MenuItem[]) {
