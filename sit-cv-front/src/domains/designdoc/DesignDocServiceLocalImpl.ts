@@ -13,6 +13,8 @@ class DesignDocServiceLocalImpl implements DesignDocService {
 
   private detailPathMap?: DetailPathMap;
 
+  private menuItems: MenuItem[] = [];
+
   public static get instance() {
     if (!this.INSTANDE) {
       this.INSTANDE = new DesignDocServiceLocalImpl();
@@ -32,7 +34,11 @@ class DesignDocServiceLocalImpl implements DesignDocService {
   }
 
   public fetchMenuItems(callback: (menuItems: MenuItem[]) => void): void {
-    ScriptLoader.load('assets/designdoc-list.js', callback);
+    ScriptLoader.load('assets/designdoc-list.js', (menuItems) => {
+      this.menuItems.length = 0;
+      this.menuItems.push(...menuItems);
+      callback(this.menuItems);
+    });
   }
 
   public fetchFunctionModelDetail(
@@ -52,6 +58,10 @@ class DesignDocServiceLocalImpl implements DesignDocService {
         resolve(crudMatrix);
       });
     });
+  }
+
+  public getMenuItems() {
+    return this.menuItems;
   }
 }
 

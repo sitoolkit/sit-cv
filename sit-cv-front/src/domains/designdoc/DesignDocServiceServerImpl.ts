@@ -11,6 +11,8 @@ class DesignDocServiceServerImpl implements DesignDocService {
 
   private currentDestination!: string;
 
+  private menuItems: MenuItem[] = [];
+
   public static get instance() {
     if (!this.INSTANCE) {
       this.INSTANCE = new DesignDocServiceServerImpl();
@@ -21,7 +23,11 @@ class DesignDocServiceServerImpl implements DesignDocService {
   public fetchMenuItems(callback: (menuItems: MenuItem[]) => void) {
     WebSocketClient.subscribe(
       '/topic/designdoc/list',
-      (messageBody) => callback(<MenuItem[]>JSON.parse(messageBody)),
+      (messageBody) => {
+        this.menuItems.length = 0;
+        this.menuItems.push(...<MenuItem[]>JSON.parse(messageBody));
+        callback(this.menuItems);
+      },
       '/app/designdoc/list'
     );
   }
@@ -51,6 +57,10 @@ class DesignDocServiceServerImpl implements DesignDocService {
       `${Config.endpoint}/designdoc/data/crud`
     );
     return response.data;
+  }
+
+  public getMenuItems() {
+    return this.menuItems;
   }
 }
 
