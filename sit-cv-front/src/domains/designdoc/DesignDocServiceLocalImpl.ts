@@ -34,7 +34,11 @@ class DesignDocServiceLocalImpl implements DesignDocService {
   }
 
   public fetchMenuItems(callback: (menuItems: MenuItem[]) => void): void {
-    ScriptLoader.load('assets/designdoc-list.js', callback);
+    ScriptLoader.load('assets/designdoc-list.js', (menuItems) => {
+      this.menuItems.length = 0;
+      this.menuItems.push(...menuItems);
+      callback(this.menuItems);
+    });
   }
 
   public fetchFunctionModelDetail(

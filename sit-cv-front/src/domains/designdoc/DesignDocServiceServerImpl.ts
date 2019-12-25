@@ -24,6 +24,7 @@ class DesignDocServiceServerImpl implements DesignDocService {
     WebSocketClient.subscribe(
       '/topic/designdoc/list',
       (messageBody) => {
+        this.menuItems.length = 0;
         this.menuItems.push(...<MenuItem[]>JSON.parse(messageBody));
         callback(this.menuItems);
       },
@@ -59,7 +60,6 @@ class DesignDocServiceServerImpl implements DesignDocService {
   }
 
   public getMenuItems() {
-    console.log("getMenuItems called : " + this.menuItems);
     return this.menuItems;
   }
 }
