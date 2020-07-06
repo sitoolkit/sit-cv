@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 @Data
 public class Project {
 
+  private static final String DEFAULT_BUILD_DIR = "cv-target";
   private static final String WORK_DIR = "sit-cv";
   private static final String SQL_LOG_FILE = "sit-cv-repository-vs-sql.json";
   private static final String CRUD_FILE = "crud.json";
@@ -83,6 +84,9 @@ public class Project {
   }
 
   public Path getWorkDir() {
+    if(buildDir == null) {
+      buildDir = Paths.get(dir.toString(), DEFAULT_BUILD_DIR);
+    }
     return dir.resolve(buildDir).resolve(WORK_DIR);
   }
 
