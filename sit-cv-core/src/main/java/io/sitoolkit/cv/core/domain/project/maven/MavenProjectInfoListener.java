@@ -22,6 +22,7 @@ public class MavenProjectInfoListener implements StdoutListener {
 
   public MavenProjectInfoListener(Path projectDir) {
     this.project = new Project(projectDir);
+    this.project.setBuildDir(Paths.get(projectDir.toString(), "target"));
   }
 
   @Override
