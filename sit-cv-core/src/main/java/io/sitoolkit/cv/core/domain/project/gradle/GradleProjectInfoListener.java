@@ -2,13 +2,12 @@ package io.sitoolkit.cv.core.domain.project.gradle;
 
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class GradleProjectInfoListener implements StdoutListener {

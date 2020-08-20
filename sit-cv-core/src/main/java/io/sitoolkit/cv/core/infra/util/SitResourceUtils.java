@@ -13,12 +13,10 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SitResourceUtils {

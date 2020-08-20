@@ -1,10 +1,5 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.github.javaparser.ast.expr.ClassExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
@@ -20,7 +15,10 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
-
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,9 +53,7 @@ class MethodReferenceResolver {
       return resolveTypeDeclaration((ThisExpr) exp)
           .map(
               declatrion ->
-                  declatrion
-                      .getAllMethods()
-                      .stream()
+                  declatrion.getAllMethods().stream()
                       .map(MethodUsage::getDeclaration)
                       .collect(Collectors.toList()))
           .orElse(Collections.emptyList());
@@ -135,8 +131,7 @@ class MethodReferenceResolver {
       List<ResolvedMethodDeclaration> methods, String methodIdentifier) {
 
     List<ResolvedMethodDeclaration> found =
-        methods
-            .stream()
+        methods.stream()
             .filter(m -> m.getName().equals(methodIdentifier))
             .collect(Collectors.toList());
 

@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -31,8 +30,7 @@ public class FunctionModel {
   }
 
   public Set<String> getAllTags() {
-    return getAllDiagrams()
-        .stream()
+    return getAllDiagrams().stream()
         .map(Diagram::getTags)
         .flatMap(Set::stream)
         .collect(Collectors.toSet());

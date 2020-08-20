@@ -1,21 +1,5 @@
 package io.sitoolkit.cv.core.app.functionmodel;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
-
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefRepository;
@@ -31,9 +15,23 @@ import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.LifeLineDef;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import io.sitoolkit.cv.core.domain.uml.SequenceDiagramProcessor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -79,9 +77,7 @@ public class FunctionModelService {
   }
 
   public synchronized Set<String> getEntryPoints() {
-    return entryPointMap
-        .values()
-        .stream()
+    return entryPointMap.values().stream()
         .filter(Objects::nonNull)
         .flatMap(Set::stream)
         .distinct()
@@ -99,8 +95,7 @@ public class FunctionModelService {
     classDefReader.init();
 
     Set<ClassDef> readDefs =
-        sourcePaths
-            .stream()
+        sourcePaths.stream()
             .filter(path -> !Files.isDirectory(path))
             .filter(Files::isReadable)
             .map(currentProject::findParseTarget)
@@ -115,14 +110,12 @@ public class FunctionModelService {
     readDefs.forEach(clazz -> log.debug("Read {}", clazz));
 
     Set<String> deletedIds =
-        sourcePaths
-            .stream()
+        sourcePaths.stream()
             .filter(s -> !Files.isDirectory(s))
             .map(Path::toString)
             .filter(
                 sId ->
-                    !readDefs
-                        .stream()
+                    !readDefs.stream()
                         .anyMatch(clazz -> StringUtils.equals(sId, clazz.getSourceId())))
             .collect(Collectors.toSet());
     deletedIds.forEach(clazz -> log.debug("Remove {}", clazz));
@@ -130,8 +123,7 @@ public class FunctionModelService {
 
     classDefRepository.solveReferences();
 
-    return readDefs
-        .stream()
+    return readDefs.stream()
         .map(ClassDef::getSourceId)
         .map(entryPointMap::get)
         .filter(Objects::nonNull)
@@ -179,8 +171,7 @@ public class FunctionModelService {
 
   public List<FunctionModel> getAll() {
     List<FunctionModel> functionModels =
-        getAllIds()
-            .stream()
+        getAllIds().stream()
             .map(
                 (functionId) -> {
                   try {

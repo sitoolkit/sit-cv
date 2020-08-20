@@ -1,11 +1,9 @@
 package io.sitoolkit.cv.tools.infra.config;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.net.MalformedURLException;
-
 import org.junit.Test;
 
 public class RepositoryLoggerArgumentParserTest {

@@ -14,9 +14,12 @@ public class SequenceClass1 {
     seq2.sequence5();
   }
 
-  private void privateMethod() {};
+  private void privateMethod() {}
+  ;
 
-  protected void protectedMethod() {};
+  protected void protectedMethod() {}
+  ;
 
-  void defaultAccessMethod() {};
+  void defaultAccessMethod() {}
+  ;
 }

@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.domain.designdoc;
 
+import io.sitoolkit.cv.core.domain.menu.MenuItem;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,10 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
-
-import io.sitoolkit.cv.core.domain.menu.MenuItem;
 
 public class DesignDocMenuBuilder {
 
@@ -49,8 +47,7 @@ public class DesignDocMenuBuilder {
     // key : path (package name or fqcn)
     Map<String, MenuItem> pathMenuItemMap = new HashMap<>();
 
-    functionIds
-        .stream()
+    functionIds.stream()
         .forEach(
             functionId -> {
               Matcher matcher = QUALIFIED_METHOD_SIG_PATTERN.matcher(functionId);

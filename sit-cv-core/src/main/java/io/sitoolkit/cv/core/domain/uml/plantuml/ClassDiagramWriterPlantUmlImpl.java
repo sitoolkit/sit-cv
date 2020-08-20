@@ -1,12 +1,5 @@
 package io.sitoolkit.cv.core.domain.uml.plantuml;
 
-import java.util.Comparator;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.FieldDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
@@ -15,9 +8,14 @@ import io.sitoolkit.cv.core.domain.functionmodel.Diagram;
 import io.sitoolkit.cv.core.domain.uml.ClassDiagram;
 import io.sitoolkit.cv.core.domain.uml.DiagramWriter;
 import io.sitoolkit.cv.core.domain.uml.RelationType;
+import java.util.Comparator;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,9 +30,7 @@ public class ClassDiagramWriterPlantUmlImpl implements DiagramWriter<ClassDiagra
     String fieldsStr =
         clazz.getFields().stream().map(this::field2str).collect(Collectors.joining("\n"));
     String methodsStr =
-        clazz
-            .getMethods()
-            .stream()
+        clazz.getMethods().stream()
             .sorted(
                 Comparator.comparing(MethodDef::isPublic)
                     .reversed()

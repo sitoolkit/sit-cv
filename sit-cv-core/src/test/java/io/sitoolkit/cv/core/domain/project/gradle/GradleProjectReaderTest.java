@@ -7,16 +7,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
+import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 import java.lang.Runtime.Version;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.junit.Test;
-
-import io.sitoolkit.cv.core.domain.project.Project;
-import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 
 public class GradleProjectReaderTest {
 

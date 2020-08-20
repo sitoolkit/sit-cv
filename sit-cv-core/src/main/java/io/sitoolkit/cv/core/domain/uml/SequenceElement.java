@@ -2,7 +2,6 @@ package io.sitoolkit.cv.core.domain.uml;
 
 import java.util.List;
 import java.util.stream.Stream;
-
 import lombok.Data;
 
 @Data

@@ -3,13 +3,11 @@ package io.sitoolkit.cv.core.domain.classdef;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.Arrays;
-
-import org.junit.Test;
-
 import io.sitoolkit.cv.core.infra.config.FilterCondition;
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
+import java.util.Arrays;
+import org.junit.Test;
 
 public class ClassDefFilterTest {
 

@@ -1,20 +1,18 @@
 package io.sitoolkit.cv.core.infra.graphviz;
 
+import io.sitoolkit.cv.core.infra.SitRepository;
+import io.sitoolkit.cv.core.infra.util.SitFileUtils;
+import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ResourceBundle;
-
+import lombok.extern.slf4j.Slf4j;
+import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.zeroturnaround.zip.ZipUtil;
-
-import io.sitoolkit.cv.core.infra.SitRepository;
-import io.sitoolkit.cv.core.infra.util.SitFileUtils;
-import io.sitoolkit.util.buildtoolhelper.proxysetting.ProxySettingService;
-import lombok.extern.slf4j.Slf4j;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 
 @Slf4j
 public class GraphvizManager {
@@ -35,7 +33,8 @@ public class GraphvizManager {
 
   private Path getGraphvizPath() {
     return SitRepository.getRepositoryPath().resolve("graphviz");
-  };
+  }
+  ;
 
   private Path getBinaryPath() {
     return getGraphvizPath().resolve("release/bin/dot.exe");

@@ -1,14 +1,5 @@
 package io.sitoolkit.cv.core.domain.project.analyze;
 
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.config.FilterCondition;
@@ -16,6 +7,13 @@ import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import io.sitoolkit.cv.core.infra.util.SitFileUtils;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 
 public class SqlLogProcessor {
 
@@ -45,9 +43,7 @@ public class SqlLogProcessor {
     agentArgsMap.put("projectType", projectType);
     agentArgsMap.put("repositoryMethodMarker", SqlLogListener.REPOSITORY_METHOD_MARKER);
     String agentArgs =
-        agentArgsMap
-            .entrySet()
-            .stream()
+        agentArgsMap.entrySet().stream()
             .map((e) -> e.getKey() + "=" + e.getValue())
             .collect(Collectors.joining(";", "=", ""));
     return "-javaagent:" + agentJar.toString() + agentArgs;

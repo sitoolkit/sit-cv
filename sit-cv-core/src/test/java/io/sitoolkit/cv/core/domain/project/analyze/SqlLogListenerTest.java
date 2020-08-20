@@ -3,13 +3,11 @@ package io.sitoolkit.cv.core.domain.project.analyze;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Test;
-
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.infra.config.EnclosureFilterCondition;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.Test;
 
 public class SqlLogListenerTest {
 

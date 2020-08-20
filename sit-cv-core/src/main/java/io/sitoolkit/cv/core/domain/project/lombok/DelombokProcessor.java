@@ -4,12 +4,11 @@ import io.sitoolkit.cv.core.domain.project.PreProcessor;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.infra.exception.ProcessExecutionException;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DelombokProcessor implements PreProcessor {
@@ -29,9 +28,7 @@ public class DelombokProcessor implements PreProcessor {
 
   static boolean isLombokUsed(Project project) {
     Optional<Path> delombokClasspath =
-        project
-            .getClasspaths()
-            .stream()
+        project.getClasspaths().stream()
             .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-"))
             .findFirst();
 
@@ -50,9 +47,7 @@ public class DelombokProcessor implements PreProcessor {
 
   DelombokProcessor(Project project) {
     this.project = project;
-    project
-        .getClasspaths()
-        .stream()
+    project.getClasspaths().stream()
         .filter(classPath -> classPath.getFileName().toString().startsWith("lombok-"))
         .findFirst()
         .ifPresent(lombokJar -> this.lombokJarPath = lombokJar);
@@ -83,9 +78,7 @@ public class DelombokProcessor implements PreProcessor {
     String srcPath = srcDir.toFile().getAbsolutePath();
     String targetPath = getDelombokTargetDir().toFile().getAbsolutePath();
     String classPath =
-        project
-            .getClasspaths()
-            .stream()
+        project.getClasspaths().stream()
             .map(Path::toAbsolutePath)
             .map(Path::toString)
             .collect(Collectors.joining(File.pathSeparator));

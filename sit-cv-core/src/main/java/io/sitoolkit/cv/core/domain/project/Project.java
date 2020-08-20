@@ -1,9 +1,5 @@
 package io.sitoolkit.cv.core.domain.project;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
-
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
 
 @Data
 public class Project {
@@ -93,8 +92,7 @@ public class Project {
   }
 
   Set<Path> getPreProcessedDirs() {
-    return getSrcDirs()
-        .stream()
+    return getSrcDirs().stream()
         .map(srcDir -> preProcessor.getPreProcessedPath(srcDir))
         .filter(srcDir -> srcDir.toFile().exists())
         .collect(Collectors.toSet());
@@ -110,8 +108,7 @@ public class Project {
       return Optional.of(this);
 
     } else {
-      return subProjects
-          .stream()
+      return subProjects.stream()
           .map(subProject -> subProject.findProjectFromSrc(inputFile))
           .filter(Optional::isPresent)
           .map(Optional::get)

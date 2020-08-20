@@ -5,6 +5,12 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.uncapitalize;
 
+import io.sitoolkit.cv.core.domain.classdef.ClassDef;
+import io.sitoolkit.cv.core.domain.classdef.FieldDef;
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import io.sitoolkit.cv.core.domain.classdef.RelationDef;
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,19 +22,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-
-import io.sitoolkit.cv.core.domain.classdef.ClassDef;
-import io.sitoolkit.cv.core.domain.classdef.FieldDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.domain.classdef.RelationDef;
-import io.sitoolkit.cv.core.domain.classdef.TypeDef;
-import io.sitoolkit.cv.core.infra.config.CvConfig;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -58,8 +56,7 @@ public class ClassDiagramProcessor {
       String id, Set<ClassDef> classes, Predicate<RelationDef> relationFilter) {
 
     Set<RelationDef> relations =
-        classes
-            .stream()
+        classes.stream()
             .flatMap(this::getRelations)
             .filter(relationFilter)
             .collect(Collectors.toSet());
@@ -69,9 +66,7 @@ public class ClassDiagramProcessor {
 
   private Stream<RelationDef> getRelations(ClassDef clazz) {
     Stream<RelationDef> instanceRels =
-        clazz
-            .getFields()
-            .stream()
+        clazz.getFields().stream()
             .map(field -> getInstanceRelation(clazz, field))
             .filter(Optional::isPresent)
             .map(Optional::get);
@@ -92,9 +87,7 @@ public class ClassDiagramProcessor {
 
   private ClassDef removeAccessor(ClassDef classDef) {
     List<MethodDef> methods =
-        classDef
-            .getMethods()
-            .stream()
+        classDef.getMethods().stream()
             .filter(method -> !isMethodAccesor(method, classDef))
             .collect(toList());
     ClassDef accessorRemoved = newInstance(classDef);
@@ -187,8 +180,7 @@ public class ClassDiagramProcessor {
   private Set<ClassDef> pickClasses(Set<MethodDef> sequenceMethods) {
 
     Set<ClassDef> paramClasses =
-        sequenceMethods
-            .stream()
+        sequenceMethods.stream()
             .map(MethodDef::getParamTypes)
             .flatMap(List::stream)
             .flatMap(TypeDef::getTypeParamsRecursively)
@@ -199,8 +191,7 @@ public class ClassDiagramProcessor {
     paramClasses.forEach(c -> log.debug("Param class picked :{}", c.getName()));
 
     Set<ClassDef> resultClasses =
-        sequenceMethods
-            .stream()
+        sequenceMethods.stream()
             .map(MethodDef::getReturnType)
             .flatMap(TypeDef::getTypeParamsRecursively)
             .map(TypeDef::getClassRef)
@@ -229,9 +220,7 @@ public class ClassDiagramProcessor {
     visited.add(classDef);
     return Stream.concat(
             Stream.of(classDef),
-            classDef
-                .getFields()
-                .stream()
+            classDef.getFields().stream()
                 .map(FieldDef::getType)
                 .flatMap(TypeDef::getTypeParamsRecursively)
                 .map(TypeDef::getClassRef)
@@ -242,9 +231,7 @@ public class ClassDiagramProcessor {
   }
 
   private Stream<RelationDef> getDependencies(MethodDef method) {
-    return method
-        .getMethodCalls()
-        .stream()
+    return method.getMethodCalls().stream()
         .map(call -> getDependency(method, call))
         .filter(rel -> !rel.getSelf().equals(rel.getOther()));
   }

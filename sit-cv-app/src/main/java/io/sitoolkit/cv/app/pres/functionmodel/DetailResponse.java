@@ -1,9 +1,8 @@
 package io.sitoolkit.cv.app.pres.functionmodel;
 
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import lombok.Data;
 
 @Data

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -82,8 +81,7 @@ public class MethodDef implements CvStatement {
 
   private Stream<MethodDef> collectCalledMethodsRecursively(
       Set<MethodCallDef> methodCalls, MethodCallStack callStack) {
-    return methodCalls
-        .stream()
+    return methodCalls.stream()
         .flatMap(
             (method) -> {
               return collectCalledMethodsRecursively(method, callStack);

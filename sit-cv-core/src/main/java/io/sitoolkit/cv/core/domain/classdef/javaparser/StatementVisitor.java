@@ -1,10 +1,5 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.LambdaExpr;
@@ -22,7 +17,10 @@ import com.github.javaparser.ast.stmt.TryStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
-
+import java.util.Collections;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -248,8 +246,7 @@ public class StatementVisitor extends VoidVisitorAdapter<VisitContext> {
   }
 
   String buildForLoopScope(Node node, String delimiter, String prefix, String suffix) {
-    return node.getChildNodes()
-        .stream()
+    return node.getChildNodes().stream()
         .filter((c) -> !(c instanceof BlockStmt))
         .map(Object::toString)
         .collect(Collectors.joining(delimiter, prefix, suffix));

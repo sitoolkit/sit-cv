@@ -11,13 +11,11 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Test;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class FileWatcherTest {

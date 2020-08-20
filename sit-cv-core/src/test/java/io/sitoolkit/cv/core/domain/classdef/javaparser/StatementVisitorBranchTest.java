@@ -3,20 +3,17 @@ package io.sitoolkit.cv.core.domain.classdef.javaparser;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.github.javaparser.ast.CompilationUnit;
-
 import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
 import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class StatementVisitorBranchTest extends StatementVisitorTest {
 
@@ -32,9 +29,7 @@ public class StatementVisitorBranchTest extends StatementVisitorTest {
     MethodDef result = getVisitResult(testName.getMethodName());
 
     List<CvStatement> branchStatements =
-        result
-            .getStatements()
-            .stream()
+        result.getStatements().stream()
             .filter(BranchStatement.class::isInstance)
             .collect(Collectors.toList());
     assertThat(branchStatements.size(), is(1));
@@ -59,9 +54,7 @@ public class StatementVisitorBranchTest extends StatementVisitorTest {
     MethodDef result = getVisitResult(testName.getMethodName());
 
     List<ConditionalStatement> conditionalStatements =
-        result
-            .getStatements()
-            .stream()
+        result.getStatements().stream()
             .filter(BranchStatement.class::isInstance)
             .map(BranchStatement.class::cast)
             .collect(Collectors.toList())
@@ -69,10 +62,7 @@ public class StatementVisitorBranchTest extends StatementVisitorTest {
             .getConditions();
 
     List<BranchStatement> nestedBranches =
-        conditionalStatements
-            .get(2)
-            .getChildren()
-            .stream()
+        conditionalStatements.get(2).getChildren().stream()
             .filter(BranchStatement.class::isInstance)
             .map(BranchStatement.class::cast)
             .collect(Collectors.toList());
@@ -93,9 +83,7 @@ public class StatementVisitorBranchTest extends StatementVisitorTest {
     MethodDef result = getVisitResult(testName.getMethodName());
 
     List<CvStatement> branchStatements =
-        result
-            .getStatements()
-            .stream()
+        result.getStatements().stream()
             .filter(BranchStatement.class::isInstance)
             .collect(Collectors.toList());
     assertThat(branchStatements.size(), is(1));

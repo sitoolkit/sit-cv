@@ -3,7 +3,6 @@ package io.sitoolkit.cv.core.domain.menu;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;

@@ -1,9 +1,8 @@
 package a.b.c.app;
 
-import java.util.Optional;
-
 import a.b.c.domain.User;
 import a.b.c.domain.UserRepository;
+import java.util.Optional;
 
 public class UserService {
 

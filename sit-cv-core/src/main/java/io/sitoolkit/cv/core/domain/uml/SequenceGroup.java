@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,8 +15,7 @@ public abstract class SequenceGroup extends SequenceElement {
 
   @Override
   public Stream<MessageDef> getMessagesRecursively() {
-    return getElements()
-        .stream()
+    return getElements().stream()
         .flatMap(SequenceElement::getMessagesRecursively)
         .filter(Objects::nonNull)
         .distinct();

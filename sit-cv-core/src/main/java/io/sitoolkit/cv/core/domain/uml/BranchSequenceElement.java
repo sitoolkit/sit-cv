@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,8 +20,7 @@ public class BranchSequenceElement extends SequenceElement {
 
   @Override
   public Stream<MessageDef> getMessagesRecursively() {
-    return getConditions()
-        .stream()
+    return getConditions().stream()
         .flatMap(SequenceElement::getMessagesRecursively)
         .filter(Objects::nonNull)
         .distinct();

@@ -3,14 +3,12 @@ package io.sitoolkit.cv.core.domain.crud.jsqlparser;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import io.sitoolkit.cv.core.domain.crud.CrudFindResult;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.junit.Test;
-import io.sitoolkit.cv.core.domain.crud.CrudFindResult;
-import io.sitoolkit.cv.core.domain.crud.jsqlparser.CrudFinderJsqlparserImpl;
 
 public class CrudFinderJsqlparserImplTest {
 
@@ -21,10 +19,7 @@ public class CrudFinderJsqlparserImplTest {
   }
 
   Set<String> getCruds(CrudFindResult tableCrud, String table) {
-    return tableCrud
-        .getMap()
-        .getOrDefault(table, new HashSet<>())
-        .stream()
+    return tableCrud.getMap().getOrDefault(table, new HashSet<>()).stream()
         .map(crud -> crud.toString())
         .collect(Collectors.toSet());
   }
@@ -55,7 +50,8 @@ public class CrudFinderJsqlparserImplTest {
   public void testSelectSub() {
     CrudFindResult tableCrud =
         finder.findCrud(
-            "SELECT * FROM tab_1 t1 WHERE EXISTS (SELECT 1 FROM tab_2 t2 WHERE t2.col_1 = t1.col_1)");
+            "SELECT * FROM tab_1 t1 WHERE EXISTS (SELECT 1 FROM tab_2 t2 WHERE t2.col_1 ="
+                + " t1.col_1)");
 
     assertThat(getCruds(tableCrud, "tab_1"), is(toSet("R")));
     assertThat(getCruds(tableCrud, "tab_2"), is(toSet("R")));
@@ -80,7 +76,8 @@ public class CrudFinderJsqlparserImplTest {
 
     tableCrud =
         finder.findCrud(
-            "UPDATE tab_1 t1 SET col_1 = 'x' WHERE EXISTS (SELECT 1 FROM tab_2 t2 WHERE t2.col_2 = t1.col_2)");
+            "UPDATE tab_1 t1 SET col_1 = 'x' WHERE EXISTS (SELECT 1 FROM tab_2 t2 WHERE t2.col_2 ="
+                + " t1.col_2)");
 
     assertThat(getCruds(tableCrud, "tab_1"), is(toSet("U")));
     assertThat(getCruds(tableCrud, "tab_2"), is(toSet("R")));
@@ -90,7 +87,8 @@ public class CrudFinderJsqlparserImplTest {
   public void testMerge() {
     CrudFindResult tableCrud =
         finder.findCrud(
-            "MERGE INTO tab_1 t1 USING (SELECT col_1 FROM tab_2) t2 ON (t1.col_1 = t2.col_1) WHEN MATCHED THEN UPDATE SET col_2 = 1");
+            "MERGE INTO tab_1 t1 USING (SELECT col_1 FROM tab_2) t2 ON (t1.col_1 = t2.col_1) WHEN"
+                + " MATCHED THEN UPDATE SET col_2 = 1");
 
     assertThat(getCruds(tableCrud, "tab_1"), is(toSet("C", "U")));
     assertThat(getCruds(tableCrud, "tab_2"), is(toSet("R")));

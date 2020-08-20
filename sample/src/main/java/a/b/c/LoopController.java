@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -88,9 +87,7 @@ public class LoopController {
           processor.process2(s);
         });
 
-    processor
-        .getList("")
-        .stream() // loop start
+    processor.getList("").stream() // loop start
         .filter(s -> processor.isNotNull(s))
         .map(s -> processor.process(s))
         .forEach(

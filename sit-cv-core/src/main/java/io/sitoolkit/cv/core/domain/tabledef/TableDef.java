@@ -1,7 +1,6 @@
 package io.sitoolkit.cv.core.domain.tabledef;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-
 import lombok.Data;
 
 @Data

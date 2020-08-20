@@ -1,13 +1,12 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
+import io.sitoolkit.cv.core.domain.classdef.ClassDef;
+import io.sitoolkit.cv.core.domain.classdef.RelationDef;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import io.sitoolkit.cv.core.domain.classdef.ClassDef;
-import io.sitoolkit.cv.core.domain.classdef.RelationDef;
-import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import lombok.Builder;
 import lombok.Value;
 

@@ -1,11 +1,10 @@
 package io.sitoolkit.cv.core.infra.config;
 
+import io.sitoolkit.cv.core.infra.util.JsonUtils;
+import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
-
-import io.sitoolkit.cv.core.infra.util.JsonUtils;
-import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 
 public class CvConfigReader {
 
