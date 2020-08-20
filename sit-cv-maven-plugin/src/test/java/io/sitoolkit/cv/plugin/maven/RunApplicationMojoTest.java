@@ -1,7 +1,6 @@
 package io.sitoolkit.cv.plugin.maven;
 
 import java.io.File;
-
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.testing.MojoRule;
 import org.apache.maven.plugin.testing.resources.TestResources;

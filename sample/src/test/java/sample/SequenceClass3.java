@@ -1,7 +1,6 @@
 package sample;
 
 import java.util.List;
-
 import sample.ifs.INoImpls;
 import sample.ifs.IOneImpl;
 import sample.ifs.ITwoImpls;

@@ -2,7 +2,6 @@ package a.b.c;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.stereotype.Repository;
 
 @Repository

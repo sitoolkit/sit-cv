@@ -1,15 +1,10 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.util.Stack;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.stmt.CatchClause;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.TryStmt;
-
 import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
 import io.sitoolkit.cv.core.domain.classdef.CatchStatement;
 import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
@@ -20,7 +15,9 @@ import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.classdef.TryStatement;
+import java.util.Stack;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class VisitContext {
@@ -95,16 +92,14 @@ public class VisitContext {
   }
 
   public CvStatement getCurrentBranch() {
-    return stack
-        .stream()
+    return stack.stream()
         .filter(BranchStatement.class::isInstance)
         .reduce((first, second) -> second)
         .get();
   }
 
   public CvStatement getCurrentMethod() {
-    return stack
-        .stream()
+    return stack.stream()
         .filter(MethodDef.class::isInstance)
         .reduce((first, second) -> second)
         .get();

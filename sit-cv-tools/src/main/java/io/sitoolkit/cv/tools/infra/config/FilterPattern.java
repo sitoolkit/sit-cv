@@ -1,10 +1,8 @@
 package io.sitoolkit.cv.tools.infra.config;
 
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
 
 @Value
 public class FilterPattern {

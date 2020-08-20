@@ -1,16 +1,14 @@
 package io.sitoolkit.cv.core.domain.crud;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.tabledef.TableDef;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,8 +19,7 @@ public class CrudProcessor {
   public CrudMatrix buildMatrix(List<SqlPerMethod> sqlPerMethodList) {
     CrudMatrix matrix = new CrudMatrix();
 
-    sqlPerMethodList
-        .stream()
+    sqlPerMethodList.stream()
         .forEach(
             sqlPerMethod -> {
               if (StringUtils.isEmpty(sqlPerMethod.getSqlText())) {
@@ -38,16 +35,10 @@ public class CrudProcessor {
                     result.getErrMsg());
               }
 
-              result
-                  .getMap()
-                  .keySet()
-                  .stream()
+              result.getMap().keySet().stream()
                   .forEach(
                       table ->
-                          result
-                              .getMap()
-                              .get(table)
-                              .stream()
+                          result.getMap().get(table).stream()
                               .forEach(
                                   crud ->
                                       matrix.add(

@@ -1,11 +1,5 @@
 package io.sitoolkit.cv.core.domain.uml;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
 import io.sitoolkit.cv.core.domain.classdef.CatchStatement;
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
@@ -22,6 +16,11 @@ import io.sitoolkit.cv.core.domain.classdef.StatementProcessor;
 import io.sitoolkit.cv.core.domain.classdef.TryStatement;
 import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,9 +46,7 @@ public class SequenceDiagramProcessor
     FilterConditionGroup classFilterGroup = config.getSequenceDiagramFilter();
     if (ClassDefFilter.needsDetail(clazz, classFilterGroup)) {
       lifeLine.setElements(
-          method
-              .getStatements()
-              .stream()
+          method.getStatements().stream()
               .map(statement -> statement.process(this, callStack))
               .filter(Optional::isPresent)
               .map(Optional::get)
@@ -124,9 +121,7 @@ public class SequenceDiagramProcessor
 
   List<SequenceElement> processChildren(
       CvStatementDefaultImpl statement, MethodCallStack callStack) {
-    return statement
-        .getChildren()
-        .stream()
+    return statement.getChildren().stream()
         .map(child -> child.process(this, callStack))
         .filter(Optional::isPresent)
         .map(Optional::get)
@@ -157,9 +152,7 @@ public class SequenceDiagramProcessor
   public Optional<SequenceElement> process(BranchStatement statement, MethodCallStack callStack) {
 
     List<ConditionalSequenceGroup> conditions =
-        statement
-            .getConditions()
-            .stream()
+        statement.getConditions().stream()
             .map(childStatement -> childStatement.process(this, callStack))
             .filter(Optional::isPresent)
             .map(Optional::get)
@@ -194,9 +187,7 @@ public class SequenceDiagramProcessor
 
     List<SequenceElement> groupElements = processChildren(statement, callStack);
     List<CatchSequenceGroup> catchGroups =
-        statement
-            .getCatchStatements()
-            .stream()
+        statement.getCatchStatements().stream()
             .map(childStatement -> childStatement.process(this, callStack))
             .filter(Optional::isPresent)
             .map(Optional::get)

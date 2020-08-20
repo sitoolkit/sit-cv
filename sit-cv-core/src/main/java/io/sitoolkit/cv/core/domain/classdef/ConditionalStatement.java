@@ -1,7 +1,6 @@
 package io.sitoolkit.cv.core.domain.classdef;
 
 import java.util.Optional;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

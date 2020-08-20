@@ -1,10 +1,9 @@
 package io.sitoolkit.cv.tools.app;
 
-import java.lang.instrument.Instrumentation;
-
 import io.sitoolkit.cv.tools.domain.transform.RepositoryClassTransformer;
 import io.sitoolkit.cv.tools.infra.config.RepositoryLoggerArgumentParser;
 import io.sitoolkit.cv.tools.infra.config.RepositoryLoggerConfig;
+import java.lang.instrument.Instrumentation;
 
 public class RepositoryLogger {
 
@@ -19,7 +18,8 @@ public class RepositoryLogger {
     if (config.getProjectType().equals("gradle")
         && !System.getProperty("sun.java.command").contains("GradleWorkerMain")) {
       System.out.println(
-          "RepositoryLogger premain exit. Because it was executed by a command other than GradleWorkerMain.");
+          "RepositoryLogger premain exit. Because it was executed by a command other than"
+              + " GradleWorkerMain.");
       return;
     }
 

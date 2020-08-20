@@ -2,7 +2,6 @@ package io.sitoolkit.cv.core.infra.config;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Value;
 
 @Value

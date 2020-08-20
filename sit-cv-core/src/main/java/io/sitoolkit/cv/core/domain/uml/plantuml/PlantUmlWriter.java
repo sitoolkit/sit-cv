@@ -1,11 +1,10 @@
 package io.sitoolkit.cv.core.domain.uml.plantuml;
 
+import io.sitoolkit.cv.core.domain.functionmodel.Diagram;
+import io.sitoolkit.cv.core.domain.uml.DiagramModel;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.function.Function;
-
-import io.sitoolkit.cv.core.domain.functionmodel.Diagram;
-import io.sitoolkit.cv.core.domain.uml.DiagramModel;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;

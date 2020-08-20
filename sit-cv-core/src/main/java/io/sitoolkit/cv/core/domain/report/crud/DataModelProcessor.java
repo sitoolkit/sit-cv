@@ -1,13 +1,12 @@
 package io.sitoolkit.cv.core.domain.report.crud;
 
+import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
+import io.sitoolkit.cv.core.domain.crud.CrudType;
+import io.sitoolkit.cv.core.infra.util.SignatureParser;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import io.sitoolkit.cv.core.domain.crud.CrudMatrix;
-import io.sitoolkit.cv.core.domain.crud.CrudType;
-import io.sitoolkit.cv.core.infra.util.SignatureParser;
 
 public class DataModelProcessor {
 
@@ -34,9 +33,7 @@ public class DataModelProcessor {
               row.put(HEADER_NAME_FUNCTION, parser.getSimpleMedhod());
               row.put(HEADER_NAME_PACKAGE, parser.getPackageName());
 
-              entity
-                  .getTableDefs()
-                  .stream()
+              entity.getTableDefs().stream()
                   .forEach(
                       table -> {
                         String crudTypes =

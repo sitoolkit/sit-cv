@@ -2,7 +2,6 @@ package io.sitoolkit.cv.core.infra;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import org.apache.commons.lang3.SystemUtils;
 
 public class SitRepository {

@@ -1,16 +1,14 @@
 package io.sitoolkit.cv.core.domain.project.analyze;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.infra.config.EnclosureFilterCondition;
 import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class SqlLogListener implements StdoutListener {

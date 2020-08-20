@@ -1,16 +1,14 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -52,9 +50,7 @@ public class TypeProcessor {
         ResolvedReferenceType rType = type.asReferenceType();
         typeDef.setName(rType.getQualifiedName());
         List<TypeDef> typeList =
-            rType
-                .getTypeParametersMap()
-                .stream()
+            rType.getTypeParametersMap().stream()
                 .map(pair -> pair.b)
                 .map(TypeProcessor::createTypeDef)
                 .collect(Collectors.toList());

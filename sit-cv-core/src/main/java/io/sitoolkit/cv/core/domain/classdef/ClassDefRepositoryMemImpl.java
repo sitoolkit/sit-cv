@@ -1,5 +1,7 @@
 package io.sitoolkit.cv.core.domain.classdef;
 
+import io.sitoolkit.cv.core.infra.config.CvConfig;
+import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,14 +10,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-
-import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
-import io.sitoolkit.cv.core.infra.config.CvConfig;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,9 +31,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
   public void save(ClassDef classDef) {
     classDefMap.put(classDef.getFullyQualifiedName(), classDef);
 
-    classDef
-        .getMethods()
-        .stream()
+    classDef.getMethods().stream()
         .forEach(
             methodDef -> {
               methodDefMap.put(methodDef.getQualifiedSignature(), methodDef);
@@ -46,18 +42,14 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
   public void remove(String sourceId) {
 
     Optional<ClassDef> removingClass =
-        classDefMap
-            .values()
-            .stream()
+        classDefMap.values().stream()
             .filter(clazz -> StringUtils.equals(clazz.getSourceId(), sourceId))
             .findFirst();
 
     removingClass.ifPresent(
         classDef -> {
           classDefMap.remove(classDef.getFullyQualifiedName());
-          classDef
-              .getMethods()
-              .stream()
+          classDef.getMethods().stream()
               .forEach(
                   methodDef -> {
                     methodDefMap.remove(methodDef.getQualifiedSignature());
@@ -86,9 +78,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
   }
 
   public void solveMethodCalls(ClassDef classDef) {
-    classDef
-        .getMethods()
-        .stream()
+    classDef.getMethods().stream()
         .forEach(
             methodDef -> {
               solveMethodType(methodDef);
@@ -149,8 +139,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
 
   private Stream<ClassDef> getFilteredEntryPointClasses() {
     FilterConditionGroup entryPointFilter = config.getEntryPointFilter();
-    return getAllClassDefs()
-        .stream()
+    return getAllClassDefs().stream()
         .filter(classDef -> ClassDefFilter.match(classDef, entryPointFilter));
   }
 
@@ -173,9 +162,7 @@ public class ClassDefRepositoryMemImpl implements ClassDefRepository {
     clazz.getFields().stream().map(FieldDef::getType).forEach(this::solveClassRef);
 
     if (clazz.isClass()) {
-      clazz
-          .getImplInterfaces()
-          .stream()
+      clazz.getImplInterfaces().stream()
           .forEach(
               ifName -> {
                 ClassDef refType = classDefMap.get(ifName);
