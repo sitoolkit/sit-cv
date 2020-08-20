@@ -18,6 +18,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.AnnotationExpr;
@@ -54,11 +55,14 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
   private StatementVisitor statementVisitor;
 
-  @NonNull private ClassDefRepository reposiotry;
+  @NonNull
+  private ClassDefRepository reposiotry;
 
-  @NonNull private ProjectManager projectManager;
+  @NonNull
+  private ProjectManager projectManager;
 
-  @NonNull private CvConfig config;
+  @NonNull
+  private CvConfig config;
 
   @Override
   public ClassDefReader readDir() {
@@ -69,39 +73,31 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     Pattern p = Pattern.compile(config.getJavaFilePattern());
 
-    projectManager
-        .getCurrentProject()
-        .getAllPreProcessedDirs()
-        .stream()
-        .forEach(
-            srcDir -> {
-              try {
-                List<Path> files =
-                    Files.walk(srcDir)
-                        .filter(file -> p.matcher(file.toFile().getName()).matches())
-                        .collect(Collectors.toList());
+    projectManager.getCurrentProject().getAllPreProcessedDirs().stream().forEach(srcDir -> {
+      try {
+        List<Path> files = Files.walk(srcDir).filter(file -> p.matcher(file.toFile().getName()).matches())
+            .collect(Collectors.toList());
 
-                int readCount = 0;
-                for (Path javaFile : files) {
+        int readCount = 0;
+        for (Path javaFile : files) {
 
-                  readJava(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
+          readJava(javaFile).ifPresent(classDef -> reposiotry.save(classDef));
 
-                  readCount++;
-                  if (readCount % 10 == 0 || readCount == files.size()) {
-                    log.info(
-                        "Processed java files : {} / {} in {}", readCount, files.size(), srcDir);
-                  }
-                }
+          readCount++;
+          if (readCount % 10 == 0 || readCount == files.size()) {
+            log.info("Processed java files : {} / {} in {}", readCount, files.size(), srcDir);
+          }
+        }
 
-                // JavaParserFacade seems to be NOT thread-safe
-                // files.stream().parallel().forEach(javaFile -> {
-                // readJava(javaFile).ifPresent(classDef ->
-                // dictionary.add(classDef));
-                // });
-              } catch (IOException e) {
-                throw new IllegalStateException(e);
-              }
-            });
+        // JavaParserFacade seems to be NOT thread-safe
+        // files.stream().parallel().forEach(javaFile -> {
+        // readJava(javaFile).ifPresent(classDef ->
+        // dictionary.add(classDef));
+        // });
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
+    });
 
     reposiotry.solveReferences();
     statementVisitor.clearCache();
@@ -121,33 +117,25 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
       classDef.setName(typeName);
       classDef.setPkg(compilationUnit.getPackageDeclaration().get().getNameAsString());
 
-      compilationUnit
-          .getClassByName(typeName)
-          .ifPresent(
-              clazz -> {
-                classDef.setType(ClassType.CLASS);
-                classDef.setMethods(readMethodDefs(clazz));
-                classDef.setFields(readFieldDefs(clazz));
-                classDef.setImplInterfaces(readInterfaces(clazz));
-                classDef.setAnnotations(readAnnotations(clazz));
-              });
+      compilationUnit.getClassByName(typeName).ifPresent(clazz -> {
+        classDef.setType(ClassType.CLASS);
+        classDef.setMethods(readMethodDefs(clazz));
+        classDef.setFields(readFieldDefs(clazz));
+        classDef.setImplInterfaces(readInterfaces(clazz));
+        classDef.setAnnotations(readAnnotations(clazz));
+      });
 
-      compilationUnit
-          .getInterfaceByName(typeName)
-          .ifPresent(
-              interfaze -> {
-                classDef.setType(ClassType.INTERFACE);
-                classDef.setMethods(readMethodDefs(interfaze));
-                classDef.setFields(readFieldDefs(interfaze));
-                classDef.setAnnotations(readAnnotations(interfaze));
-              });
+      compilationUnit.getInterfaceByName(typeName).ifPresent(interfaze -> {
+        classDef.setType(ClassType.INTERFACE);
+        classDef.setMethods(readMethodDefs(interfaze));
+        classDef.setFields(readFieldDefs(interfaze));
+        classDef.setAnnotations(readAnnotations(interfaze));
+      });
 
-      compilationUnit
-          .getEnumByName(typeName)
-          .ifPresent(
-              enumz -> {
-                classDef.setType(ClassType.ENUM);
-              });
+      compilationUnit.getEnumByName(typeName).ifPresent(enumz -> {
+        classDef.setType(ClassType.ENUM);
+        classDef.setMethods(readMethodDefs(enumz));
+      });
 
       classDef.getMethods().stream().forEach(method -> method.setClassDef(classDef));
 
@@ -164,14 +152,9 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     Set<String> interfaces = new HashSet<>();
 
     try {
-      interfaces =
-          jpf.getTypeDeclaration(typeDec)
-              .getAllAncestors()
-              .stream()
-              .map(ResolvedReferenceType::getTypeDeclaration)
-              .filter(ResolvedReferenceTypeDeclaration::isInterface)
-              .map(ResolvedReferenceTypeDeclaration::getQualifiedName)
-              .collect(Collectors.toSet());
+      interfaces = jpf.getTypeDeclaration(typeDec).getAllAncestors().stream()
+          .map(ResolvedReferenceType::getTypeDeclaration).filter(ResolvedReferenceTypeDeclaration::isInterface)
+          .map(ResolvedReferenceTypeDeclaration::getQualifiedName).collect(Collectors.toSet());
 
       log.debug("{} implements interfaces: {}", typeDec.getNameAsString(), interfaces);
 
@@ -184,12 +167,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
   Set<String> readAnnotations(ClassOrInterfaceDeclaration typeDec) {
 
-    Set<String> annotations =
-        typeDec
-            .getAnnotations()
-            .stream()
-            .map(AnnotationExpr::getNameAsString)
-            .collect(Collectors.toSet());
+    Set<String> annotations = typeDec.getAnnotations().stream().map(AnnotationExpr::getNameAsString)
+        .collect(Collectors.toSet());
     log.debug("{} has annotations : {}", typeDec.getNameAsString(), annotations);
     return annotations;
   }
@@ -200,52 +179,64 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     String classActionPath = getActionPath(typeDec);
 
-    jpf.getTypeDeclaration(typeDec)
-        .getDeclaredMethods()
-        .forEach(
-            (ResolvedMethodDeclaration declaredMethod) -> {
-              JavaParserMethodDeclaration jpDeclaredMethod =
-                  (JavaParserMethodDeclaration) declaredMethod;
+    jpf.getTypeDeclaration(typeDec).getDeclaredMethods().forEach((ResolvedMethodDeclaration declaredMethod) -> {
+      try {
+        MethodDef methodDef = createMethodDef(declaredMethod);
+        methodDefs.add(methodDef);
 
-              try {
-                MethodDef methodDef = new MethodDef();
+        if (!typeDec.isInterface()) {
+          typeDec.getMethods().stream().forEach(method -> {
+            if (equalMethods(declaredMethod, method)) {
+              method.accept(statementVisitor, VisitContext.of(methodDef));
+              methodDef.setActionPath(classActionPath + getActionPath(method));
+              methodDef.setAsync(JavaParserUtils.hasAnyAnnotation(method, config.getAsyncAnnotations()));
+            }
+          });
+        }
 
-                methodDef.setPublic(declaredMethod.accessSpecifier() == AccessSpecifier.PUBLIC);
-                methodDef.setName(declaredMethod.getName());
-                methodDef.setSignature(declaredMethod.getSignature());
-                methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
-                methodDef.setReturnType(
-                    TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
-                methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
-                methodDef.setExceptions(TypeProcessor.collectThrowTypeNames(declaredMethod));
-                methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
-                methodDefs.add(methodDef);
+        log.debug("Add method declaration : {}", methodDef);
 
-                if (!typeDec.isInterface()) {
-                  typeDec
-                      .getMethods()
-                      .stream()
-                      .forEach(
-                          method -> {
-                            if (equalMethods(declaredMethod, method)) {
-                              method.accept(statementVisitor, VisitContext.of(methodDef));
-                              methodDef.setActionPath(classActionPath + getActionPath(method));
-                              methodDef.setAsync(
-                                  JavaParserUtils.hasAnyAnnotation(
-                                      method, config.getAsyncAnnotations()));
-                            }
-                          });
-                }
+      } catch (Exception e) {
+        log.debug("Unsolved: '{}()' in '{}', {}", declaredMethod.getName(), typeDec.getName(), e);
+      }
 
-                log.debug("Add method declaration : {}", methodDef);
-
-              } catch (Exception e) {
-                log.debug(
-                    "Unsolved: '{}()' in '{}', {}", declaredMethod.getName(), typeDec.getName(), e);
-              }
-            });
+    });
 
     return methodDefs;
+  }
+
+  List<MethodDef> readMethodDefs(EnumDeclaration typeDec) {
+
+    List<MethodDef> methodDefs = new ArrayList<>();
+
+    jpf.getTypeDeclaration(typeDec).getDeclaredMethods().forEach((ResolvedMethodDeclaration declaredMethod) -> {
+      try {
+        MethodDef methodDef = createMethodDef(declaredMethod);
+        methodDefs.add(methodDef);
+
+        log.debug("Add method declaration : {}", methodDef);
+
+      } catch (Exception e) {
+        log.debug("Unsolved: '{}()' in '{}', {}", declaredMethod.getName(), typeDec.getName(), e);
+      }
+    });
+
+    return methodDefs;
+  }
+
+  MethodDef createMethodDef(ResolvedMethodDeclaration declaredMethod) {
+    JavaParserMethodDeclaration jpDeclaredMethod = (JavaParserMethodDeclaration) declaredMethod;
+    MethodDef methodDef = new MethodDef();
+
+    methodDef.setPublic(declaredMethod.accessSpecifier() == AccessSpecifier.PUBLIC);
+    methodDef.setName(declaredMethod.getName());
+    methodDef.setSignature(declaredMethod.getSignature());
+    methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
+    methodDef.setReturnType(TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
+    methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
+    methodDef.setExceptions(TypeProcessor.collectThrowTypeNames(declaredMethod));
+    methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
+    return methodDef;
   }
 
   boolean equalMethods(ResolvedMethodDeclaration m1, MethodDeclaration m2) {
@@ -284,8 +275,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     return typeString.replaceAll("[^.,<>]+\\.", "");
   }
 
-  private static final String[] ACTION_ANNOTATION_NAMES =
-      new String[] {"RequestMapping", "PostMapping", "GetMapping"};
+  private static final String[] ACTION_ANNOTATION_NAMES = new String[] { "RequestMapping", "PostMapping",
+      "GetMapping" };
 
   String getActionPath(NodeWithAnnotations<?> nwa) {
 
@@ -303,25 +294,17 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     StringBuilder actionPath = new StringBuilder();
 
-    annotation
-        .toNormalAnnotationExpr()
-        .ifPresent(
-            nae -> {
-              nae.getPairs()
-                  .forEach(
-                      mvp -> {
-                        if (StringUtils.equals(mvp.getNameAsString(), "path")) {
-                          actionPath.append(adjust(mvp.getValue().toString()));
-                        }
-                      });
-            });
+    annotation.toNormalAnnotationExpr().ifPresent(nae -> {
+      nae.getPairs().forEach(mvp -> {
+        if (StringUtils.equals(mvp.getNameAsString(), "path")) {
+          actionPath.append(adjust(mvp.getValue().toString()));
+        }
+      });
+    });
 
-    annotation
-        .toSingleMemberAnnotationExpr()
-        .ifPresent(
-            smae -> {
-              actionPath.append(adjust(smae.getMemberValue().toString()));
-            });
+    annotation.toSingleMemberAnnotationExpr().ifPresent(smae -> {
+      actionPath.append(adjust(smae.getMemberValue().toString()));
+    });
     return actionPath.toString();
   }
 
@@ -338,61 +321,40 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
   }
 
   List<FieldDef> readFieldDefs(ClassOrInterfaceDeclaration typeDec) {
-    return jpf.getTypeDeclaration(typeDec)
-        .getDeclaredFields()
-        .stream()
-        .map(
-            declaredField -> {
-              try {
-                FieldDef fieldDef = new FieldDef();
-                fieldDef.setName(declaredField.getName());
+    return jpf.getTypeDeclaration(typeDec).getDeclaredFields().stream().map(declaredField -> {
+      try {
+        FieldDef fieldDef = new FieldDef();
+        fieldDef.setName(declaredField.getName());
 
-                ResolvedType type = declaredField.getType();
-                fieldDef.setType(TypeProcessor.createTypeDef(type));
-                return fieldDef;
+        ResolvedType type = declaredField.getType();
+        fieldDef.setType(TypeProcessor.createTypeDef(type));
+        return fieldDef;
 
-              } catch (Exception e) {
-                log.debug(
-                    "Unsolved : '{}' in '{}', {}", declaredField.getName(), typeDec.getName(), e);
-                return null;
-              }
-            })
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
+      } catch (Exception e) {
+        log.debug("Unsolved : '{}' in '{}', {}", declaredField.getName(), typeDec.getName(), e);
+        return null;
+      }
+    }).filter(Objects::nonNull).collect(Collectors.toList());
   }
 
   ApiDocDef readApiDocDef(JavaParserMethodDeclaration declaredMethod) {
-    String qualifiedClassName =
-        declaredMethod.getPackageName() + "." + declaredMethod.getClassName();
+    String qualifiedClassName = declaredMethod.getPackageName() + "." + declaredMethod.getClassName();
 
     Optional<Javadoc> javadoc = declaredMethod.getWrappedNode().getJavadoc();
     List<String> contents = new ArrayList<>();
     if (javadoc.isPresent()) {
       contents.add(javadoc.get().getDescription().toText());
-      List<String> tagContents =
-          javadoc
-              .get()
-              .getBlockTags()
-              .stream()
-              .map(JavadocBlockTag::toText)
-              .collect(Collectors.toList());
+      List<String> tagContents = javadoc.get().getBlockTags().stream().map(JavadocBlockTag::toText)
+          .collect(Collectors.toList());
       contents.addAll(tagContents);
     } else {
       contents.add("No API Document.");
     }
 
-    return ApiDocDef.builder()
-        .qualifiedClassName(qualifiedClassName)
-        .annotations(
-            declaredMethod
-                .getWrappedNode()
-                .getAnnotations()
-                .stream()
-                .map(AnnotationExpr::toString)
-                .collect(Collectors.toList()))
-        .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString())
-        .contents(contents)
-        .build();
+    return ApiDocDef.builder().qualifiedClassName(qualifiedClassName)
+        .annotations(declaredMethod.getWrappedNode().getAnnotations().stream().map(AnnotationExpr::toString)
+            .collect(Collectors.toList()))
+        .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString()).contents(contents).build();
   }
 
   @Override
