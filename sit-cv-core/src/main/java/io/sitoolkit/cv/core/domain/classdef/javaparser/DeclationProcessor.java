@@ -1,8 +1,5 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.VariableDeclarator;
@@ -12,7 +9,6 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.TryStmt;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
-
 import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
 import io.sitoolkit.cv.core.domain.classdef.CatchStatement;
 import io.sitoolkit.cv.core.domain.classdef.ConditionalStatement;
@@ -21,6 +17,8 @@ import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.TryStatement;
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class DeclationProcessor {
 

@@ -1,9 +1,8 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import java.util.Map;
 import java.util.Set;
-
-import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,17 +1,15 @@
 package io.sitoolkit.cv.plugin.maven;
 
+import io.sitoolkit.cv.app.SitCvApplication;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-
-import io.sitoolkit.cv.app.SitCvApplication;
 
 @Mojo(name = "run")
 public class RunApplicationMojo extends AbstractMojo {

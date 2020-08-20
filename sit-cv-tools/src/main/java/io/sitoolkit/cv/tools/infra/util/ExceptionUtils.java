@@ -2,7 +2,6 @@ package io.sitoolkit.cv.tools.infra.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

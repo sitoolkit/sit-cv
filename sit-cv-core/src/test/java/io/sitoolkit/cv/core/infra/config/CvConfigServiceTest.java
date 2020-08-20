@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
-
 import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Test;

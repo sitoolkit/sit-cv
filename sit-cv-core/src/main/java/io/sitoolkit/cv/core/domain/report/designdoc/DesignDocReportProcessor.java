@@ -1,9 +1,8 @@
 package io.sitoolkit.cv.core.domain.report.designdoc;
 
-import java.util.List;
-
 import io.sitoolkit.cv.core.domain.menu.MenuItem;
 import io.sitoolkit.cv.core.domain.report.Report;
+import java.util.List;
 
 public class DesignDocReportProcessor {
 

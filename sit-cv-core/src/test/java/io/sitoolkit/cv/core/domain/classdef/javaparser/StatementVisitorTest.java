@@ -1,19 +1,16 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import io.sitoolkit.cv.core.domain.project.Project;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
-
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-
-import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.domain.project.Project;
 
 public class StatementVisitorTest {
 

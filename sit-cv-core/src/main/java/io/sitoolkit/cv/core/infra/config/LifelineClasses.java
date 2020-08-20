@@ -1,7 +1,6 @@
 package io.sitoolkit.cv.core.infra.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 
 @Data

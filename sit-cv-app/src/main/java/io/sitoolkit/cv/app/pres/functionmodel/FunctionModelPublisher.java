@@ -1,13 +1,12 @@
 package io.sitoolkit.cv.app.pres.functionmodel;
 
+import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
+import io.sitoolkit.cv.core.domain.functionmodel.FunctionModel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-
-import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
-import io.sitoolkit.cv.core.domain.functionmodel.FunctionModel;
-import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
@@ -22,9 +21,7 @@ public class FunctionModelPublisher implements FunctionModelEventListener {
     DetailResponse response = new DetailResponse();
     FunctionModel functionModel = service.get(functionId);
 
-    functionModel
-        .getAllDiagrams()
-        .stream()
+    functionModel.getAllDiagrams().stream()
         .forEach(
             diagram -> {
               String data = new String(diagram.getData());

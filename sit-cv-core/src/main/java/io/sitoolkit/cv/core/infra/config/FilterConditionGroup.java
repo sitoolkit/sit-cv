@@ -1,7 +1,6 @@
 package io.sitoolkit.cv.core.infra.config;
 
 import java.util.List;
-
 import lombok.Data;
 
 @Data

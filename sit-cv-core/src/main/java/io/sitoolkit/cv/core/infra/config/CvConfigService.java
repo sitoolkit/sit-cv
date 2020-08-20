@@ -1,9 +1,8 @@
 package io.sitoolkit.cv.core.infra.config;
 
+import io.sitoolkit.cv.core.infra.watcher.FileWatcher;
 import java.nio.file.Path;
 import java.util.Optional;
-
-import io.sitoolkit.cv.core.infra.watcher.FileWatcher;
 
 public class CvConfigService {
 

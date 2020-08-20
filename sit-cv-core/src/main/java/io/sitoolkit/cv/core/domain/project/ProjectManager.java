@@ -1,15 +1,13 @@
 package io.sitoolkit.cv.core.domain.project;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import io.sitoolkit.cv.core.domain.crud.SqlPerMethod;
 import io.sitoolkit.cv.core.domain.project.lombok.DelombokProcessor;
 import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +24,7 @@ public class ProjectManager {
   public void load(Path projectDir) {
 
     Optional<Project> project =
-        readers
-            .stream()
+        readers.stream()
             .map(reader -> reader.read(projectDir))
             .filter(Optional::isPresent)
             .map(Optional::get)

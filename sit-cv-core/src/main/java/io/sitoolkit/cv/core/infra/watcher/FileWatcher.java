@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.infra.watcher;
 
+import com.sun.nio.file.SensitivityWatchEventModifier;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.ClosedWatchServiceException;
@@ -15,9 +16,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import com.sun.nio.file.SensitivityWatchEventModifier;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

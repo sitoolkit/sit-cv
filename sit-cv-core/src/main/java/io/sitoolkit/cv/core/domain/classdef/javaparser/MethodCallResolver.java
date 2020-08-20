@@ -1,12 +1,10 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.util.Optional;
-
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
-
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

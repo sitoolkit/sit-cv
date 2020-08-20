@@ -3,20 +3,17 @@ package io.sitoolkit.cv.core.domain.classdef.javaparser;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.github.javaparser.ast.CompilationUnit;
-
 import io.sitoolkit.cv.core.domain.classdef.CvStatement;
 import io.sitoolkit.cv.core.domain.classdef.CvStatementDefaultImpl;
 import io.sitoolkit.cv.core.domain.classdef.LoopStatement;
 import io.sitoolkit.cv.core.domain.classdef.MethodCallDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class StatementVisitorLoopTest extends StatementVisitorTest {
 
@@ -51,9 +48,7 @@ public class StatementVisitorLoopTest extends StatementVisitorTest {
     MethodDef methodDef = getVisitResult(compilationUnit, "LoopController", method);
 
     List<CvStatement> loopStatements =
-        methodDef
-            .getStatements()
-            .stream()
+        methodDef.getStatements().stream()
             .filter(LoopStatement.class::isInstance)
             .collect(Collectors.toList());
 

@@ -1,7 +1,6 @@
 package io.sitoolkit.cv.core.domain.classdef;
 
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

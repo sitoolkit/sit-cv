@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.Data;
 
 @Data
@@ -25,8 +24,7 @@ public class TypeDef {
       return getName();
     } else {
       return getName()
-          + getTypeParamList()
-              .stream()
+          + getTypeParamList().stream()
               .map(TypeDef::toString)
               .collect(Collectors.joining(",", "<", ">"));
     }

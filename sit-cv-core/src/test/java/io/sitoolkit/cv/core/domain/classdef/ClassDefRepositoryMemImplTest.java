@@ -3,15 +3,12 @@ package io.sitoolkit.cv.core.domain.classdef;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.config.LifelineClasses;
 import java.util.ArrayList;
-
 import java.util.List;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import io.sitoolkit.cv.core.infra.config.CvConfig;
 
 public class ClassDefRepositoryMemImplTest {
 

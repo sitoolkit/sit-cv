@@ -1,5 +1,7 @@
 package io.sitoolkit.cv.tools.domain.transform;
 
+import io.sitoolkit.cv.tools.infra.config.RepositoryLoggerConfig;
+import io.sitoolkit.cv.tools.infra.util.ExceptionUtils;
 import java.io.ByteArrayInputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
@@ -9,9 +11,6 @@ import java.nio.file.Paths;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Optional;
-
-import io.sitoolkit.cv.tools.infra.config.RepositoryLoggerConfig;
-import io.sitoolkit.cv.tools.infra.util.ExceptionUtils;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -94,8 +93,7 @@ public class RepositoryClassTransformer implements ClassFileTransformer {
   }
 
   private byte[] transformCallRepositoryMethods(CtClass ctClass) {
-    Arrays.asList(ctClass.getDeclaredMethods())
-        .stream()
+    Arrays.asList(ctClass.getDeclaredMethods()).stream()
         .forEach(
             ctMethod -> {
               try {

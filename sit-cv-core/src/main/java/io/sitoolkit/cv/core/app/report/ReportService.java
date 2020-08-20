@@ -1,7 +1,5 @@
 package io.sitoolkit.cv.core.app.report;
 
-import java.util.List;
-
 import io.sitoolkit.cv.core.app.crud.CrudService;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
@@ -13,6 +11,7 @@ import io.sitoolkit.cv.core.domain.report.ReportWriter;
 import io.sitoolkit.cv.core.domain.report.crud.CrudReportProcessor;
 import io.sitoolkit.cv.core.domain.report.designdoc.DesignDocReportProcessor;
 import io.sitoolkit.cv.core.domain.report.functionmodel.FunctionModelReportProcessor;
+import java.util.List;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

@@ -1,14 +1,13 @@
 package io.sitoolkit.cv.core.domain.report.functionmodel;
 
+import io.sitoolkit.cv.core.domain.functionmodel.FunctionModel;
+import io.sitoolkit.cv.core.domain.report.Report;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.sitoolkit.cv.core.domain.functionmodel.FunctionModel;
-import io.sitoolkit.cv.core.domain.report.Report;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,8 +30,7 @@ public class FunctionModelReportProcessor {
       List<FunctionModel> functionModels) {
     DetailReportsAndPathMap reportsAndPathMap = new DetailReportsAndPathMap();
 
-    functionModels
-        .stream()
+    functionModels.stream()
         .forEach(
             functionModel -> {
               try {
@@ -55,9 +53,7 @@ public class FunctionModelReportProcessor {
 
   private FunctionModelReportDetailDef buildDetail(FunctionModel functionModel) {
     FunctionModelReportDetailDef detail = new FunctionModelReportDetailDef();
-    functionModel
-        .getAllDiagrams()
-        .stream()
+    functionModel.getAllDiagrams().stream()
         .forEach(
             diagram -> {
               String data = new String(diagram.getData());

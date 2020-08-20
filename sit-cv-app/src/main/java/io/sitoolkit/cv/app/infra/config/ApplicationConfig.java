@@ -2,7 +2,6 @@ package io.sitoolkit.cv.app.infra.config;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import lombok.Data;
 
 @Data

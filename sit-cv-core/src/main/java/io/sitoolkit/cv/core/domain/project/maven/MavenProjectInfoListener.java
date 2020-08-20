@@ -1,18 +1,16 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
+import io.sitoolkit.cv.core.domain.project.Project;
+import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
-import io.sitoolkit.cv.core.domain.project.Project;
-import io.sitoolkit.util.buildtoolhelper.process.StdoutListener;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class MavenProjectInfoListener implements StdoutListener {
@@ -101,8 +99,7 @@ public class MavenProjectInfoListener implements StdoutListener {
   }
 
   private Set<Path> splitAndTrim(String line) {
-    return Arrays.asList(line.split(","))
-        .stream()
+    return Arrays.asList(line.split(",")).stream()
         .map(String::trim)
         .map(Paths::get)
         .collect(Collectors.toSet());

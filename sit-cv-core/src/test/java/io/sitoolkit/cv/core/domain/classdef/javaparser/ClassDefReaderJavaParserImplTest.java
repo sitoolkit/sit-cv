@@ -5,20 +5,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.not;
 
+import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Test;
-
-import io.sitoolkit.cv.core.domain.classdef.ClassDef;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ClassDefReaderJavaParserImplTest {
@@ -71,8 +67,7 @@ public class ClassDefReaderJavaParserImplTest {
 
     List<MethodDef> methodDefs = classDef.getMethods();
     MethodDef methodDef =
-        methodDefs
-            .stream()
+        methodDefs.stream()
             .filter(m -> StringUtils.equals(m.getName(), "throwExceptions"))
             .findFirst()
             .get();

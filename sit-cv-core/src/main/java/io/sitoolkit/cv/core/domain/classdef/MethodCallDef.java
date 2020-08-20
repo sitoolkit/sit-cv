@@ -3,7 +3,6 @@ package io.sitoolkit.cv.core.domain.classdef;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

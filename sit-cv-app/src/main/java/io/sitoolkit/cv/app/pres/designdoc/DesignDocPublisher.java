@@ -1,14 +1,12 @@
 package io.sitoolkit.cv.app.pres.designdoc;
 
+import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 
 @Controller
 public class DesignDocPublisher implements DesignDocTreeEventListener {

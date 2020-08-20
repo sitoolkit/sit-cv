@@ -1,5 +1,7 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,9 +9,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
-import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -32,8 +31,7 @@ public class LifeLineDef {
   }
 
   public Stream<MessageDef> getMessagesRecursively() {
-    return getElements()
-        .stream()
+    return getElements().stream()
         .flatMap(SequenceElement::getMessagesRecursively)
         .filter(Objects::nonNull)
         .distinct();

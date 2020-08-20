@@ -1,15 +1,13 @@
 package io.sitoolkit.cv.core.infra.config;
 
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @NoArgsConstructor

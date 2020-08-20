@@ -1,13 +1,12 @@
 package io.sitoolkit.cv.core.domain.crud;
 
+import io.sitoolkit.cv.core.domain.tabledef.TableDef;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import io.sitoolkit.cv.core.domain.tabledef.TableDef;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -34,10 +33,7 @@ public class CrudRow {
 
   public CrudRow merge(CrudRow mergingCrud) {
 
-    mergingCrud
-        .getCellMap()
-        .entrySet()
-        .stream()
+    mergingCrud.getCellMap().entrySet().stream()
         .forEach(
             cellMapEntry -> {
               Set<CrudType> existingSet =
@@ -45,10 +41,7 @@ public class CrudRow {
               existingSet.addAll(cellMapEntry.getValue());
             });
 
-    mergingCrud
-        .getSqlTextMap()
-        .entrySet()
-        .stream()
+    mergingCrud.getSqlTextMap().entrySet().stream()
         .forEach(
             sqlTextMapEntry -> {
               Set<String> existingSet =

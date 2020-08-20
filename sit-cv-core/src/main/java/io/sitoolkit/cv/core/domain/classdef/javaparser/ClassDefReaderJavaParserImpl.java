@@ -1,19 +1,5 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
@@ -32,7 +18,6 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
-
 import io.sitoolkit.cv.core.domain.classdef.ApiDocDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDef;
 import io.sitoolkit.cv.core.domain.classdef.ClassDefReader;
@@ -43,9 +28,21 @@ import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
 import io.sitoolkit.cv.core.infra.config.CvConfig;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -69,10 +66,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     Pattern p = Pattern.compile(config.getJavaFilePattern());
 
-    projectManager
-        .getCurrentProject()
-        .getAllPreProcessedDirs()
-        .stream()
+    projectManager.getCurrentProject().getAllPreProcessedDirs().stream()
         .forEach(
             srcDir -> {
               try {
@@ -165,9 +159,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
 
     try {
       interfaces =
-          jpf.getTypeDeclaration(typeDec)
-              .getAllAncestors()
-              .stream()
+          jpf.getTypeDeclaration(typeDec).getAllAncestors().stream()
               .map(ResolvedReferenceType::getTypeDeclaration)
               .filter(ResolvedReferenceTypeDeclaration::isInterface)
               .map(ResolvedReferenceTypeDeclaration::getQualifiedName)
@@ -185,9 +177,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
   Set<String> readAnnotations(ClassOrInterfaceDeclaration typeDec) {
 
     Set<String> annotations =
-        typeDec
-            .getAnnotations()
-            .stream()
+        typeDec.getAnnotations().stream()
             .map(AnnotationExpr::getNameAsString)
             .collect(Collectors.toSet());
     log.debug("{} has annotations : {}", typeDec.getNameAsString(), annotations);
@@ -222,9 +212,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
                 methodDefs.add(methodDef);
 
                 if (!typeDec.isInterface()) {
-                  typeDec
-                      .getMethods()
-                      .stream()
+                  typeDec.getMethods().stream()
                       .forEach(
                           method -> {
                             if (equalMethods(declaredMethod, method)) {
@@ -338,9 +326,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
   }
 
   List<FieldDef> readFieldDefs(ClassOrInterfaceDeclaration typeDec) {
-    return jpf.getTypeDeclaration(typeDec)
-        .getDeclaredFields()
-        .stream()
+    return jpf.getTypeDeclaration(typeDec).getDeclaredFields().stream()
         .map(
             declaredField -> {
               try {
@@ -370,10 +356,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     if (javadoc.isPresent()) {
       contents.add(javadoc.get().getDescription().toText());
       List<String> tagContents =
-          javadoc
-              .get()
-              .getBlockTags()
-              .stream()
+          javadoc.get().getBlockTags().stream()
               .map(JavadocBlockTag::toText)
               .collect(Collectors.toList());
       contents.addAll(tagContents);
@@ -384,10 +367,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
     return ApiDocDef.builder()
         .qualifiedClassName(qualifiedClassName)
         .annotations(
-            declaredMethod
-                .getWrappedNode()
-                .getAnnotations()
-                .stream()
+            declaredMethod.getWrappedNode().getAnnotations().stream()
                 .map(AnnotationExpr::toString)
                 .collect(Collectors.toList()))
         .methodDeclaration(declaredMethod.getWrappedNode().getDeclarationAsString())

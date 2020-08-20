@@ -1,13 +1,12 @@
 package io.sitoolkit.cv.core.domain.uml;
 
+import io.sitoolkit.cv.core.domain.classdef.MethodDef;
+import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import io.sitoolkit.cv.core.domain.classdef.MethodDef;
-import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

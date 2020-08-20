@@ -1,15 +1,14 @@
 package io.sitoolkit.cv.core.infra.util;
 
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.List;
-
-import com.opencsv.bean.StatefulBeanToCsv;
-import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 public class CsvUtils {
 

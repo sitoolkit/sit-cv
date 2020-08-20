@@ -1,14 +1,5 @@
 package io.sitoolkit.cv.core.domain.uml.plantuml;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.sitoolkit.cv.core.domain.classdef.TypeDef;
 import io.sitoolkit.cv.core.domain.functionmodel.Diagram;
 import io.sitoolkit.cv.core.domain.uml.BranchSequenceElement;
@@ -23,9 +14,16 @@ import io.sitoolkit.cv.core.domain.uml.SequenceDiagram;
 import io.sitoolkit.cv.core.domain.uml.SequenceElement;
 import io.sitoolkit.cv.core.domain.uml.SequenceElementWriter;
 import io.sitoolkit.cv.core.domain.uml.TrySequenceGroup;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,8 +40,7 @@ public class SequenceDiagramWriterPlantUmlImpl
     lines.add("@startuml");
 
     lines.addAll(
-        diagrams
-            .stream()
+        diagrams.stream()
             .map(diagram -> lifeline2str(diagram.getEntryLifeLine()))
             .flatMap(List::stream)
             .collect(Collectors.toList()));
@@ -75,9 +72,7 @@ public class SequenceDiagramWriterPlantUmlImpl
 
   protected List<String> lifeline2str(LifeLineDef lifeLine) {
     List<String> lifeLineStrings =
-        lifeLine
-            .getElements()
-            .stream()
+        lifeLine.getElements().stream()
             .map(element -> element.write(lifeLine, this))
             .flatMap(List::stream)
             .collect(Collectors.toList());
@@ -131,9 +126,7 @@ public class SequenceDiagramWriterPlantUmlImpl
 
   protected String buildExceptionComment(MessageDef messageDef) {
     String note =
-        messageDef
-            .getExceptions()
-            .stream()
+        messageDef.getExceptions().stream()
             .filter(StringUtils::isNotEmpty)
             .reduce((x1, x2) -> String.join("\\n", x1, x2))
             .orElse("");
@@ -158,8 +151,7 @@ public class SequenceDiagramWriterPlantUmlImpl
 
   private List<String> elements2str(
       LifeLineDef lifeLine, List<? extends SequenceElement> elements) {
-    return elements
-        .stream()
+    return elements.stream()
         .map(childElement -> childElement.write(lifeLine, this))
         .flatMap(List::stream)
         .collect(Collectors.toList());

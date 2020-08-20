@@ -1,16 +1,14 @@
 package io.sitoolkit.cv.app.infra.config;
 
-import java.nio.file.Paths;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import io.sitoolkit.cv.core.app.crud.CrudService;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
+import java.nio.file.Paths;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class BaseConfig {

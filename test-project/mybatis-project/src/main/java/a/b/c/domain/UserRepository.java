@@ -1,7 +1,6 @@
 package a.b.c.domain;
 
 import java.util.Optional;
-
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
