@@ -4,6 +4,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.AnnotationExpr;
@@ -141,6 +142,7 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
           .ifPresent(
               enumz -> {
                 classDef.setType(ClassType.ENUM);
+                classDef.setMethods(readMethodDefs(enumz));
               });
 
       classDef.getMethods().stream().forEach(method -> method.setClassDef(classDef));
@@ -194,21 +196,8 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
         .getDeclaredMethods()
         .forEach(
             (ResolvedMethodDeclaration declaredMethod) -> {
-              JavaParserMethodDeclaration jpDeclaredMethod =
-                  (JavaParserMethodDeclaration) declaredMethod;
-
               try {
-                MethodDef methodDef = new MethodDef();
-
-                methodDef.setPublic(declaredMethod.accessSpecifier() == AccessSpecifier.PUBLIC);
-                methodDef.setName(declaredMethod.getName());
-                methodDef.setSignature(declaredMethod.getSignature());
-                methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
-                methodDef.setReturnType(
-                    TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
-                methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
-                methodDef.setExceptions(TypeProcessor.collectThrowTypeNames(declaredMethod));
-                methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
+                MethodDef methodDef = createMethodDef(declaredMethod);
                 methodDefs.add(methodDef);
 
                 if (!typeDec.isInterface()) {
@@ -234,6 +223,44 @@ public class ClassDefReaderJavaParserImpl implements ClassDefReader {
             });
 
     return methodDefs;
+  }
+
+  List<MethodDef> readMethodDefs(EnumDeclaration typeDec) {
+
+    List<MethodDef> methodDefs = new ArrayList<>();
+
+    jpf.getTypeDeclaration(typeDec)
+        .getDeclaredMethods()
+        .forEach(
+            (ResolvedMethodDeclaration declaredMethod) -> {
+              try {
+                MethodDef methodDef = createMethodDef(declaredMethod);
+                methodDefs.add(methodDef);
+
+                log.debug("Add method declaration : {}", methodDef);
+
+              } catch (Exception e) {
+                log.debug(
+                    "Unsolved: '{}()' in '{}', {}", declaredMethod.getName(), typeDec.getName(), e);
+              }
+            });
+
+    return methodDefs;
+  }
+
+  MethodDef createMethodDef(ResolvedMethodDeclaration declaredMethod) {
+    JavaParserMethodDeclaration jpDeclaredMethod = (JavaParserMethodDeclaration) declaredMethod;
+    MethodDef methodDef = new MethodDef();
+
+    methodDef.setPublic(declaredMethod.accessSpecifier() == AccessSpecifier.PUBLIC);
+    methodDef.setName(declaredMethod.getName());
+    methodDef.setSignature(declaredMethod.getSignature());
+    methodDef.setQualifiedSignature(declaredMethod.getQualifiedSignature());
+    methodDef.setReturnType(TypeProcessor.createTypeDef(declaredMethod.getReturnType()));
+    methodDef.setParamTypes(TypeProcessor.collectParamTypes(declaredMethod));
+    methodDef.setExceptions(TypeProcessor.collectThrowTypeNames(declaredMethod));
+    methodDef.setApiDoc(readApiDocDef(jpDeclaredMethod));
+    return methodDef;
   }
 
   boolean equalMethods(ResolvedMethodDeclaration m1, MethodDeclaration m2) {
