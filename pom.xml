@@ -5,7 +5,7 @@
   <!-- The Basics -->
   <groupId>io.sitoolkit.cv</groupId>
   <artifactId>sit-cv</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>pom</packaging>
 
   <dependencies>
@@ -50,7 +50,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <spring.boot.version>2.1.7.RELEASE</spring.boot.version>
-    <run>deploy</run>
+    <ant.target>deploy</ant.target>
   </properties>
 
 
@@ -81,7 +81,7 @@
         </dependencies>
         <configuration>
           <target>
-            <ant antfile="build.xml" target="${run}" />
+            <ant antfile="build.xml" target="${ant.target}" />
           </target>
         </configuration>
       </plugin>

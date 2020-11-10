@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:if="ant:if" xmlns:unless="ant:unless" name="sit-cv" basedir="." default="deploy">
+<project xmlns:if="ant:if"
+  xmlns:unless="ant:unless" name="sit-cv" basedir="." default="deploy">
 
-  <property name="version" value="1.0.0-SNAPSHOT" />
-  
+  <property name="version" value="1.0.0" />
+
   <condition property="isSnapshotVersion">
     <matches pattern=".*-SNAPSHOT" string="${version}"/>
   </condition>
@@ -22,7 +23,7 @@
   <target name="deploy">
     <antcall target="analyze" />
     <antcall target="deploy-maven" />
-  	<antcall target="deploy-gradle"/>
+    <antcall target="deploy-gradle"/>
   </target>
 
   <target name="analyze">
@@ -38,7 +39,7 @@
       <arg value="!sit-cv-tools/pom-1_8.xml,!sit-cv-tools/pom.xml" />
     </exec>
   </target>
-  
+
   <target name="deploy-maven">
     <exec executable="${mvn.cmd}" dir="${basedir}" failonerror="true">
       <env key="JAVA_HOME" value="${java.home}" />
@@ -68,20 +69,15 @@
       <arg value="versions:set" />
     </exec>
 
-    <exec executable="${mvn.cmd}"
-          dir="${basedir}/sit-cv-maven-plugin/src/test/projects/test-project-1">
+    <exec executable="${mvn.cmd}" dir="${basedir}/sit-cv-maven-plugin/src/test/projects/test-project-1">
       <arg value="-DnewVersion=${version}" />
       <arg value="versions:set" />
     </exec>
 
-    <replaceregexp file="${gbasedir}/gradle.properties"
-                   match="version=.*$"
-                   replace="version=${version}" />
+    <replaceregexp file="${gbasedir}/gradle.properties" match="version=.*$" replace="version=${version}" />
 
-    <replaceregexp file="${basedir}/sample/gradle.properties"
-                   match="version=.*$"
-                   replace="version=${version}" />
+    <replaceregexp file="${basedir}/sample/gradle.properties" match="version=.*$" replace="version=${version}" />
 
   </target>
-   
+
 </project>
