@@ -1,14 +1,13 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class MethodResolver {
 
@@ -23,18 +22,19 @@ public class MethodResolver {
 
   Optional<ResolvedMethodDeclaration> resolve(Node n) {
 
-    return cache.computeIfAbsent(n, node -> {
-      if (node instanceof MethodCallExpr) {
-        return methodCallResolver.resolve((MethodCallExpr) node);
+    return cache.computeIfAbsent(
+        n,
+        node -> {
+          if (node instanceof MethodCallExpr) {
+            return methodCallResolver.resolve((MethodCallExpr) node);
 
-      } else if (node instanceof MethodReferenceExpr) {
-        return methodReferenceResolver.resolve((MethodReferenceExpr) node);
+          } else if (node instanceof MethodReferenceExpr) {
+            return methodReferenceResolver.resolve((MethodReferenceExpr) node);
 
-      } else {
-        return Optional.empty();
-      }
-    });
-
+          } else {
+            return Optional.empty();
+          }
+        });
   }
 
   public void clearCache() {

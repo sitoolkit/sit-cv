@@ -1,5 +1,3 @@
 package sample.ifs;
 
-public interface IParam {
-
-}
+public interface IParam {}

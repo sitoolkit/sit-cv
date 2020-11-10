@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Report<T> {
-    private String path;
-    private T content;
+  private String path;
+  private T content;
 }

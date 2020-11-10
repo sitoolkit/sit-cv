@@ -1,13 +1,12 @@
 package io.sitoolkit.cv.core.domain.crud;
 
+import io.sitoolkit.cv.core.domain.tabledef.TableDef;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import io.sitoolkit.cv.core.domain.tabledef.TableDef;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -34,21 +33,24 @@ public class CrudRow {
 
   public CrudRow merge(CrudRow mergingCrud) {
 
-    mergingCrud.getCellMap().entrySet().stream().forEach(cellMapEntry -> {
-      Set<CrudType> existingSet = cellMap.computeIfAbsent(cellMapEntry.getKey(),
-          key -> new HashSet<>());
-      existingSet.addAll(cellMapEntry.getValue());
-    });
+    mergingCrud.getCellMap().entrySet().stream()
+        .forEach(
+            cellMapEntry -> {
+              Set<CrudType> existingSet =
+                  cellMap.computeIfAbsent(cellMapEntry.getKey(), key -> new HashSet<>());
+              existingSet.addAll(cellMapEntry.getValue());
+            });
 
-    mergingCrud.getSqlTextMap().entrySet().stream().forEach(sqlTextMapEntry -> {
-      Set<String> existingSet = sqlTextMap.computeIfAbsent(sqlTextMapEntry.getKey(),
-          key -> new HashSet<>());
-      existingSet.addAll(sqlTextMapEntry.getValue());
-    });
+    mergingCrud.getSqlTextMap().entrySet().stream()
+        .forEach(
+            sqlTextMapEntry -> {
+              Set<String> existingSet =
+                  sqlTextMap.computeIfAbsent(sqlTextMapEntry.getKey(), key -> new HashSet<>());
+              existingSet.addAll(sqlTextMapEntry.getValue());
+            });
 
     repositoryFunctions.addAll(mergingCrud.getRepositoryFunctions());
 
     return mergingCrud;
   }
-
 }

@@ -1,22 +1,20 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
-import java.nio.file.Path;
-import java.util.Optional;
-
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
 import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.project.SitCvToolsManager;
 import io.sitoolkit.util.buildtoolhelper.maven.MavenProject;
+import java.nio.file.Path;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class MavenProjectReader implements ProjectReader {
 
-  @NonNull
-  private SqlLogProcessor sqlLogProcessor;
+  @NonNull private SqlLogProcessor sqlLogProcessor;
 
   @Override
   public Optional<Project> read(Path projectDir) {
@@ -44,10 +42,14 @@ public class MavenProjectReader implements ProjectReader {
 
     Path agentJar = SitCvToolsManager.install(project.getWorkDir(), project.getJavaVersion());
 
-    sqlLogProcessor.process("maven", sitCvConfig, agentJar, project, (String agentParam) -> {
-      return mvnPrj.mvnw("test", "-DargLine=" + agentParam);
-    });
+    sqlLogProcessor.process(
+        "maven",
+        sitCvConfig,
+        agentJar,
+        project,
+        (String agentParam) -> {
+          return mvnPrj.mvnw("test", "-DargLine=" + agentParam);
+        });
     return true;
   }
-
 }

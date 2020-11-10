@@ -11,4 +11,6 @@ export default interface DesignDocService {
   ): void;
 
   getCrudModel(): Promise<CrudMatrix>;
+
+  getMenuItems(): MenuItem[];
 }

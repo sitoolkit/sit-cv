@@ -4,13 +4,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 
-import java.lang.Runtime.Version;
-import java.nio.file.Paths;
-
-import org.junit.Test;
-
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
+import java.lang.Runtime.Version;
+import java.nio.file.Paths;
+import org.junit.Test;
 
 public class MavenProjectReaderTest {
 
@@ -21,8 +19,10 @@ public class MavenProjectReaderTest {
     // TODO we need to test using test-project/maven-multi
     Project project = reader.read(Paths.get("..")).get();
 
-    assertThat(project.getAllSrcDirs(),
-        containsInAnyOrder(project.getDir().resolve("sit-cv-app/src/main/java"),
+    assertThat(
+        project.getAllSrcDirs(),
+        containsInAnyOrder(
+            project.getDir().resolve("sit-cv-app/src/main/java"),
             project.getDir().resolve("sit-cv-core/src/main/java"),
             project.getDir().resolve("sit-cv-maven-plugin/src/main/java"),
             project.getDir().resolve("sit-cv-maven-plugin/target/generated-sources/plugin"),

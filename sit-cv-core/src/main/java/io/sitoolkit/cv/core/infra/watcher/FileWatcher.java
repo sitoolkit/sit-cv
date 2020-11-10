@@ -1,5 +1,6 @@
 package io.sitoolkit.cv.core.infra.watcher;
 
+import com.sun.nio.file.SensitivityWatchEventModifier;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.ClosedWatchServiceException;
@@ -15,9 +16,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import com.sun.nio.file.SensitivityWatchEventModifier;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -45,13 +43,15 @@ public class FileWatcher {
       try {
         watchDir(path);
 
-        Files.walk(path).forEach(childPath -> {
-          if (childPath.toFile().isFile()) {
-            watchFile(childPath);
-          } else {
-            watchDir(childPath);
-          }
-        });
+        Files.walk(path)
+            .forEach(
+                childPath -> {
+                  if (childPath.toFile().isFile()) {
+                    watchFile(childPath);
+                  } else {
+                    watchDir(childPath);
+                  }
+                });
       } catch (IOException e) {
         throw new UncheckedIOException(e);
       }
@@ -63,18 +63,19 @@ public class FileWatcher {
       executorService = Executors.newCachedThreadPool();
     }
 
-    executorService.execute(() -> {
-      while (watching) {
-        pollWatchEvent();
-      }
-    });
+    executorService.execute(
+        () -> {
+          while (watching) {
+            pollWatchEvent();
+          }
+        });
 
-    executorService.execute(() -> {
-      while (watching) {
-        handleChangeEvent();
-      }
-    });
-
+    executorService.execute(
+        () -> {
+          while (watching) {
+            handleChangeEvent();
+          }
+        });
   }
 
   public void stop() {
@@ -108,9 +109,13 @@ public class FileWatcher {
 
       log.debug("Register WatchService to {}", dir);
 
-      dir.register(watchService,
-          new WatchEvent.Kind[] { StandardWatchEventKinds.ENTRY_CREATE,
-              StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE },
+      dir.register(
+          watchService,
+          new WatchEvent.Kind[] {
+            StandardWatchEventKinds.ENTRY_CREATE,
+            StandardWatchEventKinds.ENTRY_MODIFY,
+            StandardWatchEventKinds.ENTRY_DELETE
+          },
           SensitivityWatchEventModifier.HIGH);
 
     } catch (IOException e) {
@@ -146,10 +151,8 @@ public class FileWatcher {
       } else if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind())) {
         watchingFiles.remove(effectedPath);
       }
-
     }
     watchKey.reset();
-
   }
 
   private void handleChangeEvent() {
@@ -160,18 +163,20 @@ public class FileWatcher {
       Thread.currentThread().interrupt();
     }
 
-    modifiedFiles.getChangedFilesWithinLast(300).ifPresent(files -> {
-
-      fileEventListeners.forEach(listener -> {
-        try {
-          log.info("Fire modify event to {} with {}", listener.getClass(), files);
-          listener.onModify(files);
-        } catch (Exception e) {
-          log.error("Exception in the process of file change event", e);
-        }
-      });
-    });
-
+    modifiedFiles
+        .getChangedFilesWithinLast(300)
+        .ifPresent(
+            files -> {
+              fileEventListeners.forEach(
+                  listener -> {
+                    try {
+                      log.info("Fire modify event to {} with {}", listener.getClass(), files);
+                      listener.onModify(files);
+                    } catch (Exception e) {
+                      log.error("Exception in the process of file change event", e);
+                    }
+                  });
+            });
   }
 
   public void addListener(FileWatchEventListener listener) {

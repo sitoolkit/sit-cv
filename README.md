@@ -55,8 +55,7 @@ git clone https://github.com/citerus/dddsample-core.git
 cd dddsample-core
 git checkout f01db3d2d8be14233403f363f128645b633d2952
 1>.env echo JAVA_HOME=C:\\path\u0020to\\jdk1.8
-start http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.5/sit-cv-app-1.0.0-beta.5-exec.jar
-move %USERPROFILE%\Downloads\sit-cv-app-1.0.0-beta.5-exec.jar .
+curl -o sit-cv-app-1.0.0-beta.5-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.5/sit-cv-app-1.0.0-beta.5-exec.jar
 java -jar sit-cv-app-1.0.0-beta.5-exec.jar --cv.analyze-sql
 ```
 
@@ -69,6 +68,14 @@ git checkout f01db3d2d8be14233403f363f128645b633d2952
 echo JAVA_HOME=/path/to/jdk1.8 > .env
 curl -o sit-cv-app-1.0.0-beta.5-exec.jar -G http://repo1.maven.org/maven2/io/sitoolkit/cv/sit-cv-app/1.0.0-beta.5/sit-cv-app-1.0.0-beta.5-exec.jar
 java -jar sit-cv-app-1.0.0-beta.5-exec.jar --cv.analyze-sql
+```
+
+Exclude methods owned by the parent repository class (HibernateRepository) from the CRUD matrix, because all methods based this class converge to the same CRUD.
+
+Download the configuration file to project root.
+
+```
+curl -o sit-cv-config.json -G https://raw.githubusercontent.com/Xenuzever/sit-cv-config-dddsample-core/master/sit-cv-config-dddsample-core.json
 ```
 
 After running last java command, you can see following log on your console.
@@ -246,19 +253,23 @@ It's JSON structure is as follows.
   "sqlLogPattern": {
     "start": ".*Pattern before SQL starts.*",
     "end": ".*Pattern after SQL ends.*"
-  }
+  },
+  "showAccessor": false
 }
 ```
-| Key                 | Description                                                                        | Default value |
-|---------------------|------------------------------------------------------------------------------------|---------------|
+| Key                 | Description                                                                           | Default value |
+|---------------------|---------------------------------------------------------------------------------------|---------------|
 | override            | Ignore [default configuration](sit-cv-core/src/main/resources/io/sitoolkit/cv/core/infra/config/sit-cv-config.json). | false         |
-| lifelines           | Specify classes to draw as a lifeline in the sequence diagram.                     |               |
-| &emsp; name         | Pattern to match class qualified name.                                             |               |
-| &emsp; annotation   | Pattern to match qualified annotation name of class.                               |               |
-| &emsp; entryPoint   | Set true to recognize as a entry point, i.e. left end class of sequence diagram.   | false         |
-| &emsp; lifelineOnly | Set true to hide internal processing, i.e. messages to itself.                     | false         |
-| &emsp; dbAccess     | Set true to recognize as a repository class. This is used to generate CRUD matrix. | false         |
-| asyncAnnotations    | Annotaion names to recognize as asynchronous method.                               |               |
-| sqlLogPattern       | Filter rule to find SQL from test log. This is used to generate CRUD matrix.       |               |
-| &emsp; start        | Pattern to match the line just before SQL starts.                                  |               |
-| &emsp; end          | Pattern to match the line just after SQL ends.                                     |               |
+| lifelines           | Specify classes to draw as a lifeline in the sequence diagram.                        |               |
+| &emsp; name         | Pattern to match class qualified name.                                                |               |
+| &emsp; annotation   | Pattern to match qualified annotation name of class.                                  |               |
+| &emsp; entryPoint   | Set true to recognize as a entry point, i.e. left end class of the sequence diagram.  | false         |
+| &emsp; lifelineOnly | Set true to hide internal processing, i.e. messages to itself.                        | false         |
+| &emsp; dbAccess     | Set true to recognize as a repository class. This is used to generate CRUD matrix.    | false         |
+| &emsp; exclude      | Excludes methods owned by classes matching the pattern from the CRUD matrix.          | false         |
+| asyncAnnotations    | Annotaion names to recognize as asynchronous method.                                  |               |
+| sqlLogPattern       | Filter rule to find SQL from test log. This is used to generate CRUD matrix.          |               |
+| &emsp; start        | Pattern to match the line just before SQL starts.                                     |               |
+| &emsp; end          | Pattern to match the line just after SQL ends.                                        |               |
+| &emsp; match        | Pattern to match the string enclosed in parentheses.                                  |               |
+| showAccessor        | Set true to show setter and getter method in the class diagram.                       | false         |

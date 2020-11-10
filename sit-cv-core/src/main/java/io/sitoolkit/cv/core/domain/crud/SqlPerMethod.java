@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SqlPerMethod {
-    private String repositoryMethod;
-    private String sqlText;
+  private String repositoryMethod;
+  private String sqlText;
 }

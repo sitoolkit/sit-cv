@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
-
 import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,11 +26,11 @@ public class CvConfigServiceTest {
   public void init() throws URISyntaxException {
     service = new CvConfigService();
 
-    mergeConfigFile = Paths
-        .get(getClass().getResource("merge/" + CvConfigReader.CONFIG_FILE_NAME).toURI());
+    mergeConfigFile =
+        Paths.get(getClass().getResource("merge/" + CvConfigReader.CONFIG_FILE_NAME).toURI());
 
-    overrideConfigFile = Paths
-        .get(getClass().getResource("override/" + CvConfigReader.CONFIG_FILE_NAME).toURI());
+    overrideConfigFile =
+        Paths.get(getClass().getResource("override/" + CvConfigReader.CONFIG_FILE_NAME).toURI());
   }
 
   @Test
@@ -39,18 +38,17 @@ public class CvConfigServiceTest {
     CvConfig config = service.read(Paths.get("no/such/directory"), false);
 
     assertThat(config.getAsyncAnnotations(), is(List.of("Async", "Asynchronous")));
-
   }
 
   @Test
   public void testProjectConfig() throws URISyntaxException {
     CvConfig config = service.read(mergeConfigFile.getParent(), false);
 
-    assertThat(config.getAsyncAnnotations(), is(List.of("NewOne", "Async", "Asynchronous")));
+    assertThat(config.getAsyncAnnotations(), is(List.of("Async", "Asynchronous", "NewOne")));
     List<LifelineClasses> lifelines = config.getLifelines();
     assertThat(lifelines.size(), is(6));
-    assertThat(lifelines.get(0).getName(), is("NewName"));
-    assertThat(lifelines.get(1).getName(), is(".*Controller.*"));
+    assertThat(lifelines.get(0).getName(), is(".*Controller.*"));
+    assertThat(lifelines.get(5).getName(), is("NewName"));
   }
 
   @Test
@@ -74,8 +72,8 @@ public class CvConfigServiceTest {
     String newConfigStr = Files.readString(copyConfigFile).replace("NewOne", "AnotherOne");
     Files.writeString(copyConfigFile, newConfigStr);
 
-    Awaitility.await().atMost(Duration.ofSeconds(3))
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(3))
         .until(() -> config.getAsyncAnnotations().equals((List.of("AnotherOne"))));
   }
-
 }

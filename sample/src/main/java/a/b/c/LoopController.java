@@ -4,116 +4,124 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class LoopController {
 
-    @Autowired
-    BProcessor processor;
+  @Autowired BProcessor processor;
 
-    public void simpleFor() {
+  public void simpleFor() {
 
-        for (int i = 0; i < 1; i++) {
-            processor.process("");
-        }
+    for (int i = 0; i < 1; i++) {
+      processor.process("");
     }
+  }
 
-    public void forEach() {
+  public void forEach() {
 
-        List<String> list = Arrays.asList("");
+    List<String> list = Arrays.asList("");
 
-        for (String str : list) {
-            processor.process("");
-        }
-
+    for (String str : list) {
+      processor.process("");
     }
+  }
 
-    public void multiLoop() {
+  public void multiLoop() {
 
-        /**
-         * loop comment
-         */
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 1; j++) {
-                processor.process("");
-            }
-            processor.process2("");
-        }
-    }
-
-    public void blankLoop() {
-
+    /** loop comment */
+    for (int i = 0; i < 1; i++) {
+      for (int j = 0; j < 1; j++) {
         processor.process("");
-
-        int sum = 0;
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 1; j++) {
-                sum += i * j;
-            }
-        }
+      }
+      processor.process2("");
     }
+  }
 
-    public void streamMethodRef() {
-        List<String> list = Arrays.asList("");
+  public void blankLoop() {
 
-        list.stream().map(processor::process);
+    processor.process("");
+
+    int sum = 0;
+    for (int i = 0; i < 1; i++) {
+      for (int j = 0; j < 1; j++) {
+        sum += i * j;
+      }
     }
+  }
 
-    public void streamMethodRef2() {
-        List<String> list = Arrays.asList("");
+  public void streamMethodRef() {
+    List<String> list = Arrays.asList("");
 
-        list.stream().map(BProcessor::staticProcess)
-                .forEach(this::process);
-        list.stream().forEach(System.out::println);
-    }
+    list.stream().map(processor::process);
+  }
 
-    private void process(String s){
-        processor.process(s);
-    }
+  public void streamMethodRef2() {
+    List<String> list = Arrays.asList("");
 
-    public void streamLambda() {
+    list.stream().map(BProcessor::staticProcess).forEach(this::process);
+    list.stream().forEach(System.out::println);
+  }
 
-        List<String> list = Arrays.asList("");
+  private void process(String s) {
+    processor.process(s);
+  }
 
-        list.stream().map(str -> {
-            return processor.process("");
+  public void streamLambda() {
+
+    List<String> list = Arrays.asList("");
+
+    list.stream()
+        .map(
+            str -> {
+              return processor.process("");
+            });
+  }
+
+  public void streamLambda2() {
+
+    Optional<String> optional = Optional.ofNullable("");
+    optional.ifPresent(
+        s -> {
+          processor.process2(s);
         });
 
-    }
+    processor.getList("").stream() // loop start
+        .filter(s -> processor.isNotNull(s))
+        .map(s -> processor.process(s))
+        .forEach(
+            s -> {
+              processor.process2("");
+              processor.process3("");
+            }); // end loop
+  }
 
-    public void streamLambda2() {
+  public void streamLambda3() {
+    createStream().forEach(this::process);
+  }
 
-        Optional<String> optional = Optional.ofNullable("");
-        optional.ifPresent(s -> {
-            processor.process2(s);
-        });
+  public void streamOf() {
+    Stream.of("").forEach(this::process);
+  }
 
-            processor.getList("").stream() // loop start
-                    .filter(s -> processor.isNotNull(s))
-                    .map(s -> processor.process(s))
-                    .forEach(s -> {
-                        processor.process2("");
-                            processor.process3("");
-                    }); // end loop
-        }
+  public void deepHierarchy() {
+    processor
+        .getSelf()
+        .getSelf()
+        .getSelf()
+        .getSelf()
+        .getSelf()
+        .getSelf()
+        .getSelf()
+        .getSelf()
+        .getSelf()
+        .getList("")
+        .stream()
+        .forEach(s -> processor.process(""));
+  }
 
-    public void streamLambda3() {
-        createStream().forEach(this::process);
-    }
-
-    public void streamOf() {
-        Stream.of("").forEach(this::process);
-    }
-
-    public void deepHierarchy() {
-        processor.getSelf().getSelf().getSelf().getSelf().getSelf().getSelf().getSelf().getSelf()
-                .getSelf().getList("").stream().forEach(s -> processor.process(""));
-    }
-
-    private Stream<String> createStream() {
-        return Stream.of("");
-    }
+  private Stream<String> createStream() {
+    return Stream.of("");
+  }
 }

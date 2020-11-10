@@ -1,16 +1,14 @@
 package io.sitoolkit.cv.core.infra.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -18,8 +16,7 @@ public class JsonUtils {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  private JsonUtils() {
-  }
+  private JsonUtils() {}
 
   public static String obj2str(Object obj) {
     try {
@@ -98,11 +95,11 @@ public class JsonUtils {
     return path.toAbsolutePath().normalize();
   }
 
-  public static <T> T merge(T original, URL url) {
+  public static <T> T merge(T original, Path path) {
     ObjectReader reader = MAPPER.readerForUpdating(original);
 
     try {
-      return reader.readValue(url);
+      return reader.readValue(path.toFile());
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

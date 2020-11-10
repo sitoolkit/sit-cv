@@ -1,10 +1,5 @@
 package io.sitoolkit.cv.core.domain.project.gradle;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
-
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.ProjectReader;
 import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
@@ -13,6 +8,10 @@ import io.sitoolkit.cv.core.infra.project.SitCvToolsManager;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import io.sitoolkit.util.buildtoolhelper.gradle.GradleProject;
 import io.sitoolkit.util.buildtoolhelper.process.ProcessCommand;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,7 @@ public class GradleProjectReader implements ProjectReader {
 
   private static final String PROJECT_INFO_SCRIPT_NAME = "project-info.gradle";
 
-  @NonNull
-  private SqlLogProcessor sqlLogProcessor;
+  @NonNull private SqlLogProcessor sqlLogProcessor;
 
   @Override
   public Optional<Project> read(Path projectDir) {
@@ -44,8 +42,10 @@ public class GradleProjectReader implements ProjectReader {
 
     try {
 
-      gradleProject.gradlew("--no-daemon", "--init-script", initScript.toString(), "projectInfo")
-          .stdout(listener).execute();
+      gradleProject
+          .gradlew("--no-daemon", "--init-script", initScript.toString(), "projectInfo")
+          .stdout(listener)
+          .execute();
 
     } finally {
       try {
@@ -68,11 +68,16 @@ public class GradleProjectReader implements ProjectReader {
 
     Path agentJar = SitCvToolsManager.install(project.getWorkDir(), project.getJavaVersion());
 
-    sqlLogProcessor.process("gradle", sitCvConfig, agentJar, project, (String agentParam) -> {
-      ProcessCommand command = gradleProject.gradlew("--no-daemon", "--rerun-tasks", "test");
-      command.getEnv().put("JAVA_TOOL_OPTIONS", agentParam);
-      return command;
-    });
+    sqlLogProcessor.process(
+        "gradle",
+        sitCvConfig,
+        agentJar,
+        project,
+        (String agentParam) -> {
+          ProcessCommand command = gradleProject.gradlew("--no-daemon", "--rerun-tasks", "test");
+          command.getEnv().put("JAVA_TOOL_OPTIONS", agentParam);
+          return command;
+        });
 
     return true;
   }

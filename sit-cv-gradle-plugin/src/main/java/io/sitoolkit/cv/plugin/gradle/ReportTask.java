@@ -1,10 +1,9 @@
 package io.sitoolkit.cv.plugin.gradle;
 
+import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
-
-import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
 public class ReportTask extends DefaultTask {
 
@@ -17,8 +16,8 @@ public class ReportTask extends DefaultTask {
 
   @TaskAction
   public void export() {
-    ServiceFactory factory = ServiceFactory
-        .createAndInitialize(getProject().getProjectDir().toPath(), false);
+    ServiceFactory factory =
+        ServiceFactory.createAndInitialize(getProject().getProjectDir().toPath(), false);
 
     if (analyzeSql) {
       factory.getCrudService().analyzeSql();

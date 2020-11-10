@@ -1,7 +1,5 @@
 package io.sitoolkit.cv.core.domain.crud.jsqlparser;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import io.sitoolkit.cv.core.domain.crud.CrudFindResult;
 import io.sitoolkit.cv.core.domain.crud.CrudFinder;
 import io.sitoolkit.cv.core.domain.crud.CrudType;
@@ -16,6 +14,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.util.TablesNamesFinder;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public class CrudFinderJsqlparserImpl implements CrudFinder {
 
@@ -78,18 +77,19 @@ public class CrudFinderJsqlparserImpl implements CrudFinder {
 
     findReferenceFromSatement(select, tableCrud);
 
-    select.getSelectBody().accept(new SelectVisitorAdapter() {
+    select
+        .getSelectBody()
+        .accept(
+            new SelectVisitorAdapter() {
 
-      @Override
-      public void visit(PlainSelect plainSelect) {
-        if (plainSelect.getIntoTables() != null) {
-          plainSelect.getIntoTables().stream()
-              .forEach(table -> tableCrud.put(table.getName(), CrudType.CREATE));
-        }
-      }
-
-    });
-
+              @Override
+              public void visit(PlainSelect plainSelect) {
+                if (plainSelect.getIntoTables() != null) {
+                  plainSelect.getIntoTables().stream()
+                      .forEach(table -> tableCrud.put(table.getName(), CrudType.CREATE));
+                }
+              }
+            });
   }
 
   void findReferenceFromSatement(Statement stmt, CrudFindResult tableCrud) {
@@ -102,7 +102,6 @@ public class CrudFinderJsqlparserImpl implements CrudFinder {
 
     tablesNamesFinder.getTableList(stmt).stream()
         .forEach(table -> tableCrud.put(table, CrudType.REFERENCE));
-
   }
 
   void findReferenceFromExpression(Expression expr, CrudFindResult tableCrud) {
@@ -114,6 +113,5 @@ public class CrudFinderJsqlparserImpl implements CrudFinder {
 
     tablesNamesFinder.getTableList(expr).stream()
         .forEach(table -> tableCrud.put(table, CrudType.REFERENCE));
-
   }
 }

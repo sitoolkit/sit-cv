@@ -4,29 +4,26 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CrudFindResult {
-    /**
-     *  key:table
-     */
-    private Map<String, Set<CrudType>> map = new HashMap<>();
-    private String errMsg;
+  /** key:table */
+  private Map<String, Set<CrudType>> map = new HashMap<>();
 
-    public void put(String table, CrudType crud) {
-        Set<CrudType> cruds = map.computeIfAbsent(table, key -> new HashSet<>());
-        cruds.add(crud);
-    }
+  private String errMsg;
 
-    public boolean isError() {
-    	return StringUtils.isNotEmpty(errMsg);
-    }
+  public void put(String table, CrudType crud) {
+    Set<CrudType> cruds = map.computeIfAbsent(table, key -> new HashSet<>());
+    cruds.add(crud);
+  }
+
+  public boolean isError() {
+    return StringUtils.isNotEmpty(errMsg);
+  }
 }

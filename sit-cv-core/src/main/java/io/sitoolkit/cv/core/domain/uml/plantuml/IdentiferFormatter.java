@@ -2,13 +2,13 @@ package io.sitoolkit.cv.core.domain.uml.plantuml;
 
 public class IdentiferFormatter {
 
-    boolean showPackageName = false;
+  boolean showPackageName = false;
 
-    public String format(String identifer) {
-        return showPackageName ? identifer : hidePackageName(identifer);
-    }
+  public String format(String identifer) {
+    return showPackageName ? identifer : hidePackageName(identifer);
+  }
 
-    private String hidePackageName(String identifer) {
-        return identifer.replaceAll("[0-9A-za-z_]+\\.", "");
-    }
+  private String hidePackageName(String identifer) {
+    return identifer.replaceAll("[0-9A-za-z_]+\\.", "");
+  }
 }

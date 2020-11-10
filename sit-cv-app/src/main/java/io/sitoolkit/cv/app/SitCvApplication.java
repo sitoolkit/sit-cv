@@ -1,5 +1,8 @@
 package io.sitoolkit.cv.app;
 
+import io.sitoolkit.cv.app.infra.config.SitCvApplicationOption;
+import io.sitoolkit.cv.app.infra.utils.DesktopManager;
+import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.annotation.PostConstruct;
@@ -9,15 +12,11 @@ import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
-import io.sitoolkit.cv.app.infra.config.SitCvApplicationOption;
-import io.sitoolkit.cv.app.infra.utils.DesktopManager;
-import io.sitoolkit.cv.core.app.config.ServiceFactory;
 
 @SpringBootApplication
 public class SitCvApplication {
 
-  @Autowired
-  private ApplicationContext appCtx;
+  @Autowired private ApplicationContext appCtx;
 
   public static void main(String[] args) {
     ApplicationArguments appArgs = new DefaultApplicationArguments(args);
@@ -61,9 +60,8 @@ public class SitCvApplication {
   }
 
   /**
-   * Initialize the service before the screen is reloaded by LiveReload of
-   * spring-boot-devtools. The screen reload process is triggered when
-   * ContextRefreshedEvent is notified.
+   * Initialize the service before the screen is reloaded by LiveReload of spring-boot-devtools. The
+   * screen reload process is triggered when ContextRefreshedEvent is notified.
    *
    * @see org.springframework.boot.devtools.autoconfigure.LocalDevToolsAutoConfiguration
    */
@@ -71,5 +69,4 @@ public class SitCvApplication {
   public void initialize() {
     appCtx.getBean(ServiceFactory.class).initialize();
   }
-
 }

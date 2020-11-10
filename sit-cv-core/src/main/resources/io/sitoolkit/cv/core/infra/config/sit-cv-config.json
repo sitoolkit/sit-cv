@@ -28,5 +28,6 @@
   "sqlLogPattern": {
     "start": ".*org.hibernate.SQL.*",
     "end": "^[0-9]{4}-.*"
-  }
+  },
+  "showAccessor" : false
 }

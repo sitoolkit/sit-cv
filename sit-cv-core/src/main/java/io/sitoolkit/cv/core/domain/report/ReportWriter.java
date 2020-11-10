@@ -1,17 +1,15 @@
 package io.sitoolkit.cv.core.domain.report;
 
+import io.sitoolkit.cv.core.infra.util.JsonUtils;
+import io.sitoolkit.cv.core.infra.util.SitFileUtils;
+import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-
-import io.sitoolkit.cv.core.infra.util.JsonUtils;
-import io.sitoolkit.cv.core.infra.util.SitFileUtils;
-import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
 @Slf4j
 public class ReportWriter {
@@ -38,13 +36,16 @@ public class ReportWriter {
   }
 
   void writeReports(Path outputDirPath, List<Report<?>> reports) {
-    reports.stream().forEach((report) -> {
-      try {
-        writeToFile(outputDirPath.resolve(report.getPath()).toFile(), report2javascript(report));
-      } catch (Exception e) {
-        log.warn("Exception writing report: file '{}'", report.getPath(), e);
-      }
-    });
+    reports.stream()
+        .forEach(
+            (report) -> {
+              try {
+                writeToFile(
+                    outputDirPath.resolve(report.getPath()).toFile(), report2javascript(report));
+              } catch (Exception e) {
+                log.warn("Exception writing report: file '{}'", report.getPath(), e);
+              }
+            });
   }
 
   String report2javascript(Report<?> report) {
@@ -62,5 +63,4 @@ public class ReportWriter {
   File buildOutputDir(Path projectDir) {
     return new File(projectDir.toString(), OUTPUT_DIR);
   }
-
 }

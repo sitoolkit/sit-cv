@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -37,5 +36,4 @@ class ModifiedFiles {
 
     return Optional.of(result);
   }
-
 }

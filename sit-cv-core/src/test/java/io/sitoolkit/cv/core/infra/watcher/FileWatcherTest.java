@@ -11,13 +11,11 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Test;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class FileWatcherTest {
@@ -47,7 +45,6 @@ public class FileWatcherTest {
     Path newFile = Files.createTempFile(newDir, "new", "file");
 
     Awaitility.await().atMost(TIMEOUT).until(() -> watcher.isWatching(newFile));
-
   }
 
   @Test
@@ -67,7 +64,8 @@ public class FileWatcherTest {
 
     List<Path> newFiles = List.of(Files.createTempFile(baseDir, "new", "file"));
 
-    Awaitility.await().atMost(TIMEOUT)
+    Awaitility.await()
+        .atMost(TIMEOUT)
         .until(() -> newFiles.stream().allMatch(file -> listener.contains(file)));
 
     assertThat(listener.calledCount, is(1));
@@ -88,6 +86,5 @@ public class FileWatcherTest {
     boolean contains(Path file) {
       return this.files.contains(file.normalize().toAbsolutePath());
     }
-
   }
 }

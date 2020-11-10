@@ -9,7 +9,7 @@
       ></div>
 
     <template v-if="functionModelApiDoc">
-      <v-snackbar v-model="snackbar" :vertical="true">
+      <v-snackbar v-model="snackbar" :vertical="true" :timeout="0">
         <div class="subtitle-1">{{functionModelApiDoc.qualifiedClassName}}</div>
         <div class="subtitle-1" v-for="annotation in functionModelApiDoc.annotations">{{annotation}}</div>
         <div class="title">{{functionModelApiDoc.methodDeclaration}}</div>
@@ -63,6 +63,7 @@ export default class FunctionModel extends Vue {
     const _this = this;
 
     document.querySelectorAll('.diagram a').forEach((a) => {
+      a.removeAttribute("href")
       const methodSignature = a.getAttribute('xlink:title')!;
 
       DomUtils.addEventListenerOnce(a, 'click', (event) => {

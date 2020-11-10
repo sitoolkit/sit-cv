@@ -1,9 +1,8 @@
 package io.sitoolkit.cv.core.infra.config;
 
+import io.sitoolkit.cv.core.infra.watcher.FileWatcher;
 import java.nio.file.Path;
 import java.util.Optional;
-
-import io.sitoolkit.cv.core.infra.watcher.FileWatcher;
 
 public class CvConfigService {
 
@@ -26,16 +25,16 @@ public class CvConfigService {
 
       watcher.add(configFilePath);
 
-      watcher.addListener(modifiedFiles -> {
-        CvConfig modifiedConfig = reader.read(configFilePath);
-        config.update(modifiedConfig);
-        config.getEventListeners().stream().forEach(CvConfigEventListener::onModify);
-      });
+      watcher.addListener(
+          modifiedFiles -> {
+            CvConfig modifiedConfig = reader.read(configFilePath);
+            config.update(modifiedConfig);
+            config.getEventListeners().stream().forEach(CvConfigEventListener::onModify);
+          });
 
       watcher.start();
     }
 
     return config;
   }
-
 }

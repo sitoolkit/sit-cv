@@ -1,11 +1,10 @@
 package io.sitoolkit.cv.core.infra.config;
 
+import io.sitoolkit.cv.core.infra.util.JsonUtils;
+import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Optional;
-
-import io.sitoolkit.cv.core.infra.util.JsonUtils;
-import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
 
 public class CvConfigReader {
 
@@ -14,12 +13,11 @@ public class CvConfigReader {
   public CvConfig read(Path configFilePath) {
     CvConfig newConfig = JsonUtils.file2obj(configFilePath, CvConfig.class).orElseThrow();
 
-    if (newConfig.isOverride()) {
-      return newConfig;
+    if (!newConfig.isOverride()) {
+      newConfig = readDefaultConfig();
+      JsonUtils.merge(newConfig, configFilePath);
     }
-
-    return JsonUtils.merge(newConfig, getDefaultConfigURL());
-
+    return newConfig;
   }
 
   public Optional<Path> findConfigPath(Path baseDir) {
@@ -38,5 +36,4 @@ public class CvConfigReader {
   private URL getDefaultConfigURL() {
     return SitResourceUtils.getResourceUrl(CvConfig.class, CONFIG_FILE_NAME);
   }
-
 }

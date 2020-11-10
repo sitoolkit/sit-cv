@@ -1,12 +1,10 @@
 package io.sitoolkit.cv.core.infra.project;
 
-import java.nio.file.Path;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.sitoolkit.cv.core.infra.util.PackageUtils;
 import io.sitoolkit.cv.core.infra.util.SitResourceUtils;
+import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class SitCvToolsManager {
@@ -24,8 +22,9 @@ public class SitCvToolsManager {
   }
 
   static String resolveJarName(String javaVersion) {
-    return String.format("%s-%s-%s.jar", resolveArtifactId(javaVersion), PackageUtils.getVersion(),
-        "jar-with-dependencies");
+    return String.format(
+        "%s-%s-%s.jar",
+        resolveArtifactId(javaVersion), PackageUtils.getVersion(), "jar-with-dependencies");
   }
 
   static String resolveArtifactId(String javaVersion) {
