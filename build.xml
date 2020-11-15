@@ -60,13 +60,11 @@
   <target name="set-version">
 
     <exec executable="${mvn.cmd}" dir="${basedir}">
-      <arg value="-DnewVersion=${version}" />
-      <arg value="versions:set" />
+      <arg line="versions:set -DnewVersion=${version} -DgenerateBackupPoms=false" />
     </exec>
 
     <exec executable="${mvn.cmd}" dir="${basedir}/sample">
-      <arg value="-DnewVersion=${version}" />
-      <arg value="versions:set" />
+      <arg line="versions:set -DnewVersion=${version} -DgenerateBackupPoms=false" />
     </exec>
 
     <exec executable="${mvn.cmd}" dir="${basedir}/sit-cv-maven-plugin/src/test/projects/test-project-1">
