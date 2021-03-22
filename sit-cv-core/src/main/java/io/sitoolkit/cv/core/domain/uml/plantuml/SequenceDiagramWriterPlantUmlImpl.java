@@ -128,6 +128,10 @@ public class SequenceDiagramWriterPlantUmlImpl
     String note =
         messageDef.getExceptions().stream()
             .filter(StringUtils::isNotEmpty)
+            .map(x -> x
+                .replace("\r\n", "\\n")
+                .replace("\r", "\\n")
+                .replace("\n", "\\n"))
             .reduce((x1, x2) -> String.join("\\n", x1, x2))
             .orElse("");
     return note;
