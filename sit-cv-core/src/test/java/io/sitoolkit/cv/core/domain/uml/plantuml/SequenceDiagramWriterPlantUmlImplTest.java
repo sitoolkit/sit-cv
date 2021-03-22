@@ -50,10 +50,10 @@ public class SequenceDiagramWriterPlantUmlImplTest {
     public void allLineFeedsInException() {
 
         MessageDef messageDef = new MessageDef();
-        messageDef.setExceptions(Set.of("new Exception(\r\nlinefeed1,\nlinefeed2,\rlinefeed3)"));
+        messageDef.setExceptions(Set.of("new Exception(\r\ncrlf,\nlinefeed2,\rcarriageReturn)"));
 
         String builtComment = instance.buildExceptionComment(messageDef);
 
-        assertThat(builtComment, is("new Exception(\\nlinefeed1,\\nlinefeed2,\\nlinefeed3)"));
+        assertThat(builtComment, is("new Exception(\\ncrlf,\\nlinefeed2,\\ncarriageReturn)"));
     }
 }
