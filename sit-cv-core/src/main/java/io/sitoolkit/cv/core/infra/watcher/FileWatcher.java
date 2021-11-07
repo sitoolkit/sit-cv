@@ -125,6 +125,11 @@ public class FileWatcher {
 
   void pollWatchEvent() {
     WatchKey watchKey = null;
+
+    if (watchService == null) {
+      return;
+    }
+
     try {
       watchKey = watchService.take();
     } catch (InterruptedException e) {
