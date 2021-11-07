@@ -25,21 +25,21 @@ public class PackageUtils {
       Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
       doc.getDocumentElement().normalize();
 
-      String parentVersion =
+      String projectVersion =
           (String)
               XPathFactory.newInstance()
                   .newXPath()
-                  .compile("/project/parent/version")
+                  .compile("/project/version")
                   .evaluate(doc, XPathConstants.STRING);
 
-      if (StringUtils.isNotEmpty(parentVersion)) {
-        return parentVersion;
+      if (StringUtils.isNotEmpty(projectVersion)) {
+        return projectVersion;
       }
 
       return (String)
           XPathFactory.newInstance()
               .newXPath()
-              .compile("/project/version")
+              .compile("/project/parent/version")
               .evaluate(doc, XPathConstants.STRING);
     } catch (Exception e) {
       throw new RuntimeException("Get version from pom.xml failed");
