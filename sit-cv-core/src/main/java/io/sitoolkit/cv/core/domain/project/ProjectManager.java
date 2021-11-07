@@ -11,8 +11,10 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectManager {
 
   @NonNull private List<ProjectReader> readers;
@@ -30,18 +32,18 @@ public class ProjectManager {
             .map(Optional::get)
             .findFirst();
 
-    if (project.isPresent()) {
-      currentProject = project.get();
-      currentProject
-          .getAllProjects()
-          .forEach(
-              proj -> {
-                DelombokProcessor.of(proj).ifPresent(proj::setPreProcessor);
-              });
+    currentProject =
+        project.orElseThrow(
+            () -> new IllegalArgumentException("Project is not supported " + projectDir));
 
-    } else {
-      throw new IllegalArgumentException("Project is not supported " + projectDir);
-    }
+    log.info("Loaded project: {}", currentProject);
+
+    currentProject
+        .getAllProjects()
+        .forEach(
+            proj -> {
+              DelombokProcessor.of(proj).ifPresent(proj::setPreProcessor);
+            });
   }
 
   public Optional<List<SqlPerMethod>> getSqlLog() {

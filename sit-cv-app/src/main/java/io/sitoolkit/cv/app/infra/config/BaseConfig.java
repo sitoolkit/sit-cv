@@ -5,7 +5,6 @@ import io.sitoolkit.cv.core.app.crud.CrudService;
 import io.sitoolkit.cv.core.app.designdoc.DesignDocService;
 import io.sitoolkit.cv.core.app.functionmodel.FunctionModelService;
 import io.sitoolkit.cv.core.domain.project.ProjectManager;
-import java.nio.file.Paths;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,7 @@ public class BaseConfig {
 
   @Bean
   public ServiceFactory serviceFactory(ApplicationConfig appilcationConfig) {
-    return ServiceFactory.create(Paths.get(appilcationConfig.getProject()), true);
+    return ServiceFactory.create(appilcationConfig.getProjectDir(), true);
   }
 
   @Bean

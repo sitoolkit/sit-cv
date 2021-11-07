@@ -4,7 +4,6 @@ import io.sitoolkit.cv.app.infra.config.SitCvApplicationOption;
 import io.sitoolkit.cv.app.infra.utils.DesktopManager;
 import io.sitoolkit.cv.core.app.config.ServiceFactory;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -34,7 +33,7 @@ public class SitCvApplication {
 
   private static Path getProjectDir(ApplicationArguments appArgs) {
     String projectPath = SitCvApplicationOption.PROJECT.getValue(appArgs, ".");
-    return Paths.get(projectPath);
+    return Path.of(projectPath).toAbsolutePath().normalize();
   }
 
   private static void executeReportMode(ApplicationArguments appArgs) {

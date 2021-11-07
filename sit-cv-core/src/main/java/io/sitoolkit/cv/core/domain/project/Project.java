@@ -2,7 +2,6 @@ package io.sitoolkit.cv.core.domain.project;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -116,7 +115,15 @@ public class Project {
     }
   }
 
-  public static void main(String[] args) {
-    System.out.println(Paths.get(".").resolve("doesnotexist"));
+  @Override
+  public String toString() {
+    return "dir: "
+        + dir
+        + ", javaVersion:"
+        + javaVersion
+        + ", sourceEncoding: "
+        + sourceEncoding
+        + ", subProjects: "
+        + subProjects.stream().map(Project::toString).collect(Collectors.joining(",", "[", "]"));
   }
 }
