@@ -27,7 +27,7 @@ public class MavenProjectReader implements ProjectReader {
 
     MavenProjectInfoListener listener = new MavenProjectInfoListener(projectDir);
 
-    mvnPrj.mvnw("compile", "-X").stdout(listener).execute();
+    mvnPrj.mvnw("compile", "-X", "-B").stdout(listener).execute();
 
     return Optional.of(listener.getProject());
   }
