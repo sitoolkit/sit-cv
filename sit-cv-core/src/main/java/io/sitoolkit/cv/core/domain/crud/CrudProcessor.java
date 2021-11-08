@@ -55,6 +55,8 @@ public class CrudProcessor {
 
     CrudMatrix result = new CrudMatrix();
 
+    result.setErrorMap(repositoryMethodMatrix.getErrorMap());
+
     Stream<MethodDef> entryPointMethods =
         entryPoints.stream().map(ClassDef::getMethods).flatMap(List::stream);
 
