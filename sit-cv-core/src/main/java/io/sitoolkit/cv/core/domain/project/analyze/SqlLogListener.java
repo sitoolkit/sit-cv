@@ -31,7 +31,7 @@ public class SqlLogListener implements StdoutListener {
   @Override
   public void nextLine(String line) {
 
-    System.out.println(line);
+    log.debug(line);
 
     boolean isMarkerLine = MARKER_PATTERN.matcher(line).matches();
 
