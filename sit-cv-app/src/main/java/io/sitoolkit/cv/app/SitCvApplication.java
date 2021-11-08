@@ -20,7 +20,8 @@ public class SitCvApplication {
   public static void main(String[] args) {
     ApplicationArguments appArgs = new DefaultApplicationArguments(args);
 
-    if (appArgs.containsOption(SitCvApplicationOption.ANALYZE_SQL.getKey())) {
+    if (appArgs.containsOption(SitCvApplicationOption.ANALYZE_SQL.getKey())
+        && !"restartedMain".equals(Thread.currentThread().getName())) {
       executeAnalyzeSqlMode(appArgs);
     }
 
