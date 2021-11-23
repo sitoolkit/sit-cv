@@ -7,8 +7,8 @@ import io.sitoolkit.cv.core.infra.config.CvConfig;
 import io.sitoolkit.cv.core.infra.config.LifelineClasses;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class ClassDefRepositoryMemImplTest {
 
@@ -16,7 +16,7 @@ public class ClassDefRepositoryMemImplTest {
 
   static ClassDefRepository repository;
 
-  @BeforeClass
+  @BeforeAll
   public static void init() {
     config = new CvConfig();
     repository = new ClassDefRepositoryMemImpl(config);

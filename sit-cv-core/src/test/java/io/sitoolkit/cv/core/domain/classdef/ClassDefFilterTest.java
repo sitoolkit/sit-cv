@@ -7,7 +7,7 @@ import io.sitoolkit.cv.core.infra.config.FilterCondition;
 import io.sitoolkit.cv.core.infra.config.FilterConditionGroup;
 import io.sitoolkit.cv.core.infra.util.JsonUtils;
 import java.util.Arrays;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ClassDefFilterTest {
 

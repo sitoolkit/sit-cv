@@ -1,14 +1,14 @@
 package io.sitoolkit.cv.core.domain.crud.jsqlparser;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import io.sitoolkit.cv.core.domain.crud.CrudFindResult;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CrudFinderJsqlparserImplTest {
 

@@ -1,7 +1,7 @@
 package io.sitoolkit.cv.core.infra.watcher;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,8 +14,8 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.awaitility.Awaitility;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 @Slf4j
 public class FileWatcherTest {
@@ -24,7 +24,7 @@ public class FileWatcherTest {
   Path baseDir;
   Duration TIMEOUT = Duration.ofMillis(5000);
 
-  @Before
+  @BeforeEach
   public void setup() {
     baseDir = Paths.get("target", "filewatcher", RandomStringUtils.randomAlphabetic(5));
     baseDir.toFile().mkdirs();

@@ -1,7 +1,7 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import com.github.javaparser.ast.CompilationUnit;
 import io.sitoolkit.cv.core.domain.classdef.CatchStatement;
@@ -13,8 +13,8 @@ import io.sitoolkit.cv.core.domain.classdef.TryStatement;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class StatementVisitorTryTest extends StatementVisitorTest {
 
@@ -22,7 +22,7 @@ public class StatementVisitorTryTest extends StatementVisitorTest {
 
   static CompilationUnit repositoryCompilationUnit;
 
-  @BeforeClass
+  @BeforeAll
   public static void init() throws IOException {
     compilationUnit = parseFile("src/main/java/a/b/c/TryController.java");
     repositoryCompilationUnit = parseFile("src/main/java/a/b/c/ARepositoryFileImpl.java");
@@ -30,7 +30,7 @@ public class StatementVisitorTryTest extends StatementVisitorTest {
 
   @Test
   public void tryStatement() throws IOException {
-    MethodDef result = getVisitResult(testName.getMethodName());
+    MethodDef result = getVisitResult(getTestMethodName());
 
     List<CvStatement> tryStatements =
         result.getStatements().stream()
@@ -68,7 +68,7 @@ public class StatementVisitorTryTest extends StatementVisitorTest {
 
   @Test
   public void nestedTryStatement() throws IOException {
-    MethodDef result = getVisitResult(testName.getMethodName());
+    MethodDef result = getVisitResult(getTestMethodName());
 
     List<CvStatement> tryStatements =
         result.getStatements().stream()

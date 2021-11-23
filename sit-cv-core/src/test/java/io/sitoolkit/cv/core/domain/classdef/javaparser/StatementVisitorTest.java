@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 
 public class StatementVisitorTest {
 
@@ -18,9 +18,20 @@ public class StatementVisitorTest {
 
   static StatementVisitor statementVisitor;
 
-  @Rule public TestName testName = new TestName();
+  // @Rule public TestName testName = new TestName();
 
-  @BeforeClass
+  private TestInfo testInfo;
+
+  @BeforeEach
+  void init(TestInfo testInfo) {
+    this.testInfo = testInfo;
+  }
+
+  protected String getTestMethodName() {
+    return testInfo.getDisplayName().replace("()", "");
+  }
+
+  @BeforeAll
   public static void initVisitor() throws IOException {
     projectDir = Paths.get("../sample");
     Path srcDir = projectDir.resolve("src/main/java");

@@ -11,8 +11,8 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 import org.awaitility.Awaitility;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CvConfigServiceTest {
 
@@ -22,7 +22,7 @@ public class CvConfigServiceTest {
 
   Path overrideConfigFile;
 
-  @Before
+  @BeforeEach
   public void init() throws URISyntaxException {
     service = new CvConfigService();
 

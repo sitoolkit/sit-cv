@@ -1,13 +1,12 @@
 package a.b.c.app;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import a.b.c.domain.User;
 import a.b.c.domain.UserRepository;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +20,7 @@ public class UserServiceTest {
 
   UserService userService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     userService = new UserService(userRepository);
   }

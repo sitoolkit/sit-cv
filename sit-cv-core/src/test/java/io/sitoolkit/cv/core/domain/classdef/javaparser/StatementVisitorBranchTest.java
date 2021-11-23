@@ -1,7 +1,7 @@
 package io.sitoolkit.cv.core.domain.classdef.javaparser;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import com.github.javaparser.ast.CompilationUnit;
 import io.sitoolkit.cv.core.domain.classdef.BranchStatement;
@@ -12,21 +12,21 @@ import io.sitoolkit.cv.core.domain.classdef.MethodDef;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class StatementVisitorBranchTest extends StatementVisitorTest {
 
   static CompilationUnit compilationUnit;
 
-  @BeforeClass
+  @BeforeAll
   public static void init() throws IOException {
     compilationUnit = parseFile("src/main/java/a/b/c/BranchController.java");
   }
 
   @Test
   public void ifStatement() throws IOException {
-    MethodDef result = getVisitResult(testName.getMethodName());
+    MethodDef result = getVisitResult(getTestMethodName());
 
     List<CvStatement> branchStatements =
         result.getStatements().stream()
@@ -51,7 +51,7 @@ public class StatementVisitorBranchTest extends StatementVisitorTest {
 
   @Test
   public void nestedIfStatement() throws IOException {
-    MethodDef result = getVisitResult(testName.getMethodName());
+    MethodDef result = getVisitResult(getTestMethodName());
 
     List<ConditionalStatement> conditionalStatements =
         result.getStatements().stream()
@@ -80,7 +80,7 @@ public class StatementVisitorBranchTest extends StatementVisitorTest {
 
   @Test
   public void omittedIfStatement() throws IOException {
-    MethodDef result = getVisitResult(testName.getMethodName());
+    MethodDef result = getVisitResult(getTestMethodName());
 
     List<CvStatement> branchStatements =
         result.getStatements().stream()

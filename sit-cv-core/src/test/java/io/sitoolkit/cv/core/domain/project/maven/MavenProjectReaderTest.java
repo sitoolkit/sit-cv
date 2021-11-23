@@ -1,14 +1,14 @@
 package io.sitoolkit.cv.core.domain.project.maven;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
 
 import io.sitoolkit.cv.core.domain.project.Project;
 import io.sitoolkit.cv.core.domain.project.analyze.SqlLogProcessor;
 import java.lang.Runtime.Version;
 import java.nio.file.Paths;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MavenProjectReaderTest {
 

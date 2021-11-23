@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.apache.commons.io.FileUtils;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class ReportTaskTest {
