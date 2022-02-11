@@ -126,9 +126,6 @@
     <developerConnection>scm:git:git//github.com/sitoolkit/sit-cv.git</developerConnection>
     <url>https://github.com/sitoolkit/sit-wt-cv.git</url>
   </scm>
-  <prerequisites>
-    <maven>3.0</maven>
-  </prerequisites>
   <distributionManagement>
     <snapshotRepository>
       <id>sonatype-nexus-snapshots</id>
