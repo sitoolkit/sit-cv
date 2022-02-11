@@ -23,7 +23,7 @@ public class GradleProjectReaderTest {
   @Test
   public void testMultiProject() {
     Project project =
-        reader.read(Paths.get("../test-project/gradle-multi").toAbsolutePath().normalize()).get();
+        reader.read(Paths.get("../test-projects/gradle-multi").toAbsolutePath().normalize()).get();
 
     assertThat(
         project.getAllSrcDirs(),
