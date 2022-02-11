@@ -24,6 +24,7 @@ public class MavenProjectReaderTest {
         containsInAnyOrder(
             project.getDir().resolve("sit-cv-app/src/main/java"),
             project.getDir().resolve("sit-cv-core/src/main/java"),
+            project.getDir().resolve("sit-cv-docs/src/main/java"),
             project.getDir().resolve("sit-cv-maven-plugin/src/main/java"),
             project.getDir().resolve("sit-cv-maven-plugin/target/generated-sources/plugin"),
             project.getDir().resolve("sit-cv-tools/src/main/java")));
