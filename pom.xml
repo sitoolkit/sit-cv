@@ -56,6 +56,7 @@
     <module>sit-cv-tools</module>
     <module>sit-cv-app</module>
     <module>sit-cv-core</module>
+    <module>sit-cv-docs</module>
     <module>sit-cv-maven-plugin</module>
   </modules>
 
