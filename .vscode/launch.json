@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-SitCvApplication<sit-cv-app>",
+      "request": "launch",
+      "cwd": "${cwd}",
+      "console": "internalConsole",
+      "mainClass": "io.sitoolkit.cv.app.SitCvApplication",
+      "projectName": "sit-cv-app",
+      "args": "--cv.open=false"
+    }
+  ]
+}
