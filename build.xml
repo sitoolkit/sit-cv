@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:if="ant:if"
-  xmlns:unless="ant:unless" name="sit-cv" basedir="." default="deploy">
+<project xmlns:if="ant:if" xmlns:unless="ant:unless" name="sit-cv" basedir="." default="deploy">
 
-  <property name="version" value="1.1.0" />
+  <property name="version" value="1.1.1" />
 
   <condition property="isSnapshotVersion">
-    <matches pattern=".*-SNAPSHOT" string="${version}"/>
+    <matches pattern=".*-SNAPSHOT" string="${version}" />
   </condition>
 
   <condition property="os.windows" value="true" else="false">
@@ -23,7 +22,7 @@
   <target name="deploy">
     <antcall target="analyze" />
     <antcall target="deploy-maven" />
-    <antcall target="deploy-gradle"/>
+    <antcall target="deploy-gradle" />
   </target>
 
   <target name="analyze">
