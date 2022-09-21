@@ -20,7 +20,7 @@
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.1.0",
     "vue-router": "^3.0.3",
-    "vuetify": "^2.1.6",
+    "vuetify": "^2.6.10",
     "webstomp-client": "^1.2.6"
   },
   "devDependencies": {
